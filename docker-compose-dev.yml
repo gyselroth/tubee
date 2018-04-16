@@ -14,6 +14,8 @@ moodle-endpoint:
     image: jhardison/moodle:latest
     links:
         - moodle-db
+    environment:
+        - MOODLE_URL=http://localhost:8080
 moodle-db:
     image: mysql:latest
     environment:
@@ -34,10 +36,10 @@ tubee-dev:
         - .:/srv/www/tubee
     links:
         - mongodb
-        - openldap-endpoint
-        - mongodb-endpoint
-        - balloon-endpoint
-        - moodle-endpoint
+        #- openldap-endpoint
+        #- mongodb-endpoint
+        #- balloon-endpoint
+        #- moodle-endpoint
     entrypoint: sleep infinity
     environment:
         - TUBEE_MONGODB_URI=mongodb://mongodb:27017
