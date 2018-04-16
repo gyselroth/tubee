@@ -256,7 +256,7 @@ class Ldap extends AbstractEndpoint
             }
         }
 
-        if(!empty($request)) {
+        if (!empty($request)) {
             $filter = '(&('.$filter.')('.$request.'))';
         }
 

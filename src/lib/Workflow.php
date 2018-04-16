@@ -223,17 +223,19 @@ class Workflow implements WorkflowInterface
         $exists = $this->getImportObject($datatype, $map, $ts);
         $object_ts = new UTCDateTime();
 
-        if($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS) {
+        if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS) {
             return false;
         }
 
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
                 $datatype->delete($exists->getId(), $simulate);
+
                 return true;
             break;
             case WorkflowInterface::ENSURE_DISABLED:
                 $datatype->disable($exists->getId(), $simulate);
+
                 return true;
             break;
             case WorkflowInterface::ENSURE_EXISTS:
@@ -244,6 +246,7 @@ class Workflow implements WorkflowInterface
                 ];
 
                 $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+
                 return true;
             break;
             case WorkflowInterface::ENSURE_LAST:
@@ -252,6 +255,7 @@ class Workflow implements WorkflowInterface
                 $endoints = [];
                 $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = $object_ts;
                 $datatype->change($exists, $object, $simulate, $endpoints);
+
                 return true;
             break;
             default:
@@ -279,7 +283,7 @@ class Workflow implements WorkflowInterface
 
         $exists = $this->getExportObject($map);
 
-        if($exists === false && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== false && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
+        if ($exists === false && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== false && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
         }
 
@@ -290,6 +294,7 @@ class Workflow implements WorkflowInterface
                 ]);
 
                 $this->endpoint->delete($this->attribute_map, $map, $exists, $simulate);
+
                 return true;
             break;
             case WorkflowInterface::ENSURE_EXISTS:
@@ -307,6 +312,7 @@ class Workflow implements WorkflowInterface
                 }
 
                 $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
+
                 return true;
             break;
             case WorkflowInterface::ENSURE_LAST:
@@ -441,7 +447,7 @@ class Workflow implements WorkflowInterface
     }
 
     /**
-     * Map
+     * Map.
      */
     protected function map(Iterable $object, Iterable $mongodb_object, UTCDateTime $ts): Iterable
     {
