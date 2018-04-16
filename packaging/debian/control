@@ -1,0 +1,6 @@
+Package: datamanager
+Version: {version}
+Architecture: all
+Maintainer: Raffael Sahli <sahli@gyselroth.com>
+Homepage: https://github.com/gyselroth
+Description: Datamanager

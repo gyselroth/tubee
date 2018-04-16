@@ -1,0 +1,15 @@
+[Unit]
+Description=Datamanager
+After=network.target
+
+[Service]
+ExecStart=php src/cgi-bin/cli.php  -v -r
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=process
+Restart=on-failure
+RestartPreventExitStatus=255
+Type=notify
+
+[Install]
+WantedBy=multi-user.target
+Alias=datamanager.service
