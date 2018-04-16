@@ -36,10 +36,9 @@ tubee-dev:
         - .:/srv/www/tubee
     links:
         - mongodb
-        #- openldap-endpoint
-        #- mongodb-endpoint
-        #- balloon-endpoint
-        #- moodle-endpoint
+        - openldap-endpoint
+        - balloon-endpoint
+        - moodle-endpoint
     entrypoint: sleep infinity
     environment:
         - TUBEE_MONGODB_URI=mongodb://mongodb:27017
