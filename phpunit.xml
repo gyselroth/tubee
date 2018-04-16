@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit backupGlobals="false"
+         backupStaticAttributes="false"
+         bootstrap="vendor/autoload.php"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         colors="true">
+    <logging>
+        <log type="coverage-clover"
+             target="./build/coverage.xml"/>
+    </logging>
+    <filter>
+        <blacklist>
+            <file>./src/.container.config.php</file>
+            <file>./src/cgi-bin/cli.php</file>
+            <file>./src/httpdocs/index.php</file>
+        </blacklist>
+        <whitelist processUncoveredFilesFromWhitelist="false">
+            <directory suffix=".php">./src/</directory>
+        </whitelist>
+    </filter>
+    <testsuites>
+        <testsuite name="Package Test Suite">
+            <directory suffix=".php">./tests/</directory>
+        </testsuite>
+    </testsuites>
+</phpunit>

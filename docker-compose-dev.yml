@@ -1,0 +1,43 @@
+mongodb:
+    image: mongo:3.6.0
+openldap-endpoint:
+    image: osixia/openldap:latest
+mongodb-endpoint:
+    image: mongo:3.6.0
+mariadb-endpoint:
+    image: mariadb
+    environment:
+        - MYSQL_DATABASE=admin
+        - MYSQL_ROOT_PASSWORD=admin
+        - MYSQL_USER=admin
+moodle-endpoint:
+    image: jhardison/moodle:latest
+    links:
+        - moodle-db
+moodle-db:
+    image: mysql:latest
+    environment:
+        - MYSQL_DATABASE=moodle
+        - MYSQL_ROOT_PASSWORD=moodle
+        - MYSQL_USER=moodle
+balloon-endpoint:
+    image: gyselroth/balloon:latest-unstable
+    links:
+        - mongodb
+    entrypoint: php-fpm
+    environment:
+        - BALLOON_MONGODB_URI=mongodb://mongodb:27017
+        - BALLOON_URL=http://localhost:8080
+tubee-dev:
+    image: tubee:latest
+    volumes:
+        - .:/srv/www/tubee
+    links:
+        - mongodb
+        - openldap-endpoint
+        - mongodb-endpoint
+        - balloon-endpoint
+        - moodle-endpoint
+    entrypoint: sleep infinity
+    environment:
+        - TUBEE_MONGODB_URI=mongodb://mongodb:27017

@@ -1,0 +1,9 @@
+scripts
+vendor
+doc
+build
+config
+dist
+data
+composer.lock
+.php_cs.cache
