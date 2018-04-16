@@ -138,6 +138,14 @@ class Objects extends AbstractObjects
      */
     public function enable(): Objects
     {
+        foreach ($this->manager->getMandators($this->getMandatorsList()) as $mandator) {
+            foreach ($mandator->getDataTypes($this->getDataTypesList()) as $datatype) {
+                foreach ($datatype->getAll($this->getFilter(), false) as $object) {
+                    $datatype->enable($object->getId(), $this->isSimulate());
+                }
+            }
+        }
+
         return $this;
     }
 
@@ -146,6 +154,14 @@ class Objects extends AbstractObjects
      */
     public function disable(): Objects
     {
+        foreach ($this->manager->getMandators($this->getMandatorsList()) as $mandator) {
+            foreach ($mandator->getDataTypes($this->getDataTypesList()) as $datatype) {
+                foreach ($datatype->getAll($this->getFilter(), false) as $object) {
+                    $datatype->disable($object->getId(), $this->isSimulate());
+                }
+            }
+        }
+
         return $this;
     }
 

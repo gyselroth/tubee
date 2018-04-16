@@ -341,7 +341,7 @@ class Xml extends AbstractFile
         $xpath = new \DOMXPath($xml['dom']);
         $node = $xpath->query($filter);
         $node = $node[0];
-        $xml['dom']->removeChild($node);
+        $xml['xml_root']->removeChild($node);
         return true;
     }
 
@@ -352,6 +352,11 @@ class Xml extends AbstractFile
     {
         foreach ($this->resource as $xml) {
             $filter = $this->getFilterOne($object);
+
+            $this->logger->debug('find xml node with xpath ['.$filter.'] in ['.$xml['path'].'] on endpoint ['.$this->getIdentifier().']', [
+                'category' => get_class($this),
+            ]);
+
             $elements = [];
             if (isset($xml['xml_element'])) {
                 $elements = $xml['xml_element']->xpath($filter);

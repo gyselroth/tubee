@@ -143,11 +143,10 @@ interface DataTypeInterface
      *
      * @param ObjectId $id
      * @param bool     $simulate
-     * @param array    $endpoints
      *
      * @return bool
      */
-    public function enable(ObjectId $id, bool $simulate = false, array $endpoints = []): bool;
+    public function enable(ObjectId $id, bool $simulate = false): bool;
 
     /**
      * Disable object.
@@ -158,7 +157,7 @@ interface DataTypeInterface
      *
      * @return bool
      */
-    public function disable(ObjectId $id, bool $simulate = false, array $endpoints = []): bool;
+    public function disable(ObjectId $id, bool $simulate = false): bool;
 
     /**
      * Change object.

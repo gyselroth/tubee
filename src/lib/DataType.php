@@ -335,16 +335,36 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function enable(ObjectId $id, bool $simulate = false, array $endpoints = []): bool
+    public function enable(ObjectId $id, bool $simulate = false): bool
     {
+        $this->logger->info('enable object ['.$id.'] in ['.$this->collection.']', [
+            'category' => get_class($this),
+        ]);
+
+        $query = ['$unset' => ['deleted' => true]];
+
+        if ($simulate === false) {
+            $this->db->{$this->collection}->updateOne(['_id' => $id], $query);
+        }
+
         return true;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function disable(ObjectId $id, bool $simulate = false, array $endpoints = []): bool
+    public function disable(ObjectId $id, bool $simulate = false): bool
     {
+        $this->logger->info('disable object ['.$id.'] in ['.$this->collection.']', [
+            'category' => get_class($this),
+        ]);
+
+        $query = ['$set' => ['deleted' => new UTCDateTime()]];
+
+        if ($simulate === false) {
+            $this->db->{$this->collection}->updateOne(['_id' => $id], $query);
+        }
+
         return true;
     }
 
