@@ -223,46 +223,36 @@ class Workflow implements WorkflowInterface
         $exists = $this->getImportObject($datatype, $map, $ts);
         $object_ts = new UTCDateTime();
 
+        if($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS) {
+            return false;
+        }
+
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                if ($exists !== null) {
-                    $datatype->delete($exists->getId(), $simulate);
-                }
-
+                $datatype->delete($exists->getId(), $simulate);
                 return true;
             break;
             case WorkflowInterface::ENSURE_DISABLED:
-                if ($exists !== null) {
-                    $datatype->disable($exists->getId(), $simulate);
-                }
-
+                $datatype->disable($exists->getId(), $simulate);
                 return true;
             break;
             case WorkflowInterface::ENSURE_EXISTS:
-                if ($exists === null) {
-                    $endpoints = [
-                        $this->endpoint->getName() => [
-                            'last_sync' => $object_ts,
-                        ],
-                    ];
+                $endpoints = [
+                    $this->endpoint->getName() => [
+                        'last_sync' => $object_ts,
+                    ],
+                ];
 
-                    $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
-
-                    return true;
-                }
-
+                $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                return true;
             break;
             case WorkflowInterface::ENSURE_LAST:
-                if ($exists !== null) {
-                    $object = $this->map($map, $exists->getData(), $object_ts);
+                $object = $this->map($map, $exists->getData(), $object_ts);
 
-                    $endoints = [];
-                    $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = $object_ts;
-                    $datatype->change($exists, $object, $simulate, $endpoints);
-
-                    return true;
-                }
-
+                $endoints = [];
+                $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = $object_ts;
+                $datatype->change($exists, $object, $simulate, $endpoints);
+                return true;
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, disabled, exists or last is allowed');
@@ -289,71 +279,65 @@ class Workflow implements WorkflowInterface
 
         $exists = $this->getExportObject($map);
 
+        if($exists === false && $this->ensure !== WorkflowInterface::ENSURE_EXISTS) {
+            return false;
+        }
+
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                if ($exists !== false) {
-                    $this->logger->info('delete existing object from endpoint ['.$this->endpoint->getName().']', [
-                        'category' => get_class($this),
-                    ]);
+                $this->logger->info('delete existing object from endpoint ['.$this->endpoint->getName().']', [
+                    'category' => get_class($this),
+                ]);
 
-                    $this->endpoint->delete($this->attribute_map, $map, $exists, $simulate);
-                }
-
+                $this->endpoint->delete($this->attribute_map, $map, $exists, $simulate);
                 return true;
             break;
             case WorkflowInterface::ENSURE_EXISTS:
-                if ($exists === false) {
-                    $this->logger->info('create new object on endpoint ['.$this->endpoint->getName().']', [
-                        'category' => get_class($this),
-                    ]);
+                $this->logger->info('create new object on endpoint ['.$this->endpoint->getName().']', [
+                    'category' => get_class($this),
+                ]);
 
-                    $result = $this->endpoint->create($this->attribute_map, $map, $simulate);
+                $result = $this->endpoint->create($this->attribute_map, $map, $simulate);
 
-                    $endpoints = [];
-                    $endpoints['endpoints.'.$this->endpoint->getName()]['last_sync'] = new UTCDateTime();
+                $endpoints = [];
+                $endpoints['endpoints.'.$this->endpoint->getName()]['last_sync'] = new UTCDateTime();
 
-                    if ($result !== null) {
-                        $endpoints['endpoints.'.$this->endpoint->getName()]['id'] = $result;
-                    }
-
-                    $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
-
-                    return true;
+                if ($result !== null) {
+                    $endpoints['endpoints.'.$this->endpoint->getName()]['id'] = $result;
                 }
 
+                $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
+                return true;
             break;
             case WorkflowInterface::ENSURE_LAST:
-                if ($exists !== false) {
-                    $this->logger->info('change object on endpoint ['.$this->endpoint->getName().']', [
+                $this->logger->info('change object on endpoint ['.$this->endpoint->getName().']', [
+                    'category' => get_class($this),
+                ]);
+
+                $diff = $this->attribute_map->getDiff($map, $exists);
+                $endpoints = [];
+                if (count($diff) > 0) {
+                    $this->logger->info('update object on endpoint ['.$this->endpoint->getIdentifier().'] with attributes [{attributes}]', [
                         'category' => get_class($this),
+                        'attributes' => $diff,
                     ]);
 
-                    $diff = $this->attribute_map->getDiff($map, $exists);
-                    $endpoints = [];
-                    if (count($diff) > 0) {
-                        $this->logger->info('update object on endpoint ['.$this->endpoint->getIdentifier().'] with attributes [{attributes}]', [
-                            'category' => get_class($this),
-                            'attributes' => $diff,
-                        ]);
+                    $diff = $this->endpoint->getDiff($this->attribute_map, $diff);
+                    $result = $this->endpoint->change($this->attribute_map, $diff, $map, $exists, $simulate);
 
-                        $diff = $this->endpoint->getDiff($this->attribute_map, $diff);
-                        $result = $this->endpoint->change($this->attribute_map, $diff, $map, $exists, $simulate);
-
-                        if ($result !== null) {
-                            $endpoints['endpoints.'.$this->endpoint->getName().'.id'] = $result;
-                        }
-                    } else {
-                        $this->logger->debug('no update required for object on endpoint ['.$this->endpoint->getIdentifier().']', [
-                            'category' => get_class($this),
-                        ]);
+                    if ($result !== null) {
+                        $endpoints['endpoints.'.$this->endpoint->getName().'.id'] = $result;
                     }
-
-                    $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
-                    $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
-
-                    return true;
+                } else {
+                    $this->logger->debug('no update required for object on endpoint ['.$this->endpoint->getIdentifier().']', [
+                        'category' => get_class($this),
+                    ]);
                 }
 
+                $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
+                $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
+
+                return true;
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, exists or last is allowed');
@@ -456,12 +440,13 @@ class Workflow implements WorkflowInterface
         return $exists;
     }
 
+    /**
+     * Map
+     */
     protected function map(Iterable $object, Iterable $mongodb_object, UTCDateTime $ts): Iterable
     {
         $object = Helper::associativeArrayToPath($object);
         $mongodb_object = Helper::associativeArrayToPath($mongodb_object);
-        /*$operation = [];
-        $history = [];*/
 
         foreach ($this->attribute_map->getMap() as $attr => $value) {
             if (!isset($value['ensure'])) {
@@ -473,123 +458,12 @@ class Workflow implements WorkflowInterface
                 continue;
             }
             if (($value['ensure'] === WorkflowInterface::ENSURE_LAST || $value['ensure'] === WorkflowInterface::ENSURE_EXISTS) && isset($object[$attr])) {
-                /*if ($exists && is_array($object[$attr]) && is_array($mongodb_object[$attr]) && Helper::arrayEqual($mongodb_object[$attr], $object[$attr])) {
-                    continue;
-                }
-                if ($exists && (!is_object($object[$attr]) && $object[$attr] === $mongodb_object[$attr] ||
-                is_object($object[$attr]) && $object[$attr] == $mongodb_object[$attr])) {
-                    continue;
-                }*/
-
-                /*if (($value['history'] && $value['history'] === true) || ($this->endpoint->getHistory() && $value['history'] === true)) {
-                    if (isset($mongodb_object[$attr], $object[$attr])) {
-                        $history[] = [
-                            'field' => $attr,
-                            'from' => $mongodb_object[$attr],
-                            'to' => $object[$attr],
-                            'action' => 'update',
-                        ];
-                    } elseif (!isset($mongodb_object[$attr]) && isset($object[$attr])) {
-                        $history[] = [
-                            'field' => $attr,
-                            'to' => $object[$attr],
-                            'action' => 'add',
-                        ];
-                    }
-                }*/
-
                 $mongodb_object[$attr] = $object[$attr];
             } elseif ($value['ensure'] === WorkflowInterface::ENSURE_ABSENT && isset($mongodb_object[$attr]) || !isset($object[$attr]) && isset($mongodb_object[$attr])) {
-                /*$history[] = [
-                    'field' => $attr,
-                    'from' => $mongodb_object[$attr],
-                    'action' => 'delete',
-                ];*/
-
                 unset($mongodb_object[$attr]);
             }
         }
 
-        /*if (!empty($history)) {
-            $operation['$addToSet']['history'] = [
-                'timestamp' => $ts,
-                'attributes' => $history,
-            ];
-        }*/
-
         return $mongodb_object;
-    }
-
-    /**
-     * Prepare object.
-     *
-     * @param iterable    $object
-     * @param iterable    $mongodb_object
-     * @param UTCDateTime $ts
-     *
-     * @return iterable
-     */
-    protected function getMongoDBOperation(Iterable $object, Iterable $mongodb_object, UTCDateTime $ts): Iterable
-    {
-        $object = Helper::associativeArrayToPath($object);
-        $mongodb_object = Helper::associativeArrayToPath($mongodb_object);
-        $operation = [];
-        $history = [];
-
-        foreach ($this->attribute_map->getMap() as $attr => $value) {
-            if (!isset($value['ensure'])) {
-                continue;
-            }
-
-            $exists = isset($mongodb_object[$attr]);
-            if ($value['ensure'] === WorkflowInterface::ENSURE_EXISTS && $exists === true) {
-                continue;
-            }
-            if (($value['ensure'] === WorkflowInterface::ENSURE_LAST || $value['ensure'] === WorkflowInterface::ENSURE_EXISTS) && isset($object[$attr])) {
-                if ($exists && is_array($object[$attr]) && is_array($mongodb_object[$attr]) && Helper::arrayEqual($mongodb_object[$attr], $object[$attr])) {
-                    continue;
-                }
-                if ($exists && (!is_object($object[$attr]) && $object[$attr] === $mongodb_object[$attr] ||
-                is_object($object[$attr]) && $object[$attr] == $mongodb_object[$attr])) {
-                    continue;
-                }
-
-                /*if (($value['history'] && $value['history'] === true) || ($this->endpoint->getHistory() && $value['history'] === true)) {
-                    if (isset($mongodb_object[$attr], $object[$attr])) {
-                        $history[] = [
-                            'field' => $attr,
-                            'from' => $mongodb_object[$attr],
-                            'to' => $object[$attr],
-                            'action' => 'update',
-                        ];
-                    } elseif (!isset($mongodb_object[$attr]) && isset($object[$attr])) {
-                        $history[] = [
-                            'field' => $attr,
-                            'to' => $object[$attr],
-                            'action' => 'add',
-                        ];
-                    }
-                }*/
-
-                $operation['$set']['data'][$attr] = $object[$attr];
-            } elseif ($value['ensure'] === WorkflowInterface::ENSURE_ABSENT && isset($mongodb_object[$attr]) || !isset($object[$attr]) && isset($mongodb_object[$attr])) {
-                /*$history[] = [
-                    'field' => $attr,
-                    'from' => $mongodb_object[$attr],
-                    'action' => 'delete',
-                ];*/
-
-                $operation['$unset']['data'][$attr] = true;
-            }
-        }
-
-        /*if (!empty($history)) {
-            $operation['$addToSet']['history'] = [
-                'timestamp' => $ts,
-                'attributes' => $history,
-            ];
-        }*/
-
-        return $operation;
     }
 }

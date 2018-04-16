@@ -75,6 +75,7 @@ class Ldap extends AbstractEndpoint
      */
     public function __construct(string $name, string $type, LdapServer $ldap, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null, ?Iterable $ldap_options = [])
     {
+        $this->filter_all = '(objectClass=*)';
         $this->ldap = $ldap;
         $this->setLdapOptions($ldap_options);
         parent::__construct($name, $type, $datatype, $logger, $config);
@@ -243,42 +244,20 @@ class Ldap extends AbstractEndpoint
      */
     public function getAll($filter = null): Generator
     {
+        $filter = $this->filter_all;
+        $request = '';
         if (is_iterable($filter)) {
-            if (count($filter) > 0) {
-                $request = '';
-                foreach ($filter as $attr => $value) {
-                    $request .= '('.$attr.'='.$value.')';
-                }
-                if (count($filter > 1)) {
-                    $request = '&('.$filter.')';
-                }
-            }
-        } elseif ($filter === null) {
             $request = '';
-        } else {
-            $request = $filter;
-        }
-
-        if (is_iterable($this->filter_all)) {
-            if (count($this->filter_all) > 0) {
-                $global = '';
-                foreach ($filter as $attr => $value) {
-                    $global .= '('.$attr.'='.$value.')';
-                }
-                if (count($filter > 1)) {
-                    $global = '&('.$filter.')';
-                }
+            foreach ($filter as $attr => $value) {
+                $request .= '('.$attr.'='.$value.')';
             }
-        } else {
-            $global = $this->filter_all;
+            if (count($filter > 1)) {
+                $request = '&('.$filter.')';
+            }
         }
 
-        if (isset($global, $request)) {
-            $filter = '(&('.$global.')('.$request.'))';
-        } elseif (isset($global)) {
-            $filter = $global;
-        } elseif (isset($request)) {
-            $filter = $request;
+        if(!empty($request)) {
+            $filter = '(&('.$filter.')('.$request.'))';
         }
 
         $this->logger->debug('find all ldap objects with ldap filter ['.$filter.'] on endpoint ['.$this->name.']', [

@@ -161,6 +161,8 @@ class Xml extends AbstractFile
                     $this->{$option} = (bool) $value;
 
                     break;
+                default:
+                    throw new InvalidArgumentException('unknown xml option '.$option.' given');
             }
         }
 
@@ -265,26 +267,7 @@ class Xml extends AbstractFile
      */
     public function getDiff(AttributeMapInterface $map, array $diff): array
     {
-        $result = [];
-        foreach ($diff as $attribute => $update) {
-            switch ($update['action']) {
-                case AttributeMapInterface::ACTION_REPLACE:
-                    $result[$attribute] = '`'.$attribute.'` = ?';
-
-                break;
-                case AttributeMapInterface::ACTION_REMOVE:
-                    $result[$attribute] = '`'.$attribute.'` = NULL';
-
-                break;
-                /*case AttributeMapInterface::ACTION_ADD:
-                    $result['$addToSet'][$attribute] = $update['value'];
-                break;*/
-                default:
-                    throw new InvalidArgumentException('unknown diff action '.$update['action'].' given');
-            }
-        }
-
-        return $result;
+        return $diff;
     }
 
     /**
@@ -296,66 +279,16 @@ class Xml extends AbstractFile
         $attrs = [];
         $filter = '//'.$this->node_name.$this->getFilterOne($object);
 
-        foreach ($map->getMap() as $attr => $value) {
-            if (isset($value['ensure'])) {
-                $exists = isset($endpoint_object[$attr]);
-
-                if ($value['ensure'] === AttributeMapInterface::ENSURE_EXISTS && $exists === true) {
-                    continue;
+        if ($simulate === false) {
+            foreach ($xml['xml_element']->xpath($filter) as $element) {
+                if (!isset($element->$key)) {
+                    $element->addChild('member');
                 }
-                if (($value['ensure'] === AttributeMapInterface::ENSURE_LAST || $value['ensure'] === AttributeMapInterface::ENSURE_EXISTS) && isset($object[$attr])) {
-                    if ($exists && $object[$attr] === $endpoint_object[$attr]) {
-                        continue;
-                    }
 
-                    $attrs[$attr] = $object[$attr];
-                } elseif ($value['ensure'] === AttributeMapInterface::ENSURE_ABSENT && isset($endpoint_object[$attr])) {
-                    $attrs[$attr] = $object[$attr];
-                } elseif ($value['ensure'] === 'merge' && isset($object[$attr])) {
-                    foreach ($object[$attr] as $value) {
-                        $source_values[$attr] = $exists ? array_values($endpoint_object[$attr])[0] : [];
-
-                        if (!$exists) {
-                            $attrs[$attr][] = $value;
-                        } elseif (is_array($source_values[$attr]) && in_array($value, $source_values[$attr]) || $value === $source_values[$attr]) {
-                            continue;
-                        } else {
-                            $attrs[$attr][] = $value;
-                        }
-                    }
-                }
+                $element->$key->addChild($key, $val);
             }
-        }
 
-        if (count($attrs) === 0) {
-            $this->logger->info('object is already up2date', [
-                'category' => get_class($this),
-            ]);
-        } else {
-            if ($simulate === false) {
-                foreach ($attrs as $key => $value) {
-                    if (is_array($value)) {
-                        foreach ($value as $val) {
-                            foreach ($xml['xml_element']->xpath($filter) as $element) {
-                                if (!isset($element->$key)) {
-                                    $element->addChild('member');
-                                }
-                                $element->$key->addChild($key, $val);
-                            }
-                        }
-                    } else {
-                        foreach ($xml['xml_element']->xpath($filter) as $element) {
-                            $element->$key = $value;
-                        }
-                    }
-                }
-            }
             $xml['dom']->loadXML($xml['xml_element']->asXML());
-
-            $this->logger->info('updated xml object on endpoint ['.$this->name.'] with values [{attributes}]', [
-                'category' => get_class($this),
-                'attributes' => $attrs,
-            ]);
         }
 
         return null;

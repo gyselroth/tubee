@@ -531,13 +531,8 @@ class DataType implements DataTypeInterface
                 ]);
 
                 try {
-                    if (count($filter) > 0) {
-                        $attrs_filter = Helper::associativeArrayToPath($object->getData());
-                        $object = $ep->getOne($attrs_filter);
-                    } else {
-                        if (!is_iterable($object)) {
-                            throw new Exception\InvalidObject('read() genereator needs to yield iterable data');
-                        }
+                    if (!is_iterable($object)) {
+                        throw new Exception\InvalidObject('read() genereator needs to yield iterable data');
                     }
 
                     foreach ($ep->getWorkflows() as $workflow) {
