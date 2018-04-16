@@ -293,7 +293,7 @@ class Xml extends AbstractFile
                     if (is_array($update['value'])) {
                         $new = $xml['dom']->createElement($attribute);
                         foreach ($update['value'] as $val) {
-                            $attr_subnode->appendChild($xml['dom']->createElement($attribute, $val));
+                            $new->appendChild($xml['dom']->createElement($attribute, $val));
                         }
                     } else {
                         $new = $xml['dom']->createElement($attribute, $update['value']);
