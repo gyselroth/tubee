@@ -122,7 +122,7 @@ $(TAR): $(BUILD_TARGET)
 	@-test -d $(DIST_DIR) || mkdir $(DIST_DIR)
 	@-test ! -d $(BUILD_DIR) || rm -rfv $(BUILD_DIR)
 	@mkdir $(BUILD_DIR)
-	@cp -Rp $(CONFIG_DIR) $(BUILD_DIR)
+	@mkdir $(BUILD_DIR)/config
 	@cp -Rp $(VENDOR_DIR) $(BUILD_DIR)
 	@cp -Rp $(SRC_DIR) $(BUILD_DIR)
 	@mkdir $(BUILD_DIR)/log
