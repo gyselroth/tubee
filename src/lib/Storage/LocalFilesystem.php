@@ -108,7 +108,7 @@ class LocalFilesystem implements StorageInterface
             'category' => get_class($this),
         ]);
 
-        $stream = fopen($path, 'r+');
+        $stream = fopen($path, 'a+');
         if ($stream === false) {
             throw new Exception\OpenStreamFailed('failed open write stream for '.$path);
         }

@@ -129,7 +129,7 @@ class Balloon implements StorageInterface
             'category' => get_class($this),
         ]);
 
-        $stream = fopen('php://temp', 'r+');
+        $stream = fopen('php://temp', 'a+');
 
         if ($stream === false) {
             throw new Exception\OpenStreamFailed('failed open write stream for '.$file);

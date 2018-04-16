@@ -46,6 +46,10 @@ class Csv extends AbstractFile
      */
     public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null, ?Iterable $csv_options = null)
     {
+        if ($type === EndpointInterface::TYPE_DESTINATION) {
+            $this->flush = true;
+        }
+
         $this->setCsvOptions($csv_options);
         parent::__construct($name, $type, $file, $storage, $datatype, $logger, $config);
     }
@@ -149,16 +153,7 @@ class Csv extends AbstractFile
      */
     public function getAll($filter = []): Generator
     {
-        $filtered = [];
-        foreach ($this->filter_all as $attr => $value) {
-            if (is_iterable($value)) {
-                $filtered[$attr] = array_values($value->children());
-            } else {
-                $filtered[$attr] = $value;
-            }
-        }
-
-        $filter = array_merge($filtered, (array) $filter);
+        $filter = array_merge((array)$this->filter_all, (array) $filter);
         foreach ($this->resource as $csv) {
             while (($line = fgetcsv($csv['resource'], 0, $this->delimiter, $this->enclosure, $this->escape)) !== false) {
                 $data = array_combine($csv['header'], $line);

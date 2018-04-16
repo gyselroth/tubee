@@ -16,6 +16,7 @@ use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
+use InvalidArgumentException;
 
 class Mongodb extends AbstractEndpoint
 {
@@ -106,7 +107,7 @@ class Mongodb extends AbstractEndpoint
         ]);
 
         if ($simulate === false) {
-            $this->collection->updateOne($filter, $update);
+            $this->collection->updateOne($filter, $diff);
         }
 
         return (string) $endpoint_object['_id'];

@@ -279,7 +279,7 @@ class Workflow implements WorkflowInterface
 
         $exists = $this->getExportObject($map);
 
-        if($exists === false && $this->ensure !== WorkflowInterface::ENSURE_EXISTS) {
+        if($exists === false && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== false && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
         }
 

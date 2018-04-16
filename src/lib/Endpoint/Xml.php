@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use DOMDocument;
+use DOMNode;
 use Generator;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
@@ -20,6 +21,7 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Xml\Exception as XmlException;
 use Tubee\Storage\StorageInterface;
+use InvalidArgumentException;
 
 class Xml extends AbstractFile
 {
@@ -109,10 +111,9 @@ class Xml extends AbstractFile
                     'category' => get_class($this),
                 ]);
 
-                if ($dom->load($content) === false) {
+                if ($dom->loadXML($content) === false) {
                     throw new XmlException\InvalidXml('could not decode xml stream from '.$path.'');
                 }
-
                 $xml_element = new SimpleXMLIterator($content);
                 $xml_root = $dom->documentElement;
 
@@ -130,6 +131,7 @@ class Xml extends AbstractFile
                 'xml_root' => $xml_root,
                 'xml_element' => $xml_element,
                 'path' => $path,
+                'stream' => $stream
             ];
         }
 
@@ -176,6 +178,7 @@ class Xml extends AbstractFile
     {
         foreach ($this->resource as $resource) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
+                $this->flush($simulate);
                 if (fwrite($resource['stream'], $resource['dom']->saveXML()) === false) {
                     throw new Exception\WriteOperationFailed('failed create xml file '.$resource['path']);
                 }
@@ -277,21 +280,55 @@ class Xml extends AbstractFile
     {
         $xml = $this->resource[0];
         $attrs = [];
-        $filter = '//'.$this->node_name.$this->getFilterOne($object);
+        $filter = $this->getFilterOne($object);
+        $xpath = new \DOMXPath($xml['dom']);
+        $node = $xpath->query($filter);
+        $node = $node[0];
 
-        if ($simulate === false) {
-            foreach ($xml['xml_element']->xpath($filter) as $element) {
-                if (!isset($element->$key)) {
-                    $element->addChild('member');
-                }
+        foreach ($diff as $attribute => $update) {
+            $child = $this->getChildNode($node, $attribute);
 
-                $element->$key->addChild($key, $val);
+            switch($update['action']) {
+                case AttributeMapInterface::ACTION_REPLACE:
+                    if (is_array($update['value'])) {
+                        $new = $xml['dom']->createElement($attribute);
+                        foreach ($update['value'] as $val) {
+                            $attr_subnode->appendChild($xml['dom']->createElement($attribute, $val));
+                        }
+                    } else {
+                        $new = $xml['dom']->createElement($attribute, $update['value']);
+                    }
+
+                    $node->replaceChild($new, $child);
+                break;
+
+                case AttributeMapInterface::ACTION_REMOVE:
+                    $node->removeChild($child);
+                break;
+
+                case AttributeMapInterface::ACTION_ADD:
+                    $child->appendChild($xml['dom']->createElement($attribute, $update['value']));
+                break;
+
+                default:
+                    throw new InvalidArgumentException('unknown action '.$update['action'].' given');
             }
-
-            $xml['dom']->loadXML($xml['xml_element']->asXML());
         }
 
         return null;
+    }
+
+
+    /**
+     * Get child node by name
+     */
+    protected function getChildNode(DOMNode $node, string $name)
+    {
+        foreach($node->childNodes as $child) {
+            if($child->nodeName === $name) {
+                return $child;
+            }
+        }
     }
 
     /**
@@ -300,19 +337,11 @@ class Xml extends AbstractFile
     public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
     {
         $xml = $this->resource[0];
-        $filter = '//'.$this->node_name.$this->getFilterOne($object);
-
-        foreach ($xml['xml_element']->xpath($filter) as $element) {
-            if (!empty($element)) {
-                unset($element[0][0]);
-            }
-        }
-        $xml['dom']->loadXML($xml['xml_element']->asXML());
-
-        $this->logger->info('delete xml object on endpoint ['.$this->name.'] with filter ['.$filter.']', [
-            'category' => get_class($this),
-        ]);
-
+        $filter = $this->getFilterOne($object);
+        $xpath = new \DOMXPath($xml['dom']);
+        $node = $xpath->query($filter);
+        $node = $node[0];
+        $xml['dom']->removeChild($node);
         return true;
     }
 
@@ -322,12 +351,10 @@ class Xml extends AbstractFile
     public function getOne(Iterable $object, Iterable $attributes = []): Iterable
     {
         foreach ($this->resource as $xml) {
-            $filter = '//'.$this->node_name.$this->getFilterOne($object);
-
+            $filter = $this->getFilterOne($object);
+            $elements = [];
             if (isset($xml['xml_element'])) {
                 $elements = $xml['xml_element']->xpath($filter);
-            } else {
-                $elements = [];
             }
 
             if (count($elements) > 1) {
@@ -337,7 +364,8 @@ class Xml extends AbstractFile
                 throw new Exception\ObjectNotFound('no object found with filter '.$filter);
             }
 
-            return json_decode(json_encode((array) array_shift($elements)), true);
+            $object = json_decode(json_encode( (array) array_shift($elements)), true);
+            return $object;
         }
     }
 }

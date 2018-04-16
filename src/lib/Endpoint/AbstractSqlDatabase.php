@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Tubee\AttributeMap\AttributeMapInterface;
+use InvalidArgumentException;
 
 abstract class AbstractSqlDatabase extends AbstractEndpoint
 {
@@ -63,9 +64,6 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
                     $result[$attribute] = '`'.$attribute.'` = NULL';
 
                 break;
-                /*case AttributeMapInterface::ACTION_ADD:
-                    $result['$addToSet'][$attribute] = $update['value'];
-                break;*/
                 default:
                     throw new InvalidArgumentException('unknown diff action '.$update['action'].' given');
             }

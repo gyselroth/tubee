@@ -222,7 +222,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     public function exists(Iterable $object): bool
     {
         try {
-            $this->getOne($object);
+            $this->getOne($object, []);
 
             return true;
         } catch (Exception\ObjectMultipleFound $e) {

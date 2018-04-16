@@ -43,10 +43,6 @@ abstract class AbstractFile extends AbstractEndpoint
      */
     public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
     {
-        if ($type === EndpointInterface::TYPE_DESTINATION) {
-            $this->flush = true;
-        }
-
         $this->storage = $storage;
         $this->file = $file;
         parent::__construct($name, $type, $datatype, $logger, $config);

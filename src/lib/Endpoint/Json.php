@@ -14,9 +14,25 @@ namespace Tubee\Endpoint;
 use Generator;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Endpoint\Json\Exception as JsonException;
+use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use Tubee\DataType\DataTypeInterface;
+use Tubee\Storage\StorageInterface;
 
 class Json extends AbstractFile
 {
+    /**
+     * Init endpoint.
+     */
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
+    {
+        if ($type === EndpointInterface::TYPE_DESTINATION) {
+            $this->flush = true;
+        }
+
+        parent::__construct($name, $type, $file, $storage, $datatype, $logger, $config);
+    }
+
     /**
      * {@inheritdoc}
      */
