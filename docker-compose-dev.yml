@@ -31,7 +31,7 @@ balloon-endpoint:
         - BALLOON_MONGODB_URI=mongodb://mongodb:27017
         - BALLOON_URL=http://localhost:8080
 tubee-dev:
-    image: tubee:latest
+    image: gyselroth/tubee-development:latest
     volumes:
         - .:/srv/www/tubee
     links:
