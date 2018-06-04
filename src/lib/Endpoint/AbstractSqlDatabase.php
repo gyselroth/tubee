@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint;
 
-use Tubee\AttributeMap\AttributeMapInterface;
 use InvalidArgumentException;
+use Tubee\AttributeMap\AttributeMapInterface;
 
 abstract class AbstractSqlDatabase extends AbstractEndpoint
 {

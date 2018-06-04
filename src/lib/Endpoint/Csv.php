@@ -153,7 +153,7 @@ class Csv extends AbstractFile
      */
     public function getAll($filter = []): Generator
     {
-        $filter = array_merge((array)$this->filter_all, (array) $filter);
+        $filter = array_merge((array) $this->filter_all, (array) $filter);
         foreach ($this->resource as $csv) {
             while (($line = fgetcsv($csv['resource'], 0, $this->delimiter, $this->enclosure, $this->escape)) !== false) {
                 $data = array_combine($csv['header'], $line);

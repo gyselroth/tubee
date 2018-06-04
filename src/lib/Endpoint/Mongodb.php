@@ -12,11 +12,11 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
+use InvalidArgumentException;
 use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
-use InvalidArgumentException;
 
 class Mongodb extends AbstractEndpoint
 {

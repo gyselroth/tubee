@@ -1,0 +1,1029 @@
+swagger: "2.0"
+info:
+  description: ""
+  version: "1.0.0"
+  title: "Tubee API"
+  termsOfService: ""
+  contact:
+    email: "opensource@gyselroth.net"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "datamanager"
+basePath: "/api/v1"
+tags:
+- name: "data"
+  description: "Manage data objects"
+- name: "jobs"
+  description: "Manage jobs"
+- name: "config"
+  description: "Request configuration"
+schemes:
+- "https"
+paths:
+  /mandators:
+    get:
+      tags:
+      - "config"
+      summary: "Get mandators"
+      description: ""
+      operationId: "getMandators"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "List of mandators"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/mandator"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specific mandator"
+      description: ""
+      operationId: "getMandator"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of mandators"
+          schema:
+            $ref: "#/definitions/mandator"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes:
+    get:
+      tags:
+      - "config"
+      summary: "Get datatypes"
+      description: ""
+      operationId: "getDatatypes"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of datatypes"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/datatype"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specific datatype"
+      description: ""
+      operationId: "getDatatype"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Datatype"
+          schema:
+            $ref: "#/definitions/datatype"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints:
+    get:
+      tags:
+      - "config"
+      summary: "Get endpoints"
+      description: ""
+      operationId: "getEndpoints"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of source endpoints"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/endpoint"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specific endpoint"
+      description: ""
+      operationId: "getEndpoint"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Endpoint"
+          schema:
+            $ref: "#/definitions/endpoint"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
+    get:
+      tags:
+      - "config"
+      summary: "Get endpoint workflows"
+      description: ""
+      operationId: "getEndpointWorkflows"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of workflows"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/workflow"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specifc endpoint workflow"
+      description: ""
+      operationId: "getEndpointWorkflow"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Workflow"
+          schema:
+            $ref: "#/definitions/workflow"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}/attribute-map:
+    get:
+      tags:
+      - "config"
+      summary: "Get endpoint workflow attribute map"
+      description: ""
+      operationId: "getEndpointWorkflowAttributeMap"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Attribute map"
+          schema:
+            $ref: "#/definitions/attribute-map"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}:
+    get:
+      tags:
+      - "data"
+      summary: "Get specific object"
+      description: ""
+      operationId: "getObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of objects"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints:
+    get:
+      tags:
+      - "data"
+      summary: "Get object endpoints"
+      description: ""
+      operationId: "getObjectEndpoints"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of objects"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints/{endpoint}:
+    get:
+      tags:
+      - "data"
+      summary: "Get object endpoint"
+      description: ""
+      operationId: "getObjectEndpoint"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endooint"
+        description: "Endpoint nmae"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of objects"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/history:
+    get:
+      tags:
+      - "data"
+      summary: "Get object history"
+      description: ""
+      operationId: "getObjectHistory"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of objects"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects:
+    get:
+      tags:
+      - "data"
+      summary: "Get objects of a specific datatype"
+      description: ""
+      operationId: "getObjects"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "List of objects"
+          schema:
+            $ref: "#/definitions/objects"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "data"
+      summary: "Add a new object of a specifc datatype"
+      description: ""
+      operationId: "addObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "write"
+        description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/object"
+        202:
+          description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "data"
+      summary: "Update object"
+      description: ""
+      operationId: "updateObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "write"
+        description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/object"
+        202:
+          description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "data"
+      summary: "Delete object"
+      description: ""
+      operationId: "deleteObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "write"
+        description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      responses:
+        202:
+          description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
+          schema:
+            $ref: "#/definitions/job"
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get list of active queued jobs"
+      description: ""
+      operationId: "getJobs"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      responses:
+        200:
+          description: "List of active jobs"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/job"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "jobs"
+      summary: "Create new job"
+      description: ""
+      operationId: "addJob"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "mandators"
+        description: "Array of mandators, if not given all mandators are used"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "datatypes"
+        description: "Array of datatypes, if not given all datatypes are used"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "source-endpoints"
+        description: "Array of source endpoints, if not given all mandators are used"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "interval"
+        description: "Specify an interval for this job. If not specified the jobs runs once."
+        required: false
+        type: "integer"
+        default: 0
+      - in: "query"
+        name: "retry"
+        description: "Specify a retry count for this job. If not specified the job does not repeat if failed before."
+        required: false
+        type: "integer"
+        default: 0
+      - in: "query"
+        name: "exectute_at"
+        description: "Specify an exact timestamp when the job should get executed. The job will get executed not before this time and not before there is a free slot"
+        required: false
+        type: "integer"
+        default: 0
+      responses:
+        202:
+          description: "The server will respond with 202 Accepted since this is an asynchronous request"
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{id}:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get job by id"
+      description: ""
+      operationId: "getJob"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "id"
+        description: "Job ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Job"
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "jobs"
+      summary: "Delete job by id"
+      description: ""
+      operationId: "deleteJob"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "id"
+        description: "Job ID"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Server responds with 204 No Content if job removal was successful"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+definitions:
+  mandator:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+  job:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      status:
+        type: "integer"
+        format: "int"
+        minimum: 0
+        maximum: 4
+      created:
+        type: "string"
+        format: "date-time"
+      at:
+        type: "string"
+        format: "date-time"
+      interval:
+        type: "integer"
+      retry:
+        type: "integer"
+      retry_interval:
+        type: "integer"
+  datatype:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "Datatype name"
+      mandator:
+        type: "string"
+        description: "Mandator name"
+      enabled:
+        type: "boolean"
+        description: "Is true if datatype is enabled"
+      class:
+        type: "string"
+        description: "Name of implementation, usually Tubee\\Datatype"
+      collection:
+        type: "string"
+        description: "Collection name which holds objects of this datatype"
+      dataset:
+        type: "string"
+        description: "Dataset aggregation query"
+  endpoint:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "Endpoint name"
+      datatype:
+        type: "string"
+        description: "Datatype name"
+      mandator:
+        type: "string"
+        description: "Mandator name"
+      type:
+        type: "string"
+        description: "Type of endpoint (Either source or destination)"
+      class:
+        type: "string"
+        description: "Name of implementation (Endpoint type/protocol)"
+      history:
+        type: "boolean"
+        description: "Is true if history tracking is enabled to this endpoint"
+      import:
+        type: "array"
+        description: "Array of attributes which are used as identifier"
+        items:
+          type: "string"
+      filter_one:
+        type: "string"
+        description: "Filter to identitfy exactly one object"
+      filter_all:
+        type: "string"
+        description: "Filter whole endpoint"
+      resource:
+        type: "object"
+        description: "Endpoint specific configuration"
+  workflow:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        description: "Workflow name"
+      endpoint:
+        type: "string"
+        description: "Endpoint name"
+      datatype:
+        type: "string"
+        description: "Datatype name"
+      mandator:
+        type: "string"
+        description: "Mandator name"
+      enabled:
+        type: "boolean"
+        description: "Is true if datatype is enabled"
+      class:
+        type: "string"
+        description: "Name of implementation, usually Tubee\\Workflow"
+      ensure:
+        type: "string"
+        description: "Specifies what type of workflow this is."
+      timestamp:
+        type: "string"
+        description: "Timestamp attribute"
+      after:
+        type: "string"
+        description: "Filter to identitfy exactly one object"
+  attribute-map:
+    type: "object"
+    properties:
+      endpoint:
+        type: "string"
+        description: "Endppoint name"
+      workflow:
+        type: "string"
+        description: "Workflow name"
+      datatype:
+        type: "string"
+        description: "Datatype name"
+      mandator:
+        type: "string"
+        description: "Mandator name"
+      class:
+        type: "string"
+        description: "Name of implementation, usually Tubee\\AttributeMap"
+      map:
+        type: "object"
+        description: "Attribute map"
+  objects:
+    type: "object"
+    properties:
+      objects:
+        type: "array"
+        items:
+          $ref: "#/definitions/object"
+      count:
+        type: "number"
+      total:
+        type: "number"
+  object:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      version:
+        type: "integer"
+      created:
+        type: "string"
+        format: "date-time"
+      changed:
+        type: "string"
+        format: "date-time"
+      deleted:
+        type: "string"
+        format: "date-time"
+      mandator:
+        type: "string"
+      datatype:
+        type: "string"
+      locked:
+        type: "string"
+        format: "date-time"
+      data:
+        type: "object"
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"

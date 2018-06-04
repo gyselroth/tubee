@@ -14,6 +14,7 @@ namespace Tubee\Endpoint;
 use DOMDocument;
 use DOMNode;
 use Generator;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use SimpleXMLElement;
 use SimpleXMLIterator;
@@ -21,7 +22,6 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Xml\Exception as XmlException;
 use Tubee\Storage\StorageInterface;
-use InvalidArgumentException;
 
 class Xml extends AbstractFile
 {
@@ -131,7 +131,7 @@ class Xml extends AbstractFile
                 'xml_root' => $xml_root,
                 'xml_element' => $xml_element,
                 'path' => $path,
-                'stream' => $stream
+                'stream' => $stream,
             ];
         }
 
@@ -288,7 +288,7 @@ class Xml extends AbstractFile
         foreach ($diff as $attribute => $update) {
             $child = $this->getChildNode($node, $attribute);
 
-            switch($update['action']) {
+            switch ($update['action']) {
                 case AttributeMapInterface::ACTION_REPLACE:
                     if (is_array($update['value'])) {
                         $new = $xml['dom']->createElement($attribute);
@@ -300,35 +300,22 @@ class Xml extends AbstractFile
                     }
 
                     $node->replaceChild($new, $child);
-                break;
 
+                break;
                 case AttributeMapInterface::ACTION_REMOVE:
                     $node->removeChild($child);
-                break;
 
+                break;
                 case AttributeMapInterface::ACTION_ADD:
                     $child->appendChild($xml['dom']->createElement($attribute, $update['value']));
-                break;
 
+                break;
                 default:
                     throw new InvalidArgumentException('unknown action '.$update['action'].' given');
             }
         }
 
         return null;
-    }
-
-
-    /**
-     * Get child node by name
-     */
-    protected function getChildNode(DOMNode $node, string $name)
-    {
-        foreach($node->childNodes as $child) {
-            if($child->nodeName === $name) {
-                return $child;
-            }
-        }
     }
 
     /**
@@ -342,6 +329,7 @@ class Xml extends AbstractFile
         $node = $xpath->query($filter);
         $node = $node[0];
         $xml['xml_root']->removeChild($node);
+
         return true;
     }
 
@@ -369,8 +357,21 @@ class Xml extends AbstractFile
                 throw new Exception\ObjectNotFound('no object found with filter '.$filter);
             }
 
-            $object = json_decode(json_encode( (array) array_shift($elements)), true);
+            $object = json_decode(json_encode((array) array_shift($elements)), true);
+
             return $object;
+        }
+    }
+
+    /**
+     * Get child node by name.
+     */
+    protected function getChildNode(DOMNode $node, string $name)
+    {
+        foreach ($node->childNodes as $child) {
+            if ($child->nodeName === $name) {
+                return $child;
+            }
         }
     }
 }

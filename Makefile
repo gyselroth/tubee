@@ -96,7 +96,6 @@ $(DIST_DIR)/tubee-$(VERSION).deb: $(CHANGELOG_TARGET) $(BUILD_TARGET)
 	$(COMPOSER_BIN) update --no-dev
 	@mkdir -p $(BUILD_DIR)/DEBIAN
 	@cp $(BASE_DIR)/packaging/debian/control $(BUILD_DIR)/DEBIAN/control
-	@cp $(BASE_DIR)/packaging/debian/postinst $(BUILD_DIR)/DEBIAN/postinst
 	@sed -i s/'{version}'/$(VERSION)/g $(BUILD_DIR)/DEBIAN/control
 	@mkdir -p $(BUILD_DIR)/usr/share/tubee/src
 	@mkdir -p $(BUILD_DIR)/usr/share/tubee/scripts
@@ -107,10 +106,9 @@ $(DIST_DIR)/tubee-$(VERSION).deb: $(CHANGELOG_TARGET) $(BUILD_TARGET)
 	@cp  $(BASE_DIR)/packaging/tubee-jobs.service.upstart $(BUILD_DIR)/usr/share/tubee/scripts
 	@cp -Rp $(SRC_DIR)/cgi-bin/cli.php $(BUILD_DIR)/usr/share/tubee/bin/console/tubeecli
 	@cp -Rp $(SRC_DIR)/httpdocs $(BUILD_DIR)/usr/share/tubee/bin
-	@cp -Rp $(SRC_DIR)/{lib} $(BUILD_DIR)/usr/share/tubee/src
+	@cp -Rp $(SRC_DIR)/lib $(BUILD_DIR)/usr/share/tubee/src
 	@cp -Rp $(SRC_DIR)/.container.config.php $(BUILD_DIR)/usr/share/tubee/src
 	@mkdir -p $(BUILD_DIR)/etc/tubee
-	@cp $(CONFIG_DIR)/config.yaml.dist $(BUILD_DIR)/etc/tubee
 	@-test -d $(DIST_DIR) || mkdir $(DIST_DIR)
 	@dpkg-deb --build $(BUILD_DIR) $@
 	$(COMPOSER_BIN) update
@@ -124,7 +122,7 @@ $(TAR): $(BUILD_TARGET)
 	@-test -d $(DIST_DIR) || mkdir $(DIST_DIR)
 	@-test ! -d $(BUILD_DIR) || rm -rfv $(BUILD_DIR)
 	@mkdir $(BUILD_DIR)
-	@cp -Rp $(CONFIG_DIR) $(BUILD_DIR)
+	@mkdir $(BUILD_DIR)/config
 	@cp -Rp $(VENDOR_DIR) $(BUILD_DIR)
 	@cp -Rp $(SRC_DIR) $(BUILD_DIR)
 	@mkdir $(BUILD_DIR)/log

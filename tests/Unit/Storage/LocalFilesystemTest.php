@@ -55,7 +55,12 @@ class LocalFilesystemTest extends TestCase
 
     public function testOpenReadStreamFailed()
     {
+        $path = '/tmp/'.uniqid();
+        mkdir($path);
         $this->expectException(Exception\OpenStreamFailed::class);
+        $this->storage = new LocalFilesystem($path, $this->createMock(LoggerInterface::class));
+        rmdir($path);
+        mkdir($path, 0330);
         $stream = @$this->storage->openReadStream('bar');
     }
 
@@ -67,7 +72,10 @@ class LocalFilesystemTest extends TestCase
 
     public function testOpenWriteStreamFailed()
     {
+        $path = '/tmp/'.uniqid();
+        mkdir($path, 0550);
         $this->expectException(Exception\OpenStreamFailed::class);
+        $this->storage = new LocalFilesystem($path, $this->createMock(LoggerInterface::class));
         $stream = @$this->storage->openWriteStream('bar');
     }
 
