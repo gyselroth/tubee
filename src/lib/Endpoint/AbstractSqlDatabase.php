@@ -105,9 +105,6 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
 
     /**
      * Prepare.
-     *
-     * @param iterable $object
-     * @param bool     $simulate
      */
     protected function prepareCreate(Iterable $object, bool $simulate = false)
     {

@@ -30,12 +30,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * Init endpoint.
      *
-     * @param string            $name
-     * @param string            $type
-     * @param Collection        $collection
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * @param Logger $logger
      */
     public function __construct(string $name, string $type, Collection $collection, DataTypeInterface $datatype, LoggerInterface $logger, Iterable $config)
     {
@@ -161,11 +156,6 @@ class Mongodb extends AbstractEndpoint
 
     /**
      * Get existing object.
-     *
-     * @param iterable $object
-     * @param iterable $attributes
-     *
-     * @return array
      */
     protected function get(Iterable $object, Iterable $attributes = []): array
     {

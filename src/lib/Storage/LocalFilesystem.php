@@ -32,9 +32,6 @@ class LocalFilesystem implements StorageInterface
 
     /**
      * Init storage.
-     *
-     * @param string          $root
-     * @param LoggerInterface $logger
      */
     public function __construct(string $root, LoggerInterface $logger)
     {

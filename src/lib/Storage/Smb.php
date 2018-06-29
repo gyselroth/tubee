@@ -48,8 +48,6 @@ class Smb implements StorageInterface
 
     /**
      * Init storage.
-     *
-     * @param NativeServer $server
      */
     public function __construct(NativeServer $server, LoggerInterface $logger, string $share, string $root = '/')
     {

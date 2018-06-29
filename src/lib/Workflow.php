@@ -78,11 +78,8 @@ class Workflow implements WorkflowInterface
     /**
      * Initialize.
      *
-     * @param string            $name
-     * @param AttributeMap      $attribute_map
-     * @param EndpointInterface $endpoint
-     * @param LoggerInterface   $logger
-     * @param iterable          $config
+     * @param AttributeMap $attribute_map
+     * @param iterable     $config
      */
     public function __construct(string $name, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, ?Iterable $config = null)
     {
@@ -122,8 +119,6 @@ class Workflow implements WorkflowInterface
      * Set options.
      *
      * e@param iterable $config
-     *
-     * @return WorkflowInterface
      */
     public function setOptions(?Iterable $config = null): WorkflowInterface
     {
@@ -184,12 +179,15 @@ class Workflow implements WorkflowInterface
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
                 return $this->endpoint->getDataType()->delete($object->getId(), $simulate);
+
             break;
             case WorkflowInterface::ENSURE_DISABLED:
                 return $this->endpoint->getDataType()->disable($object->getId(), $simulate);
+
             break;
             case WorkflowInterface::ENSURE_EXISTS:
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_LAST:
                 //$object_ts = new UTCDateTime();
@@ -197,6 +195,7 @@ class Workflow implements WorkflowInterface
                 //$this->endpoint->getDataType()->change(['_id' => $object['id']], $operation, $simulate);
 
                 return true;
+
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, disabled, exists or last is allowed');
@@ -232,11 +231,13 @@ class Workflow implements WorkflowInterface
                 $datatype->delete($exists->getId(), $simulate);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_DISABLED:
                 $datatype->disable($exists->getId(), $simulate);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_EXISTS:
                 $endpoints = [
@@ -248,6 +249,7 @@ class Workflow implements WorkflowInterface
                 $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_LAST:
                 $object = $this->map($map, $exists->getData(), $object_ts);
@@ -257,6 +259,7 @@ class Workflow implements WorkflowInterface
                 $datatype->change($exists, $object, $simulate, $endpoints);
 
                 return true;
+
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, disabled, exists or last is allowed');
@@ -296,6 +299,7 @@ class Workflow implements WorkflowInterface
                 $this->endpoint->delete($this->attribute_map, $map, $exists, $simulate);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_EXISTS:
                 $this->logger->info('create new object on endpoint ['.$this->endpoint->getName().']', [
@@ -314,6 +318,7 @@ class Workflow implements WorkflowInterface
                 $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_LAST:
                 $this->logger->info('change object on endpoint ['.$this->endpoint->getName().']', [
@@ -344,6 +349,7 @@ class Workflow implements WorkflowInterface
                 $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
+
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, exists or last is allowed');
@@ -354,11 +360,6 @@ class Workflow implements WorkflowInterface
 
     /**
      * check condition.
-     *
-     * @param iterable $object
-     * @param bool     $garbage
-     *
-     * @return bool
      */
     protected function checkCondition(Iterable $object, bool $garbage = false): bool
     {
@@ -390,10 +391,6 @@ class Workflow implements WorkflowInterface
 
     /**
      * Get import object.
-     *
-     * @param DataTypeInterface $datatype
-     * @param array             $filter
-     * @param UTCDateTime       $ts
      */
     protected function getImportObject(DataTypeInterface $datatype, array $map, UTCDateTime $ts): ?DataObjectInterface
     {
@@ -426,8 +423,6 @@ class Workflow implements WorkflowInterface
 
     /**
      * Get export object.
-     *
-     * @param iterable $map
      */
     protected function getExportObject(Iterable $map)
     {

@@ -81,8 +81,7 @@ class ApiClient
     /**
      * construct.
      *
-     * @param LoggerInterface $logger
-     * @param iterable        $config
+     * @param iterable $config
      */
     public function __construct(LoggerInterface $logger, ?Iterable $config = null)
     {
@@ -94,8 +93,6 @@ class ApiClient
      * Set options.
      *
      * @param iterable $config
-     *
-     * @return ApiClient
      */
     public function setOptions(?Iterable $config): ApiClient
     {
@@ -143,7 +140,6 @@ class ApiClient
     /**
      * Run CURL request.
      *
-     * @param string $params
      * @param string $function
      *
      * @return array

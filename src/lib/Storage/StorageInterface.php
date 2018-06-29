@@ -17,17 +17,12 @@ interface StorageInterface
 {
     /**
      * Search files.
-     *
-     * @param string $pattern
-     *
-     * @return array
      */
     public function getFiles(string $pattern): array;
 
     /**
      * Open write stream.
      *
-     * @param string $file
      *
      * @return array
      */
@@ -36,7 +31,6 @@ interface StorageInterface
     /**
      * Open read stream.
      *
-     * @param string $file
      *
      * @return array
      */
@@ -44,10 +38,6 @@ interface StorageInterface
 
     /**
      * Open multiple read streams from pattern.
-     *
-     * @param string $pattern
-     *
-     * @return Generator
      */
     public function openReadStreams(string $pattern): Generator;
 
@@ -55,7 +45,6 @@ interface StorageInterface
      * Sync writeable stream.
      *
      * @param resource $stream
-     * @param string   $file
      */
     public function SyncWriteStream($stream, string $file): bool;
 }

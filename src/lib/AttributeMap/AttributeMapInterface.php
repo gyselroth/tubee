@@ -63,35 +63,21 @@ interface AttributeMapInterface
 
     /**
      * Get attribute map.
-     *
-     * @return iterable
      */
     public function getMap(): Iterable;
 
     /**
      * Get attributes.
-     *
-     * @return array
      */
     public function getAttributes(): array;
 
     /**
      * Map attributes.
-     *
-     * @param iterable    $data
-     * @param UTCDateTime $ts
-     *
-     * @return array
      */
     public function map(Iterable $data, UTCDateTime $ts): array;
 
     /**
      * Create attribute diff.
-     *
-     * @param iterable $mapped
-     * @param iterable $endpoint_object
-     *
-     * @return array
      */
     public function getDiff(Iterable $mapped, Iterable $endpoint_object): array;
 }

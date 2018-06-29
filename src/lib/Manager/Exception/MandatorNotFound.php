@@ -11,6 +11,15 @@ declare(strict_types=1);
 
 namespace Tubee\Manager\Exception;
 
-class MandatorNotFound extends \Tubee\Exception
+use Micro\Http\ExceptionInterface;
+
+class MandatorNotFound extends \Tubee\Exception implements ExceptionInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatusCode(): int
+    {
+        return 404;
+    }
 }

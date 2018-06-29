@@ -17,32 +17,22 @@ interface MandatorInterface
 {
     /**
      * Get name.
-     *
-     * @return string
      */
     public function getName(): string;
 
     /**
      * Get identifier.
-     *
-     * @return string
      */
     public function getIdentifier(): string;
 
     /**
      * Check if mandator has datatype.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
     public function hasDataType(string $name): bool;
 
     /**
      * Inject datatype.
      *
-     * @param DataTypeInterface $datatype
-     * @param string            $name
      *
      * @return DataTypeInterface
      */
@@ -50,19 +40,11 @@ interface MandatorInterface
 
     /**
      * Get datatype.
-     *
-     * @param string $name
-     *
-     * @return DataTypeInterface
      */
     public function getDataType(string $name): DataTypeInterface;
 
     /**
      * Get datatypes.
-     *
-     * @param iterable $datatypes
-     *
-     * @return array
      */
     public function getDataTypes(Iterable $datatypes): array;
 }

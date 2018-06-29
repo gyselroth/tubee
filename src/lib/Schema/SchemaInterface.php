@@ -16,7 +16,7 @@ interface SchemaInterface
     /**
      * Get Schema.
      */
-    public function getSchema(): Iterable;
+    public function getSchema(): array;
 
     /**
      * Get attributes.

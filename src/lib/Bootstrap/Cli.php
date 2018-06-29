@@ -39,10 +39,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Cli.
-     *
-     * @param LoggerInterface    $logger
-     * @param Getopt             $getopt
-     * @param ContainerInterface $container
      */
     public function __construct(LoggerInterface $logger, GetOpt $getopt, ContainerInterface $container)
     {
@@ -57,8 +53,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Process.
-     *
-     * @return Cli
      */
     public function process(): Cli
     {

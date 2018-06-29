@@ -41,9 +41,6 @@ class Wrapper
 
     /**
      * construct.
-     *
-     * @param mysqli          $mysqli
-     * @param LoggerInterface $logger
      */
     public function __construct(mysqli $mysqli, LoggerInterface $logger)
     {
@@ -55,9 +52,6 @@ class Wrapper
      * Forward calls.
      *
      * @param array $method
-     * @param array $arguments
-     *
-     * @return mixed
      */
     public function __call(string $method, array $arguments = [])
     {
@@ -76,10 +70,6 @@ class Wrapper
 
     /**
      * Query.
-     *
-     * @param string $query
-     *
-     * @return mysqli_result
      */
     public function select(string $query): mysqli_result
     {
@@ -99,10 +89,6 @@ class Wrapper
 
     /**
      * Select query.
-     *
-     * @param string $query
-     *
-     * @return bool
      */
     public function query(string $query): bool
     {
@@ -122,11 +108,6 @@ class Wrapper
 
     /**
      * Prepare query.
-     *
-     * @param string   $query
-     * @param iterable $values
-     *
-     * @return mysqli_stmt
      */
     public function prepare(string $query, Iterable $values): mysqli_stmt
     {

@@ -50,11 +50,6 @@ class Jobs
 
     /**
      * Constructor.
-     *
-     * @param App             $app
-     * @param Async           $async
-     * @param LoggerInterface $logger
-     * @param GetOpt          $getopt
      */
     public function __construct(Scheduler $scheduler, Queue $queue, LoggerInterface $logger, GetOpt $getopt)
     {
@@ -102,8 +97,6 @@ class Jobs
 
     /**
      * Delete job by id.
-     *
-     * @return Jobs
      */
     public function delete(): Jobs
     {
@@ -115,8 +108,6 @@ class Jobs
 
     /**
      * List active jobs.
-     *
-     * @return Jobs
      */
     public function get(): Jobs
     {
@@ -130,8 +121,6 @@ class Jobs
 
     /**
      * Fire up daemon.
-     *
-     * @return bool
      */
     public function listen(): bool
     {

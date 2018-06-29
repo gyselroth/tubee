@@ -142,8 +142,6 @@ class Xml extends AbstractFile
      * Set options.
      *
      * @param iterable $config
-     *
-     * @return EndpointInterface
      */
     public function setXmlOptions(?Iterable $config = null): EndpointInterface
     {

@@ -66,12 +66,8 @@ class Moodle extends AbstractEndpoint
     /**
      * Init endpoint.
      *
-     * @param string            $name
-     * @param string            $type
-     * @param ApiClient         $wrapper
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * @param Logger   $logger
+     * @param iterable $config
      */
     public function __construct(string $name, string $type, string $resource_type, ApiClient $wrapper, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
     {
@@ -260,10 +256,6 @@ class Moodle extends AbstractEndpoint
 
     /**
      * Get moodle resource id.
-     *
-     * @param iterable $endpoint_object
-     *
-     * @return string
      */
     protected function getId(Iterable $endpoint_object): string
     {

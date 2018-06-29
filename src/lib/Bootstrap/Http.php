@@ -36,19 +36,25 @@ class Http extends AbstractBootstrap
 
     /**
      * Http.
-     *
-     * @param LoggerInterface $logger
-     * @param Auth            $auth
-     * @param Router          $router
      */
-    public function __construct(LoggerInterface $logger, Auth $auth, Router $router)
+    public function __construct(/*LoggerInterface $logger, Auth $auth, Router $router*/)
     {
-        $this->setExceptionHandler();
+        /*$this->setExceptionHandler();
         $this->setErrorHandler();
 
         $this->logger = $logger;
         $this->auth = $auth;
         $this->router = $router;
+
+        $router
+            ->appendRoute(new Route('/api/v1/mandators', v1\Mandators::class))
+            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}(/|\z)', v2\Mandators::class))
+            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes(/|\z)/', v1\DataTypes::class))
+            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes/{datatype:#([0-9a-zA-Z_-])#}(/|\z)/', v1\DataTypes::class))
+            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes/{datatype:#([0-9a-zA-Z_-])#}/objects(/|\z)/', v1\Objects::class))
+            ->appendRoute(new Route('/api/v1', v2\Api::class))
+            ->appendRoute(new Route('/api$', v2\Api::class))
+            ->appendRoute(new Route('^$', v2\Api::class));*/
     }
 
     /**

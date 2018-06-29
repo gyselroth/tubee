@@ -41,8 +41,6 @@ class Balloon implements StorageInterface
 
     /**
      * Init storage.
-     *
-     * @param NativeServer $server
      */
     public function __construct(ApiClient $balloon, LoggerInterface $logger, ?string $collection = null)
     {

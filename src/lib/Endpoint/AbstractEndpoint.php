@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use InvalidArgumentException;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface as Logger;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Helper;
@@ -93,11 +94,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * Init endpoint.
      *
-     * @param string            $name
-     * @param string            $type
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * @param iterable $config
      */
     public function __construct(string $name, string $type, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
     {
@@ -128,8 +125,6 @@ abstract class AbstractEndpoint implements EndpointInterface
      * Set options.
      *
      * @param iterable $config
-     *
-     * @return EndpointInterface
      */
     public function setOptions(?Iterable $config = null): EndpointInterface
     {
@@ -166,6 +161,27 @@ abstract class AbstractEndpoint implements EndpointInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Decorate.
+     */
+    public function decorate(ServerRequestInterface $request): array
+    {
+        return [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
+            'kind' => 'Endpoint',
+            'name' => $this->name,
+            'class' => get_class($this),
+            'type' => $this->type,
+            'flush' => $this->flush,
+            'history' => $this->history,
+            'import' => $this->import,
+            'filter_all' => $this->filter_all,
+            'filter_one' => $this->filter_one,
+        ];
     }
 
     /**
@@ -340,11 +356,6 @@ abstract class AbstractEndpoint implements EndpointInterface
 
     /**
      * Parse and replace string with attribute values.
-     *
-     * @param string   $string
-     * @param iterable $data
-     *
-     * @return string
      */
     private function parseAttribute(string $string, Iterable $data): string
     {

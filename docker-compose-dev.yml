@@ -32,13 +32,13 @@ balloon-endpoint:
         - BALLOON_URL=http://localhost:8080
 tubee-dev:
     image: gyselroth/tubee-development:latest
+    ports:
+        - "8090:80"
     volumes:
         - .:/srv/www/tubee
     links:
         - mongodb
         - openldap-endpoint
         - balloon-endpoint
-        - moodle-endpoint
-    entrypoint: sleep infinity
     environment:
         - TUBEE_MONGODB_URI=mongodb://mongodb:27017

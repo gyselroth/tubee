@@ -11,6 +11,15 @@ declare(strict_types=1);
 
 namespace Tubee\Schema\Exception;
 
-class AttributeRegexNotMatch extends \Tubee\Exception
+use Micro\Http\ExceptionInterface;
+
+class AttributeRegexNotMatch extends \Tubee\Exception implements ExceptionInterface;
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatusCode(): int
+    {
+        return 422;
+    }
 }

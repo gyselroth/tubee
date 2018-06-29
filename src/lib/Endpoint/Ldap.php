@@ -334,10 +334,6 @@ class Ldap extends AbstractEndpoint
 
     /**
      * Prepare object.
-     *
-     * @param array $result
-     *
-     * @return array
      */
     protected function prepareRawObject(array $result): array
     {
@@ -361,10 +357,6 @@ class Ldap extends AbstractEndpoint
 
     /**
      * Move ldap object.
-     *
-     * @param string $new_dn
-     * @param string $current_dn
-     * @param bool   $simulate
      */
     protected function moveLdapObject(string $new_dn, string $current_dn, bool $simulate = false): bool
     {
@@ -385,11 +377,6 @@ class Ldap extends AbstractEndpoint
 
     /**
      * Get dn.
-     *
-     * @param iterable $object
-     * @param iterable $endpoint_object
-     *
-     * @return string
      */
     protected function getDn(Iterable $object, Iterable $endpoint_object = []): string
     {

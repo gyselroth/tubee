@@ -33,9 +33,6 @@ class Wrapper
 
     /**
      * construct.
-     *
-     * @param PDO             $pdo
-     * @param LoggerInterface $logger
      */
     public function __construct(PDO $pdo, LoggerInterface $logger)
     {
@@ -47,9 +44,6 @@ class Wrapper
      * Forward calls.
      *
      * @param array $method
-     * @param array $arguments
-     *
-     * @return mixed
      */
     public function __call(string $method, array $arguments = [])
     {
@@ -66,10 +60,6 @@ class Wrapper
 
     /**
      * Query.
-     *
-     * @param string $query
-     *
-     * @return PDOStatement
      */
     public function select(string $query): PDOStatement
     {
@@ -89,10 +79,6 @@ class Wrapper
 
     /**
      * Select query.
-     *
-     * @param string $query
-     *
-     * @return bool
      */
     public function query(string $query): bool
     {
@@ -115,11 +101,6 @@ class Wrapper
 
     /**
      * Prepare query.
-     *
-     * @param string   $query
-     * @param iterable $values
-     *
-     * @return PDOStatement
      */
     public function prepare(string $query, Iterable $values): PDOStatement
     {

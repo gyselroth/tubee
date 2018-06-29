@@ -13,6 +13,7 @@ namespace Tubee;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
+use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataObject\AttributeDecorator;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
@@ -32,36 +33,42 @@ class DataObject implements DataObjectInterface
      * @var UTCDateTime
      */
     protected $created;
+
     /**
      * Changed.
      *
      * @var UTCDateTime
      */
     protected $changed;
+
     /**
      * Disabled (Deleted).
      *
      * @var UTCDateTime
      */
     protected $deleted;
+
     /**
      * Object version.
      *
      * @var int
      */
     protected $version = 1;
+
     /**
      * Data.
      *
      * @var array
      */
     protected $data = [];
+
     /**
      * Endpoints.
      *
      * @var array
      */
     protected $endpoints = [];
+
     /**
      * Datatype.
      *
@@ -107,9 +114,17 @@ class DataObject implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function decorate(array $attributes = []): array
+    public function decorate(ServerRequestInterface $request): array
     {
-        return AttributeDecorator::decorate($this, $attributes);
+        return AttributeDecorator::decorate($this, $request);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHistory(?int $offset = null, ?int $limit = null): Iterable
+    {
+        return $this->datatype->getObjectHistory($this->_id);
     }
 
     /**

@@ -33,8 +33,6 @@ class Manager
 
     /**
      * Initialize.
-     *
-     * @param LoggerInterface $logger
      */
     public function __construct(LoggerInterface $logger)
     {
@@ -43,10 +41,6 @@ class Manager
 
     /**
      * Has mandator.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
     public function hasMandator(string $name): bool
     {
@@ -56,7 +50,6 @@ class Manager
     /**
      * Inject mandator.
      *
-     * @param MandatorInterface $mandator
      *
      * @return Manager
      */
@@ -77,10 +70,6 @@ class Manager
 
     /**
      * Get mandator.
-     *
-     * @param string $name
-     *
-     * @return MandatorInterface
      */
     public function getMandator(string $name): MandatorInterface
     {
@@ -93,8 +82,6 @@ class Manager
 
     /**
      * Get mandators.
-     *
-     * @param array $mandators
      *
      * @return MandatorInterface[]
      */

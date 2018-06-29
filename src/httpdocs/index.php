@@ -29,18 +29,28 @@ set_include_path(implode(PATH_SEPARATOR, [
 $composer = require 'vendor/autoload.php';
 $http = null;
 
-try {
+//try {
     $dic = ContainerBuilder::get($composer);
-    $http = $dic->get(Http::class);
-} catch (\Exception $e) {
-    error_log((string) $e);
 
-    (new Response())
+    $request = Zend\Diactoros\ServerRequestFactory::fromGlobals();
+    $dic->get(Tubee\Rest\Routes::class);
+    $dispatcher = $dic->get(\mindplay\middleman\Dispatcher::class);
+    $response = $dispatcher->dispatch($request);
+
+$emitter = new \Zend\Diactoros\Response\SapiEmitter();
+$emitter->emit($response);
+
+    //$http = $dic->get(Http::class);
+
+//} catch (\Exception $e) {
+//    error_log((string) $e);
+
+    /*(new Response())
         ->setCode(500)
         ->setBody([
             'error' => get_class($e),
             'message' => $e->getMessage(),
-        ])->send();
-}
+        ])->send();*/
+//}
 
-$http->process();
+//$http->process();

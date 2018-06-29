@@ -37,7 +37,16 @@
         "icewind/smb": "^2.0",
         "symfony/expression-language": "^4.0",
         "psr/cache": "^1.0",
-        "dreamscapes/ldap-core": "^3.1"
+        "dreamscapes/ldap-core": "^3.1",
+        "guzzlehttp/psr7": "^1.4",
+        "mindplay/middleman": "^3.0",
+        "lcobucci/content-negotiation-middleware": "^1.0",
+        "zendframework/zend-diactoros": "^1.7",
+        "psr/http-message": "*",
+        "psr/http-server-middleware": "*",
+        "middlewares/utils": "^1.1",
+        "middlewares/payload": "^2.0",
+        "middlewares/negotiation": "^1.0"
     },
     "suggest": {
         "ext-pthreads": "*",

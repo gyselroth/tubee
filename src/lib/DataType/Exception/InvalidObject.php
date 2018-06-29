@@ -11,6 +11,15 @@ declare(strict_types=1);
 
 namespace Tubee\DataType\Exception;
 
-class InvalidObject extends \Tubee\Exception
+use Micro\Http\ExceptionInterface;
+
+class InvalidObject extends \Tubee\Exception implements ExceptionInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatusCode(): int
+    {
+        return 422;
+    }
 }

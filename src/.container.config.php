@@ -14,8 +14,59 @@ use Zend\Mail\Transport\Smtp;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\ExpressionLanguage\DateTimeLanguageProvider;
 use Tubee\ExpressionLanguage\StringLanguageProvider;
+use mindplay\middleman\Dispatcher;
+use mindplay\middleman\ContainerResolver;
+use Tubee\Rest\ExceptionHandler;
+use Micro\Http\Middlewares\Router;
+use Micro\Http\Middlewares\RequestHandler;
+use Lcobucci\ContentNegotiation\ContentTypeMiddleware;
+use Lcobucci\ContentNegotiation\Formatter\Json;
+use Micro\Auth\Middleware\Auth as AuthMiddleware;
+use Middlewares\JsonPayload;
 
 return [
+    Dispatcher::class => [
+        'arguments' => [
+            'stack' => [
+                ContentTypeMiddleware::class,
+                ExceptionHandler::class,
+                JsonPayload::class,
+                AuthMiddleware::class,
+                Router::class,
+                RequestHandler::class,
+            ],
+            'resolver' => '{'.ContainerResolver::class.'}'
+        ],
+        'services' => [
+            ContentTypeMiddleware::class => [
+                'factory' => [
+                    'method' => 'fromRecommendedSettings',
+                    'arguments' => [
+                        'formats' => [
+                            'json' => [
+                                'extension' => ['json'],
+                                'mime-type' => ['application/json', 'text/json', 'application/x-json'],
+                                'charset' => true,
+                            ],
+                        ],
+                        'formatters' => [
+                            'application/json' => '{'.Json::class.'}',
+                        ],
+                        //'streamFactory' => '{'.LazyOpenStream::class.'}'
+                    ]
+                ],
+                /*'services' => [
+                    LazyOpenStream::class => [
+                        'wrap_callback' => true,
+                        'arguments' => [
+                            'filename' => 'php://temp',
+                            'mode' => 'wb+'
+                        ]
+                    ]
+                ]*/
+            ]
+        ]
+    ],
     Client::class => [
         'arguments' => [
             'uri' => '{ENV(TUBEE_MONGODB_URI,mongodb://localhost:27017)}',
@@ -123,14 +174,14 @@ return [
             ],
         ],
     ],
-    Auth::class => [
+    /*Auth::class => [
         'calls' => [
             'basic_db' => [
                 'method' => 'injectAdapter',
                 'arguments' => ['adapter' => '{'.Db::class.'}', 'name' => 'basic_db']
             ],
         ],
-    ],
+    ],*/
     TransportInterface::class => [
         'use' => Smtp::class
     ],

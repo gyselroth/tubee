@@ -1,0 +1,1592 @@
+swagger: "2.0"
+info:
+  description: ""
+  version: "1.0.0"
+  title: "Tubee API"
+  termsOfService: ""
+  contact:
+    email: "opensource@gyselroth.net"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "datamanager"
+basePath: "/api/v1"
+tags:
+- name: "data"
+  description: "Manage data objects"
+- name: "jobs"
+  description: "Manage jobs"
+- name: "config"
+  description: "Request configuration"
+schemes:
+- "https"
+paths:
+  /mandators:
+    get:
+      tags:
+      - "config"
+      summary: "Get mandators"
+      description: "A mandator is a logical group of datatypes"
+      operationId: "getMandators"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of mandators"
+          schema:
+            $ref: "#/definitions/mandators"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specific mandator"
+      description: "A mandator is a logical group of datatypes"
+      operationId: "getMandator"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Mandator"
+          schema:
+            $ref: "#/definitions/mandator"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes:
+    get:
+      tags:
+      - "config"
+      summary: "Get datatypes"
+      description: "A datatype is collection of dataobjects of a specific type"
+      operationId: "getDatatypes"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of datatypes"
+          schema:
+            $ref: "#/definitions/datatypes"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specific datatype"
+      description: "A datatype is collection of dataobjects of a specific type"
+      operationId: "getDatatype"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Datatype"
+          schema:
+            $ref: "#/definitions/datatype"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/schema:
+    get:
+      tags:
+      - "config"
+      summary: "Get datatype schema"
+      description: "A schema defines what attributes a datatype has"
+      operationId: "getSchema"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Datatype schema"
+          schema:
+            $ref: "#/definitions/schema"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints:
+    get:
+      tags:
+      - "config"
+      summary: "Get endpoints"
+      description: "An endpoint is either of type source or destination and defines an import/export destination"
+      operationId: "getEndpoints"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of endpoints"
+          schema:
+            $ref: "#/definitions/endpoints"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specific endpoint"
+      description: "An endpoint is either of type source or destination and defines an import/export destination"
+      operationId: "getEndpoint"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Endpoint"
+          schema:
+            $ref: "#/definitions/endpoint"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
+    get:
+      tags:
+      - "config"
+      summary: "Get endpoint workflows"
+      description: "A workflow is an action how to import/export a datatype and with what attribute map"
+      operationId: "getWorkflows"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of workflows"
+          schema:
+            $ref: "#/definitions/workflows"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}:
+    get:
+      tags:
+      - "config"
+      summary: "Get specifc endpoint workflow"
+      description: "A workflow is an action how to import/export a datatype and with what attribute map"
+      operationId: "getWorkflow"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Workflow"
+          schema:
+            $ref: "#/definitions/workflow"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}/attribute-map:
+    get:
+      tags:
+      - "config"
+      summary: "Get endpoint workflow attribute map"
+      description: "An attribute map defines how a datatype schema is mapped to a specific endpoint"
+      operationId: "getAttributeMap"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Attribute map"
+          schema:
+            $ref: "#/definitions/attribute-map"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}:
+    get:
+      tags:
+      - "data"
+      summary: "Get specific object"
+      description: "Get an object of a specific datatype"
+      operationId: "getObject"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Data object"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "data"
+      summary: "Update object"
+      description: "Update specific attributes of an object"
+      operationId: "updateObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "write"
+        description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Object"
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              description: "Object attributes"
+            endpoints:
+              type: array
+              items:
+                type: "string"
+              description: "Specify destination endpoints, if not set the objects get exported to all destination endpoints"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/object"
+        202:
+          description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "data"
+      summary: "Replace or create object"
+      description: "Replace all data attributes of an object (Or create one if not exists)"
+      operationId: "replaceObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "write"
+        description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Object"
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              description: "Object attributes"
+            endpoints:
+              type: array
+              items:
+                type: "string"
+              description: "Specify destination endpoints, if not set the objects get exported to all destination endpoints"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/object"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/object"
+        202:
+          description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "data"
+      summary: "Delete object"
+      description: "Delete a specific object"
+      operationId: "deleteObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "write"
+        description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      responses:
+        202:
+          description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
+          schema:
+            $ref: "#/definitions/job"
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints:
+    get:
+      tags:
+      - "data"
+      summary: "Get object from endpoints"
+      description: "Get object from all endpoints the object is related to"
+      operationId: "getObjectEndpoints"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Object attributes from endpoints"
+          schema:
+            $ref: "#/definitions/object-endpoints"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints/{endpoint}:
+    get:
+      tags:
+      - "data"
+      summary: "Get object from endpoint"
+      description: "Get object from all endpoints the object is related to"
+      operationId: "getObjectEndpoint"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint nmae"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Object attributes from a specific endpoint"
+          schema:
+            $ref: "#/definitions/object-endpoint"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/objects:
+    get:
+      tags:
+      - "data"
+      summary: "Get objects from endpoint"
+      description: "An endpoint is either of type source or destination and defines an import/export destination"
+      operationId: "getEndpointObjects"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "query"
+        description: "Query objects on endpoint"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      responses:
+        200:
+          description: "List of objects"
+          schema:
+            $ref: "#/definitions/objects"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/history:
+    get:
+      tags:
+      - "data"
+      summary: "Get object history"
+      description: "Get the history of all modifications from a specific object"
+      operationId: "getHistory"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Object history"
+          schema:
+            $ref: "#/definitions/object-history"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects:
+    get:
+      tags:
+      - "data"
+      summary: "Get objects of a specific datatype"
+      description: "A object is a data object from a specifc datatype"
+      operationId: "getObjects"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "query"
+        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      responses:
+        200:
+          description: "List of objects"
+          schema:
+            $ref: "#/definitions/objects"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "data"
+      summary: "Add a new object of a specifc datatype"
+      operationId: "addObject"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "write"
+        description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Object"
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              type: object
+              description: "Object attributes"
+            endpoints:
+              type: array
+              items:
+                type: "string"
+              description: "Specify destination endpoints, if not set the objects get exported to all destination endpoints"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/object"
+        202:
+          description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get list of active queued jobs"
+      description: "A job is an asynchronous server process"
+      operationId: "getJobs"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "query"
+        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      responses:
+        200:
+          description: "List of active jobs"
+          schema:
+            $ref: "#/definitions/jobs"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "jobs"
+      summary: "Create new job"
+      operationId: "addJob"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: body
+        name: "job"
+        description: "The job to create"
+        schema:
+          type: object
+          properties:
+            mandator:
+              description: "Array of mandators, if not given all mandators are used"
+              type: "array"
+              items:
+                type: "string"
+            datatypes:
+              description: "Array of datatypes, if not given all datatypes are used"
+              type: "array"
+              items:
+                type: "string"
+            endpoints:
+              description: "Array of source endpoints, if not given all mandators are used"
+              type: "array"
+              items:
+                type: "string"
+            interval:
+              description: "Specify an interval for this job. If not specified the jobs runs once."
+              type: "integer"
+              default: 0
+            retry:
+              description: "Specify a retry count for this job. If not specified the job does not repeat if failed before."
+              type: "integer"
+              default: 0
+            execute_at:
+              description: "Specify an exact timestamp when the job should get executed. The job will get executed not before this time and not before there is a free slot"
+              type: "integer"
+              default: 0
+      responses:
+        201:
+          description: "The created job"
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get job by id"
+      operationId: "getJob"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Job"
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "jobs"
+      summary: "Delete job by id"
+      operationId: "deleteJob"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Server responds with 204 No Content if job removal was successful"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}/errors:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get all errors of a job"
+      operationId: "getJobErrors"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "query"
+        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      responses:
+        200:
+          description: "Job"
+          schema:
+            $ref: "#/definitions/job-errors"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}/errors/{error}:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get a single job error"
+      operationId: "getJobError"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "error"
+        description: "Error id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Job"
+          schema:
+            $ref: "#/definitions/job-error"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+definitions:
+  links:
+    type: "object"
+    properties:
+      self:
+        $ref: "#/definitions/link"
+  list-links:
+    type: "object"
+    properties:
+      self:
+        $ref: "#/definitions/link"
+      prev:
+        $ref: "#/definitions/link"
+      next:
+        $ref: "#/definitions/link"
+  link:
+    type: "object"
+    properties:
+      href:
+        type: "string"
+  mandators:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/mandator"
+  mandator:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      name:
+        type: "string"
+  jobs:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/job"
+  job:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      status:
+        type: "integer"
+        format: "int"
+        minimum: 0
+        maximum: 4
+      created:
+        type: "string"
+        format: "date-time"
+      at:
+        type: "string"
+        format: "date-time"
+      interval:
+        type: "integer"
+      retry:
+        type: "integer"
+      retry_interval:
+        type: "integer"
+  job-errors:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/job-error"
+  job-error:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      object:
+        $ref: "#/definitions/object"
+      endpoint:
+        $ref: "#/definitions/endpoint"
+      timestamp:
+        type: "string"
+        format: "date-time"
+      message:
+        type: "string"
+      class:
+        type: "string"
+  datatypes:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/datatype"
+  datatype:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      name:
+        type: "string"
+        description: "Datatype name"
+      mandator:
+        $ref: "#/definitions/mandator"
+      enabled:
+        type: "boolean"
+        description: "Is true if datatype is enabled"
+      class:
+        type: "string"
+        description: "Name of implementation, usually Tubee\\Datatype"
+      collection:
+        type: "string"
+        description: "Collection name which holds objects of this datatype"
+      dataset:
+        type: "string"
+        description: "Dataset aggregation query"
+  endpoints:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/endpoint"
+  endpoint:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      name:
+        type: "string"
+        description: "Endpoint name"
+      datatype:
+        $ref: "#/definitions/datatype"
+      mandator:
+        $ref: "#/definitions/mandator"
+      type:
+        type: "string"
+        description: "Type of endpoint (Either source or destination)"
+      class:
+        type: "string"
+        description: "Name of implementation (Endpoint type/protocol)"
+      history:
+        type: "boolean"
+        description: "Is true if history tracking is enabled to this endpoint"
+      import:
+        type: "array"
+        description: "Array of attributes which are used as identifier"
+        items:
+          type: "string"
+      filter_one:
+        type: "string"
+        description: "Filter to identitfy exactly one object"
+      filter_all:
+        type: "string"
+        description: "Filter whole endpoint"
+      resource:
+        type: "object"
+        description: "Endpoint specific configuration"
+  workflows:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/workflow"
+  workflow:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      name:
+        type: "string"
+        description: "Workflow name"
+      datatype:
+        $ref: "#/definitions/datatype"
+      mandator:
+        $ref: "#/definitions/mandator"
+      endpoint:
+        type: "string"
+        description: "Workflow name"
+      class:
+        type: "string"
+        description: "Name of implementation, usually Tubee\\Workflow"
+      ensure:
+        type: "string"
+        description: "Specifies what type of workflow this is."
+      condition:
+        type: "string"
+        description: "Workflow condition"
+  schema:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      datatype:
+        $ref: "#/definitions/datatype"
+      mandator:
+        $ref: "#/definitions/mandator"
+      schema:
+        type: "object"
+        description: "Datatype schema"
+  attribute-map:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      datatype:
+        $ref: "#/definitions/datatype"
+      mandator:
+        $ref: "#/definitions/mandator"
+      workflow:
+        $ref: "#/definitions/workflow"
+      class:
+        type: "string"
+        description: "Name of implementation, usually Tubee\\AttributeMap"
+      map:
+        type: "object"
+        description: "Attribute map"
+  objects:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/object"
+  object:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      version:
+        type: "integer"
+      created:
+        type: "string"
+        format: "date-time"
+      changed:
+        type: "string"
+        format: "date-time"
+      deleted:
+        type: "string"
+        format: "date-time"
+      mandator:
+        type: "string"
+      datatype:
+        type: "string"
+      locked:
+        type: "string"
+        format: "date-time"
+      data:
+        type: "object"
+  object-history:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/object-history-object"
+  object-history-object:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      version:
+        type: "integer"
+      timestamp:
+        type: "string"
+        format: "date-time"
+      object:
+        $ref: "#/definitions/object"
+      data:
+        type: "object"
+  object-endpoints:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/object-endpoint"
+  object-endpoint:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      data:
+        type: "object"
+securityDefinitions:
+  petstore_auth:
+    type: "oauth2"
+    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
+    flow: "implicit"
+    scopes:
+      write:pets: "modify pets in your account"
+      read:pets: "read your pets"
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"

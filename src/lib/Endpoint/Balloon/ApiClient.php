@@ -59,7 +59,6 @@ class ApiClient
      * construct.
      *
      * @param iterable $config
-     * @param Logger   $logger
      */
     public function __construct(?Iterable $config = null, Logger $logger)
     {
@@ -71,8 +70,6 @@ class ApiClient
      * Set options.
      *
      * @param iterable $config
-     *
-     * @return ApiClient
      */
     public function setOptions(?Iterable $config): ApiClient
     {
@@ -111,10 +108,6 @@ class ApiClient
 
     /**
      * Open stream.
-     *
-     * @param string $url
-     * @param array  $params
-     * @param string $method
      */
     public function openSocket(string $url, array $params = [], string $method = 'GET')
     {
@@ -142,9 +135,6 @@ class ApiClient
     /**
      * REST call.
      *
-     * @param string $url
-     * @param array  $params
-     * @param string $method
      *
      * @return array
      */

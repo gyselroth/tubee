@@ -19,8 +19,6 @@ class ContainerBuilder
 {
     /**
      * Init bootstrap.
-     *
-     * @param Composer $composer
      */
     public static function get(Composer $composer)
     {
@@ -33,8 +31,6 @@ class ContainerBuilder
 
     /**
      * Load config.
-     *
-     * @return Config
      */
     protected static function loadConfig(): Config
     {

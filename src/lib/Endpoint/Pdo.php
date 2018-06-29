@@ -22,12 +22,7 @@ class Pdo extends AbstractSqlDatabase
     /**
      * Init endpoint.
      *
-     * @param string            $name
-     * @param string            $type
-     * @param string            $table
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * @param iterable $config
      */
     public function __construct(string $name, string $type, string $table, PdoWrapper $pdo, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
     {

@@ -35,9 +35,6 @@ class Sync extends AbstractJob
 
     /**
      * Sync.
-     *
-     * @param Manager   $manager
-     * @param Scheduler $scheduler
      */
     public function __construct(Manager $manager, Scheduler $scheduler)
     {
@@ -47,8 +44,6 @@ class Sync extends AbstractJob
 
     /**
      * Start job.
-     *
-     * @return bool
      */
     public function start(): bool
     {
@@ -81,8 +76,6 @@ class Sync extends AbstractJob
 
     /**
      * Get job defaults.
-     *
-     * @return array
      */
     protected function getDefaults(): array
     {

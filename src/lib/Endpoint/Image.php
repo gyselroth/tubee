@@ -146,8 +146,6 @@ class Image extends AbstractFile
      * Get image contents.
      *
      * @param resource $stream
-     *
-     * @return string
      */
     protected function scaleImage($stream): string
     {

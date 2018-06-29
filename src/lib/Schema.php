@@ -35,7 +35,7 @@ class Schema implements SchemaInterface
     /**
      * Init attribute schema.
      */
-    public function __construct(Iterable $schema = [], LoggerInterface $logger)
+    public function __construct(array $schema = [], LoggerInterface $logger)
     {
         $this->schema = $schema;
         $this->logger = $logger;
@@ -44,7 +44,7 @@ class Schema implements SchemaInterface
     /**
      * {@inheritdoc}
      */
-    public function getMap(): Iterable
+    public function getSchema(): array
     {
         return $this->schema;
     }
@@ -63,25 +63,24 @@ class Schema implements SchemaInterface
     public function validate(Iterable $data): array
     {
         $result = [];
-        foreach ($this->schema as $attr => $value) {
+        foreach ($this->schema as $attribute => $value) {
             if (!is_array($value)) {
-                throw new InvalidArgumentException('attribute '.$attr.' definiton must be an array');
+                throw new InvalidArgumentException('attribute '.$attribute.' definiton must be an array');
             }
 
-            if (isset($value['required']) && $value['required'] === true && !isset($data[$attr])) {
+            if (isset($value['required']) && $value['required'] === true && !isset($data[$attribute])) {
                 throw new Exception\AttributeNotFound('attribute '.$attribute.' is required');
             }
 
-            continue;
-            if (isset($value['type']) && gettype($data[$attr]) !== $value['type']) {
+            if (isset($value['type']) && gettype($data[$attribute]) !== $value['type']) {
                 throw new Exception\AttributeInvalidType('attribute '.$attribute.' value is not of type '.$value['type']);
             }
 
             if (isset($value['require_regex'])) {
-                $this->requireRegex($data[$attr], $attr, $value['require_regex']);
+                $this->requireRegex($data[$attribute], $attribute, $value['require_regex']);
             }
 
-            $this->logger->debug('schema attribute ['.$attr.'] to [<'.$value['type'].'> {value}]', [
+            $this->logger->debug('schema attribute ['.$attribute.'] to [<'.$value['type'].'> {value}]', [
                 'category' => get_class($this),
                 'value' => $result[$attr],
             ]);
@@ -92,8 +91,6 @@ class Schema implements SchemaInterface
 
     /**
      * Require regex value.
-     *
-     * @param iterable|string $value
      */
     protected function requireRegex($value, string $attribute, string $regex): bool
     {

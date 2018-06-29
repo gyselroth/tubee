@@ -15,12 +15,6 @@ class Helper
 {
     /**
      * Get array value via string path.
-     *
-     * @param iterable $arr
-     * @param string   $path
-     * @param string   $seperator
-     *
-     * @return mixed
      */
     public static function getArrayValue(Iterable $array, string $path, string $separator = '.')
     {
@@ -43,11 +37,7 @@ class Helper
     /**
      * Convert assoc array to single array.
      *
-     * @param iterable $arr
-     * @param iterable $narr
-     * @param string   $nkey
-     *
-     * @return array
+     * @param string $nkey
      */
     public static function associativeArrayToPath(Iterable $arr, Iterable $narr = [], $nkey = ''): array
     {
@@ -69,7 +59,6 @@ class Helper
     /**
      * Convert array with keys like a.b to associative array.
      *
-     * @param iterable $array
      *
      * @return iterable
      */
@@ -94,11 +83,6 @@ class Helper
 
     /**
      * Compare array.
-     *
-     * @param array $a1
-     * @param array $a2
-     *
-     * @return bool
      */
     public static function arrayEqual(array $a1, array $a2): bool
     {
@@ -107,11 +91,6 @@ class Helper
 
     /**
      * Search array element.
-     *
-     * @param mixed $values
-     * @param mixed $key
-     * @param array $array
-     * @param mixed $value
      */
     public static function searchArray($value, $key, array $array)
     {

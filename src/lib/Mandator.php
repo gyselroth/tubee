@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface as Logger;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Mandator\Exception;
@@ -24,13 +25,6 @@ class Mandator implements MandatorInterface
      * @var string
      */
     protected $name;
-
-    /**
-     * Id.
-     *
-     * @var int
-     */
-    protected $id;
 
     /**
      * Manager.
@@ -55,10 +49,6 @@ class Mandator implements MandatorInterface
 
     /**
      * Initialize.
-     *
-     * @param string  $name
-     * @param Manager $manager
-     * @param Logger  $logger
      */
     public function __construct(string $name, Manager $manager, Logger $logger)
     {
@@ -122,6 +112,20 @@ class Mandator implements MandatorInterface
         }
 
         return $list;
+    }
+
+    /**
+     * Decorate.
+     */
+    public function decorate(ServerRequestInterface $request): array
+    {
+        return [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
+            'kind' => 'Mandator',
+            'name' => $this->name,
+        ];
     }
 
     /**

@@ -61,11 +61,6 @@ abstract class AbstractObjects
 
     /**
      * Constructor.
-     *
-     * @param GetOpt          $getopt
-     * @param Manager         $manager
-     * @param LoggerInterface $logger
-     * @param Scheduler       $scheduler
      */
     public function __construct(GetOpt $getopt, Manager $manager, LoggerInterface $logger, Scheduler $scheduler)
     {
@@ -212,8 +207,6 @@ abstract class AbstractObjects
 
     /**
      * Read stream.
-     *
-     * @param mixed $stream
      */
     protected function readStream($stream): array
     {
@@ -291,8 +284,6 @@ abstract class AbstractObjects
 
     /**
      * Validate input.
-     *
-     * @param mixed $object
      */
     protected function validateInput($object): array
     {

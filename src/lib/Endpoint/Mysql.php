@@ -22,12 +22,8 @@ class Mysql extends AbstractSqlDatabase
     /**
      * Init endpoint.
      *
-     * @param string            $name
-     * @param string            $type
-     * @param string            $table
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * @param Logger   $logger
+     * @param iterable $config
      */
     public function __construct(string $name, string $type, string $table, MysqlWrapper $mysqli, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
     {

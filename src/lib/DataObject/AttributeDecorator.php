@@ -12,24 +12,19 @@ declare(strict_types=1);
 namespace Tubee\DataObject;
 
 use Closure;
+use Psr\Http\Message\ServerRequestInterface;
 
 class AttributeDecorator
 {
     /**
      * Decorate attributes.
-     *
-     * @param RoleInterface $role
-     * @param array         $attributes
-     *
-     * @return array
      */
-    public static function decorate(DataObjectInterface $object, ?array $attributes = null): array
+    public static function decorate(DataObjectInterface $object, ServerRequestInterface $request): array
     {
-        if (null === $attributes) {
-            $attributes = [];
-        }
+        $query = $request->getQueryParams();
+        $attributes = isset($query['attributes']) ? (array) $query['attributes'] : [];
 
-        $attrs = self::getAttributes($object);
+        $attrs = self::getAttributes($object, $request);
         if (0 === count($attributes)) {
             return self::translateAttributes($object, $attrs);
         }
@@ -39,21 +34,20 @@ class AttributeDecorator
 
     /**
      * Get Attributes.
-     *
-     * @param RoleInterface
-     * @param array $attributes
-     *
-     * @return array
      */
-    protected static function getAttributes(DataObjectInterface $object): array
+    protected static function getAttributes(DataObjectInterface $object, ServerRequestInterface $request): array
     {
         return [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
+            'kind' => 'DataObject',
             'id' => (string) $object->getId(),
-            'mandator' => function ($object) {
-                return $object->getDataType()->getMandator()->getName();
+            'mandator' => function ($object) use ($request) {
+                return $object->getDataType()->getMandator()->decorate($request);
             },
-            'datatype' => function ($object) {
-                return $object->getDataType()->getName();
+            'datatype' => function ($object) use ($request) {
+                return $object->getDataType()->decorate($request);
             },
             'version' => $object->getVersion(),
             'created' => function ($object) {
@@ -82,9 +76,6 @@ class AttributeDecorator
      * Execute closures.
      *
      * @param RoleInterface
-     * @param array $attributes
-     *
-     * @return array
      */
     protected static function translateAttributes(DataObjectInterface $object, array $attributes): array
     {

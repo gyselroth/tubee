@@ -11,22 +11,26 @@ declare(strict_types=1);
 
 namespace Tubee\Rest\v1;
 
-use Micro\Http\Response;
+use Fig\Http\Message\StatusCodeInterface;
+use Lcobucci\ContentNegotiation\UnformattedResponse;
+use Psr\Http\Message\ResponseInterface;
+use Zend\Diactoros\Response;
 
-class Rest
+class Api
 {
     /**
      * Entrypoint.
-     *
-     * @return Response
      */
-    public function get(): Response
+    public function get(): ResponseInterface
     {
         $data = [
             'name' => 'tubee',
             'version' => 1,
         ];
 
-        return (new Response())->setCode(200)->setBody($data);
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $data
+        );
     }
 }

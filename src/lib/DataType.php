@@ -16,12 +16,14 @@ use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Database;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Exception;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Schema\SchemaInterface;
 
 class DataType implements DataTypeInterface
 {
@@ -35,9 +37,16 @@ class DataType implements DataTypeInterface
     /**
      * Mandator.
      *
-     * @var Mandator
+     * @var MandatorInterface
      */
     protected $mandator;
+
+    /**
+     * Schema.
+     *
+     * @var SchemaInterface
+     */
+    protected $schema;
 
     /**
      * Database.
@@ -76,18 +85,13 @@ class DataType implements DataTypeInterface
 
     /**
      * Initialize.
-     *
-     * @param string          $name
-     * @param Mandator        $mandator
-     * @param Database        $db
-     * @param LoggerInterface $logger
-     * @param iterable        $config
      */
-    public function __construct(string $name, MandatorInterface $mandator, Database $db, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, MandatorInterface $mandator, SchemaInterface $schema, Database $db, LoggerInterface $logger, ?Iterable $config = null)
     {
         $this->name = $name;
         $this->collection = $name;
         $this->mandator = $mandator;
+        $this->schema = $schema;
         $this->db = $db;
         $this->logger = $logger;
         $this->setOptions($config);
@@ -105,8 +109,6 @@ class DataType implements DataTypeInterface
      * Set options.
      *
      * @param iterable $config
-     *
-     * @return DataTypeInterface
      */
     public function setOptions(?Iterable $config = null): DataTypeInterface
     {
@@ -130,6 +132,20 @@ class DataType implements DataTypeInterface
         }
 
         return $this;
+    }
+
+    /**
+     * Decorate.
+     */
+    public function decorate(ServerRequestInterface $request): array
+    {
+        return [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
+            'kind' => 'DataType',
+            'name' => $this->name,
+        ];
     }
 
     /**
@@ -228,6 +244,39 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getObjectHistory(ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Iterable
+    {
+        $pipeline = [
+            ['$match' => ['_id' => $id]],
+            ['$unwind' => '$history'],
+        ];
+
+        $count = $pipeline;
+
+        if ($filter !== null) {
+            $pipeline[] = ['$match' => $filter];
+        }
+
+        if ($offset !== null) {
+            $pipeline[] = ['$skip' => $offset];
+        }
+
+        if ($limit !== null) {
+            $pipeline[] = ['$limit' => $limit];
+        }
+
+        foreach ($this->db->{$this->collection}->aggregate($pipeline) as $version) {
+            yield $version['version'] => new DataObject($version, $this);
+        }
+
+        $count[] = ['$count' => 'count'];
+        //return $this->db->{$this->collection}->aggregate($count)['count'];
+        return 1;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOne(Iterable $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
         $pipeline = $this->preparePipeline($filter, $include_dataset, $version);
@@ -263,7 +312,7 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getAll(Iterable $filter = [], bool $include_dataset = true, int $version = 0): Generator
+    public function getAll(Iterable $filter = [], bool $include_dataset = true, int $version = 0, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [];
         if ($include_dataset === true) {
@@ -276,6 +325,14 @@ class DataType implements DataTypeInterface
         }
 
         $found = 0;
+
+        if ($offset !== null) {
+            array_unshift($pipeline, ['$skip' => $offset]);
+        }
+
+        if ($limit !== null) {
+            $pipeline[] = ['$limit' => $limit];
+        }
 
         if (count($pipeline) === 0) {
             $this->logger->debug('empty pipeline given (no dataset configuration), collect all objects from ['.$this->collection.'] instead', [
@@ -305,13 +362,17 @@ class DataType implements DataTypeInterface
                 'category' => get_class($this),
             ]);
         }
+
+        return $this->db->{$this->collection}->count();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(Iterable $object, bool $simulate = false, array $endpoints = []): ObjectId
+    public function create(Iterable $object, bool $simulate = false, ?array $endpoints = null): ObjectId
     {
+        $this->schema->validate($object);
+
         $object = [
             'version' => 1,
             'created' => new UTCDateTime(),
@@ -373,6 +434,8 @@ class DataType implements DataTypeInterface
      */
     public function change(DataObjectInterface $object, Iterable $data, bool $simulate = false, array $endpoints = []): int
     {
+        $this->schema->validate($data);
+
         $query = [
             '$set' => ['endpoints' => $endpoints],
         ];
@@ -593,10 +656,6 @@ class DataType implements DataTypeInterface
 
     /**
      * Ensure indexes.
-     *
-     * @param array $fields
-     *
-     * @return string
      */
     public function ensureIndex(array $fields): string
     {
@@ -628,12 +687,6 @@ class DataType implements DataTypeInterface
 
     /**
      * Prepare pipeline.
-     *
-     * @param iterable $filter
-     * @param bool     $include_dataset
-     * @param int      $version
-     *
-     * @return array
      */
     protected function preparePipeline(Iterable $filter, bool $include_dataset = true, int $version = 0): array
     {
@@ -669,10 +722,6 @@ class DataType implements DataTypeInterface
 
     /**
      * Garbage.
-     *
-     * @param UTCDateTime       $timestamp
-     * @param EndpointInterface $endpoint
-     * @param bool              $simulate
      */
     protected function garbageCollector(UTCDateTime $timestamp, EndpointInterface $endpoint, bool $simulate = false, bool $ignore = false): bool
     {

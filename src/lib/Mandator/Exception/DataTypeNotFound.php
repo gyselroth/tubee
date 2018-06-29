@@ -11,6 +11,15 @@ declare(strict_types=1);
 
 namespace Tubee\Mandator\Exception;
 
-class DataTypeNotFound extends \Tubee\Exception
+use Micro\Http\ExceptionInterface;
+
+class DataTypeNotFound extends \Tubee\Exception implements ExceptionInterface
 {
+    /**
+     * {@inheritdoc}
+     */
+    public function getStatusCode(): int
+    {
+        return 404;
+    }
 }

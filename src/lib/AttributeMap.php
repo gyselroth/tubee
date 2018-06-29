@@ -45,10 +45,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Init attribute map.
-     *
-     * @param ExpressionLanguage $expression
-     * @param LoggerInterface    $logger
-     * @param iterable           $map
      */
     public function __construct(Iterable $map = [], ExpressionLanguage $expression, LoggerInterface $logger)
     {
@@ -175,10 +171,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Check if attribute is required.
-     *
-     * @param string $attr
-     * @param array  $value
-     * @param mixed  $attrv
      */
     protected function requireAttribute(string $attr, array $value, $attrv)
     {
@@ -199,11 +191,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Determine attribute type.
-     *
-     * @param string $attr
-     * @param array  $value
-     *
-     * @return string
      */
     protected function getAttributeType(string $attr, array $value): string
     {
@@ -221,11 +208,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Transform attribute.
-     *
-     * @param string $attr
-     * @param array  $value
-     * @param array  $data
-     * @param mixed  $attrv
      */
     protected function transformAttribute(string $attr, array $value, array $data, $attrv)
     {
@@ -250,10 +232,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Convert to class.
-     *
-     * @param string $attr
-     * @param mixed  $attrv
-     * @param string $type
      */
     protected function serializeClass(string $attr, $attrv, string $type)
     {
@@ -280,11 +258,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Check if attribute is required.
-     *
-     * @param string      $attr
-     * @param array       $value
-     * @param array       $data
-     * @param UTCDateTime $ts
      */
     protected function resolveValue(string $attr, array $value, array $data, UTCDateTime $ts)
     {
@@ -323,10 +296,6 @@ class AttributeMap implements AttributeMapInterface
      * Require regex value.
      *
      * @param iterable|string $value
-     * @param string          $attribute
-     * @param string          $regex
-     *
-     * @return bool
      */
     protected function requireRegex($value, string $attribute, string $regex): bool
     {
@@ -347,12 +316,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Shift first array element.
-     *
-     * @param iterable $value
-     * @param string   $attribute
-     * @param bool     $required
-     *
-     * @return mixed
      */
     protected function firstArrayElement(Iterable $value, string $attribute)
     {
@@ -369,13 +332,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Rewrite attribute value.
-     *
-     * @param mixed    $value
-     * @param string   $attribute
-     * @param iterable $ruleset
-     * @param iterable $data
-     *
-     * @return mixed
      */
     protected function rewrite($value, string $attribute, Iterable $ruleset, Iterable $data)
     {
@@ -395,10 +351,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Process ruleset.
-     *
-     * @param mixed    $value
-     * @param iterable $ruleset
-     * @param iterable $data
      */
     protected function processRules($value, Iterable $ruleset, Iterable $data)
     {
@@ -430,33 +382,33 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Convert value.
-     *
-     * @param mixed  $value
-     * @param string $attribute
-     * @param string $type
-     *
-     * @return mixed
      */
     protected function convert($value, string $attribute, string $type)
     {
         switch ($type) {
             case AttributeMapInterface::TYPE_ARRAY:
                 return (array) $value;
+
             break;
             case AttributeMapInterface::TYPE_STRING:
                 return (string) $value;
+
             break;
             case AttributeMapInterface::TYPE_INT:
                 return (int) $value;
+
             break;
             case AttributeMapInterface::TYPE_BOOL:
                 return (bool) $value;
+
             break;
             case AttributeMapInterface::TYPE_FLOAT:
                 return (float) $value;
+
             break;
             case AttributeMapInterface::TYPE_NULL:
                 return null;
+
             break;
             default:
                 if (is_object($value)) {
