@@ -64,12 +64,13 @@ class AccessRules
      */
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $body = $request->getDecodedBody();
+        $body = $request->getParsedBody();
         $id = $this->acl->addRule($body);
+        $rule = $this->acl->getRule($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $body,
+            $rule->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

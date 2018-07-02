@@ -17,6 +17,7 @@ use MongoDB\Database;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\Acl\Exception;
+use InvalidArgumentException;
 
 class Acl
 {
@@ -46,12 +47,12 @@ class Acl
     /**
      * Verify request.
      */
-    public function isAllowed(ServerRequestInterface $request, Identity $user)
+    public function isAllowed(ServerRequestInterface $request, Identity $user): bool
     {
         $this->logger->debug('verify access rule for identity ['.$user->getIdentifier().']', [
             'category' => get_class($this),
         ]);
-
+return true;
         $roles = $this->getRoles($user);
         $rules = $this->getRules($roles);
         $method = $request->getMethod();
@@ -101,7 +102,7 @@ class Acl
     /**
      * Update rule.
      */
-    public function updateRule(ObjectId $id, array $rule): bool
+    public function updateRule(string $name, array $rule): bool
     {
     }
 
@@ -110,13 +111,45 @@ class Acl
      */
     public function addRule(array $rule): ObjectId
     {
+        if(!isset($rule['name']) || !is_string($rule['name'])) {
+            throw new InvalidArgumentException('an access rule must have a valid name');
+        }
+
+        if($this->getRule($rule['name']) === null) {
+            throw new Exception\NotUnique('an access rule name must be unqiue');
+        }
+
+        foreach($rule as $option => $value) {
+            switch($option) {
+                case 'verbs':
+                case 'selectors':
+                case 'resources':
+                    if(!is_array($value)) {
+                        throw new InvalidArgumentException($option.' must be an array of strings');
+                    }
+                break;
+
+                default:
+                    throw new InvalidArgumentException('unknown access rule option '.$option.' given');
+            }
+        }
+
+        $result = $this->db->access_rules->insertOne($rule);
+        return $result->getId();
     }
 
     /**
      * Delete rule.
      */
-    public function deleteRule(ObjectId $id): bool
+    public function deleteRule(string $name): bool
     {
+        $result = $this->db->access_rules->remove(['name' => $id]);
+
+        if($result->nRemoved !== 1) {
+            throw new Exception\NotFound('access rule not found');
+        }
+
+        return true;
     }
 
     /**
@@ -127,6 +160,16 @@ class Acl
         return $this->db->access_rules->find([
             'users' => ['$in' => $roles],
         ]);
+    }
+
+    public function getRole(string $name): array
+    {
+
+    }
+
+    public function getRule(string $name): array
+    {
+
     }
 
     /**
