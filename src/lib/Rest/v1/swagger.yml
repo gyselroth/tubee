@@ -39,6 +39,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of mandators"
@@ -71,6 +76,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Mandator"
@@ -103,6 +113,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of datatypes"
@@ -144,6 +159,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Datatype"
@@ -185,6 +205,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Datatype schema"
@@ -226,6 +251,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of endpoints"
@@ -272,6 +302,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Endpoint"
@@ -318,6 +353,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of workflows"
@@ -367,6 +407,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Workflow"
@@ -418,6 +463,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Attribute map"
@@ -462,6 +512,11 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Data object"
@@ -504,6 +559,11 @@ paths:
       - in: "query"
         name: "write"
         description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
         required: false
         type: "boolean"
       - in: body
@@ -570,6 +630,11 @@ paths:
       - in: "query"
         name: "write"
         description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
         required: false
         type: "boolean"
       - in: body
@@ -642,6 +707,11 @@ paths:
         description: "If true, the objects gets synced to all configured destination endpoints"
         required: false
         type: "boolean"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
@@ -653,6 +723,260 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives:
+    get:
+      tags:
+      - "data"
+      summary: "Get relative objects of an object"
+      description: "Get all objects the object is related to"
+      operationId: "getObjectRelatives"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Object relatives"
+          schema:
+            $ref: "#/definitions/object-relatives"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "data"
+      summary: "Add new object relation to an object"
+      operationId: "addObjectRelative"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Object"
+        schema:
+          type: object
+          required:
+            - relative
+          properties:
+            relative:
+              type: string
+              description: "ObjectID to the object to refernece to"
+            context:
+              type: object
+              description: "Add context data which describes the relation"
+      responses:
+        200:
+          description: "Object relative"
+          schema:
+            $ref: "#/definitions/object-relative"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives/{relative}:
+    get:
+      tags:
+      - "data"
+      summary: "Get single relative object of an object"
+      operationId: "getObjectRelative"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "relative"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Object relative"
+          schema:
+            $ref: "#/definitions/object-relative"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "data"
+      summary: "Update object relation"
+      operationId: "updateObjectRelative"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "relative"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Object"
+        schema:
+          type: object
+          required:
+            - relative
+          properties:
+            relative:
+              type: string
+              description: "ObjectID to the object to refernece to"
+            context:
+              type: object
+              description: "Add context data which describes the relation"
+      responses:
+        200:
+          description: "Object relative"
+          schema:
+            $ref: "#/definitions/object-relative"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "data"
+      summary: "Delete object relation"
+      operationId: "deleteObjectRelative"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "relative"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "No body if successfully deleted"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
       security:
       - petstore_auth:
         - "write:pets"
@@ -683,6 +1007,11 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object attributes from endpoints"
@@ -728,6 +1057,11 @@ paths:
         description: "Endpoint nmae"
         required: true
         type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object attributes from a specific endpoint"
@@ -789,6 +1123,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of objects"
@@ -828,6 +1167,11 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object history"
@@ -884,6 +1228,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of objects"
@@ -922,6 +1271,11 @@ paths:
       - in: "query"
         name: "write"
         description: "If true, the objects gets synced to all configured destination endpoints"
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
         required: false
         type: "boolean"
       - in: body
@@ -990,7 +1344,12 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-      responses:
+       - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+     responses:
         200:
           description: "List of active jobs"
           schema:
@@ -1010,6 +1369,11 @@ paths:
       - "application/xml"
       - "application/json"
       parameters:
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       - in: body
         name: "job"
         description: "The job to create"
@@ -1071,6 +1435,11 @@ paths:
         description: "Job ID"
         required: true
         type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -1098,7 +1467,12 @@ paths:
         description: "Job ID"
         required: true
         type: "string"
-      responses:
+       - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+     responses:
         204:
           description: "Server responds with 204 No Content if job removal was successful"
         404:
@@ -1146,6 +1520,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -1179,6 +1558,11 @@ paths:
         description: "Error id"
         required: true
         type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -1521,6 +1905,34 @@ definitions:
         format: "date-time"
       data:
         type: "object"
+  object-relatives:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/object-relative"
+  object-relative:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      relative_id:
+        type: "string"
+      context:
+        type: "object"
+      object:
+        $ref: "#/definitions/object"
   object-history:
     type: "object"
     properties:
