@@ -64,7 +64,7 @@ class Sync extends AbstractJob
                         if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
                             $datatype->import(new UTCDateTime(), $options['filter'], [$ep_name], $options['simulate'], $options['ignore']);
                         } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-                            $datatype->write(new UTCDateTime(), $options['filter'], [$ep_name], $options['simulate'], $options['ignore']);
+                            $datatype->export(new UTCDateTime(), $options['filter'], [$ep_name], $options['simulate'], $options['ignore']);
                         }
                     }
                 }

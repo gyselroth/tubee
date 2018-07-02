@@ -35,7 +35,7 @@ class Pager
             ++$count;
 
             if ($formatter !== null) {
-                $nodes[] = $formatter->call($resource, $request);
+                $nodes[] = $formatter->call($request, $resource, $request);
             } else {
                 $nodes[] = $resource->decorate($request);
             }

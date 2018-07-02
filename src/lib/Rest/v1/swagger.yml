@@ -1311,6 +1311,424 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+  /access-rules:
+    get:
+      tags:
+      - "access-rules"
+      summary: "Get access rules"
+      description: "An access rule defines what role is granted access to what resource"
+      operationId: "getAccessRules"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "query"
+        description: "Array of rules to query"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "List of access rules"
+          schema:
+            $ref: "#/definitions/access-rules"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "access-rules"
+      summary: "Create a new access rule"
+      operationId: "addAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: "job"
+        description: "The access rule to create"
+        schema:
+          type: object
+          properties:
+            name:
+              description: "Unique name of the access rule"
+              type: "string"
+            verbs:
+              description: "array of http verbs, you may also specify a wildcard ['*']"
+              type: "array"
+              items:
+                type: "string"
+            selectors:
+              description: "Array of resources to verify, for example mandator, datatype, object, you may also specify a wildcard ['*']"
+              type: "array"
+              items:
+                type: "string"
+            resources:
+              description: "Resource identifiers to check with selectors, you may also specify a wildcard ['*']"
+              type: "array"
+              items:
+                type: "string"
+            roles:
+              description: "Array of role names to apply the rule"
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        201:
+          description: "The created access rule"
+          schema:
+            $ref: "#/definitions/access-rule"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /access-rules/{access-rule}:
+    get:
+      tags:
+      - "access-rules"
+      summary: "Get access rule by name"
+      operationId: "getAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "access-rule"
+        description: "Access rule name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Acccess rule"
+          schema:
+            $ref: "#/definitions/access-rule"
+        404:
+          description: "access rule does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "access-rules"
+      summary: "Create or replace an access rule"
+      operationId: "replaceAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "access-rule"
+        description: "Access rule name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: "job"
+        description: "The access rule to create"
+        schema:
+          type: object
+          properties:
+            verbs:
+              description: "array of http verbs, you may also specify a wildcard ['*']"
+              type: "array"
+              items:
+                type: "string"
+            selectors:
+              description: "Array of resources to verify, for example mandator, datatype, object, you may also specify a wildcard ['*']"
+              type: "array"
+              items:
+                type: "string"
+            resources:
+              description: "Resource identifiers to check with selectors, you may also specify a wildcard ['*']"
+              type: "array"
+              items:
+                type: "string"
+            roles:
+              description: "Array of role names to apply the rule"
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        201:
+          description: "The created access rule"
+          schema:
+            $ref: "#/definitions/access-rule"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "access-rules"
+      summary: "Delete access-rule by name"
+      operationId: "deleteAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "access-rule"
+        description: "Access rule name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "Server responds with 204 No Content if access rule removal was successful"
+        404:
+          description: "Access rule does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /access-roles:
+    get:
+      tags:
+      - "access-roles"
+      summary: "Get access roles"
+      description: "An access role defines what role is granted access to what resource"
+      operationId: "getAccessRules"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "query"
+        description: "Array of roles to query"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "List of access roles"
+          schema:
+            $ref: "#/definitions/access-roles"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "access-roles"
+      summary: "Create a new access role"
+      operationId: "addAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: "job"
+        description: "The access role to create"
+        schema:
+          type: object
+          properties:
+            name:
+              description: "Unique name of the access role"
+              type: "string"
+            users:
+              description: "Array of user identifiers to which the role shall be applied"
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        201:
+          description: "The created access role"
+          schema:
+            $ref: "#/definitions/access-role"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /access-roles/{access-role}:
+    get:
+      tags:
+      - "access-roles"
+      summary: "Get access role by name"
+      operationId: "getAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "access-role"
+        description: "Access role name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Acccess role"
+          schema:
+            $ref: "#/definitions/access-role"
+        404:
+          description: "access role does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "access-roles"
+      summary: "Create or replace an access role"
+      operationId: "replaceAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "access-role"
+        description: "Access role name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: "job"
+        description: "The access role to create"
+        schema:
+          type: object
+          properties:
+            users:
+              description: "Array of user identifiers to which the role shall be applied"
+              type: "array"
+              items:
+                type: "string"
+      responses:
+        201:
+          description: "The created access role"
+          schema:
+            $ref: "#/definitions/access-role"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "access-roles"
+      summary: "Delete access-role by name"
+      operationId: "deleteAccessRule"
+      produces:
+      - "application/xml"
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "access-role"
+        description: "Access role name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "Server responds with 204 No Content if access role removal was successful"
+        404:
+          description: "Access role does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
   /jobs:
     get:
       tags:
@@ -1344,12 +1762,12 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-       - in: "query"
+      - in: "query"
         name: "pretty"
         description: "Prettify response"
         required: false
         type: "boolean"
-     responses:
+      responses:
         200:
           description: "List of active jobs"
           schema:
@@ -1380,6 +1798,9 @@ paths:
         schema:
           type: object
           properties:
+            type:
+              description: "Type of sync job: 1 (import), 2 (export), (4) import/export"
+              type: "number"
             mandator:
               description: "Array of mandators, if not given all mandators are used"
               type: "array"
@@ -1395,6 +1816,14 @@ paths:
               type: "array"
               items:
                 type: "string"
+            ignore:
+              description: "Ignore object error and continue with the next one"
+              type: "boolean"
+              default: true
+            simulate:
+              description: "Simulate job"
+              type: "boolean"
+              default: false
             interval:
               description: "Specify an interval for this job. If not specified the jobs runs once."
               type: "integer"
@@ -1408,7 +1837,7 @@ paths:
               type: "integer"
               default: 0
       responses:
-        201:
+        202:
           description: "The created job"
           schema:
             $ref: "#/definitions/job"
@@ -1467,12 +1896,12 @@ paths:
         description: "Job ID"
         required: true
         type: "string"
-       - in: "query"
+      - in: "query"
         name: "pretty"
         description: "Prettify response"
         required: false
         type: "boolean"
-     responses:
+      responses:
         204:
           description: "Server responds with 204 No Content if job removal was successful"
         404:

@@ -26,5 +26,5 @@ interface SchemaInterface
     /**
      * Validate.
      */
-    public function validate(Iterable $data): array;
+    public function validate(array $data): bool;
 }

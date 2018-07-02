@@ -17,6 +17,7 @@ use Tubee\ExpressionLanguage\StringLanguageProvider;
 use mindplay\middleman\Dispatcher;
 use mindplay\middleman\ContainerResolver;
 use Tubee\Rest\ExceptionHandler;
+use Tubee\Rest\Acl as AclMiddleware;
 use Micro\Http\Middlewares\Router;
 use Micro\Http\Middlewares\RequestHandler;
 use Lcobucci\ContentNegotiation\ContentTypeMiddleware;
@@ -32,6 +33,7 @@ return [
                 ExceptionHandler::class,
                 JsonPayload::class,
                 AuthMiddleware::class,
+                AclMiddleware::class,
                 Router::class,
                 RequestHandler::class,
             ],
@@ -52,18 +54,8 @@ return [
                         'formatters' => [
                             'application/json' => '{'.Json::class.'}',
                         ],
-                        //'streamFactory' => '{'.LazyOpenStream::class.'}'
                     ]
                 ],
-                /*'services' => [
-                    LazyOpenStream::class => [
-                        'wrap_callback' => true,
-                        'arguments' => [
-                            'filename' => 'php://temp',
-                            'mode' => 'wb+'
-                        ]
-                    ]
-                ]*/
             ]
         ]
     ],

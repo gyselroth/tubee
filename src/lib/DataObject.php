@@ -114,9 +114,17 @@ class DataObject implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function decorate(ServerRequestInterface $request): array
+    public function decorateFromRequest(ServerRequestInterface $request): array
     {
-        return AttributeDecorator::decorate($this, $request);
+        return AttributeDecorator::decorateFromRequest($this, $request);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function decorate(array $attributes): array
+    {
+        return AttributeDecorator::decorate($this, $attributes);
     }
 
     /**

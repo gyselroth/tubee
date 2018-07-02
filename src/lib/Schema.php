@@ -37,8 +37,24 @@ class Schema implements SchemaInterface
      */
     public function __construct(array $schema = [], LoggerInterface $logger)
     {
-        $this->schema = $schema;
+        $this->validateSchema($schema);
         $this->logger = $logger;
+    }
+
+    /**
+     * Validate schema.
+     */
+    public function validateSchema(array $schema): self
+    {
+        foreach ($schema as $attribute => $definition) {
+            if (!is_array($definition)) {
+                throw new InvalidArgumentException('schema attribute '.$attribute.' definition must be an array');
+            }
+
+            $this->addAttribute($attribute, $definition);
+        }
+
+        return $this;
     }
 
     /**
@@ -60,15 +76,11 @@ class Schema implements SchemaInterface
     /**
      * {@inheritdoc}
      */
-    public function validate(Iterable $data): array
+    public function validate(Iterable $data): bool
     {
         $result = [];
         foreach ($this->schema as $attribute => $value) {
-            if (!is_array($value)) {
-                throw new InvalidArgumentException('attribute '.$attribute.' definiton must be an array');
-            }
-
-            if (isset($value['required']) && $value['required'] === true && !isset($data[$attribute])) {
+            if ($value['required'] === true && !isset($data[$attribute])) {
                 throw new Exception\AttributeNotFound('attribute '.$attribute.' is required');
             }
 
@@ -86,7 +98,47 @@ class Schema implements SchemaInterface
             ]);
         }
 
-        return bool;
+        return true;
+    }
+
+    /**
+     * Add attribute.
+     */
+    protected function addAttribute(string $name, array $schema): self
+    {
+        $default = [
+            'required' => false,
+        ];
+
+        foreach ($schema as $option => $definition) {
+            switch ($option) {
+                case 'description':
+                case 'label':
+                case 'type':
+                case 'require_regex':
+                    if (!is_string($definition)) {
+                        throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type string');
+                    }
+
+                    $default[$option] = $definition;
+
+                break;
+                case 'required':
+                    if (!is_bool($definition)) {
+                        throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type boolean');
+                    }
+
+                    $default[$option] = $definition;
+
+                break;
+                default:
+                    throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option);
+            }
+        }
+
+        $this->schema[$name] = $default;
+
+        return $this;
     }
 
     /**

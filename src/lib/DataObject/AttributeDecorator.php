@@ -37,9 +37,9 @@ class AttributeDecorator
      */
     protected static function getAttributes(DataObjectInterface $object, ServerRequestInterface $request): array
     {
-        return [
+        $data = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
+                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'DataObject',
             'id' => (string) $object->getId(),
