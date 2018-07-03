@@ -29,8 +29,8 @@ paths:
       description: "A mandator is a logical group of datatypes"
       operationId: "getMandators"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "query"
         name: "attributes"
@@ -61,8 +61,8 @@ paths:
       description: "A mandator is a logical group of datatypes"
       operationId: "getMandator"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -98,8 +98,8 @@ paths:
       description: "A datatype is collection of dataobjects of a specific type"
       operationId: "getDatatypes"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -139,8 +139,8 @@ paths:
       description: "A datatype is collection of dataobjects of a specific type"
       operationId: "getDatatype"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -185,8 +185,8 @@ paths:
       description: "A schema defines what attributes a datatype has"
       operationId: "getSchema"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -231,8 +231,8 @@ paths:
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoints"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -277,8 +277,8 @@ paths:
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoint"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -328,8 +328,8 @@ paths:
       description: "A workflow is an action how to import/export a datatype and with what attribute map"
       operationId: "getWorkflows"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -377,8 +377,8 @@ paths:
       description: "A workflow is an action how to import/export a datatype and with what attribute map"
       operationId: "getWorkflow"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -433,8 +433,8 @@ paths:
       description: "An attribute map defines how a datatype schema is mapped to a specific endpoint"
       operationId: "getAttributeMap"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -487,8 +487,8 @@ paths:
       description: "Get an object of a specific datatype"
       operationId: "getObject"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -531,15 +531,14 @@ paths:
     patch:
       tags:
       - "data"
-      summary: "Update object"
+      summary: "Patch object as rfc6902 request"
       description: "Update specific attributes of an object"
       operationId: "updateObject"
       consumes:
-      - "application/json"
-      - "application/xml"
+      - "application/json-patch+json"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -570,18 +569,9 @@ paths:
         name: data
         description: "Object"
         schema:
-          type: object
-          required:
-            - data
-          properties:
-            data:
-              type: object
-              description: "Object attributes"
-            endpoints:
-              type: array
-              items:
-                type: "string"
-              description: "Specify destination endpoints, if not set the objects get exported to all destination endpoints"
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -606,11 +596,11 @@ paths:
       description: "Replace all data attributes of an object (Or create one if not exists)"
       operationId: "replaceObject"
       consumes:
+      - "application/yaml"
       - "application/json"
-      - "application/xml"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -681,11 +671,11 @@ paths:
       description: "Delete a specific object"
       operationId: "deleteObject"
       consumes:
+      - "application/yaml"
       - "application/json"
-      - "application/xml"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -735,8 +725,8 @@ paths:
       description: "Get all objects the object is related to"
       operationId: "getObjectRelatives"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -777,8 +767,8 @@ paths:
       summary: "Add new object relation to an object"
       operationId: "addObjectRelative"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -834,8 +824,8 @@ paths:
       summary: "Get single relative object of an object"
       operationId: "getObjectRelative"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -881,8 +871,8 @@ paths:
       summary: "Update object relation"
       operationId: "updateObjectRelative"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -942,8 +932,8 @@ paths:
       summary: "Delete object relation"
       operationId: "deleteObjectRelative"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -989,8 +979,8 @@ paths:
       description: "Get object from all endpoints the object is related to"
       operationId: "getObjectEndpoints"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1031,11 +1021,11 @@ paths:
       description: "Get object from all endpoints the object is related to"
       operationId: "getObjectEndpoint"
       consumes:
+      - "application/yaml"
       - "application/json"
-      - "application/xml"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1083,8 +1073,8 @@ paths:
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpointObjects"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1149,8 +1139,8 @@ paths:
       description: "Get the history of all modifications from a specific object"
       operationId: "getHistory"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1193,8 +1183,8 @@ paths:
       description: "A object is a data object from a specifc datatype"
       operationId: "getObjects"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1252,11 +1242,11 @@ paths:
       summary: "Add a new object of a specifc datatype"
       operationId: "addObject"
       consumes:
+      - "application/yaml"
       - "application/json"
-      - "application/xml"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1319,8 +1309,8 @@ paths:
       description: "An access rule defines what role is granted access to what resource"
       operationId: "getAccessRules"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "query"
         name: "attributes"
@@ -1368,8 +1358,8 @@ paths:
       summary: "Create a new access rule"
       operationId: "addAccessRule"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "query"
         name: "pretty"
@@ -1423,8 +1413,8 @@ paths:
       summary: "Get access rule by name"
       operationId: "getAccessRule"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-rule"
@@ -1449,14 +1439,53 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+    patch:
+      tags:
+      - "access-rules"
+      summary: "Patch access rule as rfc6902 request"
+      operationId: "updateAccessRule"
+      consumes:
+      - "application/json-patch+json"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "access-rule"
+        description: "Access rule name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: "job"
+        description: "Access rule json patch"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "The updated access rule"
+          schema:
+            $ref: "#/definitions/access-rule"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
     put:
       tags:
       - "access-rules"
       summary: "Create or replace an access rule"
       operationId: "replaceAccessRule"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-rule"
@@ -1511,8 +1540,8 @@ paths:
       summary: "Delete access-rule by name"
       operationId: "deleteAccessRule"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-rule"
@@ -1541,10 +1570,10 @@ paths:
       - "access-roles"
       summary: "Get access roles"
       description: "An access role defines what role is granted access to what resource"
-      operationId: "getAccessRules"
+      operationId: "getAccessRoles"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "query"
         name: "attributes"
@@ -1590,10 +1619,10 @@ paths:
       tags:
       - "access-roles"
       summary: "Create a new access role"
-      operationId: "addAccessRule"
+      operationId: "addAccessRole"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "query"
         name: "pretty"
@@ -1630,10 +1659,10 @@ paths:
       tags:
       - "access-roles"
       summary: "Get access role by name"
-      operationId: "getAccessRule"
+      operationId: "getAccessRole"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-role"
@@ -1658,14 +1687,56 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+    patch:
+      tags:
+      - "access-roles"
+      summary: "Patch access role as rfc6902 request"
+      operationId: "updateAccessRole"
+      consumes:
+      - "application/json-patch+json"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "access-role"
+        description: "Access role name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: "job"
+        description: "Access role json patch"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "The updated access role"
+          schema:
+            $ref: "#/definitions/access-role"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
     put:
       tags:
       - "access-roles"
       summary: "Create or replace an access role"
-      operationId: "replaceAccessRule"
-      produces:
-      - "application/xml"
+      operationId: "replaceAccessRole"
+      consumes:
       - "application/json"
+      - "application/yaml"
+      produces:
+      - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-role"
@@ -1689,8 +1760,12 @@ paths:
               items:
                 type: "string"
       responses:
+        200:
+          description: "The updated access role"
+          schema:
+            $ref: "#/definitions/access-role"
         201:
-          description: "The created access role"
+          description: "The created access role if it did not exists yet"
           schema:
             $ref: "#/definitions/access-role"
         403:
@@ -1703,10 +1778,10 @@ paths:
       tags:
       - "access-roles"
       summary: "Delete access-role by name"
-      operationId: "deleteAccessRule"
+      operationId: "deleteAccessRole"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-role"
@@ -1737,8 +1812,8 @@ paths:
       description: "A job is an asynchronous server process"
       operationId: "getJobs"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "query"
         name: "attributes"
@@ -1784,8 +1859,8 @@ paths:
       summary: "Create new job"
       operationId: "addJob"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "query"
         name: "pretty"
@@ -1856,8 +1931,8 @@ paths:
       summary: "Get job by id"
       operationId: "getJob"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -1888,8 +1963,8 @@ paths:
       summary: "Delete job by id"
       operationId: "deleteJob"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -1919,8 +1994,8 @@ paths:
       summary: "Get all errors of a job"
       operationId: "getJobErrors"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -1974,8 +2049,8 @@ paths:
       summary: "Get a single job error"
       operationId: "getJobError"
       produces:
-      - "application/xml"
       - "application/json"
+      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -2005,7 +2080,60 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+  /watch/jobs/{job}/errors:
+    get:
+      tags:
+      - "jobs"
+      summary: "Monitor  job erros as live stream (Long running http request, needs to be resend after timeout)"
+      operationId: "watchJobErrors"
+      produces:
+      - "application/json;watch=true"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "query"
+        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Job"
+          schema:
+            $ref: "#/definitions/job-errors"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
 definitions:
+  json-patch:
+    type: "object"
+    properties:
+      op:
+        type: "string"
+      path:
+        type: "string"
+      value:
+        type: "string"
   links:
     type: "object"
     properties:
@@ -2049,6 +2177,78 @@ definitions:
         type: "string"
       name:
         type: "string"
+  access-rules:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/access-rule"
+  access-rule:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      name:
+        type: "string"
+      roles:
+        type: "array"
+        items:
+          type: "string"
+      verbs:
+        type: "array"
+        items:
+          type: "string"
+      selectors:
+        type: "array"
+        items:
+          type: "string"
+      resources:
+        type: "array"
+        items:
+          type: "string"
+  access-roles:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/access-role"
+  access-role:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      name:
+        type: "string"
+      identifiers:
+        type: "array"
+        items:
+          type: "string"
   jobs:
     type: "object"
     properties:
@@ -2079,6 +2279,9 @@ definitions:
         minimum: 0
         maximum: 4
       created:
+        type: "string"
+        format: "date-time"
+      ended:
         type: "string"
         format: "date-time"
       at:
@@ -2189,6 +2392,13 @@ definitions:
       name:
         type: "string"
         description: "Endpoint name"
+      status:
+        type: object
+        properties:
+          online:
+            type: boolean
+          timeout:
+            type: number
       datatype:
         $ref: "#/definitions/datatype"
       mandator:
