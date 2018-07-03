@@ -13,7 +13,7 @@ namespace Tubee\Workflow;
 
 use MongoDB\BSON\UTCDateTime;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataType\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 

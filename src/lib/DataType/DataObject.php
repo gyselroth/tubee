@@ -15,6 +15,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataType\DataObject\DataObjectInterface;
+use Tubee\Resource\AttributeResolver;
 
 class DataObject implements DataObjectInterface
 {
@@ -114,19 +115,19 @@ class DataObject implements DataObjectInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $data = [
+        return AttributeResolver::resolve($request, $this, [
             '_links' => [
                  'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'DataObject',
-            'id' => (string) $object->getId(),
+            'id' => (string) $this->getId(),
             'mandator' => function ($object) use ($request) {
                 return $object->getDataType()->getMandator()->decorate($request);
             },
             'datatype' => function ($object) use ($request) {
                 return $object->getDataType()->decorate($request);
             },
-            'version' => $object->getVersion(),
+            'version' => $this->getVersion(),
             'created' => function ($object) {
                 return $object->getCreated()->toDateTime()->format('c');
             },
@@ -137,7 +138,7 @@ class DataObject implements DataObjectInterface
 
                 return $object->getChanged()->toDateTime()->format('c');
             },
-            'data' => $object->getData(),
+            'data' => $this->getData(),
             'endpoints' => function ($object) {
                 $endpoints = $object->getEndpoints();
                 foreach ($endpoints as &$endpoint) {
@@ -146,7 +147,7 @@ class DataObject implements DataObjectInterface
 
                 return $endpoints;
             },
-        ];
+        ]);
     }
 
     /**

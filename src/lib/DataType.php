@@ -18,7 +18,8 @@ use MongoDB\BSON\UTCDateTime;
 use MongoDB\Database;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataType\DataObject;
+use Tubee\DataType\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Exception;
 use Tubee\Endpoint\EndpointInterface;
@@ -576,6 +577,10 @@ class DataType implements DataTypeInterface
                 } catch (\Exception $e) {
                     $this->logger->error('failed write object to destination endpoint ['.$ep->getIdentifier().']', [
                         'category' => get_class($this),
+                        'mandator' => $this->getMandator()->getName(),
+                        'datatype' => $this->getName(),
+                        'endpoint' => $ep->getName(),
+                        'object' => $object->getId(),
                         'exception' => $e,
                     ]);
 
@@ -631,7 +636,7 @@ class DataType implements DataTypeInterface
 
                 try {
                     if (!is_iterable($object)) {
-                        throw new Exception\InvalidObject('read() genereator needs to yield iterable data');
+                        throw new Exception\InvalidObject('read() generator needs to yield iterable data');
                     }
 
                     foreach ($ep->getWorkflows() as $workflow) {
@@ -654,6 +659,9 @@ class DataType implements DataTypeInterface
                 } catch (\Exception $e) {
                     $this->logger->error('failed import data object from source endpoint ['.$ep->getIdentifier().']', [
                         'category' => get_class($this),
+                        'mandator' => $this->getMandator()->getName(),
+                        'datatype' => $this->getName(),
+                        'endpoint' => $ep->getName(),
                         'exception' => $e,
                     ]);
 

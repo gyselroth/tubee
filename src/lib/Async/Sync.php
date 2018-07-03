@@ -12,10 +12,13 @@ declare(strict_types=1);
 namespace Tubee\Async;
 
 use MongoDB\BSON\UTCDateTime;
+use Monolog\Handler\MongoDBHandler;
+use Monolog\Logger;
+use Psr\Log\LoggerInterface;
 use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Manager;
+use Tubee\MandatorManager;
 
 class Sync extends AbstractJob
 {
@@ -36,10 +39,11 @@ class Sync extends AbstractJob
     /**
      * Sync.
      */
-    public function __construct(Manager $manager, Scheduler $scheduler)
+    public function __construct(MandatorManager $manager, Scheduler $scheduler, LoggerInterface $logger)
     {
         $this->manager = $manager;
         $this->scheduler = $scheduler;
+        $this->logger = $logger;
     }
 
     /**
@@ -61,6 +65,8 @@ class Sync extends AbstractJob
                             'loadbalance' => false,
                         ]);
                     } else {
+                        $this->setLoggerLevel($options['log_level']);
+
                         if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
                             $datatype->import(new UTCDateTime(), $options['filter'], [$ep_name], $options['simulate'], $options['ignore']);
                         } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
@@ -68,6 +74,20 @@ class Sync extends AbstractJob
                         }
                     }
                 }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Set logger level.
+     */
+    protected function setLoggerLevel(int $level): bool
+    {
+        foreach ($this->logger->getHandlers() as $handler) {
+            if ($handler instanceof MongoDBHandler) {
+                $handler->setLevel($level);
             }
         }
 
@@ -86,6 +106,7 @@ class Sync extends AbstractJob
             'filter' => [],
             'loadbalance' => true,
             'simulate' => false,
+            'log_level' => Logger::ERROR,
             'ignore' => false,
         ], $this->data);
     }

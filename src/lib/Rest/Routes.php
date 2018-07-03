@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\Rest;
 
+use FastRoute;
 use Micro\Http\Router;
 use Micro\Http\Router\Route;
 
@@ -30,8 +31,10 @@ class Routes
             ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes(/|\z)$', v1\DataTypes::class))
             ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}(/|\z)$', v1\Mandators::class))
             ->appendRoute(new Route('/api/v1/mandators$', v1\Mandators::class))
+            ->appendRoute(new Route('/api/v1/jobs/{job:#([0-9a-zA-Z_-])#}/errors/{error:#([0-9a-zA-Z_-])#}(/|\z)', v1\Jobs::class))
             ->appendRoute(new Route('/api/v1/jobs/{job:#([0-9a-zA-Z_-])#}(/|\z)', v1\Jobs::class))
             ->appendRoute(new Route('/api/v1/jobs$', v1\Jobs::class))
+            ->appendRoute(new Route('/api/v1/watch/jobs/{job:#([0-9a-zA-Z_-])#}/errors', [v1\Jobs::class, 'watchErrors']))
             ->appendRoute(new Route('/api/v1/access-rules/{rule:#([0-9a-zA-Z_-])#}(/|\z)', v1\AccessRules::class))
             ->appendRoute(new Route('/api/v1/access-rules$', v1\AccessRules::class))
             ->appendRoute(new Route('/api/v1/access-roles/{role:#([0-9a-zA-Z_-])#}(/|\z)', v1\AccessRoles::class))
@@ -39,5 +42,12 @@ class Routes
             ->appendRoute(new Route('/api/v1', v1\Api::class))
             ->appendRoute(new Route('/api$', v1\Api::class))
             ->appendRoute(new Route('^$', v1\Api::class));
+    }
+
+    public function collect()
+    {
+        return FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
+            $r->addRoute('GET', '/api/v1/mandators', [v1\Mandators::class, 'get']);
+        });
     }
 }

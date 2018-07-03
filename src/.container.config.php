@@ -24,6 +24,9 @@ use Lcobucci\ContentNegotiation\ContentTypeMiddleware;
 use Lcobucci\ContentNegotiation\Formatter\Json;
 use Micro\Auth\Middleware\Auth as AuthMiddleware;
 use Middlewares\JsonPayload;
+use Middlewares\FastRoute;
+use Tubee\Migration;
+use Tubee\Rest\Routes;
 
 return [
     Dispatcher::class => [
@@ -34,12 +37,23 @@ return [
                 JsonPayload::class,
                 AuthMiddleware::class,
                 AclMiddleware::class,
-                Router::class,
+                FastRoute::class,
+                //Router::class,
                 RequestHandler::class,
             ],
             'resolver' => '{'.ContainerResolver::class.'}'
         ],
         'services' => [
+            Routes::class => [
+                'selects' => [[
+                    'method' => 'collect'
+                ]]
+            ],
+            FastRoute::class => [
+                'arguments' => [
+                    'router' => '{'.Routes::class.'}'
+                ]
+            ],
             ContentTypeMiddleware::class => [
                 'factory' => [
                     'method' => 'fromRecommendedSettings',
@@ -57,6 +71,14 @@ return [
                     ]
                 ],
             ]
+        ]
+    ],
+    Migration::class => [
+        'calls' => [
+            [
+                'method' => 'injectDelta',
+                'arguments' => ['delta' => '{'.Migration\CoreInstallation::class.'}']
+            ],
         ]
     ],
     Client::class => [
@@ -86,6 +108,10 @@ return [
             'name' => 'default'
         ],
         'calls' => [
+            'mongodb' => [
+                'method' => 'pushHandler',
+                'arguments' => ['handler' => '{mongodb}']
+            ],
             'file' => [
                 'method' => 'pushHandler',
                 'arguments' => ['handler' => '{file}']
@@ -100,8 +126,8 @@ return [
             ],
         ],
         'services' => [
-            'Monolog\Formatter\FormatterInterface' => [
-                'use' => 'Monolog\Formatter\LineFormatter',
+            Monolog\Formatter\FormatterInterface::class => [
+                'use' => Monolog\Formatter\LineFormatter::class,
                 'arguments' => [
                     'dateFormat' => 'Y-d-m H:i:s',
                     'format' => "%datetime% [%context.category%,%level_name%]: %message% %context.params% %context.exception%\n"
@@ -110,8 +136,17 @@ return [
                     ['method' => 'includeStacktraces']
                 ]
             ],
+            'mongodb' => [
+                'use' => Monolog\Handler\MongoDBHandler::class,
+                'arguments' => [
+                    'mongo' => '{'.Client::class.'}',
+                    'database' => 'tubee',
+                    'collection' => 'errors',
+                    'level' => 1000,
+                ]
+            ],
             'file' => [
-                'use' => 'Monolog\Handler\StreamHandler',
+                'use' => Monolog\Handler\StreamHandler::class,
                 'arguments' => [
                     'stream' => '{ENV(BALLOON_LOG_DIR,/tmp)}/out.log',
                     'level' => 100
@@ -123,7 +158,7 @@ return [
                 ]
             ],
             'stderr' => [
-                'use' => 'Monolog\Handler\StreamHandler',
+                'use' => Monolog\Handler\StreamHandler::class,
                 'arguments' => [
                     'stream' => 'php://stderr',
                     'level' => 600,
@@ -135,7 +170,7 @@ return [
                 ],
             ],
             'stdout' => [
-                'use' => 'Monolog\Handler\FilterHandler',
+                'use' => Monolog\Handler\FilterHandler::class,
                 'arguments' => [
                     'handler' => '{output}',
                     'minLevelOrList' => 100,
@@ -143,7 +178,7 @@ return [
                 ],
                 'services' => [
                     'output' => [
-                        'use' => 'Monolog\Handler\StreamHandler',
+                        'use' => Monolog\Handler\StreamHandler::class,
                         'arguments' => [
                             'stream' => 'php://stdout',
                             'level' => 100
@@ -166,14 +201,6 @@ return [
             ],
         ],
     ],
-    /*Auth::class => [
-        'calls' => [
-            'basic_db' => [
-                'method' => 'injectAdapter',
-                'arguments' => ['adapter' => '{'.Db::class.'}', 'name' => 'basic_db']
-            ],
-        ],
-    ],*/
     TransportInterface::class => [
         'use' => Smtp::class
     ],

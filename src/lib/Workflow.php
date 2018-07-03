@@ -16,7 +16,7 @@ use MongoDB\BSON\UTCDateTime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataType\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Exception as DataTypeException;
 use Tubee\Endpoint\EndpointInterface;

@@ -14,7 +14,7 @@ namespace Tubee\DataType;
 use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
-use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataType\DataObject\DataObjectInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator;
 use Tubee\Mandator\MandatorInterface;

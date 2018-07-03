@@ -11,11 +11,13 @@ declare(strict_types=1);
 
 namespace Tubee\Job;
 
+use DateTime;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\Job\Job\JobInterface;
+use Tubee\Job\Error\ErrorInterface;
+use Tubee\Resource\AttributeResolver;
 
-class Job implements JobInterface
+class Error implements ErrorInterface
 {
     /**
      * Object id.
@@ -52,15 +54,7 @@ class Job implements JobInterface
      */
     public function toArray(): array
     {
-        return [
-            '_id' => $this->_id,
-            'created' => $this->created,
-            'changed' => $this->changed,
-            'deleted' => $this->deleted,
-            'version' => $this->version,
-            'data' => $this->data,
-            'endpoints' => $this->endpoints,
-        ];
+        return $this->data;
     }
 
     /**
@@ -68,24 +62,27 @@ class Job implements JobInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $job = array_intersect_key($this->data, array_flip(['at', 'interval', 'retry', 'retry_interval', 'created', 'status', 'data', 'class']));
+        $data = $this->data;
 
-        $data = [
+        return AttributeResolver::resolve($request, $this, [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
-            'kind' => 'Job',
+            'kind' => 'JobError',
             'id' => (string) $this->getId(),
-        ];
-
-        if (isset($job['created'])) {
-            $job['created'] = $job['created']->toDateTime()->format('c');
-        }
-
-        if (isset($job['at'])) {
-            $job['at'] = $job['at']->toDateTime()->format('c');
-        }
-
-        return array_merge($data, $job);
+            'message' => $this->data['message'],
+            'created' => (new DateTime($this->data['datetime']))->format('c'),
+            'category' => $this->data['context']['category'],
+            'exception' => function ($resource) use ($data) {
+                if (isset($data['context']['exception'])) {
+                    return $data['context']['exception'];
+                }
+            },
+            'object' => function ($resource) use ($data) {
+                if (isset($data['context']['object'])) {
+                    return $data['context']['object'];
+                }
+            },
+        ]);
     }
 }

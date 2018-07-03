@@ -17,6 +17,7 @@ use Micro\Auth\Identity;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TaskScheduler\Scheduler;
 use Tubee\Acl;
 use Tubee\Async\Sync as SyncJob;
 use Tubee\Job;
@@ -82,26 +83,37 @@ class Jobs
      */
     public function getErrors(ServerRequestInterface $request, Identity $identity, ObjectId $job, ?ObjectId $error = null): ResponseInterface
     {
+        exit();
+        $query = array_merge([
+            'offset' => 0,
+            'limit' => 20,
+            'query' => [],
+        ], $request->getQueryParams());
+
         if ($error !== null) {
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->manager->getMandator($mandator)->decorate($request),
+                $this->scheduler->getError($error)->decorate($request),
                 ['pretty' => isset($query['pretty'])]
             );
         }
 
-        /*$jobs = $this->scheduler->getJobs();
-        $body = $this->acl->filterOutput($request, $identity, $jobs);
-        $scheduler = $this->scheduler;
-        $body = Pager::fromRequest($body, $request, function ($object, $request, $scheduler) {
-            return Job::decorate($object['_id'], $scheduler, $request);
-        });*/
+        $errors = $this->scheduler->getErrors($job, $query['query'], $query['offset'], $query['limit']);
+        $body = $this->acl->filterOutput($request, $identity, $errors);
+        $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $body,
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch errors.
+     */
+    public function watchErrors(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
+    {
     }
 
     /**
@@ -138,7 +150,7 @@ class Jobs
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            Job::decorate($id, $this->scheduler, $request),
+            $this->scheduler->getTask($id)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
