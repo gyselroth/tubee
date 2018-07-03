@@ -17,7 +17,7 @@ use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\Manager;
+use Tubee\MandatorManager;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
@@ -26,7 +26,7 @@ class Mandators
     /**
      * Init.
      */
-    public function __construct(Manager $manager, Acl $acl)
+    public function __construct(MandatorManager $manager, Acl $acl)
     {
         $this->manager = $manager;
         $this->acl = $acl;

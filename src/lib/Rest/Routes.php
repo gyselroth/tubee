@@ -17,7 +17,7 @@ use Micro\Http\Router\Route;
 class Routes
 {
     /**
-     * Create routing table
+     * Create routing table.
      */
     public function __construct(Router $router)
     {
@@ -35,7 +35,7 @@ class Routes
             ->appendRoute(new Route('/api/v1/access-rules/{rule:#([0-9a-zA-Z_-])#}(/|\z)', v1\AccessRules::class))
             ->appendRoute(new Route('/api/v1/access-rules$', v1\AccessRules::class))
             ->appendRoute(new Route('/api/v1/access-roles/{role:#([0-9a-zA-Z_-])#}(/|\z)', v1\AccessRoles::class))
-            ->appendRoute(new Route('/api/v1/access-roles$', v1\AccessRules::class))
+            ->appendRoute(new Route('/api/v1/access-roles$', v1\AccessRoles::class))
             ->appendRoute(new Route('/api/v1', v1\Api::class))
             ->appendRoute(new Route('/api$', v1\Api::class))
             ->appendRoute(new Route('^$', v1\Api::class));

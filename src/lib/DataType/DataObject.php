@@ -9,14 +9,12 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee;
+namespace Tubee\DataType;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\DataObject\AttributeDecorator;
-use Tubee\DataObject\DataObjectInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\DataType\DataObject\DataObjectInterface;
 
 class DataObject implements DataObjectInterface
 {
@@ -114,17 +112,41 @@ class DataObject implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function decorateFromRequest(ServerRequestInterface $request): array
+    public function decorate(ServerRequestInterface $request): array
     {
-        return AttributeDecorator::decorateFromRequest($this, $request);
-    }
+        $data = [
+            '_links' => [
+                 'self' => ['href' => (string) $request->getUri()],
+            ],
+            'kind' => 'DataObject',
+            'id' => (string) $object->getId(),
+            'mandator' => function ($object) use ($request) {
+                return $object->getDataType()->getMandator()->decorate($request);
+            },
+            'datatype' => function ($object) use ($request) {
+                return $object->getDataType()->decorate($request);
+            },
+            'version' => $object->getVersion(),
+            'created' => function ($object) {
+                return $object->getCreated()->toDateTime()->format('c');
+            },
+            'changed' => function ($object) {
+                if ($object->getChanged() === null) {
+                    return null;
+                }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function decorate(array $attributes): array
-    {
-        return AttributeDecorator::decorate($this, $attributes);
+                return $object->getChanged()->toDateTime()->format('c');
+            },
+            'data' => $object->getData(),
+            'endpoints' => function ($object) {
+                $endpoints = $object->getEndpoints();
+                foreach ($endpoints as &$endpoint) {
+                    //$endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
+                }
+
+                return $endpoints;
+            },
+        ];
     }
 
     /**

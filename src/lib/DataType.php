@@ -244,6 +244,22 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
+    public function getId(): ObjectId
+    {
+        return new ObjectId();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(): array
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getObjectHistory(ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Iterable
     {
         $pipeline = [

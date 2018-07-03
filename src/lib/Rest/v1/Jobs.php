@@ -17,11 +17,11 @@ use Micro\Auth\Identity;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TaskScheduler\Scheduler;
 use Tubee\Acl;
 use Tubee\Async\Sync as SyncJob;
 use Tubee\Job;
-use Tubee\Manager;
+use Tubee\JobManager;
+use Tubee\MandatorManager;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
@@ -30,7 +30,7 @@ class Jobs
     /**
      * Init.
      */
-    public function __construct(Scheduler $scheduler, Acl $acl, Manager $manager)
+    public function __construct(JobManager $scheduler, Acl $acl, MandatorManager $manager)
     {
         $this->scheduler = $scheduler;
         $this->acl = $acl;
@@ -43,23 +43,22 @@ class Jobs
     public function get(ServerRequestInterface $request, Identity $identity, ?ObjectId $job = null): ResponseInterface
     {
         $query = array_merge([
+            'offset' => 0,
+            'limit' => 20,
             'query' => [],
         ], $request->getQueryParams());
 
         if ($job !== null) {
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                Job::decorate($job, $this->scheduler, $request),
+                $this->scheduler->getTask($job)->decorate($request),
                 ['pretty' => isset($query['pretty'])]
             );
         }
 
-        $jobs = $this->scheduler->getJobs();
+        $jobs = $this->scheduler->getTasks($query['query'], $query['offset'], $query['limit']);
         $body = $this->acl->filterOutput($request, $identity, $jobs);
-        $scheduler = $this->scheduler;
-        $body = Pager::fromRequest($body, $request, function ($object) use ($request, $scheduler) {
-            return Job::decorate($object['_id'], $scheduler, $request);
-        });
+        $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

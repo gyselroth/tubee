@@ -9,24 +9,14 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\DataObject;
+namespace Tubee\DataType\DataObject;
 
-use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Resource\ResourceInterface;
 
-interface DataObjectInterface
+interface DataObjectInterface extends ResourceInterface
 {
-    /**
-     * Convert to array.
-     */
-    public function toArray(): array;
-
-    /**
-     * Get object id.
-     */
-    public function getId(): ObjectId;
-
     /**
      * Get object version.
      */

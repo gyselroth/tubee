@@ -12,12 +12,19 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Generator;
+use InvalidArgumentException;
 use Micro\Auth\Identity;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\Acl\Exception;
-use InvalidArgumentException;
+use Tubee\Acl\Role;
+use Tubee\Acl\Role\Exception as RoleException;
+use Tubee\Acl\Role\RoleInterface;
+use Tubee\Acl\Rule;
+use Tubee\Acl\Rule\Exception as RuleException;
+use Tubee\Acl\Rule\RuleInterface;
 
 class Acl
 {
@@ -52,9 +59,10 @@ class Acl
         $this->logger->debug('verify access rule for identity ['.$user->getIdentifier().']', [
             'category' => get_class($this),
         ]);
-return true;
-        $roles = $this->getRoles($user);
-        $rules = $this->getRules($roles);
+
+        return true;
+        $roles = $this->getRolesByIdentity($user);
+        $rules = $this->getRulesByRoles($roles);
         $method = $request->getMethod();
         $attributes = $request->getAttributes();
 
@@ -100,10 +108,36 @@ return true;
     }
 
     /**
-     * Update rule.
+     * Add role.
      */
-    public function updateRule(string $name, array $rule): bool
+    public function addRole(array $role): ObjectId
     {
+        if (!isset($role['name']) || !is_string($role['name'])) {
+            throw new InvalidArgumentException('an access role must have a valid name');
+        }
+
+        if (!isset($role['selectors']) || !is_array($role['selectors'])) {
+            throw new InvalidArgumentException('an access role must have a field selectors as array');
+        }
+
+        foreach ($role as $option => $value) {
+            switch ($option) {
+                case 'name':
+                    if ($this->hasRole($value) === true) {
+                        throw new RoleException\NotUnique('an access role name must be unqiue');
+                    }
+
+                break;
+                case 'selectors':
+                break;
+                default:
+                    throw new InvalidArgumentException('unknown access role option '.$option.' given');
+            }
+        }
+
+        $result = $this->db->access_roles->insertOne($role);
+
+        return $result->getInsertedId();
     }
 
     /**
@@ -111,31 +145,49 @@ return true;
      */
     public function addRule(array $rule): ObjectId
     {
-        if(!isset($rule['name']) || !is_string($rule['name'])) {
+        if (!isset($rule['name']) || !is_string($rule['name'])) {
             throw new InvalidArgumentException('an access rule must have a valid name');
         }
 
-        if($this->getRule($rule['name']) === null) {
-            throw new Exception\NotUnique('an access rule name must be unqiue');
-        }
+        foreach ($rule as $option => $value) {
+            switch ($option) {
+                case 'name':
+                    if ($this->hasRule($value) === true) {
+                        throw new RuleException\NotUnique('an access rule name must be unqiue');
+                    }
 
-        foreach($rule as $option => $value) {
-            switch($option) {
+                break;
                 case 'verbs':
+                case 'roles':
                 case 'selectors':
                 case 'resources':
-                    if(!is_array($value)) {
+                    if (!is_array($value)) {
                         throw new InvalidArgumentException($option.' must be an array of strings');
                     }
-                break;
 
+                break;
                 default:
                     throw new InvalidArgumentException('unknown access rule option '.$option.' given');
             }
         }
 
         $result = $this->db->access_rules->insertOne($rule);
-        return $result->getId();
+
+        return $result->getInsertedId();
+    }
+
+    /**
+     * Delete role.
+     */
+    public function deleteRole(string $name): bool
+    {
+        $result = $this->db->access_roles->remove(['name' => $id]);
+
+        if ($result->nRemoved !== 1) {
+            throw new RoleException\NotFound('access role not found');
+        }
+
+        return true;
     }
 
     /**
@@ -145,40 +197,97 @@ return true;
     {
         $result = $this->db->access_rules->remove(['name' => $id]);
 
-        if($result->nRemoved !== 1) {
-            throw new Exception\NotFound('access rule not found');
+        if ($result->nRemoved !== 1) {
+            throw new RuleException\NotFound('access rule not found');
         }
 
         return true;
     }
 
     /**
+     * Get roles.
+     */
+    public function getRoles(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    {
+        $result = $this->db->access_roles->find((array) $query, [
+            'offset' => $offset,
+            'limit' => $limit,
+        ]);
+
+        foreach ($result as $role) {
+            yield (string) $role['_id'] => new Role($role);
+        }
+
+        return $this->db->access_roles->count((array) $query);
+    }
+
+    /**
+     * Get rules.
+     */
+    public function getRules(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    {
+        $result = $this->db->access_rules->find((array) $query, [
+            'offset' => $offset,
+            'limit' => $limit,
+        ]);
+
+        foreach ($result as $rule) {
+            yield (string) $rule['_id'] => new Rule($rule);
+        }
+
+        return $this->db->access_rules->count((array) $query);
+    }
+
+    public function getRole(string $name): RoleInterface
+    {
+        $result = $this->db->access_roles->findOne(['name' => $name]);
+        if ($result === null) {
+            throw new RoleException\NotFound('access role not found');
+        }
+
+        return new Role($result);
+    }
+
+    public function getRule(string $name): RuleInterface
+    {
+        $result = $this->db->access_rules->findOne(['name' => $name]);
+        if ($result === null) {
+            throw new RuleException\NotFound('access rule not found');
+        }
+
+        return new Rule($result);
+    }
+
+    public function hasRole(string $name): bool
+    {
+        return $this->db->access_roles->count(['name' => $name]) === 1;
+    }
+
+    public function hasRule(string $name): bool
+    {
+        return $this->db->access_rules->count(['name' => $name]) === 1;
+    }
+
+    /**
      * Get access rules.
      */
-    protected function getRules(array $roles)
+    protected function getRulesByRoles(array $roles)
     {
         return $this->db->access_rules->find([
             'users' => ['$in' => $roles],
         ]);
     }
 
-    public function getRole(string $name): array
-    {
-
-    }
-
-    public function getRule(string $name): array
-    {
-
-    }
-
     /**
      * Get access roles.
      */
-    protected function getRoles(Identity $user)
+    protected function getRolesByIdentity(Identity $user)
     {
         $roles = $this->db->access_roles->find([
-            'users' => $user->getIdentifier(),
+            '$or' => [
+                ['users' => $user->getIdentifier()],
+                ['users' => '*'],
+            ],
         ]);
 
         $roles = array_column(iterator_to_array($roles), '_id');

@@ -20,7 +20,7 @@ use Tubee\Acl;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
-class AccessRules
+class AccessRoles
 {
     /**
      * Init.
@@ -33,7 +33,7 @@ class AccessRules
     /**
      * Entrypoint.
      */
-    public function get(ServerRequestInterface $request, Identity $identity, ?string $rule = null): ResponseInterface
+    public function get(ServerRequestInterface $request, Identity $identity, ?string $role = null): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -41,17 +41,17 @@ class AccessRules
             'query' => [],
         ], $request->getQueryParams());
 
-        if ($rule !== null) {
+        if ($role !== null) {
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->acl->getRule($rule)->decorate($request),
+                $this->acl->getRule($role)->decorate($request),
                 ['pretty' => isset($query['pretty'])]
             );
         }
 
-        $rules = $this->acl->getRules($query['query'], $query['offset'], $query['limit']);
+        $roles = $this->acl->getRoles($query['query'], $query['offset'], $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $rules);
+        $body = $this->acl->filterOutput($request, $identity, $roles);
         $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
@@ -62,71 +62,71 @@ class AccessRules
     }
 
     /**
-     * Add new access rule.
+     * Add new access role.
      */
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
         $id = $this->acl->addRule($body);
-        $rule = $this->acl->getRule($body['name']);
+        $role = $this->acl->getRule($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $rule->decorate($request),
+            $role->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
 
     /**
-     * Update access rule.
+     * Update access role.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
         $body = $request->getParsedBody();
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $rule->decorate($request),
+            $role->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
 
     /**
-     * Create or replace access rule.
+     * Create or replace access role.
      */
-    public function put(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
+    public function put(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
         $body = $request->getParsedBody();
 
         if ($this->acl->hasRule()) {
-            $this->acl->updateRule($rule, $body);
-            $rule = $this->acl->getRule($rule);
+            $this->acl->updateRule($role, $body);
+            $role = $this->acl->getRule($role);
 
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $rule->decorate($request),
+                $role->decorate($request),
                 ['pretty' => isset($query['pretty'])]
             );
         }
 
-        $body['name'] = $rule;
+        $body['name'] = $role;
         $id = $this->acl->addRule($body);
-        $rule = $this->acl->getRule($body['name']);
+        $role = $this->acl->getRule($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $rule->decorate($request),
+            $role->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
 
     /**
-     * Delete access rule.
+     * Delete access role.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $this->acl->deleteRule($rule);
+        $this->acl->deleteRule($role);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

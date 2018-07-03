@@ -13,9 +13,10 @@ namespace Tubee\Endpoint;
 
 use Generator;
 use Tubee\AttributeMap\AttributeMapInterface;
+use Tubee\Resource\ResourceInterface;
 use Tubee\Workflow\WorkflowInterface;
 
-interface EndpointInterface
+interface EndpointInterface extends ResourceInterface
 {
     /**
      * Types.

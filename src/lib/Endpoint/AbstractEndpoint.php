@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use InvalidArgumentException;
+use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface as Logger;
 use Tubee\DataType\DataTypeInterface;
@@ -161,6 +162,22 @@ abstract class AbstractEndpoint implements EndpointInterface
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId(): ObjectId
+    {
+        return new ObjectId();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(): array
+    {
+        return [];
     }
 
     /**

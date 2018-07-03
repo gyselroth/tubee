@@ -12,8 +12,9 @@ declare(strict_types=1);
 namespace Tubee\Mandator;
 
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Resource\ResourceInterface;
 
-interface MandatorInterface
+interface MandatorInterface extends ResourceInterface
 {
     /**
      * Get name.

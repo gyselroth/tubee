@@ -9,17 +9,17 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Manager\Exception;
+namespace Tubee\Job\Exception;
 
 use Micro\Http\ExceptionInterface;
 
-class MandatorNotUnique extends \Tubee\Exception implements ExceptionInterface
+class NotFound extends \Tubee\Exception implements ExceptionInterface
 {
     /**
      * {@inheritdoc}
      */
     public function getStatusCode(): int
     {
-        return 422;
+        return 404;
     }
 }

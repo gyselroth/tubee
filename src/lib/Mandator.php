@@ -11,8 +11,9 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Mandator\Exception;
 use Tubee\Mandator\MandatorInterface;
@@ -25,13 +26,6 @@ class Mandator implements MandatorInterface
      * @var string
      */
     protected $name;
-
-    /**
-     * Manager.
-     *
-     * @var Manager
-     */
-    protected $manager;
 
     /**
      * Logger.
@@ -50,10 +44,9 @@ class Mandator implements MandatorInterface
     /**
      * Initialize.
      */
-    public function __construct(string $name, Manager $manager, Logger $logger)
+    public function __construct(string $name, LoggerInterface $logger)
     {
         $this->name = $name;
-        $this->manager = $manager;
         $this->logger = $logger;
     }
 
@@ -142,5 +135,21 @@ class Mandator implements MandatorInterface
     public function getName(): string
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getId(): ObjectId
+    {
+        return new ObjectId();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(): array
+    {
+        return [];
     }
 }

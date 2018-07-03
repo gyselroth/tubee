@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Psr\Log\LoggerInterface;
-use Tubee\Manager\Exception;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\MandatorManager\Exception;
 
-class Manager
+class MandatorManager
 {
     /**
      * Logger.

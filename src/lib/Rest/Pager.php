@@ -11,17 +11,17 @@ declare(strict_types=1);
 
 namespace Tubee\Rest;
 
-use Closure;
 use Generator;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
+use Tubee\Resource\ResourceInterface;
 
 class Pager
 {
     /**
      * Pager.
      */
-    public static function fromRequest(Iterable $data, ServerRequestInterface $request, ?Closure $formatter = null): array
+    public static function fromRequest(Iterable $data, ServerRequestInterface $request): array
     {
         $query = array_merge([
             'offset' => 0,
@@ -34,10 +34,10 @@ class Pager
         foreach ($data as $resource) {
             ++$count;
 
-            if ($formatter !== null) {
-                $nodes[] = $formatter->call($request, $resource, $request);
-            } else {
+            if ($resource instanceof ResourceInterface) {
                 $nodes[] = $resource->decorate($request);
+            } else {
+                $nodes[] = (array) $resource;
             }
         }
 

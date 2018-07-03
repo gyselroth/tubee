@@ -18,8 +18,9 @@ use Tubee\DataObject\DataObjectInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\ResourceInterface;
 
-interface DataTypeInterface
+interface DataTypeInterface extends ResourceInterface
 {
     /**
      * Get dataset.
