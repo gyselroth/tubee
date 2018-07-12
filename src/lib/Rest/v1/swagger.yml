@@ -24,7 +24,7 @@ paths:
   /mandators:
     get:
       tags:
-      - "config"
+      - "mandators"
       summary: "Get mandators"
       description: "A mandator is a logical group of datatypes"
       operationId: "getMandators"
@@ -49,6 +49,47 @@ paths:
           description: "List of mandators"
           schema:
             $ref: "#/definitions/mandators"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "mandators"
+      summary: "Add mandator"
+      operationId: "addMandator"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Mandator"
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/mandator"
+        403:
+          description: "Access denied"
       security:
       - petstore_auth:
         - "write:pets"
@@ -56,7 +97,7 @@ paths:
   /mandators/{mandator}:
     get:
       tags:
-      - "config"
+      - "mandators"
       summary: "Get specific mandator"
       description: "A mandator is a logical group of datatypes"
       operationId: "getMandator"
@@ -86,6 +127,124 @@ paths:
           description: "Mandator"
           schema:
             $ref: "#/definitions/mandator"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "mandators"
+      summary: "Delete specific mandator"
+      operationId: "deleteMandator"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "mandators"
+      summary: "Create or replace mandator"
+      operationId: "replaceMandator"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Mandator"
+        schema:
+          type: object
+          required:
+            - name
+          properties:
+            descripiton:
+              type: string
+              description: "Description"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/mandator"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/mandator"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "mandators"
+      summary: "Patch mandator as rfc6902 request"
+      description: "Update specific attributes of a mandator"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Mandator"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "Mandator"
+          schema:
+            $ref: "#/definitions/mandator"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
       security:
       - petstore_auth:
         - "write:pets"
@@ -93,10 +252,10 @@ paths:
   /mandators/{mandator}/datatypes:
     get:
       tags:
-      - "config"
-      summary: "Get datatypes"
-      description: "A datatype is collection of dataobjects of a specific type"
-      operationId: "getDatatypes"
+      - "datatypes"
+      summary: "Get datatypes from a specific mandator"
+      description: "A datatype is collection of data objects of a specific type"
+      operationId: "getMandatorDatatypes"
       produces:
       - "application/json"
       - "application/yaml"
@@ -131,13 +290,60 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+    post:
+      tags:
+      - "datatypes"
+      summary: "Add datatype to a specific mandator"
+      operationId: "addMandatorDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            schema:
+              $ref: "#/definitions/schema"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/datatype"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource does not exists"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}:
     get:
       tags:
-      - "config"
-      summary: "Get specific datatype"
+      - "datatypes"
+      summary: "Get specific datatype from a specific mandator"
       description: "A datatype is collection of dataobjects of a specific type"
-      operationId: "getDatatype"
+      operationId: "getMandatorDatatype"
       produces:
       - "application/json"
       - "application/yaml"
@@ -177,13 +383,11 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /mandators/{mandator}/datatypes/{datatype}/schema:
-    get:
+    delete:
       tags:
-      - "config"
-      summary: "Get datatype schema"
-      description: "A schema defines what attributes a datatype has"
-      operationId: "getSchema"
+      - "datatypes"
+      summary: "Delete specific datatype from a specific mandator"
+      operationId: "deleteMandatorDatatype"
       produces:
       - "application/json"
       - "application/yaml"
@@ -193,6 +397,215 @@ paths:
         description: "Mandator name"
         required: true
         type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "datatypes"
+      summary: "Create or replace datatype from a specific mandator"
+      operationId: "replaceMandatorDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            schema:
+              $ref: "#/definitions/schema"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/datatype"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/datatype"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "datatypes"
+      summary: "Patch datatype as rfc6902 request"
+      description: "Update specific attributes of a datatype from a specific mandator"
+      operationId: "updateMandatorDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "Datatype"
+          schema:
+            $ref: "#/definitions/datatype"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /datatypes:
+    get:
+      tags:
+      - "datatypes"
+      summary: "Get global datatypes"
+      description: "A datatype is collection of data objects of a specific type"
+      operationId: "getGlobalDatatypes"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "List of datatypes"
+          schema:
+            $ref: "#/definitions/datatypes"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "datatypes"
+      summary: "Add global datatype"
+      operationId: "addGlobalDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            schema:
+              $ref: "#/definitions/schema"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/datatype"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource does not exists"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /datatypes/{datatype}:
+    get:
+      tags:
+      - "datatypes"
+      summary: "Get specific global datatype"
+      description: "A datatype is collection of dataobjects of a specific type"
+      operationId: "getGlobalDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
       - in: "path"
         name: "datatype"
         description: "Datatype"
@@ -212,9 +625,128 @@ paths:
         type: "boolean"
       responses:
         200:
-          description: "Datatype schema"
+          description: "Datatype"
           schema:
-            $ref: "#/definitions/schema"
+            $ref: "#/definitions/datatype"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "datatypes"
+      summary: "Delete specific global datatype"
+      operationId: "deleteGlobalDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "datatypes"
+      summary: "Create or replace global datatype"
+      operationId: "replaceGlobalDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            schema:
+              $ref: "#/definitions/schema"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/datatype"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/datatype"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "datatypes"
+      summary: "Patch global datatype as rfc6902 request"
+      description: "Update specific attributes of a global datatype"
+      operationId: "updateGlobalDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "Datatype"
+          schema:
+            $ref: "#/definitions/datatype"
         404:
           description: "Resource does not exists"
         403:
@@ -226,10 +758,10 @@ paths:
   /mandators/{mandator}/datatypes/{datatype}/endpoints:
     get:
       tags:
-      - "config"
-      summary: "Get endpoints"
+      - "endpoints"
+      summary: "Get endpoints from a mandator"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
-      operationId: "getEndpoints"
+      operationId: "getMandatorEndpoints"
       produces:
       - "application/json"
       - "application/yaml"
@@ -269,13 +801,67 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+    post:
+      tags:
+      - "endpoints"
+      summary: "Add datatype"
+      operationId: "addDatatype"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            schema:
+              $ref: "#/definitions/schema"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/datatype"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource does not exists"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+
+
   /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}:
     get:
       tags:
-      - "config"
-      summary: "Get specific endpoint"
+      - "endpoints"
+      summary: "Get specific endpoint from a mandator"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
-      operationId: "getEndpoint"
+      operationId: "getMandatorEndpoint"
       produces:
       - "application/json"
       - "application/yaml"
@@ -320,13 +906,428 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+    delete:
+      tags:
+      - "endpoints"
+      summary: "Delete specific endpoint from a mandator"
+      operationId: "deleteMandatorEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "endpoints"
+      summary: "Create or replace endppoint in a mandator"
+      operationId: "replaceMandatorEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            schema:
+              $ref: "#/definitions/schema"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/endpoint"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/endpoint"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "endpoints"
+      summary: "Patch datatype as rfc6902 request"
+      description: "Update specific attributes of a endpoint from a mandator"
+      operationId: "updateMandatorEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Datatype"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "Endpoint"
+          schema:
+            $ref: "#/definitions/endpoint"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /datatypes/{datatype}/endpoints:
+    get:
+      tags:
+      - "endpoints"
+      summary: "Get global endpoints"
+      description: "An endpoint is either of type source or destination and defines an import/export destination"
+      operationId: "getGlobalEndpoints"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "List of endpoints"
+          schema:
+            $ref: "#/definitions/endpoints"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "endpoints"
+      summary: "Add global endpoint"
+      operationId: "addGlobalEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Endpoint"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            schema:
+              $ref: "#/definitions/schema"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/endpoint"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource does not exists"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /datatypes/{datatype}/endpoints/{endpoint}:
+    get:
+      tags:
+      - "endpoints"
+      summary: "Get specific global endpoint"
+      description: "An endpoint is either of type source or destination and defines an import/export destination"
+      operationId: "getEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "Endpoint"
+          schema:
+            $ref: "#/definitions/endpoint"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "endpoints"
+      summary: "Delete specific global endpoint"
+      operationId: "deleteGlobalEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "endpoints"
+      summary: "Create or replace global endpoint"
+      operationId: "replaceGlobalEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Endpoint"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/endpoint"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/endpoint"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "endpoints"
+      summary: "Patch global endpoint as rfc6902 request"
+      description: "Update specific attributes of a global endpoint"
+      operationId: "updateGlobalEndpoint"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Endpoint"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "Datatype"
+          schema:
+            $ref: "#/definitions/endpoint"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
     get:
       tags:
-      - "config"
-      summary: "Get endpoint workflows"
+      - "workflows"
+      summary: "Get endpoint workflows of a mandator"
       description: "A workflow is an action how to import/export a datatype and with what attribute map"
-      operationId: "getWorkflows"
+      operationId: "getMandatorWorkflows"
       produces:
       - "application/json"
       - "application/yaml"
@@ -369,13 +1370,70 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+    post:
+      tags:
+      - "workflows"
+      summary: "Add worfklow to endpoint of a mandator"
+      operationId: "addMandatorWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Workflow"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            map:
+              $ref: "#/definitions/attribute-map"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/workflow"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource does not exists"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}:
     get:
       tags:
-      - "config"
-      summary: "Get specifc endpoint workflow"
+      - "workflows"
+      summary: "Get specifc endpoint workflow of a mandator"
       description: "A workflow is an action how to import/export a datatype and with what attribute map"
-      operationId: "getWorkflow"
+      operationId: "getMandatorWorkflow"
       produces:
       - "application/json"
       - "application/yaml"
@@ -425,13 +1483,273 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}/attribute-map:
+    delete:
+      tags:
+      - "workflows"
+      summary: "Delete specific workflow from a mandator"
+      operationId: "deleteMandatorWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "workflows"
+      summary: "Create or replace workflow in a mandator"
+      operationId: "replaceMandatorWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Workflow"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            map:
+              $ref: "#/definitions/attribute-map"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/workflow"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/workflow"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "workflows"
+      summary: "Patch mandator workflow as rfc6902 request"
+      description: "Update specific attributes of a workflow from a mandator"
+      operationId: "updateMandatorWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Workflow"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "Workflow"
+          schema:
+            $ref: "#/definitions/workflow"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /datatypes/{datatype}/endpoints/{endpoint}/workflows:
     get:
       tags:
-      - "config"
-      summary: "Get endpoint workflow attribute map"
-      description: "An attribute map defines how a datatype schema is mapped to a specific endpoint"
-      operationId: "getAttributeMap"
+      - "workflows"
+      summary: "Get global endpoint workflows"
+      description: "A workflow is an action how to import/export a datatype and with what attribute map"
+      operationId: "getGlobalWorkflows"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        200:
+          description: "List of workflows"
+          schema:
+            $ref: "#/definitions/workflows"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "workflows"
+      summary: "Add global workflow to endpoint"
+      operationId: "addGlobalWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Workflow"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            map:
+              $ref: "#/definitions/attribute-map"
+      responses:
+        201:
+          description: "If successful the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/workflow"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource does not exists"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}:
+    get:
+      tags:
+      - "workflows"
+      summary: "Get specifc endpoint workflow of a mandator"
+      description: "A workflow is an action how to import/export a datatype and with what attribute map"
+      operationId: "getGlobalWorkflow"
       produces:
       - "application/json"
       - "application/yaml"
@@ -470,15 +1788,166 @@ paths:
         type: "boolean"
       responses:
         200:
-          description: "Attribute map"
+          description: "Workflow"
           schema:
-            $ref: "#/definitions/attribute-map"
+            $ref: "#/definitions/workflow"
+        404:
+          description: "Resource does not exists"
         403:
           description: "Access denied"
       security:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+    delete:
+      tags:
+      - "workflows"
+      summary: "Delete specific global workflow"
+      operationId: "deleteGlobalWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      responses:
+        204:
+          description: "If successful the server will respond with 204 No Content"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    put:
+      tags:
+      - "workflows"
+      summary: "Create or replace global workflow"
+      operationId: "replaceGlobalWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Workflow"
+        schema:
+          required:
+            - name
+          properties:
+            name:
+              type: string
+              description: "Name"
+            descripiton:
+              type: string
+              description: "Description"
+            map:
+              $ref: "#/definitions/attribute-map"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/workflow"
+        201:
+          description: "If successful and the object was newly created the server will respond with 201 Created"
+          schema:
+            $ref: "#/definitions/workflow"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    patch:
+      tags:
+      - "workflows"
+      summary: "Patch global workflow as rfc6902 request"
+      description: "Update global specific attributes of a workflow"
+      operationId: "updateGlobalWorkflow"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "workflow"
+        description: "Workflow name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "pretty"
+        description: "Prettify response"
+        required: false
+        type: "boolean"
+      - in: body
+        name: data
+        description: "Workflow"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "Workflow"
+          schema:
+            $ref: "#/definitions/workflow"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"      
   /mandators/{mandator}/datatypes/{datatype}/objects/{object}:
     get:
       tags:
