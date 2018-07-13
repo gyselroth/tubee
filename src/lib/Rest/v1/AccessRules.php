@@ -33,21 +33,13 @@ class AccessRules
     /**
      * Entrypoint.
      */
-    public function get(ServerRequestInterface $request, Identity $identity, ?string $rule = null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
             'query' => [],
         ], $request->getQueryParams());
-
-        if ($rule !== null) {
-            return new UnformattedResponse(
-                (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->acl->getRule($rule)->decorate($request),
-                ['pretty' => isset($query['pretty'])]
-            );
-        }
 
         $rules = $this->acl->getRules($query['query'], $query['offset'], $query['limit']);
 
@@ -57,6 +49,20 @@ class AccessRules
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $body,
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Entrypoint.
+     */
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
+    {
+        $request->getQueryParams());
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->acl->getRule($rule)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

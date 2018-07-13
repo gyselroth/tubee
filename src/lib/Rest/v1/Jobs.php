@@ -41,21 +41,13 @@ class Jobs
     /**
      * Entrypoint.
      */
-    public function get(ServerRequestInterface $request, Identity $identity, ?ObjectId $job = null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
             'query' => [],
         ], $request->getQueryParams());
-
-        if ($job !== null) {
-            return new UnformattedResponse(
-                (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->scheduler->getTask($job)->decorate($request),
-                ['pretty' => isset($query['pretty'])]
-            );
-        }
 
         $jobs = $this->scheduler->getTasks($query['query'], $query['offset'], $query['limit']);
         $body = $this->acl->filterOutput($request, $identity, $jobs);
@@ -64,6 +56,20 @@ class Jobs
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $body,
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Entrypoint.
+     */
+    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
+    {
+        $query = $request->getQueryParams();
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->scheduler->getTask($job)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

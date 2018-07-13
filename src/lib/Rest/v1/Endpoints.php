@@ -17,7 +17,9 @@ use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\MandatorManager;
+use Tubee\DataType\Factory as DataTypeFactory;
+use Tubee\Endpoint\Factory as EndpointFactory;
+use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
@@ -26,31 +28,28 @@ class Endpoints
     /**
      * Init.
      */
-    public function __construct(MandatorManager $manager, Acl $acl)
+    public function __construct(MandatorFactory $mandator, DataTypeFactory $datatype, EndpointFactory $endpoint, Acl $acl)
     {
-        $this->manager = $manager;
+        $this->mandator = $mandator;
+        $this->datatype = $datatype;
+        $this->endpoint = $endpoint;
         $this->acl = $acl;
     }
 
     /**
      * Entrypoint.
      */
-    public function get(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ?string $endpoint = null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
     {
         $query = array_merge([
+            'offset' => 0,
+            'limit' => 20,
             'query' => [],
         ], $request->getQueryParams());
 
-        if ($endpoint !== null) {
-            return new UnformattedResponse(
-                (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->manager->getMandator($mandator)->getDataType($datatype)->getEndpoint($endpoint)->decorate($request),
-                ['pretty' => isset($query['pretty'])]
-            );
-        }
-
-        $datatype = $this->manager->getMandator($mandator)->getDataType($datatype);
-        $endpoints = $datatype->getEndpoints($query['query']);
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $endpoints = $this->endpoint->getAll($datatype, $query['query'], (int) $query['offset'], (int) $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $endpoints);
         $body = Pager::fromRequest($body, $request);
@@ -58,6 +57,42 @@ class Endpoints
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $body,
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Entrypoint.
+     */
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    {
+        $query = $request->getQueryParams();
+
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $endpoint = $this->endpoint->getAll($datatype, $endpoint);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $endpoint->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Create.
+     */
+    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $id = $this->endpoint->add($datatype, $body);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
+            $this->endpoint->getOne($datatype, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

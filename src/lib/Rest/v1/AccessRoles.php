@@ -33,21 +33,13 @@ class AccessRoles
     /**
      * Entrypoint.
      */
-    public function get(ServerRequestInterface $request, Identity $identity, ?string $role = null): ResponseInterface
+    public function get(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
             'query' => [],
         ], $request->getQueryParams());
-
-        if ($role !== null) {
-            return new UnformattedResponse(
-                (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->acl->getRule($role)->decorate($request),
-                ['pretty' => isset($query['pretty'])]
-            );
-        }
 
         $roles = $this->acl->getRoles($query['query'], $query['offset'], $query['limit']);
 
@@ -57,6 +49,20 @@ class AccessRoles
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $body,
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Entrypoint.
+     */
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
+    {
+        $query = $request->getQueryParams());
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->acl->getRule($role)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

@@ -13,98 +13,23 @@ namespace Tubee;
 
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
-use Tubee\Mandator\Exception;
 use Tubee\Mandator\MandatorInterface;
 
 class Mandator implements MandatorInterface
 {
     /**
-     * Name.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
-     * Logger.
-     *
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * Type.
+     * Data.
      *
      * @var array
      */
-    protected $datatypes = [];
+    protected $data = [];
 
     /**
      * Initialize.
      */
-    public function __construct(string $name, LoggerInterface $logger)
+    public function __construct(array $data)
     {
-        $this->name = $name;
-        $this->logger = $logger;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hasDataType(string $name): bool
-    {
-        return isset($this->datatypes[$name]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function injectDataType(DataTypeInterface $datatype, string $name): MandatorInterface
-    {
-        $this->logger->debug('inject datatype ['.$name.'] of type ['.get_class($datatype).']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($this->hasDataType($name)) {
-            throw new Exception\DataTypeNotUnique('datatype '.$name.' is already registered');
-        }
-
-        $this->datatypes[$name] = $datatype;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(string $name): DataTypeInterface
-    {
-        if (!$this->hasDataType($name)) {
-            throw new Exception\DataTypeNotFound('datatype '.$name.' is not registered');
-        }
-
-        return $this->datatypes[$name];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataTypes(Iterable $datatypes = []): array
-    {
-        if (count($datatypes) === 0) {
-            return $this->datatypes;
-        }
-        $list = [];
-        foreach ($datatypes as $name) {
-            if (!$this->hasDataType($name)) {
-                throw new Exception\DataTypeNotFound('datatype '.$name.' is not registered');
-            }
-            $list[$name] = $this->datatypes[$name];
-        }
-
-        return $list;
+        $this->data = $data;
     }
 
     /**
@@ -117,7 +42,7 @@ class Mandator implements MandatorInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Mandator',
-            'name' => $this->name,
+            'name' => $this->data['name'],
         ];
     }
 
@@ -126,7 +51,7 @@ class Mandator implements MandatorInterface
      */
     public function getIdentifier(): string
     {
-        return $this->name;
+        return $this->data['name'];
     }
 
     /**
@@ -134,7 +59,7 @@ class Mandator implements MandatorInterface
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->data['name'];
     }
 
     /**
@@ -142,7 +67,7 @@ class Mandator implements MandatorInterface
      */
     public function getId(): ObjectId
     {
-        return new ObjectId();
+        return $this->data['_id'];
     }
 
     /**
@@ -150,6 +75,6 @@ class Mandator implements MandatorInterface
      */
     public function toArray(): array
     {
-        return [];
+        return $this->data;
     }
 }

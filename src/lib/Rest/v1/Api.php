@@ -14,6 +14,7 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Zend\Diactoros\Response;
 
 class Api
@@ -21,9 +22,12 @@ class Api
     /**
      * Entrypoint.
      */
-    public function get(): ResponseInterface
+    public function get(ServerRequestInterface $request): ResponseInterface
     {
         $data = [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
             'name' => 'tubee',
             'version' => 1,
         ];

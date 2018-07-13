@@ -9,11 +9,11 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\MandatorManager\Exception;
+namespace Tubee\Mandator\Exception;
 
 use Micro\Http\ExceptionInterface;
 
-class MandatorNotFound extends \Tubee\Exception implements ExceptionInterface
+class NotFound extends \Tubee\Exception implements ExceptionInterface
 {
     /**
      * {@inheritdoc}

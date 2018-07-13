@@ -9,18 +9,17 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee;
+namespace Tubee\Job;
 
 use Generator;
 use MongoDB\BSON\ObjectId;
+use MongoDB\Operation\Find;
 use TaskScheduler\Scheduler;
-use Tubee\Job\Error;
+use Traversable;
 use Tubee\Job\Error\ErrorInterface;
-use Tubee\Job\Exception;
-use Tubee\Job\Job;
 use Tubee\Job\Job\JobInterface;
 
-class JobManager extends Scheduler
+class Factory extends Scheduler
 {
     /**
      * Get jobs.
@@ -73,12 +72,13 @@ class JobManager extends Scheduler
     /**
      * Get jobs errors.
      */
-    public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Traversable
     {
         return $this->db->errors->find((array) $query, [
             'offset' => $offset,
             'limit' => $limit,
-            'tailable' => true,
+            'cursorType' => Find::TAILABLE,
+            'noCursorTimeout' => true,
         ]);
 
         /*foreach ($result as $error) {

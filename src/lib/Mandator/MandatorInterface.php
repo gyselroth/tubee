@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\Mandator;
 
-use Tubee\DataType\DataTypeInterface;
 use Tubee\Resource\ResourceInterface;
 
 interface MandatorInterface extends ResourceInterface
@@ -25,27 +24,4 @@ interface MandatorInterface extends ResourceInterface
      * Get identifier.
      */
     public function getIdentifier(): string;
-
-    /**
-     * Check if mandator has datatype.
-     */
-    public function hasDataType(string $name): bool;
-
-    /**
-     * Inject datatype.
-     *
-     *
-     * @return DataTypeInterface
-     */
-    public function injectDataType(DataTypeInterface $datatype, string $name): MandatorInterface;
-
-    /**
-     * Get datatype.
-     */
-    public function getDataType(string $name): DataTypeInterface;
-
-    /**
-     * Get datatypes.
-     */
-    public function getDataTypes(Iterable $datatypes): array;
 }

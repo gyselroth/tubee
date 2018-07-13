@@ -36,21 +36,13 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function get(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ?ObjectId $object = null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
             'query' => [],
         ], $request->getQueryParams());
-
-        if ($object !== null) {
-            return new UnformattedResponse(
-                (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->manager->getMandator($mandator)->getDataType($datatype)->getOne(['_id' => $object], false)->decorate($request),
-                ['pretty' => isset($query['pretty'])]
-            );
-        }
 
         $mandator = $this->manager->getMandator($mandator);
         $datatype = $mandator->getDataType($datatype);
@@ -62,6 +54,20 @@ class Objects
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $body,
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Entrypoint.
+     */
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    {
+        $query =$request->getQueryParams());
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->manager->getMandator($mandator)->getDataType($datatype)->getOne(['_id' => $object], false)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

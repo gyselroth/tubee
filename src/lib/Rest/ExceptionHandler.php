@@ -53,7 +53,7 @@ class ExceptionHandler implements MiddlewareInterface
     {
         try {
             return $handler->handle($request);
-        } catch (Exception $e) {
+        } catch (\Exception $e) {
             return $this->sendException($e);
         }
     }

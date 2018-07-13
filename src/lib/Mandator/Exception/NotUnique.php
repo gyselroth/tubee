@@ -13,7 +13,7 @@ namespace Tubee\Mandator\Exception;
 
 use Micro\Http\ExceptionInterface;
 
-class DataTypeNotUnique extends \Tubee\Exception implements ExceptionInterface;
+class NotUnique extends \Tubee\Exception implements ExceptionInterface
 {
     /**
      * {@inheritdoc}

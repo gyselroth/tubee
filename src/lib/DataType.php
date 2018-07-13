@@ -78,24 +78,24 @@ class DataType implements DataTypeInterface
     protected $endpoints = [];
 
     /**
-     * Collection name.
+     * Resource.
      *
-     * @var string
+     * @var array
      */
-    protected $collection;
+    protected $resource;
 
     /**
      * Initialize.
      */
-    public function __construct(string $name, MandatorInterface $mandator, SchemaInterface $schema, Database $db, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(array $resource, MandatorInterface $mandator, SchemaInterface $schema, Database $db, LoggerInterface $logger, ?Iterable $config = null)
     {
-        $this->name = $name;
-        $this->collection = $name;
+        $this->resource = $resource;
+        //$this->collection = $name;
         $this->mandator = $mandator;
         $this->schema = $schema;
         $this->db = $db;
         $this->logger = $logger;
-        $this->setOptions($config);
+        //$this->setOptions($config);
     }
 
     /**
@@ -108,10 +108,8 @@ class DataType implements DataTypeInterface
 
     /**
      * Set options.
-     *
-     * @param iterable $config
      */
-    public function setOptions(?Iterable $config = null): DataTypeInterface
+    /*public function setOptions(?Iterable $config = null): DataTypeInterface
     {
         if ($config === null) {
             return $this;
@@ -133,7 +131,7 @@ class DataType implements DataTypeInterface
         }
 
         return $this;
-    }
+    }*/
 
     /**
      * Decorate.
@@ -145,7 +143,9 @@ class DataType implements DataTypeInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'DataType',
-            'name' => $this->name,
+            'name' => $this->resource['name'],
+            'mandator' => $this->mandator->decorate($request, ['_links', 'name']),
+            'schema' => $this->schema->getSchema(),
         ];
     }
 
@@ -239,7 +239,7 @@ class DataType implements DataTypeInterface
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->resource['name'];
     }
 
     /**
@@ -247,7 +247,7 @@ class DataType implements DataTypeInterface
      */
     public function getId(): ObjectId
     {
-        return new ObjectId();
+        return $this->resource['id'];
     }
 
     /**
@@ -255,7 +255,7 @@ class DataType implements DataTypeInterface
      */
     public function toArray(): array
     {
-        return [];
+        return $this->resource;
     }
 
     /**

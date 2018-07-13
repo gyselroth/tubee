@@ -15,7 +15,6 @@ use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Tubee\DataType\DataObject\DataObjectInterface;
-use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator;
 use Tubee\Mandator\MandatorInterface;
 use Tubee\Resource\ResourceInterface;
@@ -30,29 +29,9 @@ interface DataTypeInterface extends ResourceInterface
     public function getDataset(): array;
 
     /**
-     * Check if datatype has endpoint.
-     */
-    public function hasEndpoint(string $name): bool;
-
-    /**
-     * Inject endpoint.
-     */
-    public function injectEndpoint(EndpointInterface $endpoint, string $name): DataTypeInterface;
-
-    /**
      * Get mandator.
      */
     public function getMandator(): MandatorInterface;
-
-    /**
-     * Get endpoint.
-     */
-    public function getEndpoint(string $name): EndpointInterface;
-
-    /**
-     * Get endpoints.
-     */
-    public function getEndpoints(Iterable $endpoints): array;
 
     /**
      * Get one.
@@ -103,18 +82,6 @@ interface DataTypeInterface extends ResourceInterface
      * Delete object.
      */
     public function delete(ObjectId $id, bool $simulate = false): bool;
-
-    /**
-     * Get source endpoints.
-     */
-    public function getSourceEndpoints(Iterable $endpoints = []): array;
-
-    /**
-     * Get destination endpoitns.
-     *
-     * @param array $endpoints
-     */
-    public function getDestinationEndpoints(Iterable $endpoints = []): array;
 
     /**
      * Get identifier.
