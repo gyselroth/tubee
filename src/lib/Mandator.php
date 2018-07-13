@@ -22,14 +22,14 @@ class Mandator implements MandatorInterface
      *
      * @var array
      */
-    protected $data = [];
+    protected $resource = [];
 
     /**
      * Initialize.
      */
-    public function __construct(array $data)
+    public function __construct(array $resource)
     {
-        $this->data = $data;
+        $this->resource = $resource;
     }
 
     /**
@@ -42,7 +42,7 @@ class Mandator implements MandatorInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Mandator',
-            'name' => $this->data['name'],
+            'name' => $this->resource['name'],
         ];
     }
 
@@ -51,7 +51,7 @@ class Mandator implements MandatorInterface
      */
     public function getIdentifier(): string
     {
-        return $this->data['name'];
+        return $this->resource['name'];
     }
 
     /**
@@ -59,7 +59,7 @@ class Mandator implements MandatorInterface
      */
     public function getName(): string
     {
-        return $this->data['name'];
+        return $this->resource['name'];
     }
 
     /**
@@ -67,7 +67,7 @@ class Mandator implements MandatorInterface
      */
     public function getId(): ObjectId
     {
-        return $this->data['_id'];
+        return $this->resource['_id'];
     }
 
     /**
@@ -75,6 +75,6 @@ class Mandator implements MandatorInterface
      */
     public function toArray(): array
     {
-        return $this->data;
+        return $this->resource;
     }
 }

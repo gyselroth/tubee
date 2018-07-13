@@ -87,6 +87,8 @@ class Factory
      */
     public function add(array $resource): ObjectId
     {
+        Validator::validate($resource);
+
         if ($this->has($resource['name'])) {
             throw new Exception\NotUnique('mandator '.$name.' does already exists');
         }

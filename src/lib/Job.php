@@ -18,25 +18,18 @@ use Tubee\Job\Job\JobInterface;
 class Job implements JobInterface
 {
     /**
-     * Object id.
-     *
-     * @var ObjectId
-     */
-    protected $_id;
-
-    /**
      * Job.
      *
      * @var array
      */
-    protected $data;
+    protected $resource;
 
     /**
      * Data object.
      */
-    public function __construct(array $data)
+    public function __construct(array $resource)
     {
-        $this->data = $data;
+        $this->resource = $resource;
     }
 
     /**
@@ -44,7 +37,7 @@ class Job implements JobInterface
      */
     public function getId(): ObjectId
     {
-        return $this->data['_id'];
+        return $this->resource['_id'];
     }
 
     /**
@@ -52,15 +45,7 @@ class Job implements JobInterface
      */
     public function toArray(): array
     {
-        return [
-            '_id' => $this->_id,
-            'created' => $this->created,
-            'changed' => $this->changed,
-            'deleted' => $this->deleted,
-            'version' => $this->version,
-            'data' => $this->data,
-            'endpoints' => $this->endpoints,
-        ];
+        return $this->resource;
     }
 
     /**
@@ -68,9 +53,9 @@ class Job implements JobInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $job = array_intersect_key($this->data, array_flip(['at', 'interval', 'retry', 'retry_interval', 'created', 'status', 'data', 'class']));
+        $job = array_intersect_key($this->resource, array_flip(['at', 'interval', 'retry', 'retry_interval', 'created', 'status', 'resource', 'class']));
 
-        $data = [
+        $resource = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
@@ -86,6 +71,6 @@ class Job implements JobInterface
             $job['at'] = $job['at']->toDateTime()->format('c');
         }
 
-        return array_merge($data, $job);
+        return array_merge($resource, $job);
     }
 }
