@@ -29,8 +29,6 @@ class Mongodb extends AbstractEndpoint
 
     /**
      * Init endpoint.
-     *
-     * @param Logger $logger
      */
     public function __construct(string $name, string $type, Collection $collection, DataTypeInterface $datatype, LoggerInterface $logger, Iterable $config)
     {

@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Pdo\Wrapper as PdoWrapper;
@@ -21,14 +21,13 @@ class Pdo extends AbstractSqlDatabase
 {
     /**
      * Init endpoint.
-     *
-     * @param iterable $config
      */
-    public function __construct(string $name, string $type, string $table, PdoWrapper $pdo, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
+    public function __construct(array $resource, PdoWrapper $pdo, DataTypeInterface $datatype, LoggerInterface $logger)
     {
-        $this->resource = $pdo;
-        $this->table = $table;
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        $this->resource = $resource;
+        $this->socket = $pdo;
+        $this->table = $resource['table'];
+        parent::__construct($resource, $datatype, $logger, $resource['config']);
     }
 
     /**
@@ -44,7 +43,7 @@ class Pdo extends AbstractSqlDatabase
             $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         }
 
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
 
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
             yield $row;
@@ -58,7 +57,7 @@ class Pdo extends AbstractSqlDatabase
     {
         $filter = $this->getFilterOne($object);
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
 
         if ($result->num_rows > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
@@ -81,6 +80,6 @@ class Pdo extends AbstractSqlDatabase
             return null;
         }
 
-        return $this->resource->getResouce()->lastInsertId();
+        return $this->socket->getResouce()->lastInsertId();
     }
 }

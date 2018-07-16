@@ -96,4 +96,16 @@ class Endpoints
             ['pretty' => isset($query['pretty'])]
         );
     }
+
+    /**
+     * Delete.
+     */
+    public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    {
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $this->endpoint->delete($datatype, $endpoint);
+
+        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+    }
 }

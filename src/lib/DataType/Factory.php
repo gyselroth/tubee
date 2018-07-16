@@ -92,6 +92,10 @@ class Factory
      */
     public function delete(MandatorInterface $mandator, string $name): bool
     {
+        if (!$this->has($mandator, $name)) {
+            throw new Exception\NotFound('endpoint '.$name.' does not exists');
+        }
+
         $this->db->datatypes->deleteOne([
             'mandator' => $mandator->getName(),
             'name' => $name,
@@ -105,6 +109,8 @@ class Factory
      */
     public function add(MandatorInterface $mandator, array $resource): ObjectId
     {
+        Validator::validate($resource);
+
         if ($this->has($mandator, $resource['name'])) {
             throw new Exception\NotUnique('datatype '.$resource['name'].' does already exists');
         }

@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee;
 
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\Schema\Exception;
 use Tubee\Schema\SchemaInterface;
@@ -37,24 +36,8 @@ class Schema implements SchemaInterface
      */
     public function __construct(array $schema = [], LoggerInterface $logger)
     {
-        $this->validateSchema($schema);
+        $this->schema = $schema;
         $this->logger = $logger;
-    }
-
-    /**
-     * Validate schema.
-     */
-    public function validateSchema(array $schema): self
-    {
-        foreach ($schema as $attribute => $definition) {
-            if (!is_array($definition)) {
-                throw new InvalidArgumentException('schema attribute '.$attribute.' definition must be an array');
-            }
-
-            $this->addAttribute($attribute, $definition);
-        }
-
-        return $this;
     }
 
     /**
@@ -99,46 +82,6 @@ class Schema implements SchemaInterface
         }
 
         return true;
-    }
-
-    /**
-     * Add attribute.
-     */
-    protected function addAttribute(string $name, array $schema): self
-    {
-        $default = [
-            'required' => false,
-        ];
-
-        foreach ($schema as $option => $definition) {
-            switch ($option) {
-                case 'description':
-                case 'label':
-                case 'type':
-                case 'require_regex':
-                    if (!is_string($definition)) {
-                        throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type string');
-                    }
-
-                    $default[$option] = $definition;
-
-                break;
-                case 'required':
-                    if (!is_bool($definition)) {
-                        throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type boolean');
-                    }
-
-                    $default[$option] = $definition;
-
-                break;
-                default:
-                    throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option);
-            }
-        }
-
-        $this->schema[$name] = $default;
-
-        return $this;
     }
 
     /**

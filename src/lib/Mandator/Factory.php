@@ -77,6 +77,10 @@ class Factory
      */
     public function delete(string $name): bool
     {
+        if (!$this->has($name)) {
+            throw new Exception\NotFound('endpoint '.$name.' does not exists');
+        }
+
         $this->db->mandators->deleteOne(['name' => $name]);
 
         return true;

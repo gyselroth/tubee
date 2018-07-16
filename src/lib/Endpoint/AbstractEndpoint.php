@@ -93,25 +93,23 @@ abstract class AbstractEndpoint implements EndpointInterface
     protected $history = false;
 
     /**
-     * Init endpoint.
+     * Resource.
      *
-     * @param iterable $config
+     * @var array
      */
-    public function __construct(string $name, string $type, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
+    protected $resource = [];
+
+    /**
+     * Init endpoint.
+     */
+    public function __construct(array $resource, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
     {
-        $this->name = $name;
-        $this->type = $type;
+        $this->name = $resource['name'];
+        $this->type = $resource['type'];
+        $this->resource = $resource;
         $this->datatype = $datatype;
         $this->logger = $logger;
-        $this->setOptions($config);
-
-        if ($this->type === EndpointInterface::TYPE_SOURCE && count($this->import) === 0) {
-            throw new Exception\SourceEndpointNoImportCondition('source endpoint must include at least one import condition');
-        }
-
-        /*if (is_iterable($this->filter_one) && count($this->filter_one) === 0) {
-            throw new Exception\FilterOneRequired('endpoint must declare a single object filter');
-        }*/
+        $this->setOptions($resource['config']);
     }
 
     /**
@@ -124,8 +122,6 @@ abstract class AbstractEndpoint implements EndpointInterface
 
     /**
      * Set options.
-     *
-     * @param iterable $config
      */
     public function setOptions(?Iterable $config = null): EndpointInterface
     {
@@ -169,7 +165,7 @@ abstract class AbstractEndpoint implements EndpointInterface
      */
     public function getId(): ObjectId
     {
-        return new ObjectId();
+        return $this->resource['_id'];
     }
 
     /**
@@ -177,7 +173,7 @@ abstract class AbstractEndpoint implements EndpointInterface
      */
     public function toArray(): array
     {
-        return [];
+        return $this->resource;
     }
 
     /**
@@ -193,11 +189,6 @@ abstract class AbstractEndpoint implements EndpointInterface
             'name' => $this->name,
             'class' => get_class($this),
             'type' => $this->type,
-            'flush' => $this->flush,
-            'history' => $this->history,
-            'import' => $this->import,
-            'filter_all' => $this->filter_all,
-            'filter_one' => $this->filter_one,
         ];
     }
 

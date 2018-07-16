@@ -15,6 +15,7 @@ use MongoDB\Database;
 use Tubee\Workflow\Exception;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap;
+use MongoDB\BSON\ObjectId;
 
 class Factory
 {
@@ -56,7 +57,9 @@ class Factory
     {
         return $this->db->workflows->count([
             'name' => $name,
-            'mandator' => $endpoint->getName()
+            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
+            'datatype' => $endpoint->getDataType()->getName(),
+            'endpoint' => $endpoint->getName(),
         ]) > 0;
     }
 
@@ -65,7 +68,11 @@ class Factory
      */
     public function getAll(EndpointInterface $endpoint, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->datatypes->find((['mandator' => $endpoint->getName()], [
+        $result = $this->db->datatypes->find([
+            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
+            'datatype' => $endpoint->getDataType()->getName(),
+            'endpoint' => $endpoint->getName(),
+        ], [
             'offset' => $offset,
             'limit' => $limit,
         ]);
@@ -84,7 +91,9 @@ class Factory
     {
         $result = $this->db->datatypes->findOne([
             'name' => $name,
-            'mandator' => $endpoint->getName()
+            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
+            'datatype' => $endpoint->getDataType()->getName(),
+            'endpoint' => $endpoint->getName(),
         ]);
 
         if ($result === null) {
@@ -92,6 +101,44 @@ class Factory
         }
 
         return self::build($result, $endpoint, $this->db, $this->logger);
+    }
+
+    /**
+     * Delete by name.
+     */
+    public function delete(EndpointInterface $endpoint, string $name): bool
+    {
+        if (!$this->has($endpoint, $name)) {
+            throw new Exception\NotFound('workflow '.$name.' does not exists');
+        }
+
+        $this->db->datatypes->deleteOne([
+            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
+            'datatype' => $endpoint->getDataType()->getName(),
+            'endpoint' => $endpoint->getName(),
+            'name' => $name,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Add mandator.
+     */
+    public function add(EndpointInterface $endpoint, array $resource): ObjectId
+    {
+        Validator::validate($resource);
+
+        if ($this->has($endpoint, $resource['name'])) {
+            throw new Exception\NotUnique('datatype '.$resource['name'].' does already exists');
+        }
+
+        $resource['mandator'] = $endpoint->getDataType()->getMandator()->getName(),
+        $resource['datatype'] = $endpoint->getDataType()->getName(),
+        $resource['endpoint'] = $endpoint->getName(),
+        $result = $this->db->workflows->insertOne($resource);
+
+        return $result->getInsertedId();
     }
 
     /**

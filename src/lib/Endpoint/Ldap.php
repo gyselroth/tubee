@@ -73,12 +73,12 @@ class Ldap extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, LdapServer $ldap, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null, ?Iterable $ldap_options = [])
+    public function __construct(array $resource, LdapServer $ldap, DataTypeInterface $datatype, LoggerInterface $logger)
     {
         $this->filter_all = '(objectClass=*)';
         $this->ldap = $ldap;
-        $this->setLdapOptions($ldap_options);
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        $this->setLdapOptions($resource['ldap_options']);
+        parent::__construct($resource, $datatype, $logger);
     }
 
     /**

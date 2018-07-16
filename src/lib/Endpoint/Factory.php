@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
@@ -73,7 +74,7 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['_id'] => new Endpoint($resource);
+            yield (string) $resource['_id'] => self::build($resource, $datatype, $this->logger);
         }
 
         return $this->db->endpoints->count((array) $query);
@@ -94,7 +95,46 @@ class Factory
             throw new Exception\DataTypeNotFound('mandator '.$name.' is not registered');
         }
 
-        return new Endpoint($result);
+        return self::build($result, $datatype, $this->logger);
+    }
+
+    /**
+     * Delete by name.
+     */
+    public function delete(DataTypeInterface $datatype, string $name): bool
+    {
+        if (!$this->has($datatype, $name)) {
+            throw new Exception\NotFound('endpoint '.$name.' does not exists');
+        }
+
+        $this->db->endpoints->deleteOne([
+            'name' => $name,
+            'mandator' => $datatype->getMandator()->getName(),
+            'datatype' => $datatype->getName(),
+        ]);
+
+        return true;
+    }
+
+    /**
+     * Add mandator.
+     */
+    public function add(DataTypeInterface $datatype, array $resource): ObjectId
+    {
+        $resource = Validator::validate($resource);
+
+        if ($this->has($datatype, $resource['name'])) {
+            throw new Exception\NotUnique('endpoint '.$resource['name'].' does already exists');
+        }
+
+        $endpoint = self::build($resource, $datatype, $this->logger);
+        $endpoint->setup();
+
+        $resource['mandator'] = $datatype->getMandator()->getName();
+        $resource['datatype'] = $datatype->getName();
+        $result = $this->db->endpoints->insertOne($resource);
+
+        return $result->getInsertedId();
     }
 
     /**
@@ -102,6 +142,8 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, LoggerInterface $logger)
     {
-        return new Endpoint($resource, $datatype, $logger);
+        $factory = $resource['class'].'\\Factory';
+
+        return $factory::build($resource, $datatype, $logger);
     }
 }
