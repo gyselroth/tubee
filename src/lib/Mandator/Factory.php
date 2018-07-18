@@ -14,6 +14,7 @@ namespace Tubee\Mandator;
 use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
+use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator;
 
 class Factory
@@ -26,11 +27,19 @@ class Factory
     protected $db;
 
     /**
+     * Datatype.
+     *
+     * @var DataTypeFactory
+     */
+    protected $datatype;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, DataTypeFactory $datatype)
     {
         $this->db = $db;
+        $this->datatype = $datatype;
     }
 
     /**
@@ -52,7 +61,7 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['_id'] => self::build($resource);
+            yield (string) $resource['name'] => self::build($resource, $this->datatype);
         }
 
         return $this->db->mandators->count((array) $query);
@@ -69,7 +78,7 @@ class Factory
             throw new Exception\NotFound('mandator '.$name.' is not registered');
         }
 
-        return self::build($result);
+        return self::build($result, $this->datatype);
     }
 
     /**
@@ -105,8 +114,8 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource): MandatorInterface
+    public static function build(array $resource, DataTypeFactory $datatype): MandatorInterface
     {
-        return new Mandator($resource);
+        return new Mandator($resource, $datatype);
     }
 }

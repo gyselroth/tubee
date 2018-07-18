@@ -19,7 +19,6 @@ use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\Console\Jobs;
-use Tubee\Console\Objects;
 use Tubee\Console\Upgrade;
 
 class Cli extends AbstractBootstrap
@@ -61,9 +60,6 @@ class Cli extends AbstractBootstrap
         $this->getopt->addOption(['h', 'help', GetOpt::NO_ARGUMENT, 'Help']);
 
         $this->getopt->addCommands([
-            /*\GetOpt\Command::create('objects', Objects::class)
-                ->addOptions(Objects::getOptions())
-                ->addOperands(Objects::getOperands()),*/
             \GetOpt\Command::create('upgrade', Upgrade::class)
                 ->addOptions(Upgrade::getOptions())
                 ->addOperands(Upgrade::getOperands()),

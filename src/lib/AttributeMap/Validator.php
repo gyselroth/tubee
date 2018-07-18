@@ -15,7 +15,7 @@ use InvalidArgumentException;
 
 class Validator
 {
-    public function validate(array $resource): bool
+    public function validate(array $resource): array
     {
         foreach ($resource as $attribute => $definition) {
             if (!is_array($definition)) {
@@ -25,7 +25,7 @@ class Validator
             self::validateAttribute($attribute, $definition);
         }
 
-        return true;
+        return $resource;
     }
 
     /**

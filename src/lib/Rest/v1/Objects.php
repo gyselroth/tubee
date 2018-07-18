@@ -18,7 +18,8 @@ use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\MandatorManager;
+use Tubee\DataType\Factory as DataTypeFactory;
+use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
@@ -27,9 +28,10 @@ class Objects
     /**
      * Init.
      */
-    public function __construct(MandatorManager $manager, Acl $acl)
+    public function __construct(MandatorFactory $mandator, DataTypeFactory $datatype, Acl $acl)
     {
-        $this->manager = $manager;
+        $this->mandator = $mandator;
+        $this->datatype = $datatype;
         $this->acl = $acl;
     }
 
@@ -44,9 +46,9 @@ class Objects
             'query' => [],
         ], $request->getQueryParams());
 
-        $mandator = $this->manager->getMandator($mandator);
-        $datatype = $mandator->getDataType($datatype);
-        $objects = $datatype->getAll($query['query'], true, 1, (int) $query['offset'], (int) $query['limit']);
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $objects = $datatype->getAll($query['query'], false, (int) $query['offset'], (int) $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $objects);
         $body = Pager::fromRequest($body, $request);
@@ -63,11 +65,15 @@ class Objects
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
     {
-        $query =$request->getQueryParams());
+        $query = $request->getQueryParams();
+
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $object = $datatype->getOne(['_id' => $object], false);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->manager->getMandator($mandator)->getDataType($datatype)->getOne(['_id' => $object], false)->decorate($request),
+            $object->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -85,7 +91,9 @@ class Objects
             'data' => [],
             'endpoints' => null,
         ], $request->getParsedBody());
-        $datatype = $this->manager->getMandator($mandator)->getDataType($datatype);
+
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
         $id = $datatype->create($body['data'], false, $body['endpoints']);
 
         if ($query['write'] === true) {
@@ -110,42 +118,11 @@ class Objects
             'query' => [],
         ], $request->getQueryParams());
 
-        $mandator = $this->manager->getMandator($mandator);
-        $object = $mandator->getDataType($datatype)->getOne(['_id' => $object], false);
+        $mandator = $this->mandator->getOne($mandator);
+        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $object = $datatype->getOne(['_id' => $object], false);
         $history = $object->getHistory();
         $body = Pager::fromRequest($history, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
-    }
-
-    /**
-     * Entrypoint.
-     */
-    public function getEndpoints(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object, ?string $endpoint = null): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => 0,
-            'limit' => 20,
-            'query' => [],
-        ], $request->getQueryParams());
-
-        if ($object !== null) {
-            return new UnformattedResponse(
-                (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->manager->getMandator($mandator)->getDataType($datatype)->getOne(['_id' => $object], false)->decorate($request),
-                ['pretty' => isset($query['pretty'])]
-            );
-        }
-
-        $mandator = $this->manager->getMandator($mandator);
-        $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
-
-        $body = $this->acl->filterOutput($request, $identity, $objects);
-        $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

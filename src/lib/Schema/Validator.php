@@ -15,7 +15,7 @@ use InvalidArgumentException;
 
 class Validator
 {
-    public function validate(array $resource): bool
+    public function validate(array $resource): array
     {
         foreach ($resource as $attribute => $definition) {
             if (!is_array($definition)) {
@@ -25,7 +25,7 @@ class Validator
             self::validateAttribute($attribute, $definition);
         }
 
-        return true;
+        return $resource;
     }
 
     /**
@@ -33,10 +33,6 @@ class Validator
      */
     protected static function validateAttribute(string $name, array $schema): bool
     {
-        $default = [
-            'required' => false,
-        ];
-
         foreach ($schema as $option => $definition) {
             switch ($option) {
                 case 'description':
@@ -47,15 +43,11 @@ class Validator
                         throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type string');
                     }
 
-                    $default[$option] = $definition;
-
                 break;
                 case 'required':
                     if (!is_bool($definition)) {
                         throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type boolean');
                     }
-
-                    $default[$option] = $definition;
 
                 break;
                 default:

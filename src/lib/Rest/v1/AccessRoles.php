@@ -58,7 +58,7 @@ class AccessRoles
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
-        $query = $request->getQueryParams());
+        $query = $request->getQueryParams();
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

@@ -51,6 +51,10 @@ class CoreInstallation implements DeltaInterface
 
         $this->db->access_roles->createIndex(['name' => 1], ['unique' => true]);
         $this->db->access_rules->createIndex(['name' => 1], ['unique' => true]);
+        $this->db->mandators->createIndex(['name' => 1], ['unique' => true]);
+        $this->db->datatypes->createIndex(['name' => 1, 'mandator' => 1], ['unique' => true]);
+        $this->db->endpoints->createIndex(['name' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
+        $this->db->workflows->createIndex(['name' => 1, 'workflow' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
 
         $this->acl->addRole([
             'name' => 'admin',

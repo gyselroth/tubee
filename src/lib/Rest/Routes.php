@@ -13,35 +13,11 @@ namespace Tubee\Rest;
 
 use FastRoute;
 use Micro\Http\Router;
-use Micro\Http\Router\Route;
 
 class Routes
 {
-    /**
-     * Create routing table.
-     */
-    public function __construct(Router $router)
+    public function __construct(Router $roueter)
     {
-        $router
-            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes/{datatype:#([0-9a-zA-Z_-])#}/objects/{object:#([0-9a-zA-Z_-])#}(/|\z)', v1\Objects::class))
-            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes/{datatype:#([0-9a-zA-Z_-])#}/objects(/|\z)$', v1\Objects::class))
-            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes/{datatype:#([0-9a-zA-Z_-])#}/endpoints/{endpoint:#([0-9a-zA-Z_-])#}(/|\z)$', v1\Endpoints::class))
-            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes/{datatype:#([0-9a-zA-Z_-])#}/endpoints(/|\z)$', v1\Endpoints::class))
-            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes/{datatype:#([0-9a-zA-Z_-])#}(/|\z)$', v1\DataTypes::class))
-            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}/datatypes(/|\z)$', v1\DataTypes::class))
-            ->appendRoute(new Route('/api/v1/mandators/{mandator:#([0-9a-zA-Z_-])#}(/|\z)$', v1\Mandators::class))
-            ->appendRoute(new Route('/api/v1/mandators$', v1\Mandators::class))
-            ->appendRoute(new Route('/api/v1/jobs/{job:#([0-9a-zA-Z_-])#}/errors/{error:#([0-9a-zA-Z_-])#}(/|\z)', v1\Jobs::class))
-            ->appendRoute(new Route('/api/v1/jobs/{job:#([0-9a-zA-Z_-])#}(/|\z)', v1\Jobs::class))
-            ->appendRoute(new Route('/api/v1/jobs$', v1\Jobs::class))
-            ->appendRoute(new Route('/api/v1/watch/jobs/{job:#([0-9a-zA-Z_-])#}/errors', [v1\Jobs::class, 'watchErrors']))
-            ->appendRoute(new Route('/api/v1/access-rules/{rule:#([0-9a-zA-Z_-])#}(/|\z)', v1\AccessRules::class))
-            ->appendRoute(new Route('/api/v1/access-rules$', v1\AccessRules::class))
-            ->appendRoute(new Route('/api/v1/access-roles/{role:#([0-9a-zA-Z_-])#}(/|\z)', v1\AccessRoles::class))
-            ->appendRoute(new Route('/api/v1/access-roles$', v1\AccessRoles::class))
-            ->appendRoute(new Route('/api/v1', v1\Api::class))
-            ->appendRoute(new Route('/api$', v1\Api::class))
-            ->appendRoute(new Route('^$', v1\Api::class));
     }
 
     public function collect()
@@ -66,7 +42,11 @@ class Routes
             $r->addRoute('PUT', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}', [v1\Endpoints::class, 'put']);
             $r->addRoute('PATCH', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}', [v1\Endpoints::class, 'patch']);
             $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows', [v1\Workflows::class, 'getAll']);
+            $r->addRoute('POST', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows', [v1\Workflows::class, 'post']);
             $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}', [v1\Workflows::class, 'getOne']);
+            $r->addRoute('DELETE', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}', [v1\Workflows::class, 'delete']);
+            $r->addRoute('PATCH', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}', [v1\Workflows::class, 'patch']);
+            $r->addRoute('PUT', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}', [v1\Workflows::class, 'post']);
             $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects', [v1\Objects::class, 'getAll']);
             $r->addRoute('POST', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects', [v1\Objects::class, 'post']);
             $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}', [v1\Objects::class, 'getOne']);
@@ -94,6 +74,7 @@ class Routes
             $r->addRoute('PUT', '/api/v1/access-roles/{rule}', [v1\AccessRoles::class, 'put']);
             $r->addRoute('PATCH', '/api/v1/access-roles/{rule}', [v1\AccessRoles::class, 'patch']);
             $r->addRoute('GET', '/api/v1/jobs', [v1\Jobs::class, 'getAll']);
+            $r->addRoute('POST', '/api/v1/jobs', [v1\Jobs::class, 'post']);
             $r->addRoute('GET', '/api/v1/jobs/{job}', [v1\Jobs::class, 'getOne']);
             $r->addRoute('DELETE', '/api/v1/jobs/{job}', [v1\Jobs::class, 'delete']);
             $r->addRoute('GET', '/api/v1/jobs/{job}/errors', [v1\JobErrors::class, 'getAll']);

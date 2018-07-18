@@ -18,8 +18,8 @@ use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\JobManager;
-use Tubee\MandatorManager;
+use Tubee\Job\Factory as JobFactory;
+use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
@@ -28,11 +28,11 @@ class JobErrors
     /**
      * Init.
      */
-    public function __construct(JobManager $scheduler, Acl $acl, MandatorManager $manager)
+    public function __construct(JobFactory $job, Acl $acl, MandatorFactory $mandator)
     {
-        $this->scheduler = $scheduler;
+        $this->job = $job;
         $this->acl = $acl;
-        $this->manager = $manager;
+        $this->mandator = $mandator;
     }
 
     /**
@@ -46,7 +46,7 @@ class JobErrors
             'query' => [],
         ], $request->getQueryParams());
 
-        $errors = $this->scheduler->getErrors($job, $query['query'], $query['offset'], $query['limit']);
+        $errors = $this->job->getErrors($job, $query['query'], $query['offset'], $query['limit']);
         $body = $this->acl->filterOutput($request, $identity, $errors);
         $body = Pager::fromRequest($body, $request);
 
@@ -66,7 +66,7 @@ class JobErrors
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->scheduler->getError($error)->decorate($request),
+            $this->job->getError($error)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -76,7 +76,7 @@ class JobErrors
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
     {
-        $cursor = $this->scheduler->watchErrors($job);
+        $cursor = $this->job->watchErrors($job);
 
         $iterator = function () use ($cursor) {
             $iterator = new \IteratorIterator($cursor);

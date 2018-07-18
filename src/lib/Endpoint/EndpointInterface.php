@@ -45,11 +45,6 @@ interface EndpointInterface extends ResourceInterface
     public function hasWorkflow(string $name): bool;
 
     /**
-     * inject workflow.
-     */
-    public function injectWorkflow(WorkflowInterface $workflow, string $name): EndpointInterface;
-
-    /**
      * Get workflow.
      */
     public function getWorkflow(string $name): WorkflowInterface;
@@ -57,19 +52,19 @@ interface EndpointInterface extends ResourceInterface
     /**
      * Get workflows.
      */
-    public function getWorkflows(Iterable $workflows = []): array;
+    public function getWorkflows(array $workflows = [], ?int $offset = null, ?int $limit = null): Generator;
 
     /**
      * Get object from endpoint.
      */
-    public function getOne(Iterable $object, Iterable $attributes): Iterable;
+    public function getOne(array $object, array $attributes): array;
 
     /**
      * Check if object does exists on endpoint.
      *
      * @param DataObjectInterface $object
      */
-    public function exists(Iterable $object): bool;
+    public function exists(array $object): bool;
 
     /**
      * Check if a flush is required.
@@ -87,7 +82,7 @@ interface EndpointInterface extends ResourceInterface
      *
      * @return bool
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string;
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string;
 
     /**
      * Get diff for change.
@@ -100,12 +95,12 @@ interface EndpointInterface extends ResourceInterface
      *
      * @return bool
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string;
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string;
 
     /**
      * Remove object from endpoint.
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool;
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool;
 
     /**
      * Read endpoint.

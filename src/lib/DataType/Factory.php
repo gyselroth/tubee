@@ -16,6 +16,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType;
+use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\MandatorInterface;
 use Tubee\Schema;
 
@@ -34,12 +35,20 @@ class Factory
     protected $logger;
 
     /**
+     * Endpoint.
+     *
+     * @var EndpointInterface
+     */
+    protected $endpoint;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, LoggerInterface $logger)
+    public function __construct(Database $db, EndpointFactory $endpoint, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->logger = $logger;
+        $this->endpoint = $endpoint;
     }
 
     /**
@@ -64,7 +73,7 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['_id'] => self::build($resource, $mandator, $this->db, $this->logger);
+            yield (string) $resource['name'] => self::build($resource, $mandator, $this->db, $this->endpoint, $this->logger);
         }
 
         return $this->db->datatypes->count((array) $query);
@@ -84,7 +93,7 @@ class Factory
             throw new Exception\NotFound('mandator '.$name.' is not registered');
         }
 
-        return self::build($result, $mandator, $this->db, $this->logger);
+        return self::build($result, $mandator, $this->db, $this->endpoint, $this->logger);
     }
 
     /**
@@ -124,10 +133,10 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource, MandatorInterface $mandator, Database $db, LoggerInterface $logger): DataTypeInterface
+    public static function build(array $resource, MandatorInterface $mandator, Database $db, EndpointFactory $endpoint, LoggerInterface $logger): DataTypeInterface
     {
         $schema = new Schema($resource['schema'], $logger);
 
-        return new DataType($resource, $mandator, $schema, $db, $logger);
+        return new DataType($resource, $mandator, $endpoint, $schema, $db, $logger);
     }
 }

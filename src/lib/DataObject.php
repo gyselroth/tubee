@@ -9,64 +9,29 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\DataType;
+namespace Tubee;
 
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\DataType\DataObject\DataObjectInterface;
+use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataType\DataTypeInterface;
 use Tubee\Resource\AttributeResolver;
 
 class DataObject implements DataObjectInterface
 {
     /**
-     * Object id.
-     *
-     * @var ObjectId
-     */
-    protected $_id;
-
-    /**
-     * Created.
-     *
-     * @var UTCDateTime
-     */
-    protected $created;
-
-    /**
-     * Changed.
-     *
-     * @var UTCDateTime
-     */
-    protected $changed;
-
-    /**
-     * Disabled (Deleted).
-     *
-     * @var UTCDateTime
-     */
-    protected $deleted;
-
-    /**
-     * Object version.
-     *
-     * @var int
-     */
-    protected $version = 1;
-
-    /**
-     * Data.
+     * Resource.
      *
      * @var array
      */
-    protected $data = [];
-
-    /**
-     * Endpoints.
-     *
-     * @var array
-     */
-    protected $endpoints = [];
+    protected $resource = [
+        'version' => 1,
+        'data' => [],
+        'endpoints' => [],
+        'deleted' => null,
+        'changed' => null,
+    ];
 
     /**
      * Datatype.
@@ -78,12 +43,10 @@ class DataObject implements DataObjectInterface
     /**
      * Data object.
      */
-    public function __construct(array $data, DataTypeInterface $datatype)
+    public function __construct(array $resource, DataTypeInterface $datatype)
     {
+        $this->resource = array_merge($this->resource, $resource);
         $this->datatype = $datatype;
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
     }
 
     /**
@@ -91,7 +54,7 @@ class DataObject implements DataObjectInterface
      */
     public function getId(): ObjectId
     {
-        return $this->_id;
+        return $this->resource['_id'];
     }
 
     /**
@@ -99,15 +62,7 @@ class DataObject implements DataObjectInterface
      */
     public function toArray(): array
     {
-        return [
-            '_id' => $this->_id,
-            'created' => $this->created,
-            'changed' => $this->changed,
-            'deleted' => $this->deleted,
-            'version' => $this->version,
-            'data' => $this->data,
-            'endpoints' => $this->endpoints,
-        ];
+        return $this->resource;
     }
 
     /**
@@ -115,18 +70,17 @@ class DataObject implements DataObjectInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        return AttributeResolver::resolve($request, $this, [
+        $datatype = $this->getDataType();
+        $mandator = $datatype->getMandator();
+
+        $resource = [
             '_links' => [
                  'self' => ['href' => (string) $request->getUri()],
+                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
+                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
             ],
             'kind' => 'DataObject',
             'id' => (string) $this->getId(),
-            'mandator' => function ($object) use ($request) {
-                return $object->getDataType()->getMandator()->decorate($request);
-            },
-            'datatype' => function ($object) use ($request) {
-                return $object->getDataType()->decorate($request);
-            },
             'version' => $this->getVersion(),
             'created' => function ($object) {
                 return $object->getCreated()->toDateTime()->format('c');
@@ -147,7 +101,9 @@ class DataObject implements DataObjectInterface
 
                 return $endpoints;
             },
-        ]);
+        ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
@@ -155,7 +111,7 @@ class DataObject implements DataObjectInterface
      */
     public function getHistory(?int $offset = null, ?int $limit = null): Iterable
     {
-        return $this->datatype->getObjectHistory($this->_id);
+        return $this->datatype->getObjectHistory($this->resource['_id']);
     }
 
     /**
@@ -163,7 +119,7 @@ class DataObject implements DataObjectInterface
      */
     public function getVersion(): int
     {
-        return $this->version;
+        return $this->resource['version'];
     }
 
     /**
@@ -171,7 +127,7 @@ class DataObject implements DataObjectInterface
      */
     public function getChanged(): ?UTCDateTime
     {
-        return $this->changed;
+        return $this->resource['changed'];
     }
 
     /**
@@ -179,7 +135,7 @@ class DataObject implements DataObjectInterface
      */
     public function getCreated(): UTCDateTime
     {
-        return $this->created;
+        return $this->resource['created'];
     }
 
     /**
@@ -187,7 +143,7 @@ class DataObject implements DataObjectInterface
      */
     public function getDeleted(): ?UTCDateTime
     {
-        return $this->deleted;
+        return $this->resource['deleted'];
     }
 
     /**
@@ -195,7 +151,7 @@ class DataObject implements DataObjectInterface
      */
     public function getData(): array
     {
-        return $this->data;
+        return $this->resource['data'];
     }
 
     /**
@@ -211,6 +167,6 @@ class DataObject implements DataObjectInterface
      */
     public function getEndpoints(): array
     {
-        return $this->endpoints;
+        return $this->resource['endpoints'];
     }
 }

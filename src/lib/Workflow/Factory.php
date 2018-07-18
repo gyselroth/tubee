@@ -11,30 +11,33 @@ declare(strict_types=1);
 
 namespace Tubee\Workflow;
 
-use MongoDB\Database;
-use Tubee\Workflow\Exception;
-use Psr\Log\LoggerInterface;
-use Tubee\AttributeMap;
+use Generator;
 use MongoDB\BSON\ObjectId;
+use MongoDB\Database;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
+use Tubee\AttributeMap;
+use Tubee\Endpoint\EndpointInterface;
+use Tubee\Workflow;
 
 class Factory
 {
     /**
-     * Database
+     * Database.
      *
      * @var Database
      */
     protected $db;
 
     /**
-     * Expression lang
+     * Expression lang.
      *
      * @var ExpressionLanguage
      */
     protected $script;
 
     /**
-     * Logger
+     * Logger.
      *
      * @var LoggerInterface
      */
@@ -68,7 +71,7 @@ class Factory
      */
     public function getAll(EndpointInterface $endpoint, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->datatypes->find([
+        $result = $this->db->workflows->find([
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
             'endpoint' => $endpoint->getName(),
@@ -78,10 +81,10 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['_id'] => self::build($resource, $endpoint, $this->db, $this->logger);
+            yield (string) $resource['name'] => self::build($resource, $endpoint, $this->script, $this->logger);
         }
 
-        return $this->db->datatypes->count((array) $query);
+        return $this->db->workflows->count((array) $query);
     }
 
     /**
@@ -89,7 +92,7 @@ class Factory
      */
     public function getOne(EndpointInterface $endpoint, string $name): WorkflowInterface
     {
-        $result = $this->db->datatypes->findOne([
+        $result = $this->db->workflows->findOne([
             'name' => $name,
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
@@ -100,7 +103,7 @@ class Factory
             throw new Exception\NotFound('workflow '.$name.' is not registered');
         }
 
-        return self::build($result, $endpoint, $this->db, $this->logger);
+        return self::build($result, $endpoint, $this->script, $this->logger);
     }
 
     /**
@@ -112,7 +115,7 @@ class Factory
             throw new Exception\NotFound('workflow '.$name.' does not exists');
         }
 
-        $this->db->datatypes->deleteOne([
+        $this->db->workflows->deleteOne([
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
             'endpoint' => $endpoint->getName(),
@@ -133,20 +136,21 @@ class Factory
             throw new Exception\NotUnique('datatype '.$resource['name'].' does already exists');
         }
 
-        $resource['mandator'] = $endpoint->getDataType()->getMandator()->getName(),
-        $resource['datatype'] = $endpoint->getDataType()->getName(),
-        $resource['endpoint'] = $endpoint->getName(),
+        $resource['mandator'] = $endpoint->getDataType()->getMandator()->getName();
+        $resource['datatype'] = $endpoint->getDataType()->getName();
+        $resource['endpoint'] = $endpoint->getName();
         $result = $this->db->workflows->insertOne($resource);
 
         return $result->getInsertedId();
     }
 
     /**
-     * Build instance
+     * Build instance.
      */
-    public static function build(array $resource, EndpointInterface $endpoint, Database $db, LoggerInterface $logger): WorkflowInterface
+    public static function build(array $resource, EndpointInterface $endpoint, ExpressionLanguage $script, LoggerInterface $logger): WorkflowInterface
     {
-        $schema = new AttributeMap($resource['map']);
-        return new Workflow($resource, $endpoint, $script, $map, $db, $logger);
+        $map = new AttributeMap($resource['map'], $script, $logger);
+
+        return new Workflow($resource['name'], $resource['ensure'], $script, $map, $endpoint, $logger, $resource);
     }
 }

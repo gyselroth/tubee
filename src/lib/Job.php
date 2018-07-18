@@ -9,11 +9,11 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Job;
+namespace Tubee;
 
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\Job\Job\JobInterface;
+use Tubee\Job\JobInterface;
 
 class Job implements JobInterface
 {
@@ -53,7 +53,7 @@ class Job implements JobInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $job = array_intersect_key($this->resource, array_flip(['at', 'interval', 'retry', 'retry_interval', 'created', 'status', 'resource', 'class']));
+        $job = array_intersect_key($this->resource, array_flip(['at', 'interval', 'retry', 'retry_interval', 'created', 'status', 'resource', 'class', 'data']));
 
         $resource = [
             '_links' => [

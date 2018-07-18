@@ -21,8 +21,8 @@ use TaskScheduler\Scheduler;
 use Tubee\Acl;
 use Tubee\Async\Sync as SyncJob;
 use Tubee\Job;
-use Tubee\JobManager;
-use Tubee\MandatorManager;
+use Tubee\Job\Factory as JobFactory;
+use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
@@ -31,11 +31,11 @@ class Jobs
     /**
      * Init.
      */
-    public function __construct(JobManager $scheduler, Acl $acl, MandatorManager $manager)
+    public function __construct(JobFactory $job, Acl $acl, MandatorFactory $mandator)
     {
-        $this->scheduler = $scheduler;
+        $this->job = $job;
         $this->acl = $acl;
-        $this->manager = $manager;
+        $this->mandator = $mandator;
     }
 
     /**
@@ -49,7 +49,7 @@ class Jobs
             'query' => [],
         ], $request->getQueryParams());
 
-        $jobs = $this->scheduler->getTasks($query['query'], $query['offset'], $query['limit']);
+        $jobs = $this->job->getTasks($query['query'], $query['offset'], $query['limit']);
         $body = $this->acl->filterOutput($request, $identity, $jobs);
         $body = Pager::fromRequest($body, $request);
 
@@ -69,7 +69,7 @@ class Jobs
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->scheduler->getTask($job)->decorate($request),
+            $this->job->getTask($job)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -79,7 +79,7 @@ class Jobs
      */
     public function delete(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
     {
-        $this->scheduler->cancelJob($job);
+        $this->job->cancelJob($job);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
@@ -99,12 +99,12 @@ class Jobs
         if ($error !== null) {
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->scheduler->getError($error)->decorate($request),
+                $this->job->getError($error)->decorate($request),
                 ['pretty' => isset($query['pretty'])]
             );
         }
 
-        $errors = $this->scheduler->getErrors($job, $query['query'], $query['offset'], $query['limit']);
+        $errors = $this->job->getErrors($job, $query['query'], $query['offset'], $query['limit']);
         $body = $this->acl->filterOutput($request, $identity, $errors);
         $body = Pager::fromRequest($body, $request);
 
@@ -151,12 +151,12 @@ class Jobs
         $job = array_merge($job, $body);
 
         //validate job requst
-        $this->manager->getMandators($job['mandator']);
-        $id = $this->scheduler->addJob(SyncJob::class, $job, $task_set);
+        $this->mandator->getAll($job['mandator']);
+        $id = $this->job->addJob(SyncJob::class, $job, $task_set);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->scheduler->getTask($id)->decorate($request),
+            $this->job->getTask($id)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

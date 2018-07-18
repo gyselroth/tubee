@@ -16,18 +16,18 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Pdo\Wrapper as PdoWrapper;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Pdo extends AbstractSqlDatabase
 {
     /**
      * Init endpoint.
      */
-    public function __construct(array $resource, PdoWrapper $pdo, DataTypeInterface $datatype, LoggerInterface $logger)
+    public function __construct(string $name, string $type, string $table, PdoWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->resource = $resource;
-        $this->socket = $pdo;
-        $this->table = $resource['table'];
-        parent::__construct($resource, $datatype, $logger, $resource['config']);
+        $this->socket = $socket;
+        $this->table = $table;
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
@@ -53,7 +53,7 @@ class Pdo extends AbstractSqlDatabase
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): array
     {
         $filter = $this->getFilterOne($object);
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
@@ -72,7 +72,7 @@ class Pdo extends AbstractSqlDatabase
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $result = $this->prepareCreate($object, $simulate);
 

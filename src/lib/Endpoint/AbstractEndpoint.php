@@ -11,13 +11,14 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint;
 
-use InvalidArgumentException;
+use Generator;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Helper;
-use Tubee\Workflow;
+use Tubee\Resource\AttributeResolver;
+use Tubee\Workflow\Factory as WorkflowFactory;
 use Tubee\Workflow\WorkflowInterface;
 
 abstract class AbstractEndpoint implements EndpointInterface
@@ -58,13 +59,6 @@ abstract class AbstractEndpoint implements EndpointInterface
     protected $filter_one;
 
     /**
-     * Workflow.
-     *
-     * @var iterable
-     */
-    protected $workflows = [];
-
-    /**
      * Import.
      *
      * @var array
@@ -102,14 +96,15 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * Init endpoint.
      */
-    public function __construct(array $resource, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $type, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->name = $resource['name'];
-        $this->type = $resource['type'];
+        $this->name = $name;
+        $this->type = $type;
         $this->resource = $resource;
         $this->datatype = $datatype;
         $this->logger = $logger;
-        $this->setOptions($resource['config']);
+        $this->workflow = $workflow;
+        $this->setOptions($resource);
     }
 
     /**
@@ -132,7 +127,7 @@ abstract class AbstractEndpoint implements EndpointInterface
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'flush':
-                    $this->flush = (bool) (int) $value;
+                    $this->flush = (bool) $value;
 
                 break;
                 case 'import':
@@ -153,7 +148,7 @@ abstract class AbstractEndpoint implements EndpointInterface
 
                 break;
                 default:
-                    throw new InvalidArgumentException('unknown option '.$option.' given');
+                    //do nothing
             }
         }
 
@@ -177,19 +172,49 @@ abstract class AbstractEndpoint implements EndpointInterface
     }
 
     /**
-     * Decorate.
+     * {@inheritdoc}
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        return [
+        $datatype = $this->getDataType();
+        $mandator = $datatype->getMandator();
+
+        $resource = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
-            ],
+                'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
+                'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+           ],
             'kind' => 'Endpoint',
             'name' => $this->name,
+            'id' => (string) $this->resource['_id'],
             'class' => get_class($this),
+            'options' => $this->options,
+            'import' => $this->import,
+            'history' => $this->history,
+            'flush' => $this->flush,
+            'filter_one' => $this->filter_one,
+            'filter_all' => $this->filter_all,
             'type' => $this->type,
+            'status' => function ($endpoint) {
+                try {
+                    $endpoint->setup();
+
+                    return [
+                        'available' => true,
+                    ];
+                } catch (\Exception $e) {
+                    return [
+                        'available' => false,
+                        'exception' => get_class($e),
+                        'error' => $e->getMessage(),
+                        'code' => $e->getCode(),
+                    ];
+                }
+            },
         ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
@@ -261,25 +286,7 @@ abstract class AbstractEndpoint implements EndpointInterface
      */
     public function hasWorkflow(string $name): bool
     {
-        return isset($this->workflows[$name]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function injectWorkflow(WorkflowInterface $workflow, string $name): EndpointInterface
-    {
-        $this->logger->debug('inject workflow ['.$name.'] of type ['.get_class($workflow).']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($this->hasWorkflow($name)) {
-            throw new Exception\WorkflowNotUnique('workflow '.$name.' is already registered');
-        }
-
-        $this->workflows[$name] = $workflow;
-
-        return $this;
+        return $this->workflow->has($this, $name);
     }
 
     /**
@@ -287,30 +294,15 @@ abstract class AbstractEndpoint implements EndpointInterface
      */
     public function getWorkflow(string $name): WorkflowInterface
     {
-        if (!isset($this->workflows[$name])) {
-            throw new Exception\WorkflowNotFound('workflow '.$name.' is not registered in endpoint '.$this->name);
-        }
-
-        return $this->workflows[$name];
+        return $this->workflow->getOne($this, $name);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getWorkflows(Iterable $workflows = []): array
+    public function getWorkflows(array $workflows = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        if (count($workflows) === 0) {
-            return $this->workflows;
-        }
-        $list = [];
-        foreach ($workflows as $name) {
-            if (!isset($this->workflows[$name])) {
-                throw new Exception\WorkflowNotFound('workflow '.$name.' is not registered in endpoint '.$this->name);
-            }
-            $list[$name] = $this->workflows[$name];
-        }
-
-        return $list;
+        return $this->workflow->getAll($this, $workflows, $offset, $limit);
     }
 
     /**

@@ -16,6 +16,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
 {
@@ -27,10 +28,11 @@ class Factory
     protected $db;
 
     /**
-     * Datatype factory.
+     * Factory.
      *
-     * @var DataTypeFactory
+     * @var WorkflowFactory
      */
+    protected $workflow;
 
     /**
      * Logger.
@@ -42,10 +44,11 @@ class Factory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, LoggerInterface $logger)
+    public function __construct(Database $db, WorkflowFactory $workflow, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->logger = $logger;
+        $this->workflow = $workflow;
     }
 
     /**
@@ -74,7 +77,7 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['_id'] => self::build($resource, $datatype, $this->logger);
+            yield (string) $resource['name'] => self::build($resource, $datatype, $this->workflow, $this->logger);
         }
 
         return $this->db->endpoints->count((array) $query);
@@ -95,7 +98,7 @@ class Factory
             throw new Exception\DataTypeNotFound('mandator '.$name.' is not registered');
         }
 
-        return self::build($result, $datatype, $this->logger);
+        return self::build($result, $datatype, $this->workflow, $this->logger);
     }
 
     /**
@@ -140,10 +143,10 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, LoggerInterface $logger)
+    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger)
     {
         $factory = $resource['class'].'\\Factory';
 
-        return $factory::build($resource, $datatype, $logger);
+        return $factory::build($resource, $datatype, $workflow, $logger);
     }
 }

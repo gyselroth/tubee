@@ -18,7 +18,7 @@ use Psr\Log\LoggerInterface;
 use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\MandatorManager;
+use Tubee\Mandator\Factory as MandatorFactory;
 
 class Sync extends AbstractJob
 {
@@ -39,9 +39,9 @@ class Sync extends AbstractJob
     /**
      * Sync.
      */
-    public function __construct(MandatorManager $manager, Scheduler $scheduler, LoggerInterface $logger)
+    public function __construct(MandatorFactory $mandator, Scheduler $scheduler, LoggerInterface $logger)
     {
-        $this->manager = $manager;
+        $this->mandator = $mandator;
         $this->scheduler = $scheduler;
         $this->logger = $logger;
     }
@@ -53,9 +53,10 @@ class Sync extends AbstractJob
     {
         $options = $this->getDefaults();
 
-        foreach ($this->manager->getMandators($options['mandators']) as $mandator_name => $mandator) {
-            foreach ($mandator->getDataTypes($options['datatypes']) as $dt_name => $datatype) {
-                $res_endpoints = $datatype->getEndpoints($options['endpoints']);
+        foreach ($this->mandator->getAll(['name' => ['$in' => $options['mandators']]]) as $mandator_name => $mandator) {
+            foreach ($mandator->getDataTypes(['name' => ['$in' => $options['datatypes']]]) as $dt_name => $datatype) {
+                $res_endpoints = $datatype->getEndpoints(['name' => ['$in' => $options['endpoints']]]);
+
                 foreach ($res_endpoints as $ep_name => $endpoint) {
                     if ($options['loadbalance'] === true) {
                         $this->scheduler->addJob(self::class, [
@@ -63,6 +64,9 @@ class Sync extends AbstractJob
                             'endpoints' => [$ep_name],
                             'filter' => $options['filter'],
                             'loadbalance' => false,
+                            'ignore' => $options['ignore'],
+                            'simulate' => $options['simulate'],
+                            'log_level' => $options['log_level'],
                         ]);
                     } else {
                         $this->setLoggerLevel($options['log_level']);

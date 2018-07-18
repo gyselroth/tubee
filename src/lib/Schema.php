@@ -34,7 +34,7 @@ class Schema implements SchemaInterface
     /**
      * Init attribute schema.
      */
-    public function __construct(array $schema = [], LoggerInterface $logger)
+    public function __construct(array $schema, LoggerInterface $logger)
     {
         $this->schema = $schema;
         $this->logger = $logger;
@@ -45,7 +45,19 @@ class Schema implements SchemaInterface
      */
     public function getSchema(): array
     {
-        return $this->schema;
+        $default = [
+            'label' => null,
+            'required' => false,
+            'type' => null,
+            'require_regex' => null,
+        ];
+
+        $result = [];
+        foreach ($this->schema as $attribute => $schema) {
+            $result[$attribute] = array_merge($default, $schema);
+        }
+
+        return $result;
     }
 
     /**
@@ -61,13 +73,12 @@ class Schema implements SchemaInterface
      */
     public function validate(Iterable $data): bool
     {
-        $result = [];
         foreach ($this->schema as $attribute => $value) {
-            if ($value['required'] === true && !isset($data[$attribute])) {
+            if (isset($value['required']) && $value['required'] === true && !isset($data[$attribute])) {
                 throw new Exception\AttributeNotFound('attribute '.$attribute.' is required');
             }
 
-            if (isset($value['type']) && gettype($data[$attribute]) !== $value['type']) {
+            if ($value['type'] !== null && gettype($data[$attribute]) !== $value['type']) {
                 throw new Exception\AttributeInvalidType('attribute '.$attribute.' value is not of type '.$value['type']);
             }
 
@@ -77,7 +88,7 @@ class Schema implements SchemaInterface
 
             $this->logger->debug('schema attribute ['.$attribute.'] to [<'.$value['type'].'> {value}]', [
                 'category' => get_class($this),
-                'value' => $result[$attr],
+                'value' => $data[$attribute],
             ]);
         }
 

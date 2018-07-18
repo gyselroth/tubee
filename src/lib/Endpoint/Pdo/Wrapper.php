@@ -15,7 +15,7 @@ use PDO;
 use PDOStatement;
 use Psr\Log\LoggerInterface;
 
-class Wrapper
+class Wrapper extends PDO
 {
     /**
      * Logger.
@@ -25,19 +25,22 @@ class Wrapper
     protected $logger;
 
     /**
-     * Connection resource.
+     * DSN.
      *
-     * @var PDO
+     * @var string
      */
-    protected $pdo;
+    protected $dsn;
 
     /**
      * construct.
      */
-    public function __construct(PDO $pdo, LoggerInterface $logger)
+    public function __construct(string $dsn, LoggerInterface $logger, ?string $username = null, ?string $password = null, ?array $options = null)
     {
         $this->logger = $logger;
-        $this->pdo = $pdo;
+        $this->dsn = $dsn;
+        $this->username = $username;
+        $this->password = $password;
+        $this->options = $options;
     }
 
     /**
@@ -51,11 +54,13 @@ class Wrapper
     }
 
     /**
-     * Get connection.
+     * Connect.
      */
-    public function getResource(): PDO
+    public function connect(): Wrapper
     {
-        return $this->pdo;
+        parent::__construct($this->dsn, $this->username, $this->password, $this->options);
+
+        return $this;
     }
 
     /**
@@ -67,8 +72,7 @@ class Wrapper
             'category' => get_class($this),
         ]);
 
-        $link = $this->getResource();
-        $result = $link->query($query);
+        $result = parent::query($query);
 
         if (false === $result) {
             throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->errorInfo()[2].' ('.$link->errorCode().')');
@@ -86,8 +90,7 @@ class Wrapper
             'category' => get_class($this),
         ]);
 
-        $link = $this->getResource();
-        $result = $link->exec($query);
+        $result = $this->exec($query);
 
         if (false === $result) {
             throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->errorInfo().' ('.$link->errorCode().')');
@@ -102,15 +105,14 @@ class Wrapper
     /**
      * Prepare query.
      */
-    public function prepare(string $query, Iterable $values): PDOStatement
+    public function prepareValues(string $query, Iterable $values): PDOStatement
     {
         $this->logger->debug('prepare and execute pdo query ['.$query.'] with values [{values}]', [
             'category' => get_class($this),
             'values' => $values,
         ]);
 
-        $link = $this->getResource();
-        $stmt = $link->prepare($query);
+        $stmt = $this->prepare($query);
 
         if (!($stmt instanceof PDOStatement)) {
             throw new Exception\InvalidQuery('failed to prepare pdo query with error '.$link->error.' ('.$link->errno.')');

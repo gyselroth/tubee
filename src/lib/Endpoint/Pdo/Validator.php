@@ -20,6 +20,10 @@ class Validator
      */
     public static function validate(array $resource): array
     {
+        if (!isset($resource['table']) || !is_string($resource['table'])) {
+            throw new InvalidArgumentException('table is required and must be a string');
+        }
+
         if (!isset($resource['pdo_options']) || !is_array($resource['pdo_options'])) {
             throw new InvalidArgumentException('pdo_options is required and must be an array');
         }

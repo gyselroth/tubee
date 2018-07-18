@@ -58,7 +58,7 @@ class AccessRules
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
     {
-        $request->getQueryParams());
+        $request->getQueryParams();
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

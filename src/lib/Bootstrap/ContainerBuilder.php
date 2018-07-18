@@ -36,6 +36,7 @@ class ContainerBuilder
     {
         $configs = [constant('TUBEE_PATH').DIRECTORY_SEPARATOR.'src'.DIRECTORY_SEPARATOR.'.container.config.php'];
         foreach (glob(constant('TUBEE_CONFIG_DIR').DIRECTORY_SEPARATOR.'*.yaml') as $path) {
+            clearstatcache(true, $path);
             $configs[] = $path;
         }
 

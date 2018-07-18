@@ -16,7 +16,7 @@ class Validator
     /**
      * Validate resource.
      */
-    public static function validate(array $resource): bool
+    public static function validate(array $resource): array
     {
         if (!isset($resource['name']) && !is_string($resource['name'])) {
             throw new InvalidArgumentException('A name as string must be provided');
@@ -26,6 +26,6 @@ class Validator
             throw new InvalidArgumentException('Description must be a string');
         }
 
-        return true;
+        return $resource;
     }
 }

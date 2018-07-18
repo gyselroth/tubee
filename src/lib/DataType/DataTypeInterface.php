@@ -14,7 +14,8 @@ namespace Tubee\DataType;
 use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
-use Tubee\DataType\DataObject\DataObjectInterface;
+use Tubee\DataObject\DataObjectInterface;
+use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator;
 use Tubee\Mandator\MandatorInterface;
 use Tubee\Resource\ResourceInterface;
@@ -34,24 +35,39 @@ interface DataTypeInterface extends ResourceInterface
     public function getMandator(): MandatorInterface;
 
     /**
+     * Has endpoint.
+     */
+    public function hasEndpoint(string $name): bool;
+
+    /**
+     * Get endpoint.
+     */
+    public function getEndpoint(string $name): EndpointInterface;
+
+    /**
+     * Get Endpoints.
+     */
+    public function getEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator;
+
+    /**
      * Get one.
      */
-    public function getOne(Iterable $filter, bool $include_dataset = false, int $version = 0): DataObjectInterface;
+    public function getOne(array $filter, bool $include_dataset = false, int $version = 0): DataObjectInterface;
 
     /**
      * Get all data objects.
      */
-    public function getAll(Iterable $filter, bool $include_dataset = false, int $version = 0, ?int $offset = null, ?int $limit = null): Generator;
+    public function getAll(array $filter, bool $include_dataset = false, ?int $offset = null, ?int $limit = null): Generator;
 
     /**
      * Write to destination endpoints.
      */
-    public function export(UTCDateTime $timestamp, Iterable $filter, Iterable $endpoints, bool $simulate, bool $ignore): bool;
+    public function export(UTCDateTime $timestamp, array $filter, array $endpoints, bool $simulate, bool $ignore): bool;
 
     /**
      * Import from source endpoints.
      */
-    public function import(UTCDateTime $timestamp, Iterable $filter, Iterable $endpoints, bool $simulate, bool $ignore): bool;
+    public function import(UTCDateTime $timestamp, array $filter, array $endpoints, bool $simulate, bool $ignore): bool;
 
     /**
      * Flush.
@@ -61,7 +77,7 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Create object.
      */
-    public function create(Iterable $object, bool $simulate, array $endpoints): ObjectId;
+    public function create(array $object, bool $simulate, array $endpoints): ObjectId;
 
     /**
      * Enable object.
@@ -76,7 +92,7 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Change object.
      */
-    public function change(DataObjectInterface $object, Iterable $data, bool $simulate = false, array $endpoints = []): int;
+    public function change(DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int;
 
     /**
      * Delete object.

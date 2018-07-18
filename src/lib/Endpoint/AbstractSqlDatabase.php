@@ -19,9 +19,14 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     /**
      * Resource.
      *
-     * @var resource
+     * @var array
      */
-    protected $resource;
+    protected $resource = [];
+
+    /**
+     * Socket.
+     */
+    protected $socket;
 
     /**
      * Primary table.
@@ -29,6 +34,16 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
      * @var string
      */
     protected $table;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setup(bool $simulate = false): EndpointInterface
+    {
+        $this->socket->connect();
+
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
@@ -43,7 +58,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
             return true;
         }
 
-        $this->resource->query('TRUNCATE `'.$this->table.'`;');
+        $this->socket->query('TRUNCATE `'.$this->table.'`;');
 
         return true;
     }
@@ -82,7 +97,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         $query = 'UPDATE '.$this->table.' SET '.implode(',', $diff).' WHERE '.$filter;
 
         if ($simulate === false) {
-            $this->resource->prepare($query, $values);
+            $this->socket->prepareValues($query, $values);
         }
 
         return null;
@@ -97,7 +112,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         $sql = 'DELETE FROM '.$this->table.' WHERE '.$filter;
 
         if ($simulate === false) {
-            $this->resource->query($sql);
+            $this->socket->query($sql);
         }
 
         return true;
@@ -125,7 +140,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         $sql = 'INSERT INTO '.$this->table.' ('.implode(',', $columns).') VALUES ('.implode(',', $repl).')';
 
         if ($simulate === false) {
-            return $this->resource->prepare($sql, $values);
+            return $this->socket->prepareValues($sql, $values);
         }
 
         return null;

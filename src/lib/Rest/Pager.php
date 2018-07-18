@@ -59,7 +59,7 @@ class Pager
     /**
      * Get paging links.
      */
-    protected function getLinks(int $offset, int $limit, UriInterface $uri, int $total): array
+    protected static function getLinks(int $offset, int $limit, UriInterface $uri, int $total): array
     {
         $links = [
             'self' => ['href' => (string) $uri->withQuery('offset', $offset)],

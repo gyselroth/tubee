@@ -16,11 +16,12 @@ use MongoDB\BSON\UTCDateTime;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataObject\DataObjectInterface;
+use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObject\Exception as DataObjectException;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\DataType\Exception as DataTypeException;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception as EndpointException;
+use Tubee\Resource\AttributeResolver;
 use Tubee\Workflow\Exception;
 use Tubee\Workflow\WorkflowInterface;
 
@@ -55,18 +56,21 @@ class Workflow implements WorkflowInterface
     protected $attribute_map;
 
     /**
-     * Ensure.
+     * Condition.
      *
      * @var string
      */
     protected $ensure = WorkflowInterface::ENSURE_EXISTS;
 
     /**
-     * Condition.
-     *
-     * @var string
+     *  Condiditon.
      */
     protected $condition;
+
+    /**
+     * Resource.
+     */
+    protected $resource;
 
     /**
      * Expression.
@@ -79,16 +83,15 @@ class Workflow implements WorkflowInterface
      * Initialize.
      *
      * @param AttributeMap $attribute_map
-     * @param iterable     $config
      */
-    public function __construct(string $name, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $ensure, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
         $this->expression = $expression;
         $this->attribute_map = $attribute_map;
         $this->endpoint = $endpoint;
         $this->logger = $logger;
-        $this->setOptions($config);
+        $this->resource = $resource;
     }
 
     /**
@@ -108,40 +111,32 @@ class Workflow implements WorkflowInterface
     }
 
     /**
+     * Decorate.
+     */
+    public function decorate(ServerRequestInterface $request): array
+    {
+        $resource = [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
+            'kind' => 'Workflow',
+            'name' => $this->resource['name'],
+            'id' => (string) $this->resource['_id'],
+            'class' => get_class($this),
+            'ensure' => $this->ensure,
+            'condition' => $this->condition,
+            'map' => $this->attribute_map->getMap(),
+        ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getEndpoint(): EndpointInterface
     {
         return $this->endpoint;
-    }
-
-    /**
-     * Set options.
-     *
-     * e@param iterable $config
-     */
-    public function setOptions(?Iterable $config = null): WorkflowInterface
-    {
-        if ($config === null) {
-            return $this;
-        }
-
-        foreach ($config as $option => $value) {
-            switch ($option) {
-                case 'ensure':
-                    $this->ensure = $value;
-
-                break;
-                case 'condition':
-                    $this->condition = $value;
-
-                break;
-                default:
-                    throw new InvalidArgumentException('invalid option '.$option.' given');
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -222,7 +217,7 @@ class Workflow implements WorkflowInterface
         $exists = $this->getImportObject($datatype, $map, $ts);
         $object_ts = new UTCDateTime();
 
-        if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS) {
+        if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
         }
 
@@ -406,9 +401,9 @@ class Workflow implements WorkflowInterface
 
         try {
             $exists = $datatype->getOne($prefixed, false);
-        } catch (DataTypeException\ObjectMultipleFound $e) {
+        } catch (DataObjectException\MultipleFound $e) {
             throw $e;
-        } catch (DataTypeException\ObjectNotFound $e) {
+        } catch (DataObjectException\NotFound $e) {
             return null;
         }
 
@@ -432,9 +427,9 @@ class Workflow implements WorkflowInterface
             } else {
                 $exists = $this->endpoint->getOne($map, $this->attribute_map->getAttributes());
             }
-        } catch (EndpointException\ObjectMultipleFound $e) {
+        } catch (EndpointException\MultipleFound $e) {
             throw $e;
-        } catch (EndpointException\ObjectNotFound $e) {
+        } catch (EndpointException\NotFound $e) {
             $exists = false;
         }
 

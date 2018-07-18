@@ -12,18 +12,18 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Generator;
-use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Database;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataObject;
-use Tubee\DataType\DataObject\DataObjectInterface;
+use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObject\Exception;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\DataType\Exception;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\AttributeResolver;
 use Tubee\Schema\SchemaInterface;
 
 class DataType implements DataTypeInterface
@@ -87,15 +87,15 @@ class DataType implements DataTypeInterface
     /**
      * Initialize.
      */
-    public function __construct(array $resource, MandatorInterface $mandator, SchemaInterface $schema, Database $db, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(array $resource, MandatorInterface $mandator, EndpointFactory $endpoint, SchemaInterface $schema, Database $db, LoggerInterface $logger, ?Iterable $config = null)
     {
         $this->resource = $resource;
-        //$this->collection = $name;
+        $this->collection = 'objects'.'.'.$mandator->getName().'.'.$resource['name'];
         $this->mandator = $mandator;
         $this->schema = $schema;
+        $this->endpoint = $endpoint;
         $this->db = $db;
         $this->logger = $logger;
-        //$this->setOptions($config);
     }
 
     /**
@@ -107,46 +107,23 @@ class DataType implements DataTypeInterface
     }
 
     /**
-     * Set options.
-     */
-    /*public function setOptions(?Iterable $config = null): DataTypeInterface
-    {
-        if ($config === null) {
-            return $this;
-        }
-
-        foreach ($config as $option => $value) {
-            switch ($option) {
-                case 'collection':
-                    $this->collection = $value;
-
-                break;
-                case 'dataset':
-                    $this->dataset = json_decode($value);
-
-                break;
-                default:
-                    throw new InvalidArgumentException('unknown option '.$option.' given');
-            }
-        }
-
-        return $this;
-    }*/
-
-    /**
      * Decorate.
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        return [
+        $resource = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
+                'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$this->getMandator()->getName()))],
             ],
             'kind' => 'DataType',
             'name' => $this->resource['name'],
-            'mandator' => $this->mandator->decorate($request, ['_links', 'name']),
+            'id' => (string) $this->resource['_id'],
+            'class' => get_class($this),
             'schema' => $this->schema->getSchema(),
         ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
@@ -154,25 +131,7 @@ class DataType implements DataTypeInterface
      */
     public function hasEndpoint(string $name): bool
     {
-        return isset($this->endpoints[$name]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function injectEndpoint(EndpointInterface $endpoint, string $name): DataTypeInterface
-    {
-        $this->logger->debug('inject endpoint ['.$name.'] of type ['.get_class($endpoint).']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($this->hasEndpoint($name)) {
-            throw new Exception\EndpointNotUnique('endpoint '.$name.' is already registered');
-        }
-
-        $this->endpoints[$name] = $endpoint;
-
-        return $this;
+        return $this->endpoint->has($this, $name);
     }
 
     /**
@@ -180,50 +139,41 @@ class DataType implements DataTypeInterface
      */
     public function getEndpoint(string $name): EndpointInterface
     {
-        if (!isset($this->endpoints[$name])) {
-            throw new Exception\EndpointNotFound('endpoint '.$name.' is not registered in '.$this->getIdentifier());
-        }
-
-        return $this->endpoints[$name];
+        return $this->endpoint->getOne($this, $name);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEndpoints(Iterable $endpoints = []): array
+    public function getEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        if (count($endpoints) === 0) {
-            return $this->endpoints;
-        }
-        $list = [];
-        foreach ($endpoints as $name) {
-            if (!isset($this->endpoints[$name])) {
-                throw new Exception\EndpointNotFound('endpoint '.$name.' is not registered in '.$this->getIdentifier());
-            }
-            $list[$name] = $this->endpoints[$name];
-        }
-
-        return $list;
+        return $this->endpoint->getAll($this, $endpoints, $offset, $limit);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getSourceEndpoints(Iterable $endpoints = []): array
+    public function getSourceEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        return array_filter($this->getEndpoints($endpoints), function ($ep) {
-            return $ep->getType() === EndpointInterface::TYPE_SOURCE;
-        });
+        $query = ['type' => 'source'];
+        if ($endpoints !== []) {
+            $query = ['$and' => [$query, $endpoints]];
+        }
+
+        return $this->endpoint->getAll($this, $query, $offset, $limit);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDestinationEndpoints(Iterable $endpoints = []): array
+    public function getDestinationEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        return array_filter($this->getEndpoints($endpoints), function ($ep) {
-            return $ep->getType() === EndpointInterface::TYPE_DESTINATION;
-        });
+        $query = ['type' => 'destination'];
+        if ($endpoints !== []) {
+            $query = ['$and' => [$query, $endpoints]];
+        }
+
+        return $this->endpoint->getAll($this, $query, $offset, $limit);
     }
 
     /**
@@ -247,7 +197,7 @@ class DataType implements DataTypeInterface
      */
     public function getId(): ObjectId
     {
-        return $this->resource['id'];
+        return $this->resource['_id'];
     }
 
     /**
@@ -309,10 +259,10 @@ class DataType implements DataTypeInterface
         $objects = iterator_to_array($cursor);
 
         if (count($objects) === 0) {
-            throw new Exception\ObjectNotFound('data object '.json_encode($filter).' not found in collection '.$this->collection);
+            throw new Exception\NotFound('data object '.json_encode($filter).' not found in collection '.$this->collection);
         }
         if (count($objects) > 1) {
-            throw new Exception\ObjectMultipleFound('multiple data objects found with filter '.json_encode($filter).' in collection '.$this->collection);
+            throw new Exception\MultipleFound('multiple data objects found with filter '.json_encode($filter).' in collection '.$this->collection);
         }
 
         return new DataObject(array_shift($objects), $this);
@@ -329,7 +279,7 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getAll(Iterable $filter = [], bool $include_dataset = true, int $version = 0, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(Iterable $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [];
         if ($include_dataset === true) {
@@ -523,7 +473,7 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function export(UTCDateTime $timestamp, Iterable $filter = [], Iterable $endpoints = [], bool $simulate = false, bool $ignore = false): bool
+    public function export(UTCDateTime $timestamp, array $filter = [], array $endpoints = [], bool $simulate = false, bool $ignore = false): bool
     {
         $this->logger->info('start write onto destination endpoints fom data type ['.$this->getIdentifier().']', [
             'category' => get_class($this),
@@ -601,26 +551,20 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function import(UTCDateTime $timestamp, Iterable $filter = [], Iterable $endpoints = [], bool $simulate = false, bool $ignore = false): bool
+    public function import(UTCDateTime $timestamp, array $filter = [], array $endpoints = [], bool $simulate = false, bool $ignore = false): bool
     {
         $this->logger->info('start import from source endpoints into data type ['.$this->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
-        if (count($this->getSourceEndpoints()) === 0) {
-            $this->logger->info('no source endpoint active for datatype ['.$this->getIdentifier().'], skip import', [
-                'category' => get_class($this),
-            ]);
+        $endpoints = $this->getSourceEndpoints($endpoints);
 
-            return true;
-        }
-
-        foreach ($this->getSourceEndpoints($endpoints) as  $ep) {
+        foreach ($endpoints as $ep) {
             $this->logger->info('start import from source endpoint ['.$ep->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
-            $this->ensureIndex($ep->getImport());
+            //$this->ensureIndex($ep->getImport());
 
             if ($ep->flushRequired()) {
                 $this->flush($simulate);
@@ -673,6 +617,14 @@ class DataType implements DataTypeInterface
 
             $this->garbageCollector($timestamp, $ep, $simulate, $ignore);
             $ep->shutdown($simulate);
+        }
+
+        if ($endpoints->getReturn() === 0) {
+            $this->logger->warning('no source endpoint active for datatype ['.$this->getIdentifier().'], skip import', [
+                'category' => get_class($this),
+            ]);
+
+            return true;
         }
 
         return true;

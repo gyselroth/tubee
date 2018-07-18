@@ -9,10 +9,10 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\DataType;
+namespace Tubee\Workflow;
 
 use InvalidArgumentException;
-use Tubee\Schema\Validator as SchemaValidator;
+use Tubee\AttributeMap\Validator as AttributeMapValidator;
 
 class Validator
 {
@@ -29,10 +29,15 @@ class Validator
             throw new InvalidArgumentException('Description must be a string');
         }
 
-        if (!isset($resource['schema'])) {
-            throw new InvalidArgumentException('A schema must be provided');
+        if (!isset($resource['ensure']) || !in_array($resource['ensure'], WorkflowInterface::VALID_ENSURES)) {
+            throw new InvalidArgumentException('valie ensure as string must be provided (One of exists,last,disabled,absent)');
         }
-        SchemaValidator::validate($resource['schema']);
+
+        if (!isset($resource['map'])) {
+            throw new InvalidArgumentException('A map must be provided');
+        }
+
+        AttributeMapValidator::validate($resource['map']);
 
         return $resource;
     }

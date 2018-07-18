@@ -13,7 +13,7 @@ namespace Tubee\Workflow;
 
 use MongoDB\BSON\UTCDateTime;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataObject\DataObjectInterface;
+use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 
@@ -26,6 +26,16 @@ interface WorkflowInterface
     const ENSURE_LAST = 'last';
     const ENSURE_DISABLED = 'disabled';
     const ENSURE_ABSENT = 'absent';
+
+    /**
+     * Valid ensures.
+     */
+    const VALID_ENSURES = [
+        self::ENSURE_EXISTS,
+        self::ENSURE_LAST,
+        self::ENSURE_DISABLED,
+        self::ENSURE_ABSENT,
+    ];
 
     /**
      * Get endpoint.

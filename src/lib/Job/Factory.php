@@ -16,8 +16,8 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Operation\Find;
 use TaskScheduler\Scheduler;
 use Traversable;
+use Tubee\Job;
 use Tubee\Job\Error\ErrorInterface;
-use Tubee\Job\Job\JobInterface;
 
 class Factory extends Scheduler
 {
@@ -57,7 +57,9 @@ class Factory extends Scheduler
      */
     public function getErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->errors->find((array) $query, [
+        $result = $this->db->errors->find([
+            'job' => $job,
+        ], [
             'offset' => $offset,
             'limit' => $limit,
         ]);
@@ -74,7 +76,9 @@ class Factory extends Scheduler
      */
     public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Traversable
     {
-        return $this->db->errors->find((array) $query, [
+        return $this->db->errors->find([
+            'job' => $job,
+        ], [
             'offset' => $offset,
             'limit' => $limit,
             'cursorType' => Find::TAILABLE,

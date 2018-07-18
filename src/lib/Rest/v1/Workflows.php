@@ -17,29 +17,27 @@ use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\DataType\Factory as DataTypeFactory;
-use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
+use Tubee\Workflow\Factory as WorkflowFactory;
 use Zend\Diactoros\Response;
 
-class Endpoints
+class Workflows
 {
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator, DataTypeFactory $datatype, EndpointFactory $endpoint, Acl $acl)
+    public function __construct(MandatorFactory $mandator, WorkflowFactory $workflow, Acl $acl)
     {
         $this->mandator = $mandator;
-        $this->datatype = $datatype;
-        $this->endpoint = $endpoint;
+        $this->workflow = $workflow;
         $this->acl = $acl;
     }
 
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -48,10 +46,9 @@ class Endpoints
         ], $request->getQueryParams());
 
         $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $endpoints = $this->endpoint->getAll($datatype, $query['query'], (int) $query['offset'], (int) $query['limit']);
+        $workflows = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $endpoints);
+        $body = $this->acl->filterOutput($request, $identity, $workflows);
         $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
@@ -64,13 +61,12 @@ class Endpoints
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
     {
         $query = $request->getQueryParams();
 
         $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $endpoint = $this->endpoint->getOne($datatype, $endpoint);
+        $workflow = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflow($workflow);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
@@ -82,17 +78,17 @@ class Endpoints
     /**
      * Create.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
     {
         $body = $request->getParsedBody();
 
         $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $id = $this->endpoint->add($datatype, $body);
+        $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
+        $this->workflow->add($endpoint, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->endpoint->getOne($datatype, $body['name'])->decorate($request),
+            $endpoint->getWorkflow($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -100,11 +96,11 @@ class Endpoints
     /**
      * Delete.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
     {
         $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $this->endpoint->delete($datatype, $endpoint);
+        $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
+        $this->workflow->delete($endpoint, $workflow);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

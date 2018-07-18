@@ -14,6 +14,7 @@ namespace Tubee\Acl;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl\Role\RoleInterface;
+use Tubee\Resource\AttributeResolver;
 
 class Role implements RoleInterface
 {
@@ -71,12 +72,14 @@ class Role implements RoleInterface
         $result = $this->data;
         unset($result['_id']);
 
-        return [
+        $resource = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'AccessRole',
             'id' => (string) $this->getId(),
         ] + $result;
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 }

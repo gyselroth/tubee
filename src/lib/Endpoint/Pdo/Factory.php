@@ -11,29 +11,28 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint\Pdo;
 
-use PDO as CorePDO;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Pdo as PdoEndpoint;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
 {
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, LoggerInterface $logger): EndpointInterface
+    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $options = array_values(array_merge([
+        $options = array_merge([
             'dsn' => null,
             'username' => null,
             'passwd' => null,
             'options' => null,
-        ], $resource['pdo_options']));
+        ], $resource['pdo_options']);
 
-        $pdo = new CorePDO(...$options);
-        $wrapper = new Wrapper($pdo, $logger);
+        $wrapper = new Wrapper($options['dsn'], $logger, $options['username'], $options['passwd'], $options['options']);
 
-        return new PdoEndpoint($resource, $wrapper, $datatype, $logger);
+        return new PdoEndpoint($resource['name'], $resource['type'], $resource['table'], $wrapper, $datatype, $workflow, $logger, $resource);
     }
 }

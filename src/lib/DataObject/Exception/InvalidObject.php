@@ -9,11 +9,11 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\DataType\Exception;
+namespace Tubee\DataObject\Exception;
 
 use Micro\Http\ExceptionInterface;
 
-class ObjectMultipleFound extends \Tubee\Exception implements ExceptionInterface
+class InvalidObject extends \Tubee\Exception implements ExceptionInterface
 {
     /**
      * {@inheritdoc}

@@ -11,9 +11,13 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use Generator;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
+use Tubee\DataType\DataTypeInterface;
+use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\AttributeResolver;
 
 class Mandator implements MandatorInterface
 {
@@ -25,11 +29,19 @@ class Mandator implements MandatorInterface
     protected $resource = [];
 
     /**
+     * Datatype.
+     *
+     * @var DataTypeFactory
+     */
+    protected $datatype;
+
+    /**
      * Initialize.
      */
-    public function __construct(array $resource)
+    public function __construct(array $resource, DataTypeFactory $datatype)
     {
         $this->resource = $resource;
+        $this->datatype = $datatype;
     }
 
     /**
@@ -37,13 +49,17 @@ class Mandator implements MandatorInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        return [
+        $resource = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Mandator',
             'name' => $this->resource['name'],
+            'id' => (string) $this->resource['_id'],
+            'class' => get_class($this),
         ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
@@ -60,6 +76,30 @@ class Mandator implements MandatorInterface
     public function getName(): string
     {
         return $this->resource['name'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasDataType(string $name): bool
+    {
+        return $this->datatype->has($this, $name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataType(string $name): DataTypeInterface
+    {
+        return $this->datatype->getOne($this, $name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataTypes(array $datatypes = [], ?int $offset = null, ?int $limit = null): Generator
+    {
+        return $this->datatype->getAll($this, $datatypes, $offset, $limit);
     }
 
     /**

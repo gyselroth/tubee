@@ -14,6 +14,7 @@ namespace Tubee\Acl;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl\Rule\RuleInterface;
+use Tubee\Resource\AttributeResolver;
 
 class Rule implements RuleInterface
 {
@@ -71,12 +72,14 @@ class Rule implements RuleInterface
         $result = $this->data;
         unset($result['_id']);
 
-        return [
+        $resource = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'AccessRule',
             'id' => (string) $this->getId(),
         ] + $result;
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 }

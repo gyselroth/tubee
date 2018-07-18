@@ -32,7 +32,7 @@ class Validator
             throw new InvalidArgumentException('Either destination or source must be provided as type');
         }
 
-        if ($resource['type'] === EndpointInterface::TYPE_SOURCE && $resource['import'] === 0) {
+        if ($resource['type'] === EndpointInterface::TYPE_SOURCE && !(is_array($resource['import']) || count($resource['import']) === 0)) {
             throw new InvalidArgumentException('source endpoint must include at least one import condition');
         }
 
