@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Storage\StorageInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Csv extends AbstractFile
 {
@@ -44,13 +45,16 @@ class Csv extends AbstractFile
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null, ?Iterable $csv_options = null)
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         if ($type === EndpointInterface::TYPE_DESTINATION) {
             $this->flush = true;
         }
 
-        $this->setCsvOptions($csv_options);
+        if (isset($resource['resource'])) {
+            $this->setCsvOptions($resource['resource']);
+        }
+
         parent::__construct($name, $type, $file, $storage, $datatype, $logger, $config);
     }
 
@@ -78,7 +82,7 @@ class Csv extends AbstractFile
                 ]);
             }
 
-            $this->resource[] = [
+            $this->files[] = [
                 'resource' => $stream,
                 'header' => $data,
             ];
@@ -90,7 +94,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function setCsvOptions(?Iterable $config = null): EndpointInterface
+    public function setCsvOptions(?array $config = null): EndpointInterface
     {
         if ($config === null) {
             return $this;
@@ -117,7 +121,7 @@ class Csv extends AbstractFile
      */
     public function shutdown(bool $simulate = false): EndpointInterface
     {
-        foreach ($this->resource as $csv) {
+        foreach ($this->files as $csv) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
                 $this->storage->syncWriteStream($csv['resource'], $this->file);
             }
@@ -130,7 +134,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): array
     {
         $filter = $this->getFilterOne($object);
         foreach ($this->getAll($filter) as $object) {
@@ -143,7 +147,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function exists(Iterable $object): bool
+    public function exists(array $object): bool
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support exists(), use Endpoint\CsvInMemory instead or flush=true');
     }
@@ -154,7 +158,7 @@ class Csv extends AbstractFile
     public function getAll($filter = []): Generator
     {
         $filter = array_merge((array) $this->filter_all, (array) $filter);
-        foreach ($this->resource as $csv) {
+        foreach ($this->files as $csv) {
             while (($line = fgetcsv($csv['resource'], 0, $this->delimiter, $this->enclosure, $this->escape)) !== false) {
                 $data = array_combine($csv['header'], $line);
                 $this->logger->debug('parse csv line [{line}]', [
@@ -181,7 +185,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         foreach ($object as $key => $value) {
             if (is_array($value)) {
@@ -189,12 +193,12 @@ class Csv extends AbstractFile
             }
         }
 
-        if ($this->resource[0]['header'] === false) {
-            $this->resource[0]['header'] = $map->getAttributes();
-            $this->create($map, $this->resource[0]['header'], $simulate);
+        if ($this->files[0]['header'] === false) {
+            $this->files[0]['header'] = $map->getAttributes();
+            $this->create($map, $this->files[0]['header'], $simulate);
         }
 
-        if (fputcsv($this->resource[0]['resource'], $object, $this->delimiter, $this->enclosure, $this->escape) === false) {
+        if (fputcsv($this->files[0]['resource'], $object, $this->delimiter, $this->enclosure, $this->escape) === false) {
             throw new Exception\WriteOperationFailed('failed append object to csv file '.$this->file);
         }
 
@@ -212,7 +216,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support change(), use Endpoint\CsvInMemory instead or flush=true');
     }
@@ -220,7 +224,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support delete(), use Endpoint\CsvInMemory instead or flush=true');
     }

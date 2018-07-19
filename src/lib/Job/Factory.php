@@ -12,10 +12,10 @@ declare(strict_types=1);
 namespace Tubee\Job;
 
 use Generator;
+use IteratorIterator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Operation\Find;
 use TaskScheduler\Scheduler;
-use Traversable;
 use Tubee\Job;
 use Tubee\Job\Error\ErrorInterface;
 
@@ -58,7 +58,7 @@ class Factory extends Scheduler
     public function getErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
         $result = $this->db->errors->find([
-            'job' => $job,
+            'context.job' => (string) $job,
         ], [
             'offset' => $offset,
             'limit' => $limit,
@@ -74,10 +74,10 @@ class Factory extends Scheduler
     /**
      * Get jobs errors.
      */
-    public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Traversable
+    public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->db->errors->find([
-            'job' => $job,
+        $result = $this->db->errors->find([
+            'context.job' => (string) $job,
         ], [
             'offset' => $offset,
             'limit' => $limit,
@@ -85,11 +85,24 @@ class Factory extends Scheduler
             'noCursorTimeout' => true,
         ]);
 
-        /*foreach ($result as $error) {
-            yield (string) $error['_id'] => new Error($error);
-        }
+        $iterator = new IteratorIterator($result);
+        $iterator->rewind();
 
-        return $this->db->erros->count((array) $query);*/
+        while (true) {
+            if (null === $iterator->current()) {
+                if ($iterator->getInnerIterator()->isDead()) {
+                    return $this->db->erros->count((array) $query);
+                }
+
+                $iterator->next();
+
+                continue;
+            }
+
+            $resource = $iterator->current();
+            $iterator->next();
+            yield (string) $resource['_id'] => new Error($resource);
+        }
     }
 
     /**

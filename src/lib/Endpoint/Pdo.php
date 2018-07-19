@@ -80,6 +80,6 @@ class Pdo extends AbstractSqlDatabase
             return null;
         }
 
-        return $this->socket->getResouce()->lastInsertId();
+        return $this->socket->lastInsertId();
     }
 }

@@ -59,7 +59,7 @@ class Sync extends AbstractJob
 
                 foreach ($res_endpoints as $ep_name => $endpoint) {
                     if ($options['loadbalance'] === true) {
-                        $this->scheduler->addJob(self::class, [
+                        $id = $this->scheduler->addJob(self::class, [
                             'mandators' => [$mandator_name],
                             'endpoints' => [$ep_name],
                             'filter' => $options['filter'],
@@ -69,13 +69,20 @@ class Sync extends AbstractJob
                             'log_level' => $options['log_level'],
                         ]);
                     } else {
-                        $this->setLoggerLevel($options['log_level']);
+                        $this->setupLogger($options['log_level'], [
+                            'job' => (string) $this->getId(),
+                            'mandator' => $mandator_name,
+                            'datatype' => $dt_name,
+                            'endpoint' => $ep_name,
+                        ]);
 
                         if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
-                            $datatype->import(new UTCDateTime(), $options['filter'], [$ep_name], $options['simulate'], $options['ignore']);
+                            $datatype->import(new UTCDateTime(), $options['filter'], ['name' => $ep_name], $options['simulate'], $options['ignore']);
                         } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-                            $datatype->export(new UTCDateTime(), $options['filter'], [$ep_name], $options['simulate'], $options['ignore']);
+                            $datatype->export(new UTCDateTime(), $options['filter'], ['name' => $ep_name], $options['simulate'], $options['ignore']);
                         }
+
+                        $this->logger->popProcessor();
                     }
                 }
             }
@@ -87,11 +94,17 @@ class Sync extends AbstractJob
     /**
      * Set logger level.
      */
-    protected function setLoggerLevel(int $level): bool
+    protected function setupLogger(int $level, array $context): bool
     {
         foreach ($this->logger->getHandlers() as $handler) {
             if ($handler instanceof MongoDBHandler) {
                 $handler->setLevel($level);
+
+                $this->logger->pushProcessor(function ($record) use ($context) {
+                    $record['context'] = array_merge($record['context'], $context);
+
+                    return $record;
+                });
             }
         }
 

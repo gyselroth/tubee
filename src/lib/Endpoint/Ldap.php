@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Ldap\Exception as LdapEndpointException;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Ldap extends AbstractEndpoint
 {
@@ -73,12 +74,16 @@ class Ldap extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(array $resource, LdapServer $ldap, DataTypeInterface $datatype, LoggerInterface $logger)
+    public function __construct(string $name, string $type, LdapServer $ldap, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->filter_all = '(objectClass=*)';
         $this->ldap = $ldap;
-        $this->setLdapOptions($resource['ldap_options']);
-        parent::__construct($resource, $datatype, $logger);
+
+        if (isset($resource['resource'])) {
+            $this->setLdapOptions($resource['resource']);
+        }
+
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
@@ -124,7 +129,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function setLdapOptions(?Iterable $config = null): EndpointInterface
+    public function setLdapOptions(?array $config = null): EndpointInterface
     {
         if ($config === null) {
             return $this;
@@ -168,7 +173,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $object = array_change_key_case($object);
         $dn = $this->getDn($object, $endpoint_object);
@@ -202,7 +207,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         $dn = $this->getDn($object, $endpoint_object);
         $this->logger->debug('delete ldap object ['.$dn.']', [
@@ -219,7 +224,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $dn = $this->getDn($object);
 
@@ -312,7 +317,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, ?Iterable $attributes = []): Iterable
+    public function getOne(array $object, ?array $attributes = []): array
     {
         $filter = $this->getFilterOne($object);
         $this->logger->debug('find ldap object with ldap filter ['.$filter.'] in ['.$this->basedn.'] on endpoint ['.$this->getIdentifier().']', [
@@ -378,7 +383,7 @@ class Ldap extends AbstractEndpoint
     /**
      * Get dn.
      */
-    protected function getDn(Iterable $object, Iterable $endpoint_object = []): string
+    protected function getDn(array $object, array $endpoint_object = []): string
     {
         if (isset($object['entrydn'])) {
             return $object['entrydn'];

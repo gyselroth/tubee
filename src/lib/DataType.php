@@ -87,10 +87,11 @@ class DataType implements DataTypeInterface
     /**
      * Initialize.
      */
-    public function __construct(array $resource, MandatorInterface $mandator, EndpointFactory $endpoint, SchemaInterface $schema, Database $db, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, MandatorInterface $mandator, EndpointFactory $endpoint, SchemaInterface $schema, Database $db, LoggerInterface $logger, array $resource = [])
     {
         $this->resource = $resource;
-        $this->collection = 'objects'.'.'.$mandator->getName().'.'.$resource['name'];
+        $this->name = $name;
+        $this->collection = 'objects'.'.'.$mandator->getName().'.'.$namec;
         $this->mandator = $mandator;
         $this->schema = $schema;
         $this->endpoint = $endpoint;
@@ -117,11 +118,15 @@ class DataType implements DataTypeInterface
                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$this->getMandator()->getName()))],
             ],
             'kind' => 'DataType',
-            'name' => $this->resource['name'],
-            'id' => (string) $this->resource['_id'],
-            'class' => get_class($this),
-            'schema' => $this->schema->getSchema(),
-        ];
+            'metadata' => [
+                'name' => $this->resource['name'],
+                'id' => (string) $this->resource['_id'],
+                'class' => get_class($this),
+            ],
+            'spec' => [
+                'schema' => $this->schema->getSchema(),
+            ],
+       ];
 
         return AttributeResolver::resolve($request, $this, $resource);
     }
@@ -189,7 +194,7 @@ class DataType implements DataTypeInterface
      */
     public function getName(): string
     {
-        return $this->resource['name'];
+        return $this->name;
     }
 
     /**
@@ -475,20 +480,13 @@ class DataType implements DataTypeInterface
      */
     public function export(UTCDateTime $timestamp, array $filter = [], array $endpoints = [], bool $simulate = false, bool $ignore = false): bool
     {
-        $this->logger->info('start write onto destination endpoints fom data type ['.$this->getIdentifier().']', [
+        $this->logger->info('start export to destination endpoints from data type ['.$this->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
-        if (count($this->getDestinationEndpoints()) === 0) {
-            $this->logger->info('no destination endpoint active for datatype ['.$this->getIdentifier().'], skip write', [
-                'category' => get_class($this),
-            ]);
+        $endpoints = iterator_to_array($this->getDestinationEndpoints($endpoints));
 
-            return true;
-        }
-
-        //setup endpoints first
-        foreach ($this->getDestinationEndpoints($endpoints) as $ep) {
+        foreach ($endpoints as $ep) {
             if ($ep->flushRequired()) {
                 $ep->flush($simulate);
             }
@@ -501,7 +499,7 @@ class DataType implements DataTypeInterface
                 'category' => get_class($this),
             ]);
 
-            foreach ($this->getDestinationEndpoints($endpoints) as $ep) {
+            foreach ($endpoints as $ep) {
                 $this->logger->info('start write onto destination endpoint ['.$ep->getIdentifier().']', [
                     'category' => get_class($this),
                 ]);
@@ -527,9 +525,6 @@ class DataType implements DataTypeInterface
                 } catch (\Exception $e) {
                     $this->logger->error('failed write object to destination endpoint ['.$ep->getIdentifier().']', [
                         'category' => get_class($this),
-                        'mandator' => $this->getMandator()->getName(),
-                        'datatype' => $this->getName(),
-                        'endpoint' => $ep->getName(),
                         'object' => $object->getId(),
                         'exception' => $e,
                     ]);
@@ -541,7 +536,15 @@ class DataType implements DataTypeInterface
             }
         }
 
-        foreach ($this->getDestinationEndpoints($endpoints) as $n => $ep) {
+        if (count($endpoints) === 0) {
+            $this->logger->warning('no destination endpoint active for datatype ['.$this->getIdentifier().'], skip export', [
+                'category' => get_class($this),
+            ]);
+
+            return true;
+        }
+
+        foreach ($endpoints as $n => $ep) {
             $ep->shutdown($simulate);
         }
 

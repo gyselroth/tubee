@@ -9,23 +9,24 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\Ldap\Factory;
+namespace Tubee\Endpoint\Ldap;
 
 use Dreamscapes\Ldap\Core\Ldap as LdapServer;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Endpoint\Ldap;
+use Tubee\Endpoint\Ldap as LdapEndpoint;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
 {
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, LoggerInterface $logger): EndpointInterface
+    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
         $ldap = new LdapServer();
 
-        return new Ldap($resource, $ldap, $datatype, $logger);
+        return new LdapEndpoint($resource['name'], $resource['type'], $ldap, $datatype, $workflow, $logger, $resource);
     }
 }

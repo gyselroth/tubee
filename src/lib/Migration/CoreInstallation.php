@@ -56,20 +56,24 @@ class CoreInstallation implements DeltaInterface
         $this->db->endpoints->createIndex(['name' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
         $this->db->workflows->createIndex(['name' => 1, 'workflow' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
 
-        $this->acl->addRole([
-            'name' => 'admin',
-            'selectors' => ['*'],
-        ]);
+        if (!$this->acl->hasRole('admin')) {
+            $this->acl->addRole([
+                'name' => 'admin',
+                'selectors' => ['*'],
+            ]);
+        }
 
-        $this->acl->addRule([
-            'name' => 'full-access',
-            'roles' => ['admin'],
-            'verbs' => ['*'],
-            'selectors' => ['*'],
-            'resources' => ['*'],
-        ]);
+        if (!$this->acl->hasRule('full-access')) {
+            $this->acl->addRule([
+                'name' => 'full-access',
+                'roles' => ['admin'],
+                'verbs' => ['*'],
+                'selectors' => ['*'],
+                'resources' => ['*'],
+            ]);
+        }
 
-        if (!in_array('erros', $collections, true)) {
+        if (!in_array('errors', $collections)) {
             $this->db->createCollection(
                 'errors',
                 [

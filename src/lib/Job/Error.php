@@ -31,14 +31,14 @@ class Error implements ErrorInterface
      *
      * @var array
      */
-    protected $data;
+    protected $resource;
 
     /**
      * Data object.
      */
-    public function __construct(array $data)
+    public function __construct(array $resource)
     {
-        $this->data = $data;
+        $this->resource = $resource;
     }
 
     /**
@@ -46,7 +46,7 @@ class Error implements ErrorInterface
      */
     public function getId(): ObjectId
     {
-        return $this->data['_id'];
+        return $this->resource['_id'];
     }
 
     /**
@@ -54,7 +54,7 @@ class Error implements ErrorInterface
      */
     public function toArray(): array
     {
-        return $this->data;
+        return $this->resource;
     }
 
     /**
@@ -62,7 +62,7 @@ class Error implements ErrorInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $data = $this->data;
+        $data = $this->resource;
 
         return AttributeResolver::resolve($request, $this, [
             '_links' => [
@@ -70,9 +70,11 @@ class Error implements ErrorInterface
             ],
             'kind' => 'JobError',
             'id' => (string) $this->getId(),
-            'message' => $this->data['message'],
-            'created' => (new DateTime($this->data['datetime']))->format('c'),
-            'category' => $this->data['context']['category'],
+            'level' => $this->resource['level'],
+            'level_name' => $this->resource['level_name'],
+            'message' => $this->resource['message'],
+            'created' => (new DateTime($this->resource['datetime']))->format('c'),
+            'category' => $this->resource['context']['category'],
             'exception' => function ($resource) use ($data) {
                 if (isset($data['context']['exception'])) {
                     return $data['context']['exception'];

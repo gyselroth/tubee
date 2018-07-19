@@ -17,6 +17,7 @@ use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Mongodb extends AbstractEndpoint
 {
@@ -30,16 +31,16 @@ class Mongodb extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, Collection $collection, DataTypeInterface $datatype, LoggerInterface $logger, Iterable $config)
+    public function __construct(string $name, string $type, Collection $collection, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->collection = $collection;
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): array
     {
         return $this->get($object, $attributes);
     }
@@ -47,7 +48,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function exists(Iterable $object): bool
+    public function exists(array $object): bool
     {
         try {
             $this->get($object);
@@ -75,7 +76,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $this->logger->debug('create new mongodb object on endpoint ['.$this->name.'] with values [{values}]', [
             'category' => get_class($this),
@@ -92,7 +93,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $filter = $this->getFilterOne($object);
         $this->logger->info('update mongodb object on endpoint ['.$this->getIdentifier().']', [
@@ -137,7 +138,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, ?Iterable $endpoint_object = null, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, ?array $endpoint_object = null, bool $simulate = false): bool
     {
         $filter = $this->getFilterOne($object);
 
@@ -155,7 +156,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * Get existing object.
      */
-    protected function get(Iterable $object, Iterable $attributes = []): array
+    protected function get(array $object, array $attributes = []): array
     {
         $result = [];
         $filter = $this->getFilterOne($object);

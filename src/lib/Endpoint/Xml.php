@@ -22,16 +22,10 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Xml\Exception as XmlException;
 use Tubee\Storage\StorageInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Xml extends AbstractFile
 {
-    /**
-     * XML element.
-     *
-     * @var SimpleXMLElement
-     */
-    protected $file;
-
     /**
      * new XML element.
      *
@@ -68,19 +62,15 @@ class Xml extends AbstractFile
     protected $preserve_whitespace = false;
 
     /**
-     * Resource.
-     *
-     * @var array
-     */
-    protected $resource = [];
-
-    /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null, ?Iterable $xml_options = null)
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->setXmlOptions($xml_options);
-        parent::__construct($name, $type, $file, $storage, $datatype, $logger, $config);
+        if (isset($resource['resource'])) {
+            $this->setXmlOptions($resource['resource']);
+        }
+
+        parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);
     }
 
     /**
@@ -126,7 +116,7 @@ class Xml extends AbstractFile
                 }
             }
 
-            $this->resource[] = [
+            $this->files[] = [
                 'dom' => $dom,
                 'xml_root' => $xml_root,
                 'xml_element' => $xml_element,
@@ -140,10 +130,8 @@ class Xml extends AbstractFile
 
     /**
      * Set options.
-     *
-     * @param iterable $config
      */
-    public function setXmlOptions(?Iterable $config = null): EndpointInterface
+    public function setXmlOptions(?array $config = null): EndpointInterface
     {
         if ($config === null) {
             return $this;
@@ -174,7 +162,7 @@ class Xml extends AbstractFile
      */
     public function shutdown(bool $simulate = false): EndpointInterface
     {
-        foreach ($this->resource as $resource) {
+        foreach ($this->files as $resource) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
                 $this->flush($simulate);
                 if (fwrite($resource['stream'], $resource['dom']->saveXML()) === false) {
@@ -187,7 +175,7 @@ class Xml extends AbstractFile
             fclose($resource['stream']);
         }
 
-        $this->resource = [];
+        $this->files = [];
 
         return $this;
     }
@@ -208,7 +196,7 @@ class Xml extends AbstractFile
 
         $filter = array_merge($filtered, (array) $filter);
 
-        foreach ($this->resource as $xml) {
+        foreach ($this->files as $xml) {
             $data = json_decode(json_encode((array) $xml['xml_element']), true)[$this->node_name];
 
             if (!isset($data[0])) {
@@ -238,9 +226,9 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
-        $xml = $this->resource[0];
+        $xml = $this->files[0];
         $current_track = $xml['dom']->createElement($this->node_name);
         $current_track = $xml['xml_root']->appendChild($current_track);
 
@@ -274,9 +262,9 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
-        $xml = $this->resource[0];
+        $xml = $this->files[0];
         $attrs = [];
         $filter = $this->getFilterOne($object);
         $xpath = new \DOMXPath($xml['dom']);
@@ -319,9 +307,9 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $xml = $this->resource[0];
+        $xml = $this->files[0];
         $filter = $this->getFilterOne($object);
         $xpath = new \DOMXPath($xml['dom']);
         $node = $xpath->query($filter);
@@ -334,9 +322,9 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): array
     {
-        foreach ($this->resource as $xml) {
+        foreach ($this->files as $xml) {
             $filter = $this->getFilterOne($object);
 
             $this->logger->debug('find xml node with xpath ['.$filter.'] in ['.$xml['path'].'] on endpoint ['.$this->getIdentifier().']', [

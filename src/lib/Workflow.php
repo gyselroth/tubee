@@ -12,7 +12,9 @@ declare(strict_types=1);
 namespace Tubee;
 
 use InvalidArgumentException;
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
@@ -111,7 +113,23 @@ class Workflow implements WorkflowInterface
     }
 
     /**
-     * Decorate.
+     * {@inheritdoc}
+     */
+    public function getId(): ObjectId
+    {
+        return $this->resource['_id'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray(): array
+    {
+        return $this->resource;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function decorate(ServerRequestInterface $request): array
     {
@@ -120,12 +138,16 @@ class Workflow implements WorkflowInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Workflow',
-            'name' => $this->resource['name'],
-            'id' => (string) $this->resource['_id'],
-            'class' => get_class($this),
-            'ensure' => $this->ensure,
-            'condition' => $this->condition,
-            'map' => $this->attribute_map->getMap(),
+            'metadata' => [
+                'name' => $this->resource['name'],
+                'id' => (string) $this->resource['_id'],
+                'class' => get_class($this),
+            ],
+            'spec' => [
+                'ensure' => $this->ensure,
+                'condition' => $this->condition,
+                'map' => $this->attribute_map->getMap(),
+            ],
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);

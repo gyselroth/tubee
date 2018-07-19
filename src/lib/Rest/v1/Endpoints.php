@@ -92,7 +92,7 @@ class Endpoints
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->endpoint->getOne($datatype, $body['name'])->decorate($request),
+            $this->endpoint->getOne($datatype, $body['metadata']['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

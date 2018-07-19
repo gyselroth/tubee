@@ -16,6 +16,8 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Endpoint\Validator as EndpointValidator;
+use Tubee\Resource\Validator as ResourceValidator;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
@@ -57,7 +59,7 @@ class Factory
     public function has(DataTypeInterface $datatype, string $name): bool
     {
         return $this->db->endpoints->count([
-            'name' => $name,
+            'metadata.name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
         ]) > 0;
@@ -68,16 +70,24 @@ class Factory
      */
     public function getAll(DataTypeInterface $datatype, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->endpoints->find([
+        $filter = [
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
-        ], [
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        $result = $this->db->endpoints->find($filter, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['name'] => self::build($resource, $datatype, $this->workflow, $this->logger);
+            yield (string) $resource['metadata']['name'] => self::build($resource, $datatype, $this->workflow, $this->logger);
         }
 
         return $this->db->endpoints->count((array) $query);
@@ -89,7 +99,7 @@ class Factory
     public function getOne(DataTypeInterface $datatype, string $name): EndpointInterface
     {
         $result = $this->db->endpoints->findOne([
-            'name' => $name,
+            'metadata.name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
         ]);
@@ -111,7 +121,7 @@ class Factory
         }
 
         $this->db->endpoints->deleteOne([
-            'name' => $name,
+            'metadata.name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
         ]);
@@ -124,13 +134,14 @@ class Factory
      */
     public function add(DataTypeInterface $datatype, array $resource): ObjectId
     {
-        $resource = Validator::validate($resource);
+        $resource = ResourceValidator::validate($resource);
+        $resource['spec'] = EndpointValidator::validate((array) $resource['spec']);
 
-        if ($this->has($datatype, $resource['name'])) {
-            throw new Exception\NotUnique('endpoint '.$resource['name'].' does already exists');
+        if ($this->has($datatype, $resource['metadata']['name'])) {
+            throw new Exception\NotUnique('endpoint '.$resource['metadata']['name'].' does already exists');
         }
 
-        $endpoint = self::build($resource, $datatype, $this->logger);
+        $endpoint = self::build($resource, $datatype, $this->workflow, $this->logger);
         $endpoint->setup();
 
         $resource['mandator'] = $datatype->getMandator()->getName();

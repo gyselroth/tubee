@@ -16,6 +16,7 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
@@ -70,7 +71,7 @@ class Workflows
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $endpoint->decorate($request),
+            $workflow->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -88,7 +89,7 @@ class Workflows
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $endpoint->getWorkflow($body['name'])->decorate($request),
+            $endpoint->getWorkflow($body['metadata']['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -101,6 +102,28 @@ class Workflows
         $mandator = $this->mandator->getOne($mandator);
         $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
         $this->workflow->delete($endpoint, $workflow);
+
+        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+    }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        var_dump($body);
+
+        $mandator = $this->mandator->getOne($mandator);
+        $workflow = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflow($workflow);
+        $doc = $workflow->toArray();
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        var_dump($patched);
+        var_dump(json_decode($patched));
+
+        $this->workflow->update($endpoint, $workflow, $update);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

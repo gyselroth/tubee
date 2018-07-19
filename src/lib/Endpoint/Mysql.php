@@ -16,30 +16,18 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Mysql\Wrapper as MysqlWrapper;
+use Tubee\Workflow\Factory as WorkflowFactory
 
 class Mysql extends AbstractSqlDatabase
 {
     /**
      * Init endpoint.
-     *
-     * @param Logger   $logger
-     * @param iterable $config
      */
-    public function __construct(string $name, string $type, string $table, MysqlWrapper $mysqli, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $type, string $table, MysqlWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->resource = $mysqli;
+        $this->socket = $socket
         $this->table = $table;
-        parent::__construct($name, $type, $datatype, $logger, $config);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setup(bool $simulate = false): EndpointInterface
-    {
-        $this->resource->connect();
-
-        return $this;
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
@@ -47,7 +35,7 @@ class Mysql extends AbstractSqlDatabase
      */
     public function shutdown(bool $simulate = false): EndpointInterface
     {
-        $this->resource->close();
+        $this->socket->close();
 
         return $this;
     }
@@ -65,7 +53,7 @@ class Mysql extends AbstractSqlDatabase
             $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         }
 
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
 
         while ($row = $result->fetch_assoc()) {
             yield $row;
@@ -75,11 +63,11 @@ class Mysql extends AbstractSqlDatabase
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): array
     {
         $filter = $this->getFilterOne($object);
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
 
         if ($result->num_rows > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
@@ -94,7 +82,7 @@ class Mysql extends AbstractSqlDatabase
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $result = $this->prepareCreate($object, $simulate);
 

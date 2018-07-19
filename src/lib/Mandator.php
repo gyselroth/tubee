@@ -22,6 +22,13 @@ use Tubee\Resource\AttributeResolver;
 class Mandator implements MandatorInterface
 {
     /**
+     * Name.
+     *
+     * @var string
+     */
+    protected $name;
+
+    /**
      * Data.
      *
      * @var array
@@ -38,8 +45,9 @@ class Mandator implements MandatorInterface
     /**
      * Initialize.
      */
-    public function __construct(array $resource, DataTypeFactory $datatype)
+    public function __construct(string $name, DataTypeFactory $datatype, array $resource = [])
     {
+        $this->name = $name;
         $this->resource = $resource;
         $this->datatype = $datatype;
     }
@@ -54,9 +62,11 @@ class Mandator implements MandatorInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Mandator',
-            'name' => $this->resource['name'],
-            'id' => (string) $this->resource['_id'],
-            'class' => get_class($this),
+            'metadata' => [
+                'name' => $this->resource['name'],
+                'id' => (string) $this->resource['_id'],
+                'class' => get_class($this),
+            ],
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);
@@ -67,7 +77,7 @@ class Mandator implements MandatorInterface
      */
     public function getIdentifier(): string
     {
-        return $this->resource['name'];
+        return $this->name;
     }
 
     /**
@@ -75,7 +85,7 @@ class Mandator implements MandatorInterface
      */
     public function getName(): string
     {
-        return $this->resource['name'];
+        return $this->name;
     }
 
     /**

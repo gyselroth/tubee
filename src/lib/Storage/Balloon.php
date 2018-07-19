@@ -42,11 +42,11 @@ class Balloon implements StorageInterface
     /**
      * Init storage.
      */
-    public function __construct(ApiClient $balloon, LoggerInterface $logger, ?string $collection = null)
+    public function __construct(ApiClient $balloon, LoggerInterface $logger, ?ObjectId $collection = null)
     {
         $this->balloon = $balloon;
         $this->logger = $logger;
-        $this->collection = new ObjectId($collection);
+        $this->collection = $collection;
     }
 
     /**

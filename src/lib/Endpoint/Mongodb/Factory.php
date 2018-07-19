@@ -9,12 +9,13 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\Pdo;
+namespace Tubee\Endpoint\Image;
 
+use MongoDB\Client;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Endpoint\Pdo as PdoEndpoint;
+use Tubee\Endpoint\Mongodb as MongodbEndpoint;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
@@ -24,15 +25,14 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $options = array_merge([
-            'dsn' => null,
-            'username' => null,
-            'passwd' => null,
-            'options' => null,
-        ], $resource['resource']);
+        $options = array_values(array_merge([
+            'uri' => 'mongodb://127.0.0.1',
+            'uri_options' => null,
+            'driver_options' => null,
+        ], $resource['resource']));
 
-        $wrapper = new Wrapper($options['dsn'], $logger, $options['username'], $options['passwd'], $options['options']);
+        $mongodb = new Client(...$options);
 
-        return new PdoEndpoint($resource['name'], $resource['type'], $resource['table'], $wrapper, $datatype, $workflow, $logger, $resource);
+        return new MongodbEndpoint($resource['name'], $resource['type'], $mongodb->selectCollection($resource['collection']), $storage, $datatype, $workflow, $logger, $resource);
     }
 }

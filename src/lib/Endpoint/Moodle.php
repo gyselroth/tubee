@@ -18,6 +18,7 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Moodle\ApiClient;
 use Tubee\Endpoint\Moodle\Exception as MoodleEndpointException;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Moodle extends AbstractEndpoint
 {
@@ -65,11 +66,8 @@ class Moodle extends AbstractEndpoint
 
     /**
      * Init endpoint.
-     *
-     * @param Logger   $logger
-     * @param iterable $config
      */
-    public function __construct(string $name, string $type, string $resource_type, ApiClient $wrapper, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $type, string $resource_type, ApiClient $wrapper, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         if (!isset(self::METHODS[$resource_type])) {
             throw new InvalidArgumentException('moodle resource type ['.$resource_type.'] does not exists');
@@ -77,13 +75,13 @@ class Moodle extends AbstractEndpoint
 
         $this->moodle = $wrapper;
         $this->resource_type = $resource_type;
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
      * {@inheritdoc}
      */
-    /*public function getDiff(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object): array
+    /*public function getDiff(AttributeMapInterface $map, array $object, array $endpoint_object): array
     {
         $id = $this->getId($endpoint_object);
         $diff = [[]];
@@ -146,7 +144,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $id = $this->getId($endpoint_object);
         $diff = [$diff];
@@ -169,7 +167,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         foreach ($object as $key => $value) {
             if (is_array($value)) {
@@ -195,7 +193,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         $id = $this->getId($endpoint_object);
         $diff = [[]];
@@ -234,7 +232,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): array
     {
         $filter = $this->getFilterOne($object);
 
@@ -257,7 +255,7 @@ class Moodle extends AbstractEndpoint
     /**
      * Get moodle resource id.
      */
-    protected function getId(Iterable $endpoint_object): string
+    protected function getId(array $endpoint_object): string
     {
         if (isset($endpoint_object['id'])) {
             return $endpoint_object['id'];

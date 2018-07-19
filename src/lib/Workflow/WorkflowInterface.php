@@ -16,8 +16,9 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Resource\ResourceInterface;
 
-interface WorkflowInterface
+interface WorkflowInterface extends ResourceInterface
 {
     /**
      * Object ensure states.

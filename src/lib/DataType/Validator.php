@@ -21,16 +21,8 @@ class Validator
      */
     public static function validate(array $resource): array
     {
-        if (!isset($resource['name']) || !is_string($resource['name'])) {
-            throw new InvalidArgumentException('A name as string must be provided');
-        }
-
-        if (isset($resource['description']) && !is_string($resource['description'])) {
-            throw new InvalidArgumentException('Description must be a string');
-        }
-
         if (!isset($resource['schema'])) {
-            throw new InvalidArgumentException('A schema must be provided');
+            throw new InvalidArgumentException('spec.schema must be provided');
         }
         SchemaValidator::validate($resource['schema']);
 

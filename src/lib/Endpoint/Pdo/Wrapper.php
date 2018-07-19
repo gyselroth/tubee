@@ -44,16 +44,6 @@ class Wrapper extends PDO
     }
 
     /**
-     * Forward calls.
-     *
-     * @param array $method
-     */
-    public function __call(string $method, array $arguments = [])
-    {
-        return call_user_func_array([&$this->pdo, $method], $arguments);
-    }
-
-    /**
      * Connect.
      */
     public function connect(): Wrapper

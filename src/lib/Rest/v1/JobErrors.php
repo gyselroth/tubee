@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Rest\v1;
 
 use Fig\Http\Message\StatusCodeInterface;
+use IteratorIterator;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use MongoDB\BSON\ObjectId;
@@ -78,16 +79,13 @@ class JobErrors
     {
         $cursor = $this->job->watchErrors($job);
 
-        $iterator = function () use ($cursor) {
-            $iterator = new \IteratorIterator($cursor);
-
+        $iterator = function () use ($cursor, $request) {
+            $iterator = new IteratorIterator($cursor);
             $iterator->rewind();
-
             while (true) {
                 if ($iterator->valid()) {
                     $document = $iterator->current();
-                    yield $document;
-                    //printf("Consumed document created at: %s\n", $document->createdAt);
+                    yield $document->decorate($request);
                 }
 
                 $iterator->next();
@@ -95,7 +93,7 @@ class JobErrors
         };
 
         $encoder = (new \Violet\StreamingJsonEncoder\BufferJsonEncoder($iterator))
-    ->setOptions(JSON_PRETTY_PRINT);
+            ->setOptions(JSON_PRETTY_PRINT);
 
         $stream = new \Violet\StreamingJsonEncoder\JsonStream($encoder);
 

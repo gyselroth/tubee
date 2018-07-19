@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Storage\StorageInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Image extends AbstractFile
 {
@@ -45,16 +46,19 @@ class Image extends AbstractFile
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null, ?Iterable $image_options = null)
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->setImageOptions($image_options);
-        parent::__construct($name, $type, $file, $storage, $datatype, $logger, $config);
+        if (isset($resource['resource'])) {
+            $this->setImageOptions($resource['resource']);
+        }
+
+        parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);
     }
 
     /**
      * Set image options.
      */
-    public function setImageOptions(?Iterable $config = null): EndpointInterface
+    public function setImageOptions(?array $config = null): EndpointInterface
     {
         if ($config === null) {
             return $this;
@@ -82,7 +86,7 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): array
     {
         return [];
     }
@@ -90,7 +94,7 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function exists(Iterable $object): bool
+    public function exists(array $object): bool
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support exists()');
     }
@@ -121,7 +125,7 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support create()');
     }
@@ -129,7 +133,7 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support change()');
     }
@@ -137,7 +141,7 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support delete()');
     }

@@ -14,9 +14,38 @@ namespace Tubee\Resource;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
+use MongoDB\Database;
 
 class AbstractFactory
 {
+    /**
+     * Event types.
+     */
+    public const EVENT_ADD = 'ADD';
+    public const EVENT_DELETE = 'DELETE';
+    public const EVENT_UPDATE = 'UPDATE';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Add resource.
+     */
+    public function addEvent(Collection $collection, string $type, ObjectId $id): ObjectId
+    {
+        $result = $this->db->events->insertOne([
+            'collection' => $collection->getName(),
+            'object' => $id,
+            'type' => $type,
+        ]);
+
+        return $result->getInsertedId();
+    }
+
     /**
      * Add resource.
      */
@@ -28,6 +57,18 @@ class AbstractFactory
         ];
 
         $result = $collection->insertOne($resource);
+        $this->addEvent($collection->getName(), self::EVENT_ADD, $result->getInsertedId());
+
+        return $result->getInsertedId();
+    }
+
+    /**
+     * Delete resource.
+     */
+    public function delete(Collection $collection, array $resource, array $filter): ObjectId
+    {
+        $collection->deleteOne($filter);
+        $this->addEvent($collection->getName(), self::EVENT_DELETE, $result->getInsertedId());
 
         return $result->getInsertedId();
     }

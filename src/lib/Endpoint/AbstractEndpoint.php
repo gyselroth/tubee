@@ -118,7 +118,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * Set options.
      */
-    public function setOptions(?Iterable $config = null): EndpointInterface
+    public function setOptions(?array $config = null): EndpointInterface
     {
         if ($config === null) {
             return $this;
@@ -186,16 +186,20 @@ abstract class AbstractEndpoint implements EndpointInterface
                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
            ],
             'kind' => 'Endpoint',
-            'name' => $this->name,
-            'id' => (string) $this->resource['_id'],
-            'class' => get_class($this),
-            'options' => $this->options,
-            'import' => $this->import,
-            'history' => $this->history,
-            'flush' => $this->flush,
-            'filter_one' => $this->filter_one,
-            'filter_all' => $this->filter_all,
-            'type' => $this->type,
+            'metadata' => [
+                'name' => $this->name,
+                'id' => (string) $this->resource['_id'],
+                'class' => get_class($this),
+            ],
+            'spec' => [
+                'options' => $this->options,
+                'import' => $this->import,
+                'history' => $this->history,
+                'flush' => $this->flush,
+                'filter_one' => $this->filter_one,
+                'filter_all' => $this->filter_all,
+                'type' => $this->type,
+            ],
             'status' => function ($endpoint) {
                 try {
                     $endpoint->setup();
@@ -252,7 +256,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function getImport(): Iterable
+    public function getImport(): array
     {
         return $this->import;
     }
@@ -268,7 +272,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Iterable $object): bool
+    public function exists(array $object): bool
     {
         try {
             $this->getOne($object, []);
@@ -332,7 +336,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function getFilterOne(Iterable $object)
+    public function getFilterOne(array $object)
     {
         if (is_iterable($this->filter_one)) {
             $filter = [];
@@ -357,7 +361,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * Parse and replace string with attribute values.
      */
-    private function parseAttribute(string $string, Iterable $data): string
+    private function parseAttribute(string $string, array $data): string
     {
         return preg_replace_callback('/(\{(([^\}]*)+)\})(\}?)/', function ($match) use ($string, $data) {
             if (substr($match[0], 0, 2) === '{{' && $match[4][0] === '}') {

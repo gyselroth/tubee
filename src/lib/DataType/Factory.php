@@ -16,8 +16,10 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType;
+use Tubee\DataType\Validator as DataTypeValidator;
 use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\Validator as ResourceValidator;
 use Tubee\Schema;
 
 class Factory
@@ -57,7 +59,7 @@ class Factory
     public function has(MandatorInterface $mandator, string $name): bool
     {
         return $this->db->datatypes->count([
-            'name' => $name,
+            'metadata.name' => $name,
             'mandator' => $mandator->getName(),
         ]) > 0;
     }
@@ -73,7 +75,7 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['name'] => self::build($resource, $mandator, $this->db, $this->endpoint, $this->logger);
+            yield (string) $resource['metadata']['name'] => self::build($resource, $mandator, $this->db, $this->endpoint, $this->logger);
         }
 
         return $this->db->datatypes->count((array) $query);
@@ -85,7 +87,7 @@ class Factory
     public function getOne(MandatorInterface $mandator, string $name): DataTypeInterface
     {
         $result = $this->db->datatypes->findOne([
-            'name' => $name,
+            'metadata.name' => $name,
             'mandator' => $mandator->getName(),
         ]);
 
@@ -107,7 +109,7 @@ class Factory
 
         $this->db->datatypes->deleteOne([
             'mandator' => $mandator->getName(),
-            'name' => $name,
+            'metadata.name' => $name,
         ]);
 
         return true;
@@ -118,10 +120,11 @@ class Factory
      */
     public function add(MandatorInterface $mandator, array $resource): ObjectId
     {
-        Validator::validate($resource);
+        ResourceValidator::validate($resource);
+        DataTypeValidator::validate((array) $resource['spec']);
 
-        if ($this->has($mandator, $resource['name'])) {
-            throw new Exception\NotUnique('datatype '.$resource['name'].' does already exists');
+        if ($this->has($mandator, $resource['metadata']['name'])) {
+            throw new Exception\NotUnique('datatype '.$resource['metadata']['name'].' does already exists');
         }
 
         $resource['mandator'] = $mandator->getName();
@@ -135,8 +138,8 @@ class Factory
      */
     public static function build(array $resource, MandatorInterface $mandator, Database $db, EndpointFactory $endpoint, LoggerInterface $logger): DataTypeInterface
     {
-        $schema = new Schema($resource['schema'], $logger);
+        $schema = new Schema($resource['spec']['schema'], $logger);
 
-        return new DataType($resource, $mandator, $endpoint, $schema, $db, $logger);
+        return new DataType($resource['metadata']['name'], $mandator, $endpoint, $schema, $db, $logger, $resource);
     }
 }

@@ -19,6 +19,7 @@ use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\Console\Jobs;
+use Tubee\Console\Objects;
 use Tubee\Console\Upgrade;
 
 class Cli extends AbstractBootstrap
@@ -66,6 +67,9 @@ class Cli extends AbstractBootstrap
             \GetOpt\Command::create('jobs', Jobs::class)
                 ->addOptions(Jobs::getOptions())
                 ->addOperands(Jobs::getOperands()),
+            \GetOpt\Command::create('objects', Objects::class)
+                ->addOptions(Objects::getOptions())
+                ->addOperands(Objects::getOperands()),
         ]);
 
         try {
