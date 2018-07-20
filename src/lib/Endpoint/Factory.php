@@ -105,7 +105,7 @@ class Factory extends ResourceFactory
         ]);
 
         if ($result === null) {
-            throw new Exception\DataTypeNotFound('mandator '.$name.' is not registered');
+            throw new Exception\NotFound('endpoint '.$name.' is not registered');
         }
 
         return self::build($result, $datatype, $this->workflow, $this->logger);

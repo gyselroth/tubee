@@ -84,8 +84,6 @@ class AttributeMap implements AttributeMapInterface
                 throw new InvalidArgumentException('attribute '.$attr.' definiton must be an array');
             }
 
-            $value['type'] = $this->getAttributeType($attr, $value);
-
             if (isset($value['ensure'])) {
                 if ($value['ensure'] === AttributeMapInterface::ENSURE_MERGE && $value['type'] !== AttributeMapInterface::TYPE_ARRAY) {
                     throw new InvalidArgumentException('attribute '.$attr.' ensure is set to merge but type is not an array');
@@ -98,14 +96,22 @@ class AttributeMap implements AttributeMapInterface
 
             $attrv = $this->resolveValue($attr, $value, $data, $ts);
             $attrv = $this->transformAttribute($attr, $value, $data, $attrv);
-            $attrv = $this->serializeClass($attr, $attrv, $value['type']);
+
+            if (isset($value['type'])) {
+                $attrv = $this->serializeClass($attr, $attrv, $value['type']);
+            }
 
             if ($this->requireAttribute($attr, $value, $attrv) === null) {
                 continue;
             }
 
-            $result[$attr] = $this->convert($attrv, $attr, $value['type']);
-            $this->logger->debug('mapped attribute ['.$attr.'] to [<'.$value['type'].'> {value}]', [
+            if (isset($value['type'])) {
+                $attrv = $this->convert($attrv, $attr, $value['type']);
+            }
+
+            $result[$attr] = $attrv;
+
+            $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
                 'category' => get_class($this),
                 'value' => $result[$attr],
             ]);
@@ -190,23 +196,6 @@ class AttributeMap implements AttributeMapInterface
     }
 
     /**
-     * Determine attribute type.
-     */
-    protected function getAttributeType(string $attr, array $value): string
-    {
-        if (isset($value['type'])) {
-            return $value['type'];
-        }
-
-        $type = AttributeMapInterface::TYPE_STRING;
-        $this->logger->warning('missing type for attribute ['.$attr.'] assuming it is string', [
-             'category' => get_class($this),
-        ]);
-
-        return $type;
-    }
-
-    /**
      * Transform attribute.
      */
     protected function transformAttribute(string $attr, array $value, array $data, $attrv)
@@ -215,7 +204,7 @@ class AttributeMap implements AttributeMapInterface
             return null;
         }
 
-        if ($value['type'] !== AttributeMapInterface::TYPE_ARRAY && is_array($attrv)) {
+        if (isset($value['type']) && $value['type'] !== AttributeMapInterface::TYPE_ARRAY && is_array($attrv)) {
             $attrv = $this->firstArrayElement($attrv, $attr);
         }
 

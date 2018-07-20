@@ -47,7 +47,7 @@ class Pager
 
         $data = [
             'kind' => 'List',
-            '_links' => self::getLinks($query['offset'], $query['limit'], $request->getUri(), $total),
+            '_links' => self::getLinks((int) $query['offset'], (int) $query['limit'], $request->getUri(), $total),
             'count' => $count,
             'total' => $total,
             'data' => $nodes,
@@ -62,7 +62,7 @@ class Pager
     protected static function getLinks(int $offset, int $limit, UriInterface $uri, int $total): array
     {
         $links = [
-            'self' => ['href' => (string) $uri->withQuery('offset', $offset)],
+            'self' => ['href' => (string) $uri->withQuery('offset='.$offset).'&limit='.$limit],
         ];
 
         if ($offset > 0) {
@@ -72,13 +72,13 @@ class Pager
             }
 
             $links['prev'] = [
-                'href' => (string) $uri->withQuery('offset', $new_offset),
+                'href' => (string) $uri->withQuery('offset='.(string) $new_offset.'&limit='.$limit),
             ];
         }
 
-        if ($new_offset + $count < $total) {
+        if ($offset + $limit < $total) {
             $links['next'] = [
-                'href' => (string) $uri->withQuery('offset', $offset + $count),
+                'href' => (string) $uri->withQuery('offset='.(string) ($offset + $limit).'&limit='.$limit),
             ];
         }
 
