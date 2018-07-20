@@ -26,10 +26,10 @@ class AccessRules
     /**
      * Init.
      */
-    public function __construct(AccessRuleFactory $rule, Acl $rule)
+    public function __construct(AccessRuleFactory $rule, Acl $acl)
     {
         $this->rule = $rule;
-        $this->rule = $rule;
+        $this->acl = $acl;
     }
 
     /**
@@ -45,7 +45,7 @@ class AccessRules
 
         $rules = $this->rule->getAll($query['query'], $query['offset'], $query['limit']);
 
-        $body = $this->rule->filterOutput($request, $identity, $rules);
+        $body = $this->acl->filterOutput($request, $identity, $rules);
         $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(

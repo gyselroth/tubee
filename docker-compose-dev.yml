@@ -1,7 +1,9 @@
-mongodb:
+mongodb2:
     image: mongo:3.6.0
 openldap-endpoint:
     image: osixia/openldap:latest
+    environment:
+        - LDAP_ADMIN_PASSWORD=admin
 mongodb-endpoint:
     image: mongo:3.6.0
 mariadb-endpoint:
@@ -25,7 +27,7 @@ moodle-db:
 balloon-endpoint:
     image: gyselroth/balloon:latest-unstable
     links:
-        - mongodb
+        - mongodb2
     entrypoint: php-fpm
     environment:
         - BALLOON_MONGODB_URI=mongodb://mongodb:27017
@@ -37,8 +39,8 @@ tubee-dev:
     volumes:
         - .:/srv/www/tubee
     links:
-        - mongodb
+        - mongodb2
         - openldap-endpoint
         - balloon-endpoint
     environment:
-        - TUBEE_MONGODB_URI=mongodb://mongodb:27017
+        - TUBEE_MONGODB_URI=mongodb://mongodb2:27017

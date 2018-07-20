@@ -18,10 +18,11 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Workflow;
 use Tubee\Workflow\Validator as WorkflowValidator;
 
-class Factory
+class Factory extends ResourceFactory
 {
     /**
      * Database.
@@ -148,9 +149,8 @@ class Factory
         $resource['mandator'] = $endpoint->getDataType()->getMandator()->getName();
         $resource['datatype'] = $endpoint->getDataType()->getName();
         $resource['endpoint'] = $endpoint->getName();
-        $result = $this->db->workflows->insertOne($resource);
 
-        return $result->getInsertedId();
+        return parent::addTo($this->db->workflows, $resource);
     }
 
     /**

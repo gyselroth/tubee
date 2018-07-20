@@ -21,7 +21,7 @@ class AttributeResolver
      */
     public static function resolve(ServerRequestInterface $request, ResourceInterface $resource, array $resolvable): array
     {
-        $resolveable += self::addResourceMetaData($resource);
+        $resolvable += self::addResourceMetaData($resource);
 
         $params = $request->getQueryParams();
         $attributes = [];
@@ -38,19 +38,20 @@ class AttributeResolver
     }
 
     /**
-     * Add metadata
+     * Add metadata.
      */
     protected static function addResourceMetadata(ResourceInterface $resource): array
     {
-        $resource = $resource->toArray();
+        $data = $resource->toArray();
 
         return [
-            'id' => (string) $resource['_id'],
+            'id' => (string) $data['_id'],
+            'version' => $data['version'],
             'class' => get_class($resource),
-            'created' => $resource['created']->toDateTime()->format('c'),
-            'changed' => isset($resource['changed']) ? $resource['changed']->toDateTime()->format('c') : null,
-            'description' => isset($resource['description']) ? $resource['description'] : null,
-        ]
+            'created' => isset($data['created']) ? $data['created']->toDateTime()->format('c') : null,
+            'changed' => isset($data['changed']) ? $data['changed']->toDateTime()->format('c') : null,
+            'description' => isset($data['description']) ? $data['description'] : null,
+        ];
     }
 
     /**

@@ -19,9 +19,10 @@ use Tubee\DataType;
 use Tubee\DataType\Validator as DataTypeValidator;
 use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Schema;
 
-class Factory
+class Factory extends ResourceFactory
 {
     /**
      * Database.
@@ -69,7 +70,7 @@ class Factory
     public function getAll(MandatorInterface $mandator, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
         $filter = [
-            'mandator' => $datatype->getMandator()->getName(),
+            'mandator' => $mandator->getName(),
         ];
 
         if (!empty($query)) {
@@ -136,9 +137,8 @@ class Factory
         }
 
         $resource['mandator'] = $mandator->getName();
-        $result = $this->db->datatypes->insertOne($resource);
 
-        return $result->getInsertedId();
+        return parent::addTo($this->db->datatypes, $resource);
     }
 
     /**

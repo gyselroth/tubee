@@ -22,7 +22,7 @@ class Validator extends ResourceValidator
      */
     public static function validate(array $resource): array
     {
-        $resource = parent::valudate($resource);
+        $resource = parent::validate($resource);
 
         if (!isset($resource['ensure']) || !in_array($resource['ensure'], WorkflowInterface::VALID_ENSURES)) {
             throw new InvalidArgumentException('ensure as string must be provided (one of exists,last,disabled,absent)');
@@ -36,7 +36,7 @@ class Validator extends ResourceValidator
             throw new InvalidArgumentException('provided condition must be a string');
         }
 
-        parent::allowOnly(['ensure', 'condition', 'map']);
+        parent::allowOnly($resource, ['ensure', 'condition', 'map']);
         AttributeMapValidator::validate($resource['map']);
 
         return $resource;

@@ -66,8 +66,8 @@ class Xml extends AbstractFile
      */
     public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        if (isset($resource['resource'])) {
-            $this->setXmlOptions($resource['resource']);
+        if (isset($resource['xml_options'])) {
+            $this->setXmlOptions($resource['xml_options']);
         }
 
         parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);

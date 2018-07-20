@@ -48,8 +48,8 @@ class Image extends AbstractFile
      */
     public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        if (isset($resource['resource'])) {
-            $this->setImageOptions($resource['resource']);
+        if (isset($resource['image_options'])) {
+            $this->setImageOptions($resource['image_options']);
         }
 
         parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);

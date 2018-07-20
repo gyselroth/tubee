@@ -15,8 +15,9 @@ use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Tubee\AccessRule;
+use Tubee\Resource\Factory as ResourceFactory;
 
-class Factory
+class Factory extends ResourceFactory
 {
     /**
      * Database.
@@ -97,9 +98,7 @@ class Factory
             throw new Exception\NotUnique('access rule '.$resource['name'].' does already exists');
         }
 
-        $result = $this->db->access_rules->insertOne($resource);
-
-        return $result->getInsertedId();
+        return parent::addTo($this->db->access_rules, $resource);
     }
 
     /**

@@ -35,7 +35,7 @@ class AccessRoles
     /**
      * Entrypoint.
      */
-    public function get(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,

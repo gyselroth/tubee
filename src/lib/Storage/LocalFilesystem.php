@@ -57,6 +57,7 @@ class LocalFilesystem implements StorageInterface
     public function openReadStreams(string $pattern): Generator
     {
         $files = $this->getFiles($pattern);
+
         if (count($files) === 0) {
             throw new Exception\NoFilesFound('no files found for '.$pattern);
         }

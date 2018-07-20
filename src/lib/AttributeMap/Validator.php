@@ -39,13 +39,15 @@ class Validator
 
         foreach ($schema as $option => $definition) {
             switch ($option) {
-                case 'from':
                 case 'value':
+                break;
+                case 'from':
+                case 'type':
                 case 'script':
                 case 'rewrite':
                 case 'require_regex':
                     if (!is_string($definition)) {
-                        throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type string');
+                        throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type string');
                     }
 
                     $default[$option] = $definition;
@@ -53,14 +55,14 @@ class Validator
                 break;
                 case 'required':
                     if (!is_bool($definition)) {
-                        throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option.', value must be of type boolean');
+                        throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type boolean');
                     }
 
                     $default[$option] = $definition;
 
                 break;
                 default:
-                    throw new InvalidArgumentException('schema attribute '.$name.' has an invalid option '.$option);
+                    throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option);
             }
         }
 

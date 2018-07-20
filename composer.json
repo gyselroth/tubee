@@ -49,7 +49,9 @@
         "middlewares/negotiation": "^1.0",
         "violet/streaming-json-encoder": "^1.1",
         "nikic/fast-route": "^1.3",
-        "middlewares/fast-route": "^1.0"
+        "middlewares/fast-route": "^1.0",
+        "php-jsonpatch/php-jsonpatch": "^3.0",
+        "stolt/json-merge-patch": "^1.0"
     },
     "suggest": {
         "ext-pthreads": "*",

@@ -9,10 +9,15 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\AccessRole;
+namespace Tubee\Storage\Balloon;
 
-use Tubee\Resource\ResourceInterface;
-
-interface AccessRoleInterface extends ResourceInterface
+class Validator
 {
+    /**
+     * Validate resource.
+     */
+    public static function validate(array $resource): array
+    {
+        return $resource;
+    }
 }

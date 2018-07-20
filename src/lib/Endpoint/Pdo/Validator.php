@@ -24,15 +24,11 @@ class Validator
             throw new InvalidArgumentException('table is required and must be a string');
         }
 
-        if (!isset($resource['pdo_options']) || !is_array($resource['pdo_options'])) {
-            throw new InvalidArgumentException('pdo_options is required and must be an array');
+        if (!isset($resource['resource']['dsn'])) {
+            throw new InvalidArgumentException('resource.dsn is required');
         }
 
-        if (!isset($resource['pdo_options']['dsn'])) {
-            throw new InvalidArgumentException('dsn in pdo_options is required');
-        }
-
-        foreach ($resource['pdo_options'] as $key => $value) {
+        foreach ($resource['resource'] as $key => $value) {
             switch ($key) {
                 case 'dsn':
                 case 'username':

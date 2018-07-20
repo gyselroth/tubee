@@ -87,7 +87,7 @@ class DataTypes
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->datatype->getOne($mandator, $body['metadata']['name'])->decorate($request),
+            $this->datatype->getOne($mandator, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

@@ -17,9 +17,10 @@ use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Validator as EndpointValidator;
+use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
-class Factory
+class Factory extends ResourceFactory
 {
     /**
      * Database.
@@ -144,9 +145,8 @@ class Factory
 
         $resource['mandator'] = $datatype->getMandator()->getName();
         $resource['datatype'] = $datatype->getName();
-        $result = $this->db->endpoints->insertOne($resource);
 
-        return $result->getInsertedId();
+        return parent::addTo($this->db->endpoints, $resource);
     }
 
     /**

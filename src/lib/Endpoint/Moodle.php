@@ -23,34 +23,6 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Moodle extends AbstractEndpoint
 {
     /**
-     * Moodle methods and identifier.
-     */
-    const METHODS = [
-        'users' => [
-            'get' => [
-                'function' => 'core_user_get_users_by_field',
-                'identifier' => '',
-            ],
-            'create' => [
-                'function' => 'core_user_create_users',
-                'identifier' => 'users',
-            ],
-            'change' => [
-                'function' => 'core_user_update_users',
-                'identifier' => 'users',
-            ],
-            'delete' => [
-                'function' => 'core_user_delete_users',
-                'identifier' => 'userids',
-            ],
-            'get_all' => [
-                'function' => 'core_user_get_users',
-                'identifier' => '',
-            ],
-        ],
-    ];
-
-    /**
      * Moodle.
      *
      * @var Moodle
@@ -58,23 +30,12 @@ class Moodle extends AbstractEndpoint
     protected $moodle;
 
     /**
-     * Type.
-     *
-     * @var string
-     */
-    protected $resource_type = 'users';
-
-    /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $resource_type, ApiClient $wrapper, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, array $call_map, ApiClient $wrapper, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        if (!isset(self::METHODS[$resource_type])) {
-            throw new InvalidArgumentException('moodle resource type ['.$resource_type.'] does not exists');
-        }
-
         $this->moodle = $wrapper;
-        $this->resource_type = $resource_type;
+        $this->call_map = $call_map;
         parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 

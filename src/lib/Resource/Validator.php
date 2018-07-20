@@ -34,10 +34,10 @@ class Validator
     /**
      * Allow only.
      */
-    public static function allowOnly(array $attributes): bool
+    public static function allowOnly(array $resource, array $attributes): bool
     {
-        $allow = ['name', 'description'] + $attributes;
-        foreach ($attributes as $attribute => $value) {
+        $allow = array_merge(['name', 'description'], $attributes);
+        foreach ($resource as $attribute => $value) {
             if (!in_array($attribute, $allow)) {
                 throw new InvalidArgumentException('given attribute '.$attribute.' is not valid at this place');
             }

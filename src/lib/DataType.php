@@ -91,7 +91,7 @@ class DataType implements DataTypeInterface
     {
         $this->resource = $resource;
         $this->name = $name;
-        $this->collection = 'objects'.'.'.$mandator->getName().'.'.$namec;
+        $this->collection = 'objects'.'.'.$mandator->getName().'.'.$name;
         $this->mandator = $mandator;
         $this->schema = $schema;
         $this->endpoint = $endpoint;

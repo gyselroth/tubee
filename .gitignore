@@ -3,6 +3,7 @@ vendor
 doc
 build
 config
+log/*
 dist
 data
 composer.lock

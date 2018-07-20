@@ -51,11 +51,11 @@ class Csv extends AbstractFile
             $this->flush = true;
         }
 
-        if (isset($resource['resource'])) {
-            $this->setCsvOptions($resource['resource']);
+        if (isset($resource['csv_options'])) {
+            $this->setCsvOptions($resource['csv_options']);
         }
 
-        parent::__construct($name, $type, $file, $storage, $datatype, $logger, $config);
+        parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);
     }
 
     /**

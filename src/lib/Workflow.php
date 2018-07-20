@@ -443,9 +443,9 @@ class Workflow implements WorkflowInterface
             } else {
                 $exists = $this->endpoint->getOne($map, $this->attribute_map->getAttributes());
             }
-        } catch (EndpointException\MultipleFound $e) {
+        } catch (EndpointException\ObjectMultipleFound $e) {
             throw $e;
-        } catch (EndpointException\NotFound $e) {
+        } catch (EndpointException\ObjectNotFound $e) {
             $exists = false;
         }
 

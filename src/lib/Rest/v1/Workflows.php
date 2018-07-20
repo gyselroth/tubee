@@ -89,7 +89,7 @@ class Workflows
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $endpoint->getWorkflow($body['metadata']['name'])->decorate($request),
+            $endpoint->getWorkflow($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

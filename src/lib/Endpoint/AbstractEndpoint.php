@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
+use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -104,7 +105,10 @@ abstract class AbstractEndpoint implements EndpointInterface
         $this->datatype = $datatype;
         $this->logger = $logger;
         $this->workflow = $workflow;
-        $this->setOptions($resource);
+
+        if (isset($resource['data_options'])) {
+            $this->setOptions($resource['data_options']);
+        }
     }
 
     /**
@@ -134,13 +138,12 @@ abstract class AbstractEndpoint implements EndpointInterface
                     $this->import = (array) $value;
 
                 break;
-                case 'filter':
-                    if (isset($value['all'])) {
-                        $this->filter_all = $value['all'];
-                    }
-                    if (isset($value['one'])) {
-                        $this->filter_one = $value['one'];
-                    }
+                case 'filter_one':
+                        $this->filter_one = $value;
+
+                break;
+                case 'filter_all':
+                        $this->filter_all = $value;
 
                 break;
                 case 'history':
@@ -188,7 +191,7 @@ abstract class AbstractEndpoint implements EndpointInterface
             'kind' => 'Endpoint',
             'name' => $this->name,
             'type' => $this->type,
-            'options' => [
+            'data_options' => [
                 'options' => $this->options,
                 'import' => $this->import,
                 'history' => $this->history,

@@ -16,7 +16,7 @@ use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Database;
 
-class AbstractFactory
+class Factory
 {
     /**
      * Event types.
@@ -33,12 +33,20 @@ class AbstractFactory
     protected $db;
 
     /**
+     * Initialize.
+     */
+    public function __construct(Database $db)
+    {
+        $this->db = $db;
+    }
+
+    /**
      * Add resource.
      */
     public function addEvent(Collection $collection, string $type, ObjectId $id): ObjectId
     {
         $result = $this->db->events->insertOne([
-            'collection' => $collection->getName(),
+            'collection' => $collection->getCollectionName(),
             'object' => $id,
             'type' => $type,
         ]);
@@ -49,7 +57,7 @@ class AbstractFactory
     /**
      * Add resource.
      */
-    public function add(Collection $collection, array $resource): ObjectId
+    public function addTo(Collection $collection, array $resource): ObjectId
     {
         $resource += [
             'created' => new UTCDateTime(),
@@ -57,7 +65,7 @@ class AbstractFactory
         ];
 
         $result = $collection->insertOne($resource);
-        $this->addEvent($collection->getName(), self::EVENT_ADD, $result->getInsertedId());
+        $this->addEvent($collection, self::EVENT_ADD, $result->getInsertedId());
 
         return $result->getInsertedId();
     }
@@ -65,7 +73,7 @@ class AbstractFactory
     /**
      * Delete resource.
      */
-    public function delete(Collection $collection, array $resource, array $filter): ObjectId
+    public function deleteFrom(Collection $collection, array $resource, array $filter): ObjectId
     {
         $collection->deleteOne($filter);
         $this->addEvent($collection->getName(), self::EVENT_DELETE, $result->getInsertedId());

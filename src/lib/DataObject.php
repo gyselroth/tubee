@@ -80,9 +80,6 @@ class DataObject implements DataObjectInterface
                  'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
             ],
             'kind' => 'DataObject',
-            'id' => (string) $this->getId(),
-            'version' => $this->getVersion(),
-            'created' => $object->getCreated()->toDateTime()->format('c'),
             'data' => $this->getData(),
             'status' => function ($object) {
                 $endpoints = $object->getEndpoints();

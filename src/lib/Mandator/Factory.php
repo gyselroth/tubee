@@ -16,9 +16,10 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator;
+use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Resource\Validator as ResourceValidator;
 
-class Factory
+class Factory extends ResourceFactory
 {
     /**
      * Database.
@@ -107,9 +108,7 @@ class Factory
             throw new Exception\NotUnique('mandator '.$resource['name'].' does already exists');
         }
 
-        $result = $this->db->mandators->insertOne($resource);
-
-        return $result->getInsertedId();
+        return parent::addTo($this->db->mandators, $resource);
     }
 
     /**

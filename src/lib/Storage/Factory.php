@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Storage;
 
 use Icewind\SMB\NativeServer;
+use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use Psr\Log\LoggerInterface;
 use Tubee\Endpoint\Balloon\ApiClient;

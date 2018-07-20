@@ -52,12 +52,12 @@ class Sync extends AbstractJob
     public function start(): bool
     {
         $options = $this->getDefaults();
-
-        foreach ($this->mandator->getAll(['name' => ['$in' => $options['mandators']]]) as $mandator_name => $mandator) {
-            foreach ($mandator->getDataTypes(['name' => ['$in' => $options['datatypes']]]) as $dt_name => $datatype) {
-                $res_endpoints = $datatype->getEndpoints(['name' => ['$in' => $options['endpoints']]]);
-
-                foreach ($res_endpoints as $ep_name => $endpoint) {
+        $filter = !empty($options['mandators']) ? ['name' => ['$in' => $options['mandators']]] : [];
+        foreach ($this->mandator->getAll($filter) as $mandator_name => $mandator) {
+            $filter = !empty($options['datatypes']) ? ['name' => ['$in' => $options['datatypes']]] : [];
+            foreach ($mandator->getDataTypes($filter) as $dt_name => $datatype) {
+                $filter = !empty($options['endpoints']) ? ['name' => ['$in' => $options['endpoints']]] : [];
+                foreach ($datatype->getEndpoints($filter) as $ep_name => $endpoint) {
                     if ($options['loadbalance'] === true) {
                         $id = $this->scheduler->addJob(self::class, [
                             'mandators' => [$mandator_name],

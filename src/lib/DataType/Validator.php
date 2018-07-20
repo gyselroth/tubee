@@ -28,7 +28,7 @@ class Validator extends ResourceValidator
             throw new InvalidArgumentException('schema must be provided');
         }
 
-        parent::allowOnly(['schema']);
+        parent::allowOnly($resource, ['schema']);
         SchemaValidator::validate($resource['schema']);
 
         return $resource;

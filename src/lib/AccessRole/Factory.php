@@ -15,8 +15,9 @@ use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Tubee\AccessRole;
+use Tubee\Resource\Factory as ResourceFactory;
 
-class Factory
+class Factory extends ResourceFactory
 {
     /**
      * Database.
@@ -97,9 +98,7 @@ class Factory
             throw new Exception\NotUnique('access role '.$resource['name'].' does already exists');
         }
 
-        $result = $this->db->access_roles->insertOne($resource);
-
-        return $result->getInsertedId();
+        return parent::addTo($this->db->access_roles, $resource);
     }
 
     /**
