@@ -14,6 +14,7 @@ namespace Tubee;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Job\JobInterface;
+use Tubee\Resource\AttributeResolver;
 
 class Job implements JobInterface
 {
@@ -63,14 +64,12 @@ class Job implements JobInterface
             'id' => (string) $this->getId(),
         ];
 
-        if (isset($job['created'])) {
-            $job['created'] = $job['created']->toDateTime()->format('c');
-        }
-
         if (isset($job['at'])) {
             $job['at'] = $job['at']->toDateTime()->format('c');
         }
 
-        return array_merge($resource, $job);
+        $resource = array_merge($resource, $job);
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 }

@@ -16,6 +16,7 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tubee\AccessRule\Factory as AccessRuleFactory;
 use Tubee\Acl;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
@@ -25,9 +26,10 @@ class AccessRules
     /**
      * Init.
      */
-    public function __construct(Acl $acl)
+    public function __construct(AccessRuleFactory $rule, Acl $rule)
     {
-        $this->acl = $acl;
+        $this->rule = $rule;
+        $this->rule = $rule;
     }
 
     /**
@@ -41,9 +43,9 @@ class AccessRules
             'query' => [],
         ], $request->getQueryParams());
 
-        $rules = $this->acl->getRules($query['query'], $query['offset'], $query['limit']);
+        $rules = $this->rule->getAll($query['query'], $query['offset'], $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $rules);
+        $body = $this->rule->filterOutput($request, $identity, $rules);
         $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
@@ -62,7 +64,7 @@ class AccessRules
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->acl->getRule($rule)->decorate($request),
+            $this->rule->getOne($rule)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -73,8 +75,8 @@ class AccessRules
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $id = $this->acl->addRule($body);
-        $rule = $this->acl->getRule($body['name']);
+        $id = $this->rule->add($body);
+        $rule = $this->rule->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -104,9 +106,9 @@ class AccessRules
     {
         $body = $request->getParsedBody();
 
-        if ($this->acl->hasRule()) {
-            $this->acl->updateRule($rule, $body);
-            $rule = $this->acl->getRule($rule);
+        if ($this->rule->has($rule)) {
+            $this->rule->update($rule, $body);
+            $rule = $this->rule->getOne($rule);
 
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
@@ -116,8 +118,8 @@ class AccessRules
         }
 
         $body['name'] = $rule;
-        $id = $this->acl->addRule($body);
-        $rule = $this->acl->getRule($body['name']);
+        $id = $this->rule->add($body);
+        $rule = $this->rule->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -132,7 +134,7 @@ class AccessRules
     public function delete(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $this->acl->deleteRule($rule);
+        $this->rule->delete($rule);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

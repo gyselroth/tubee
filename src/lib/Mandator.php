@@ -62,11 +62,7 @@ class Mandator implements MandatorInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Mandator',
-            'metadata' => [
-                'name' => $this->resource['name'],
-                'id' => (string) $this->resource['_id'],
-                'class' => get_class($this),
-            ],
+            'name' => $this->name,
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);

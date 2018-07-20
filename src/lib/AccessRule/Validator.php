@@ -9,11 +9,10 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\DataType;
+namespace Tubee\AccessRule;
 
 use InvalidArgumentException;
 use Tubee\Resource\Validator as ResourceValidator;
-use Tubee\Schema\Validator as SchemaValidator;
 
 class Validator extends ResourceValidator
 {
@@ -24,12 +23,21 @@ class Validator extends ResourceValidator
     {
         $resource = parent::validate($resource);
 
-        if (!isset($resource['schema'])) {
-            throw new InvalidArgumentException('schema must be provided');
+        foreach ($resource as $option => $value) {
+            switch ($option) {
+                case 'verbs':
+                case 'roles':
+                case 'selectors':
+                case 'resources':
+                    if (!is_array($value)) {
+                        throw new InvalidArgumentException($option.' must be an array of strings');
+                    }
+
+                break;
+            }
         }
 
-        parent::allowOnly(['schema']);
-        SchemaValidator::validate($resource['schema']);
+        parent::allowOnly(['verbs', 'roles', 'selectors', 'resources']);
 
         return $resource;
     }

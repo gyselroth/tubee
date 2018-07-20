@@ -13,31 +13,24 @@ namespace Tubee\Acl;
 
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\Acl\Rule\RuleInterface;
+use Tubee\AccessRule\AccessRuleInterface;
 use Tubee\Resource\AttributeResolver;
 
-class Rule implements RuleInterface
+class AccessRule implements AccessRuleInterface
 {
     /**
-     * Object id.
-     *
-     * @var ObjectId
-     */
-    protected $_id;
-
-    /**
-     * Job.
+     * Resource.
      *
      * @var array
      */
-    protected $data;
+    protected $resource;
 
     /**
      * Data object.
      */
-    public function __construct(array $data)
+    public function __construct(array $resource)
     {
-        $this->data = $data;
+        $this->resource = $resource;
     }
 
     /**
@@ -45,7 +38,7 @@ class Rule implements RuleInterface
      */
     public function getId(): ObjectId
     {
-        return $this->data['_id'];
+        return $this->resource['_id'];
     }
 
     /**
@@ -53,15 +46,7 @@ class Rule implements RuleInterface
      */
     public function toArray(): array
     {
-        return [
-            '_id' => $this->_id,
-            'created' => $this->created,
-            'changed' => $this->changed,
-            'deleted' => $this->deleted,
-            'version' => $this->version,
-            'data' => $this->data,
-            'endpoints' => $this->endpoints,
-        ];
+        return $this->resource;
     }
 
     /**
@@ -69,7 +54,7 @@ class Rule implements RuleInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $result = $this->data;
+        $result = $this->resource;
         unset($result['_id']);
 
         $resource = [
@@ -77,7 +62,6 @@ class Rule implements RuleInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'AccessRule',
-            'id' => (string) $this->getId(),
         ] + $result;
 
         return AttributeResolver::resolve($request, $this, $resource);

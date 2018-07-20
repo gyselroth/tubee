@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Resource\Validator as ResourceValidator;
 use Tubee\Workflow;
 use Tubee\Workflow\Validator as WorkflowValidator;
 
@@ -61,7 +60,7 @@ class Factory
     public function has(EndpointInterface $endpoint, string $name): bool
     {
         return $this->db->workflows->count([
-            'metadata.name' => $name,
+            'name' => $name,
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
             'endpoint' => $endpoint->getName(),
@@ -73,17 +72,25 @@ class Factory
      */
     public function getAll(EndpointInterface $endpoint, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->workflows->find([
+        $filter = [
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
             'endpoint' => $endpoint->getName(),
-        ], [
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        $result = $this->db->workflows->find($filter, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['metadata']['name'] => self::build($resource, $endpoint, $this->script, $this->logger);
+            yield (string) $resource['name'] => self::build($resource, $endpoint, $this->script, $this->logger);
         }
 
         return $this->db->workflows->count((array) $query);
@@ -95,7 +102,7 @@ class Factory
     public function getOne(EndpointInterface $endpoint, string $name): WorkflowInterface
     {
         $result = $this->db->workflows->findOne([
-            'metadata.name' => $name,
+            'name' => $name,
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
             'endpoint' => $endpoint->getName(),
@@ -132,11 +139,10 @@ class Factory
      */
     public function add(EndpointInterface $endpoint, array $resource): ObjectId
     {
-        ResourceValidator::validate($resource);
-        WorkflowValidator::validate((array) $resource['spec']);
+        $resource = WorkflowValidator::validate($resource);
 
-        if ($this->has($endpoint, $resource['metadata']['name'])) {
-            throw new Exception\NotUnique('workflow '.$resource['metadata']['name'].' does already exists');
+        if ($this->has($endpoint, $resource['name'])) {
+            throw new Exception\NotUnique('workflow '.$resource['name'].' does already exists');
         }
 
         $resource['mandator'] = $endpoint->getDataType()->getMandator()->getName();
@@ -154,6 +160,6 @@ class Factory
     {
         $map = new AttributeMap($resource['map'], $script, $logger);
 
-        return new Workflow($resource['metadata']['name'], $resource['spec']['ensure'], $script, $map, $endpoint, $logger, $resource);
+        return new Workflow($resource['name'], $resource['ensure'], $script, $map, $endpoint, $logger, $resource);
     }
 }

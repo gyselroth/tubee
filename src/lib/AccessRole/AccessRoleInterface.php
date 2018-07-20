@@ -13,6 +13,6 @@ namespace Tubee\Acl\Role;
 
 use Tubee\Resource\ResourceInterface;
 
-interface RoleInterface extends ResourceInterface
+interface AccessRoleInterface extends ResourceInterface
 {
 }

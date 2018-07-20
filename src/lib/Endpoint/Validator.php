@@ -12,14 +12,17 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use InvalidArgumentException;
+use Tubee\Resource\Validator as ResourceValidator
 
-class Validator
+class Validator extends ResourceValidator
 {
     /**
      * Validate resource.
      */
     public static function validate(array $resource): array
     {
+        $resource = parent::validate($resource);
+
         if (!isset($resource['type']) || $resource['type'] !== 'destination' && $resource['type'] !== 'source') {
             throw new InvalidArgumentException('Either destination or source must be provided as type');
         }
@@ -31,6 +34,8 @@ class Validator
         if (!isset($resource['class']) || !is_string($resource['class'])) {
             throw new InvalidArgumentException('A class as string must be provided');
         }
+
+        parent::allowOnly(['type','class','import']);
 
         return self::validateEndpoint($resource);
     }

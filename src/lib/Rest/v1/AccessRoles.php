@@ -16,6 +16,7 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tubee\AccessRole\Factory as AccessRoleFactory;
 use Tubee\Acl;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
@@ -25,8 +26,9 @@ class AccessRoles
     /**
      * Init.
      */
-    public function __construct(Acl $acl)
+    public function __construct(AccessRoleFactory $role, Acl $acl)
     {
+        $this->role = $role;
         $this->acl = $acl;
     }
 
@@ -41,7 +43,7 @@ class AccessRoles
             'query' => [],
         ], $request->getQueryParams());
 
-        $roles = $this->acl->getRoles($query['query'], $query['offset'], $query['limit']);
+        $roles = $this->role->getAll($query['query'], $query['offset'], $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $roles);
         $body = Pager::fromRequest($body, $request);
@@ -73,8 +75,8 @@ class AccessRoles
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $id = $this->acl->addRule($body);
-        $role = $this->acl->getRule($body['name']);
+        $id = $this->role->add($body);
+        $role = $this->role->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -104,9 +106,9 @@ class AccessRoles
     {
         $body = $request->getParsedBody();
 
-        if ($this->acl->hasRule()) {
-            $this->acl->updateRule($role, $body);
-            $role = $this->acl->getRule($role);
+        if ($this->role->has()) {
+            $this->role->update($role, $body);
+            $role = $this->role->getOne($role);
 
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
@@ -116,8 +118,8 @@ class AccessRoles
         }
 
         $body['name'] = $role;
-        $id = $this->acl->addRule($body);
-        $role = $this->acl->getRule($body['name']);
+        $id = $this->role->add($body);
+        $role = $this->role->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -131,8 +133,7 @@ class AccessRoles
      */
     public function delete(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
-        $body = $request->getParsedBody();
-        $this->acl->deleteRule($role);
+        $this->role->delete($role);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

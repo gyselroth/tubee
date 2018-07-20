@@ -148,7 +148,7 @@ abstract class AbstractEndpoint implements EndpointInterface
 
                 break;
                 default:
-                    //do nothing
+                    throw new InvalidArgumentException('unknown option '.$option.' given');
             }
         }
 
@@ -186,19 +186,15 @@ abstract class AbstractEndpoint implements EndpointInterface
                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
            ],
             'kind' => 'Endpoint',
-            'metadata' => [
-                'name' => $this->name,
-                'id' => (string) $this->resource['_id'],
-                'class' => get_class($this),
-            ],
-            'spec' => [
+            'name' => $this->name,
+            'type' => $this->type,
+            'options' => [
                 'options' => $this->options,
                 'import' => $this->import,
                 'history' => $this->history,
                 'flush' => $this->flush,
                 'filter_one' => $this->filter_one,
                 'filter_all' => $this->filter_all,
-                'type' => $this->type,
             ],
             'status' => function ($endpoint) {
                 try {

@@ -13,6 +13,6 @@ namespace Tubee\Acl\Rule;
 
 use Tubee\Resource\ResourceInterface;
 
-interface RuleInterface extends ResourceInterface
+interface AccessRuleInterface extends ResourceInterface
 {
 }

@@ -118,14 +118,8 @@ class DataType implements DataTypeInterface
                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$this->getMandator()->getName()))],
             ],
             'kind' => 'DataType',
-            'metadata' => [
-                'name' => $this->resource['name'],
-                'id' => (string) $this->resource['_id'],
-                'class' => get_class($this),
-            ],
-            'spec' => [
-                'schema' => $this->schema->getSchema(),
-            ],
+            'name' => $name,
+            'schema' => $this->schema->getSchema(),
        ];
 
         return AttributeResolver::resolve($request, $this, $resource);

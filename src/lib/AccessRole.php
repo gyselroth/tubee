@@ -13,31 +13,24 @@ namespace Tubee\Acl;
 
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\Acl\Role\RoleInterface;
+use Tubee\AccessRole\AccessRoleInterface;
 use Tubee\Resource\AttributeResolver;
 
-class Role implements RoleInterface
+class AccessRole implements AccessRoleInterface
 {
     /**
-     * Object id.
-     *
-     * @var ObjectId
-     */
-    protected $_id;
-
-    /**
-     * Job.
+     * Resource.
      *
      * @var array
      */
-    protected $data;
+    protected $resource;
 
     /**
      * Data object.
      */
-    public function __construct(array $data)
+    public function __construct(array $resource)
     {
-        $this->data = $data;
+        $this->resource = $resource;
     }
 
     /**
@@ -45,7 +38,7 @@ class Role implements RoleInterface
      */
     public function getId(): ObjectId
     {
-        return $this->data['_id'];
+        return $this->resource['_id'];
     }
 
     /**
@@ -53,15 +46,7 @@ class Role implements RoleInterface
      */
     public function toArray(): array
     {
-        return [
-            '_id' => $this->_id,
-            'created' => $this->created,
-            'changed' => $this->changed,
-            'deleted' => $this->deleted,
-            'version' => $this->version,
-            'data' => $this->data,
-            'endpoints' => $this->endpoints,
-        ];
+        return $this->resource;
     }
 
     /**
@@ -69,7 +54,7 @@ class Role implements RoleInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $result = $this->data;
+        $result = $this->resource;
         unset($result['_id']);
 
         $resource = [
@@ -77,7 +62,6 @@ class Role implements RoleInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'AccessRole',
-            'id' => (string) $this->getId(),
         ] + $result;
 
         return AttributeResolver::resolve($request, $this, $resource);

@@ -138,16 +138,10 @@ class Workflow implements WorkflowInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Workflow',
-            'metadata' => [
-                'name' => $this->resource['name'],
-                'id' => (string) $this->resource['_id'],
-                'class' => get_class($this),
-            ],
-            'spec' => [
-                'ensure' => $this->ensure,
-                'condition' => $this->condition,
-                'map' => $this->attribute_map->getMap(),
-            ],
+            'name' => $this->name,
+            'ensure' => $this->ensure,
+            'condition' => $this->condition,
+            'map' => $this->attribute_map->getMap(),
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);

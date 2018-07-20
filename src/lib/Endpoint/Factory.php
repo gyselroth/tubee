@@ -17,7 +17,6 @@ use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Validator as EndpointValidator;
-use Tubee\Resource\Validator as ResourceValidator;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
@@ -59,7 +58,7 @@ class Factory
     public function has(DataTypeInterface $datatype, string $name): bool
     {
         return $this->db->endpoints->count([
-            'metadata.name' => $name,
+            'name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
         ]) > 0;
@@ -87,7 +86,7 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['metadata']['name'] => self::build($resource, $datatype, $this->workflow, $this->logger);
+            yield (string) $resource['name'] => self::build($resource, $datatype, $this->workflow, $this->logger);
         }
 
         return $this->db->endpoints->count((array) $query);
@@ -99,7 +98,7 @@ class Factory
     public function getOne(DataTypeInterface $datatype, string $name): EndpointInterface
     {
         $result = $this->db->endpoints->findOne([
-            'metadata.name' => $name,
+            'name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
         ]);
@@ -121,7 +120,7 @@ class Factory
         }
 
         $this->db->endpoints->deleteOne([
-            'metadata.name' => $name,
+            'name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
         ]);
@@ -134,11 +133,10 @@ class Factory
      */
     public function add(DataTypeInterface $datatype, array $resource): ObjectId
     {
-        $resource = ResourceValidator::validate($resource);
-        $resource['spec'] = EndpointValidator::validate((array) $resource['spec']);
+        $resource = EndpointValidator::validate($resource);
 
-        if ($this->has($datatype, $resource['metadata']['name'])) {
-            throw new Exception\NotUnique('endpoint '.$resource['metadata']['name'].' does already exists');
+        if ($this->has($datatype, $resource['name'])) {
+            throw new Exception\NotUnique('endpoint '.$resource['name'].' does already exists');
         }
 
         $endpoint = self::build($resource, $datatype, $this->workflow, $this->logger);

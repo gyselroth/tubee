@@ -48,7 +48,7 @@ class Factory
      */
     public function has(string $name): bool
     {
-        return $this->db->mandators->count(['metadata.name' => $name]) > 0;
+        return $this->db->mandators->count(['name' => $name]) > 0;
     }
 
     /**
@@ -62,7 +62,7 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['metadata']['name'] => self::build($resource, $this->datatype);
+            yield (string) $resource['name'] => self::build($resource, $this->datatype);
         }
 
         return $this->db->mandators->count((array) $query);
@@ -73,7 +73,7 @@ class Factory
      */
     public function getOne(string $name): MandatorInterface
     {
-        $result = $this->db->mandators->findOne(['metadata.name' => $name]);
+        $result = $this->db->mandators->findOne(['name' => $name]);
 
         if ($result === null) {
             throw new Exception\NotFound('mandator '.$name.' is not registered');
@@ -91,7 +91,7 @@ class Factory
             throw new Exception\NotFound('endpoint '.$name.' does not exists');
         }
 
-        $this->db->mandators->deleteOne(['metadata.name' => $name]);
+        $this->db->mandators->deleteOne(['name' => $name]);
 
         return true;
     }
@@ -103,8 +103,8 @@ class Factory
     {
         ResourceValidator::validate($resource);
 
-        if ($this->has($resource['metadata']['name'])) {
-            throw new Exception\NotUnique('mandator '.$resource['metadata']['name'].' does already exists');
+        if ($this->has($resource['name'])) {
+            throw new Exception\NotUnique('mandator '.$resource['name'].' does already exists');
         }
 
         $result = $this->db->mandators->insertOne($resource);
@@ -117,6 +117,6 @@ class Factory
      */
     public static function build(array $resource, DataTypeFactory $datatype): MandatorInterface
     {
-        return new Mandator($resource['metadata']['name'], $datatype, $resource);
+        return new Mandator($resource['name'], $datatype, $resource);
     }
 }

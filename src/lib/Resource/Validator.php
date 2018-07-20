@@ -20,14 +20,29 @@ class Validator
      */
     public static function validate(array $resource): array
     {
-        if (!isset($resource['metadata']['name']) || !is_string($resource['metadata']['name'])) {
-            throw new InvalidArgumentException('metadata.name as string must be provided');
+        if (!isset($resource['name']) || !is_string($resource['name'])) {
+            throw new InvalidArgumentException('name as string must be provided');
         }
 
-        if (isset($resource['metadata']['description']) && !is_string($resource['metadata']['description'])) {
-            throw new InvalidArgumentException('metadata.description must be a string');
+        if (isset($resource['description']) && !is_string($resource['description'])) {
+            throw new InvalidArgumentException('description must be a string');
         }
 
         return $resource;
+    }
+
+    /**
+     * Allow only.
+     */
+    public static function allowOnly(array $attributes): bool
+    {
+        $allow = ['name', 'description'] + $attributes;
+        foreach ($attributes as $attribute => $value) {
+            if (!in_array($attribute, $allow)) {
+                throw new InvalidArgumentException('given attribute '.$attribute.' is not valid at this place');
+            }
+        }
+
+        return true;
     }
 }
