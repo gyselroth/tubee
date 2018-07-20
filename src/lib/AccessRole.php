@@ -36,6 +36,14 @@ class AccessRole implements AccessRoleInterface
     /**
      * {@inheritdoc}
      */
+    public function getName(): string
+    {
+        return $this->resource['name'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getId(): ObjectId
     {
         return $this->resource['_id'];

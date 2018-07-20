@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\Image;
+namespace Tubee\Endpoint\Moodle;
 
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;

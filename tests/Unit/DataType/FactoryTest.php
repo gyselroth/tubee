@@ -11,15 +11,15 @@ declare(strict_types=1);
 
 namespace Tubee\Testsuite\Unit\DataType;
 
+use Helmich\MongoMock\MockDatabase;
+use MongoDB\BSON\ObjectId;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\Exception;
-use Tubee\Mandator\MandatorInterface;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\Endpoint\Factory as EndpointFactory;
+use Tubee\DataType\Exception;
 use Tubee\DataType\Factory as DataTypeFactory;
-use MongoDB\BSON\ObjectId;
-use Helmich\MongoMock\MockDatabase;
+use Tubee\Endpoint\Factory as EndpointFactory;
+use Tubee\Mandator\MandatorInterface;
 
 class FactoryTest extends TestCase
 {
@@ -38,21 +38,6 @@ class FactoryTest extends TestCase
 
         $this->factory = new DataTypeFactory($db, $this->createMock(EndpointFactory::class), $this->createMock(LoggerInterface::class));
         $this->mandator = $this->getMandatorMock();
-    }
-
-    protected function getMandatorMock()
-    {
-        $mock = $this->createMock(MandatorInterface::class);
-        $mock->method('getName')->willReturn('foo');
-        return $mock;
-    }
-
-    protected function getDataTypeDefinition($name)
-    {
-        return [
-            'name' => $name,
-            'schema' => [],
-        ];
     }
 
     public function testAdd()
@@ -127,5 +112,21 @@ class FactoryTest extends TestCase
     {
         $this->expectException(Exception\NotFound::class);
         $this->assertTrue($this->factory->delete($this->mandator, 'foo'));
+    }
+
+    protected function getMandatorMock()
+    {
+        $mock = $this->createMock(MandatorInterface::class);
+        $mock->method('getName')->willReturn('foo');
+
+        return $mock;
+    }
+
+    protected function getDataTypeDefinition($name)
+    {
+        return [
+            'name' => $name,
+            'schema' => [],
+        ];
     }
 }

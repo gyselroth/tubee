@@ -118,7 +118,7 @@ class DataType implements DataTypeInterface
                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$this->getMandator()->getName()))],
             ],
             'kind' => 'DataType',
-            'name' => $name,
+            'name' => $this->name,
             'schema' => $this->schema->getSchema(),
        ];
 

@@ -9,12 +9,11 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\Image;
+namespace Tubee\Endpoint\Balloon;
 
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Endpoint\Image as ImageEndpoint;
 use Tubee\Storage\Factory as StorageFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
 

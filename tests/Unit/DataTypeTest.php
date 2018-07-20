@@ -11,21 +11,18 @@ declare(strict_types=1);
 
 namespace Tubee\Testsuite\Unit;
 
-use DateTime;
 use Helmich\MongoMock\MockDatabase;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
-use Tubee\DataType;
-use Tubee\DataType\DataTypeInterface;
-use Tubee\DataType\Exception;
+use Psr\Log\LoggerInterface;
 use Tubee\DataObject\Exception as ObjectException;
+use Tubee\DataType;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Mandator\MandatorInterface;
 use Tubee\Endpoint\Factory as EndpointFactory;
+use Tubee\Mandator\MandatorInterface;
 use Tubee\Schema\SchemaInterface;
 
 class DataTypeTest extends TestCase
@@ -52,7 +49,7 @@ class DataTypeTest extends TestCase
         $this->datatype = new DataType('foo', $mandator, $endpoint, $schema, $db, $this->createMock(LoggerInterface::class), [
             '_id' => new ObjectId(),
             'version' => 1,
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
     }
 

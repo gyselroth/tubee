@@ -75,7 +75,7 @@ class Factory
      */
     public function deleteFrom(Collection $collection, array $resource, array $filter): ObjectId
     {
-        $collection->deleteOne($filter);
+        $result = $collection->deleteOne($filter);
         $this->addEvent($collection->getName(), self::EVENT_DELETE, $result->getInsertedId());
 
         return $result->getInsertedId();

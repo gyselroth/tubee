@@ -44,7 +44,7 @@ class Moodle extends AbstractEndpoint
      */
     /*public function getDiff(AttributeMapInterface $map, array $object, array $endpoint_object): array
     {
-        $id = $this->getId($endpoint_object);
+        $id = $this->getEndpointId($endpoint_object);
         $diff = [[]];
         $diff[0]['id'] = $id;
 
@@ -107,11 +107,11 @@ class Moodle extends AbstractEndpoint
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
-        $id = $this->getId($endpoint_object);
+        $id = $this->getEndpointId($endpoint_object);
         $diff = [$diff];
         $diff[0]['id'] = $id;
 
-        $this->logger->info('update moodle object ['.$id.'] on endpoint ['.$this->getIdentifier().']', [
+        $this->logger->info('update moodle object ['.$id.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -139,7 +139,7 @@ class Moodle extends AbstractEndpoint
         $identifier = isset(self::METHODS[$this->resource_type]['create']['identifier']) ? self::METHODS[$this->resource_type]['create']['identifier'] : '';
         $prepared_data = http_build_query([$identifier => [0 => $object]]);
 
-        $this->logger->info('create new moodle object on endpoint ['.$this->getIdentifier().'] with attributes [{attributes}]', [
+        $this->logger->info('create new moodle object on endpoint ['.$this->getEndpointIdentifier().'] with attributes [{attributes}]', [
             'category' => get_class($this),
             'attributes' => $object,
         ]);
@@ -156,11 +156,11 @@ class Moodle extends AbstractEndpoint
      */
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $id = $this->getId($endpoint_object);
+        $id = $this->getEndpointId($endpoint_object);
         $diff = [[]];
         $diff[0] = $id;
 
-        $this->logger->info('delete existing moodle object ['.$id.'] on endpoint ['.$this->getIdentifier().']', [
+        $this->logger->info('delete existing moodle object ['.$id.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -179,7 +179,7 @@ class Moodle extends AbstractEndpoint
      */
     public function getAll($filter): Generator
     {
-        $this->logger->debug('find all moodle objects with moodle filter ['.$this->filter_all.'] on endpoint ['.$this->getIdentifier().']', [
+        $this->logger->debug('find all moodle objects with moodle filter ['.$this->filter_all.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -197,7 +197,7 @@ class Moodle extends AbstractEndpoint
     {
         $filter = $this->getFilterOne($object);
 
-        $this->logger->debug('find moodle object with moodle filter ['.$filter.'] on endpoint ['.$this->getIdentifier().']', [
+        $this->logger->debug('find moodle object with moodle filter ['.$filter.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -216,7 +216,7 @@ class Moodle extends AbstractEndpoint
     /**
      * Get moodle resource id.
      */
-    protected function getId(array $endpoint_object): string
+    protected function getEndpointId(array $endpoint_object): string
     {
         if (isset($endpoint_object['id'])) {
             return $endpoint_object['id'];

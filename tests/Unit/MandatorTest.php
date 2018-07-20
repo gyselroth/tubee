@@ -11,15 +11,13 @@ declare(strict_types=1);
 
 namespace Tubee\Testsuite\Unit;
 
+use MongoDB\BSON\ObjectId;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\Mandator;
-use Tubee\Mandator\Exception;
 use Tubee\DataType\Factory as DataTypeFactory;
-use MongoDB\BSON\ObjectId;
+use Tubee\Mandator;
 
 class MandatorTest extends TestCase
 {
@@ -31,7 +29,7 @@ class MandatorTest extends TestCase
         $datatype->method('getOne')->willReturn(
             $this->createMock(DataTypeInterface::class)
         );
-        $datatype->method('getAll')->will($this->returnCallback(function() {
+        $datatype->method('getAll')->will($this->returnCallback(function () {
             yield 'foo' => $this->createMock(DataTypeInterface::class);
         }));
         $datatype->method('has')->willReturn(true);

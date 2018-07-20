@@ -11,14 +11,13 @@ declare(strict_types=1);
 
 namespace Tubee\Testsuite\Unit\Mandator;
 
-use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
-use Tubee\Mandator\Exception;
-use Tubee\Mandator\MandatorInterface;
-use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\DataType\Factory as DataTypeFactory;
-use MongoDB\BSON\ObjectId;
 use Helmich\MongoMock\MockDatabase;
+use MongoDB\BSON\ObjectId;
+use PHPUnit\Framework\TestCase;
+use Tubee\DataType\Factory as DataTypeFactory;
+use Tubee\Mandator\Exception;
+use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\Mandator\MandatorInterface;
 
 class FactoryTest extends TestCase
 {
@@ -40,7 +39,7 @@ class FactoryTest extends TestCase
     public function testAdd()
     {
         $id = $this->factory->add([
-            'name' => 'foo'
+            'name' => 'foo',
         ]);
 
         $this->assertInstanceOf(ObjectId::class, $id);

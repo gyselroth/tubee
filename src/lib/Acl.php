@@ -43,41 +43,58 @@ class Acl
      */
     public function isAllowed(ServerRequestInterface $request, Identity $user): bool
     {
-        $this->logger->debug('verify access rule for identity ['.$user->getIdentifier().']', [
+        $this->logger->debug('verify access for identity ['.$user->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
-        return true;
         $roles = $this->role->getAll([
             '$or' => [
-                ['users' => $user->getIdentifier()],
-                ['users' => '*'],
+                ['selectors' => $user->getIdentifier()],
+                ['selectors' => '*'],
             ],
         ]);
 
-        $roles = array_column(iterator_to_array($roles), '_id');
-        if ($roles === null) {
-            $roles = [];
+        $names = [];
+        foreach ($roles as $role) {
+            $names[] = $role->getName();
+        }
+
+        if ($names === []) {
+            $this->logger->info('no matching access roles for ['.$user->getIdentifier().']', [
+                'category' => get_class($this),
+            ]);
+
+            throw new Exception\NotAllowed('Not allowed to call this resource');
         }
 
         $rules = $this->rule->getAll([
-            'selector' => ['$in' => $roles],
+            'roles' => ['$in' => $names],
         ]);
 
         $method = $request->getMethod();
         $attributes = $request->getAttributes();
 
         foreach ($rules as $rule) {
-            $this->logger->debug('verify access rule ['.$rule['_id'].']', [
+            $rule = $rule->toArray();
+
+            $this->logger->debug('verify access rule ['.$rule['name'].']', [
                 'category' => get_class($this),
             ]);
+
+            if (empty(array_intersect($names, $rule['roles'])) && !in_array('*', $rule['roles'])) {
+                continue;
+            }
 
             if (!in_array($method, $rule['verbs']) && !in_array('*', $rule['verbs'])) {
                 continue;
             }
 
-            foreach ($rule['selector'] as $selector) {
-                if (isset($attributes[$selector]) && (in_array($attributes[$selector], $rule['resoures']) || in_array('*', $rule['resources']))) {
+            foreach ($rule['selectors'] as $selector) {
+                if ($selector === '*') {
+                    return true;
+                }
+
+                if (isset($attributes[$selector]) && (in_array($attributes[$selector], $rule['resources']) || in_array('*', $rule['resources']))) {
                     return true;
                 }
             }
@@ -85,6 +102,7 @@ class Acl
 
         $this->logger->info('access denied for user ['.$user->getIdentifier().'], no access rule match', [
             'category' => get_class($this),
+            'roles' => $names,
         ]);
 
         throw new Exception\NotAllowed('Not allowed to call this resource');

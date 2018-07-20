@@ -11,16 +11,16 @@ declare(strict_types=1);
 
 namespace Tubee\Testsuite\Unit;
 
-use PHPUnit\Framework\TestCase;
 use Micro\Auth\Identity;
+use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Tubee\Acl\Exception;
+use Tubee\AccessRole;
 use Tubee\AccessRole\Factory as AccessRoleFactory;
+use Tubee\AccessRule;
 use Tubee\AccessRule\Factory as AccessRuleFactory;
 use Tubee\Acl;
-use Tubee\AccessRole;
-use Tubee\AccessRule;
+use Tubee\Acl\Exception;
 
 class AclTest extends TestCase
 {
@@ -33,8 +33,8 @@ class AclTest extends TestCase
         $this->expectException(Exception\NotAllowed::class);
 
         $role = $this->createMock(AccessRoleFactory::class);
-        $role->method('getAll')->will($this->returnCallback(function(){
-            if(false) {
+        $role->method('getAll')->will($this->returnCallback(function () {
+            if (false) {
                 yield 1;
             }
         }));
@@ -43,25 +43,12 @@ class AclTest extends TestCase
         $acl->isAllowed($this->createMock(ServerRequestInterface::class), $this->createMock(Identity::class));
     }
 
-    protected function getAllRoleMock()
-    {
-        $role = $this->createMock(AccessRoleFactory::class);
-        $role->method('getAll')->will($this->returnCallback(function(){
-            yield new AccessRole([
-                'name' => 'all',
-                'selectors' => ['*'],
-            ]);
-        }));
-
-        return $role;
-    }
-
     public function testDenyIfNoRulesMatch()
     {
         $this->expectException(Exception\NotAllowed::class);
 
         $rule = $this->createMock(AccessRuleFactory::class);
-        $rule->method('getAll')->will($this->returnCallback(function(){
+        $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-foo',
                 'roles' => ['foo'],
@@ -78,7 +65,7 @@ class AclTest extends TestCase
     public function testAllowWildcardRoleAndWildardResource()
     {
         $rule = $this->createMock(AccessRuleFactory::class);
-        $rule->method('getAll')->will($this->returnCallback(function(){
+        $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-all',
                 'roles' => ['all'],
@@ -97,7 +84,7 @@ class AclTest extends TestCase
         $this->expectException(Exception\NotAllowed::class);
 
         $rule = $this->createMock(AccessRuleFactory::class);
-        $rule->method('getAll')->will($this->returnCallback(function(){
+        $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
                 'roles' => ['all'],
@@ -117,7 +104,7 @@ class AclTest extends TestCase
     public function testAllowMatchingVerb()
     {
         $rule = $this->createMock(AccessRuleFactory::class);
-        $rule->method('getAll')->will($this->returnCallback(function(){
+        $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
                 'roles' => ['all'],
@@ -139,7 +126,7 @@ class AclTest extends TestCase
         $this->expectException(Exception\NotAllowed::class);
 
         $rule = $this->createMock(AccessRuleFactory::class);
-        $rule->method('getAll')->will($this->returnCallback(function(){
+        $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
                 'roles' => ['all'],
@@ -151,7 +138,7 @@ class AclTest extends TestCase
 
         $request = $this->createMock(ServerRequestInterface::class);
         $request->method('getAttributes')->willReturn([
-            'foo' => 'foo'
+            'foo' => 'foo',
         ]);
 
         $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
@@ -161,7 +148,7 @@ class AclTest extends TestCase
     public function testAllowMatchingResource()
     {
         $rule = $this->createMock(AccessRuleFactory::class);
-        $rule->method('getAll')->will($this->returnCallback(function(){
+        $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
                 'roles' => ['all'],
@@ -173,10 +160,23 @@ class AclTest extends TestCase
 
         $request = $this->createMock(ServerRequestInterface::class);
         $request->method('getAttributes')->willReturn([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
 
         $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
         $this->assertTrue($acl->isAllowed($request, $this->createMock(Identity::class)));
+    }
+
+    protected function getAllRoleMock()
+    {
+        $role = $this->createMock(AccessRoleFactory::class);
+        $role->method('getAll')->will($this->returnCallback(function () {
+            yield new AccessRole([
+                'name' => 'all',
+                'selectors' => ['*'],
+            ]);
+        }));
+
+        return $role;
     }
 }

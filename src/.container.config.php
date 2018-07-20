@@ -148,7 +148,7 @@ return [
             'file' => [
                 'use' => Monolog\Handler\StreamHandler::class,
                 'arguments' => [
-                    'stream' => '{ENV(BALLOON_LOG_DIR,/tmp)}/out.log',
+                    'stream' => '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log',
                     'level' => 100
                  ],
                 'calls' => [
