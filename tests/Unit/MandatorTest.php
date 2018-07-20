@@ -13,10 +13,13 @@ namespace Tubee\Testsuite\Unit;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\Manager;
 use Tubee\Mandator;
 use Tubee\Mandator\Exception;
+use Tubee\DataType\Factory as DataTypeFactory;
+use MongoDB\BSON\ObjectId;
 
 class MandatorTest extends TestCase
 {
@@ -24,62 +27,34 @@ class MandatorTest extends TestCase
 
     public function setUp()
     {
-        $this->mandator = new Mandator('foo', $this->createMock(Manager::class), $this->createMock(LoggerInterface::class));
-    }
+        $datatype = $this->createMock(DataTypeFactory::class);
+        $datatype->method('getOne')->willReturn(
+            $this->createMock(DataTypeInterface::class)
+        );
+        $datatype->method('getAll')->will($this->returnCallback(function() {
+            yield 'foo' => $this->createMock(DataTypeInterface::class);
+        }));
+        $datatype->method('has')->willReturn(true);
 
-    public function testInjectDataType()
-    {
-        $datatype = $this->createMock(DataTypeInterface::class);
-        $this->assertInstanceOf(Mandator::class, $this->mandator->injectDataType($datatype, 'foo'));
-    }
-
-    public function testInjectDataTypeNotUnique()
-    {
-        $this->expectException(Exception\DataTypeNotUnique::class);
-        $datatype = $this->createMock(DataTypeInterface::class);
-        $this->mandator->injectDataType($datatype, 'foo');
-        $this->mandator->injectDataType($datatype, 'foo');
+        $this->mandator = new Mandator('foo', $datatype, [
+            '_id' => new ObjectId(),
+            'name' => 'foo',
+            'version' => 1,
+        ]);
     }
 
     public function testGetDataType()
     {
-        $datatype = $this->createMock(DataTypeInterface::class);
-        $this->mandator->injectDataType($datatype, 'foo');
-        $this->assertSame($datatype, $this->mandator->getDataType('foo'));
-    }
-
-    public function testGetDataTypeNotFound()
-    {
-        $this->expectException(Exception\DataTypeNotFound::class);
-        $this->mandator->getDataType('foo');
+        $this->assertInstanceOf(DataTypeInterface::class, $this->mandator->getDataType('foo'));
     }
 
     public function testGetDataTypes()
     {
-        $datatype = $this->createMock(DataTypeInterface::class);
-        $this->mandator->injectDataType($datatype, 'foo');
-        $this->assertSame(['foo' => $datatype], $this->mandator->getDataTypes());
-    }
-
-    public function testGetDataTypesFiltered()
-    {
-        $datatype = $this->createMock(DataTypeInterface::class);
-        $this->mandator->injectDataType($datatype, 'bar');
-        $this->mandator->injectDataType($datatype, 'foo');
-        $this->assertSame(['foo' => $datatype], $this->mandator->getDataTypes(['foo']));
-    }
-
-    public function testGetDataTypesFilteredNotFound()
-    {
-        $this->expectException(Exception\DataTypeNotFound::class);
-        $datatype = $this->createMock(DataTypeInterface::class);
-        $this->mandator->getDataTypes(['foo']);
+        $this->assertCount(1, iterator_to_array($this->mandator->getDataTypes()));
     }
 
     public function testHasDataType()
     {
-        $datatype = $this->createMock(DataTypeInterface::class);
-        $this->mandator->injectDataType($datatype, 'bar');
         $this->assertTrue($this->mandator->hasDataType('bar'));
     }
 
@@ -91,5 +66,15 @@ class MandatorTest extends TestCase
     public function testGetIdentifier()
     {
         $this->assertSame('foo', $this->mandator->getIdentifier());
+    }
+
+    public function testDecorate()
+    {
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getUri')->willReturn($this->createMock(UriInterface::class));
+
+        $result = $this->mandator->decorate($request);
+        $this->assertSame('foo', $result['name']);
+        $this->assertSame('Mandator', $result['kind']);
     }
 }

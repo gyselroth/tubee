@@ -1,0 +1,182 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * tubee.io
+ *
+ * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
+ */
+
+namespace Tubee\Testsuite\Unit;
+
+use PHPUnit\Framework\TestCase;
+use Micro\Auth\Identity;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
+use Tubee\Acl\Exception;
+use Tubee\AccessRole\Factory as AccessRoleFactory;
+use Tubee\AccessRule\Factory as AccessRuleFactory;
+use Tubee\Acl;
+use Tubee\AccessRole;
+use Tubee\AccessRule;
+
+class AclTest extends TestCase
+{
+    /*public function __construct(AccessRoleFactory $role, AccessRuleFactory $rule, LoggerInterface $logger)
+    public function isAllowed(ServerRequestInterface $request, Identity $user): bool
+    public function filterOutput(ServerRequestInterface $request, Identity $user, Iterable $resources): Generator*/
+
+    public function testDenyIfNoRoles()
+    {
+        $this->expectException(Exception\NotAllowed::class);
+
+        $role = $this->createMock(AccessRoleFactory::class);
+        $role->method('getAll')->will($this->returnCallback(function(){
+            if(false) {
+                yield 1;
+            }
+        }));
+
+        $acl = new Acl($role, $this->createMock(AccessRuleFactory::class), $this->createMock(LoggerInterface::class));
+        $acl->isAllowed($this->createMock(ServerRequestInterface::class), $this->createMock(Identity::class));
+    }
+
+    protected function getAllRoleMock()
+    {
+        $role = $this->createMock(AccessRoleFactory::class);
+        $role->method('getAll')->will($this->returnCallback(function(){
+            yield new AccessRole([
+                'name' => 'all',
+                'selectors' => ['*'],
+            ]);
+        }));
+
+        return $role;
+    }
+
+    public function testDenyIfNoRulesMatch()
+    {
+        $this->expectException(Exception\NotAllowed::class);
+
+        $rule = $this->createMock(AccessRuleFactory::class);
+        $rule->method('getAll')->will($this->returnCallback(function(){
+            yield new AccessRule([
+                'name' => 'allow-foo',
+                'roles' => ['foo'],
+                'selectors' => ['*'],
+                'verbs' => ['*'],
+                'resources' => ['*'],
+            ]);
+        }));
+
+        $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
+        $acl->isAllowed($this->createMock(ServerRequestInterface::class), $this->createMock(Identity::class));
+    }
+
+    public function testAllowWildcardRoleAndWildardResource()
+    {
+        $rule = $this->createMock(AccessRuleFactory::class);
+        $rule->method('getAll')->will($this->returnCallback(function(){
+            yield new AccessRule([
+                'name' => 'allow-all',
+                'roles' => ['all'],
+                'selectors' => ['*'],
+                'verbs' => ['*'],
+                'resources' => ['*'],
+            ]);
+        }));
+
+        $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
+        $this->assertTrue($acl->isAllowed($this->createMock(ServerRequestInterface::class), $this->createMock(Identity::class)));
+    }
+
+    public function testDenyNoMatchingVerb()
+    {
+        $this->expectException(Exception\NotAllowed::class);
+
+        $rule = $this->createMock(AccessRuleFactory::class);
+        $rule->method('getAll')->will($this->returnCallback(function(){
+            yield new AccessRule([
+                'name' => 'allow-post-all',
+                'roles' => ['all'],
+                'selectors' => ['*'],
+                'verbs' => ['POST'],
+                'resources' => ['*'],
+            ]);
+        }));
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getMethod')->willReturn('GET');
+
+        $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
+        $this->assertTrue($acl->isAllowed($request, $this->createMock(Identity::class)));
+    }
+
+    public function testAllowMatchingVerb()
+    {
+        $rule = $this->createMock(AccessRuleFactory::class);
+        $rule->method('getAll')->will($this->returnCallback(function(){
+            yield new AccessRule([
+                'name' => 'allow-post-all',
+                'roles' => ['all'],
+                'selectors' => ['*'],
+                'verbs' => ['POST'],
+                'resources' => ['*'],
+            ]);
+        }));
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getMethod')->willReturn('POST');
+
+        $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
+        $this->assertTrue($acl->isAllowed($request, $this->createMock(Identity::class)));
+    }
+
+    public function testDenyNoMatchingResource()
+    {
+        $this->expectException(Exception\NotAllowed::class);
+
+        $rule = $this->createMock(AccessRuleFactory::class);
+        $rule->method('getAll')->will($this->returnCallback(function(){
+            yield new AccessRule([
+                'name' => 'allow-post-all',
+                'roles' => ['all'],
+                'selectors' => ['foo'],
+                'verbs' => ['*'],
+                'resources' => ['bar'],
+            ]);
+        }));
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getAttributes')->willReturn([
+            'foo' => 'foo'
+        ]);
+
+        $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
+        $this->assertTrue($acl->isAllowed($request, $this->createMock(Identity::class)));
+    }
+
+    public function testAllowMatchingResource()
+    {
+        $rule = $this->createMock(AccessRuleFactory::class);
+        $rule->method('getAll')->will($this->returnCallback(function(){
+            yield new AccessRule([
+                'name' => 'allow-post-all',
+                'roles' => ['all'],
+                'selectors' => ['foo'],
+                'verbs' => ['*'],
+                'resources' => ['bar'],
+            ]);
+        }));
+
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getAttributes')->willReturn([
+            'foo' => 'bar'
+        ]);
+
+        $acl = new Acl($this->getAllRoleMock(), $rule, $this->createMock(LoggerInterface::class));
+        $this->assertTrue($acl->isAllowed($request, $this->createMock(Identity::class)));
+    }
+}

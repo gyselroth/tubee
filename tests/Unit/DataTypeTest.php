@@ -17,11 +17,16 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\UriInterface;
 use Tubee\DataType;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Exception;
+use Tubee\DataObject\Exception as ObjectException;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Endpoint\Factory as EndpointFactory;
+use Tubee\Schema\SchemaInterface;
 
 class DataTypeTest extends TestCase
 {
@@ -33,6 +38,9 @@ class DataTypeTest extends TestCase
         $mandator->method('getIdentifier')->willReturn('foo');
         $mandator->method('getName')->willReturn('foo');
 
+        $schema = $this->createMock(SchemaInterface::class);
+        $endpoint = $this->createMock(EndpointFactory::class);
+
         $db = new MockDatabase('foobar', [
             'typeMap' => [
                 'root' => 'array',
@@ -41,44 +49,14 @@ class DataTypeTest extends TestCase
             ],
         ]);
 
-        $this->datatype = new DataType('foo', $mandator, $db, $this->createMock(LoggerInterface::class));
+        $this->datatype = new DataType('foo', $mandator, $endpoint, $schema, $db, $this->createMock(LoggerInterface::class), [
+            '_id' => new ObjectId(),
+            'version' => 1,
+            'name' => 'foo'
+        ]);
     }
 
-    public function testInjectEndpoint()
-    {
-        $endpoint = $this->createMock(EndpointInterface::class);
-        $this->assertInstanceOf(DataTypeInterface::class, $this->datatype->injectEndpoint($endpoint, 'foo'));
-    }
-
-    public function testInjectEndpointNotUnique()
-    {
-        $this->expectException(Exception\EndpointNotUnique::class);
-        $endpoint = $this->createMock(EndpointInterface::class);
-        $this->datatype->injectEndpoint($endpoint, 'foo');
-        $this->datatype->injectEndpoint($endpoint, 'foo');
-    }
-
-    public function testGetEndpoint()
-    {
-        $endpoint = $this->createMock(EndpointInterface::class);
-        $this->datatype->injectEndpoint($endpoint, 'foo');
-        $this->assertSame($endpoint, $this->datatype->getEndpoint('foo'));
-    }
-
-    public function testGetEndpointNotFound()
-    {
-        $this->expectException(Exception\EndpointNotFound::class);
-        $this->datatype->getEndpoint('foo');
-    }
-
-    public function testGetEndpoints()
-    {
-        $endpoint = $this->createMock(EndpointInterface::class);
-        $this->datatype->injectEndpoint($endpoint, 'foo');
-        $this->assertSame(['foo' => $endpoint], $this->datatype->getEndpoints());
-    }
-
-    public function testGetSourceEndpoints()
+    /*public function testGetSourceEndpoints()
     {
         $endpoint = $this->createMock(EndpointInterface::class);
         $endpoint->method('getType')->willReturn(EndpointInterface::TYPE_SOURCE);
@@ -94,29 +72,7 @@ class DataTypeTest extends TestCase
 
         $this->datatype->injectEndpoint($endpoint, 'foo');
         $this->assertSame(['foo' => $endpoint], $this->datatype->getDestinationEndpoints());
-    }
-
-    public function testGetEndpointsFiltered()
-    {
-        $endpoint = $this->createMock(EndpointInterface::class);
-        $this->datatype->injectEndpoint($endpoint, 'bar');
-        $this->datatype->injectEndpoint($endpoint, 'foo');
-        $this->assertSame(['foo' => $endpoint], $this->datatype->getEndpoints(['foo']));
-    }
-
-    public function testGetEndpointsFilteredNotFound()
-    {
-        $this->expectException(Exception\EndpointNotFound::class);
-        $endpoint = $this->createMock(EndpointInterface::class);
-        $this->datatype->getEndpoints(['foo']);
-    }
-
-    public function testHasEndpoint()
-    {
-        $endpoint = $this->createMock(EndpointInterface::class);
-        $this->datatype->injectEndpoint($endpoint, 'bar');
-        $this->assertTrue($this->datatype->hasEndpoint('bar'));
-    }
+    }*/
 
     public function testGetName()
     {
@@ -130,7 +86,7 @@ class DataTypeTest extends TestCase
 
     public function testCreateObjectSimulate()
     {
-        $this->expectException(Exception\ObjectNotFound::class);
+        $this->expectException(ObjectException\NotFound::class);
         $id = $this->datatype->create(['foo' => 'bar'], true);
         $this->assertInstanceOf(ObjectId::class, $id);
         $this->datatype->getOne(['_id' => $id], false);
@@ -147,7 +103,7 @@ class DataTypeTest extends TestCase
 
     public function testGetOneMultipleFound()
     {
-        $this->expectException(Exception\ObjectMultipleFound::class);
+        $this->expectException(ObjectException\MultipleFound::class);
         $this->datatype->create(['foo' => 'bar']);
         $this->datatype->create(['foo' => 'bar']);
         $object = $this->datatype->getOne(['data.foo' => 'bar'], false);
@@ -180,7 +136,7 @@ class DataTypeTest extends TestCase
 
     public function testDeleteObject()
     {
-        $this->expectException(Exception\ObjectNotFound::class);
+        $this->expectException(ObjectException\NotFound::class);
         $id = $this->datatype->create(['foo' => 'bar']);
         $this->datatype->delete($id);
         $object = $this->datatype->getOne(['data.foo' => 'bar'], false);
@@ -234,7 +190,7 @@ class DataTypeTest extends TestCase
 
     public function testFlush()
     {
-        $this->expectException(Exception\ObjectNotFound::class);
+        $this->expectException(ObjectException\NotFound::class);
         $this->datatype->create(['foo' => 'bar']);
         $this->datatype->flush();
         $object = $this->datatype->getOne(['data.foo' => 'bar'], false);
@@ -251,20 +207,13 @@ class DataTypeTest extends TestCase
         $this->assertNull($object->getDeleted());
     }
 
-    public function testDataObjectAttributeDecorator()
+    public function testDecorate()
     {
-        $id = $this->datatype->create(['foo' => 'bar']);
-        $object = $this->datatype->getOne(['_id' => $id], false)->decorate();
-        $this->assertSame((string) $id, $object['id']);
-        $this->assertSame(1, $object['version']);
-        $this->assertSame('bar', $object['data']['foo']);
-        $this->assertInstanceOf(DateTime::class, new DateTime($object['created']));
-    }
+        $request = $this->createMock(ServerRequestInterface::class);
+        $request->method('getUri')->willReturn($this->createMock(UriInterface::class));
 
-    public function testDataObjectAttributeDecoratorFiltered()
-    {
-        $id = $this->datatype->create(['foo' => 'bar']);
-        $object = $this->datatype->getOne(['_id' => $id], false)->decorate(['data']);
-        $this->assertSame(['data' => ['foo' => 'bar']], $object);
+        $result = $this->datatype->decorate($request);
+        $this->assertSame('foo', $result['name']);
+        $this->assertSame('DataType', $result['kind']);
     }
 }
