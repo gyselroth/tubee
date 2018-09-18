@@ -21,9 +21,9 @@ class Factory
     /**
      * Event types.
      */
-    public const EVENT_ADD = 'ADD';
+    /*public const EVENT_ADD = 'ADD';
     public const EVENT_DELETE = 'DELETE';
-    public const EVENT_UPDATE = 'UPDATE';
+    public const EVENT_UPDATE = 'UPDATE';*/
 
     /**
      * Database.
@@ -43,7 +43,7 @@ class Factory
     /**
      * Add resource.
      */
-    public function addEvent(Collection $collection, string $type, ObjectId $id): ObjectId
+    /*public function addEvent(Collection $collection, string $type, ObjectId $id): ObjectId
     {
         $result = $this->db->events->insertOne([
             'collection' => $collection->getCollectionName(),
@@ -52,7 +52,7 @@ class Factory
         ]);
 
         return $result->getInsertedId();
-    }
+    }*/
 
     /**
      * Add resource.
@@ -76,7 +76,7 @@ class Factory
     public function deleteFrom(Collection $collection, array $resource, array $filter): ObjectId
     {
         $result = $collection->deleteOne($filter);
-        $this->addEvent($collection->getName(), self::EVENT_DELETE, $result->getInsertedId());
+        //$this->addEvent($collection->getName(), self::EVENT_DELETE, $result->getInsertedId());
 
         return $result->getInsertedId();
     }

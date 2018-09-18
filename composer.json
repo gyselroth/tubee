@@ -17,18 +17,18 @@
         }
     },
     "require": {
-        "php": ">=7.1",
+        "php": ">=7.2",
         "psr/log": "1.*",
         "ext-mongodb": "*",
         "ext-curl": "*",
         "gyselroth/micro-auth": "*",
-        "gyselroth/micro-container": "^1.0.0",
+        "gyselroth/micro-container": "^2.0.0",
         "gyselroth/micro-http": "^0.0.6",
         "psr/container": "*",
         "mongodb/mongodb": "1.2.0",
         "ulrichsg/getopt-php": "^3.0",
         "zendframework/zend-mail": "2.7.*",
-        "gyselroth/mongodb-php-task-scheduler": "^2.0.2",
+        "gyselroth/mongodb-php-task-scheduler": "^3.0.0",
         "hassankhan/config": "*",
         "symfony/yaml": "^4.0",
         "monolog/monolog": "^1.23",
@@ -53,8 +53,9 @@
         "php-jsonpatch/php-jsonpatch": "^3.0",
         "stolt/json-merge-patch": "^1.0"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "suggest": {
-        "ext-pthreads": "*",
         "ext-ldap": "*",
         "ext-mysqli": "*",
         "ext-pdo": "*",

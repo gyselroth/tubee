@@ -48,6 +48,18 @@ interface AttributeMapInterface
     const TYPE_NULL = 'null';
 
     /**
+     * Valid types.
+     */
+    const VALID_TYPES = [
+        self::TYPE_STRING,
+        self::TYPE_ARRAY,
+        self::TYPE_INT,
+        self::TYPE_FLOAT,
+        self::TYPE_BOOL,
+        self::TYPE_NULL,
+    ];
+
+    /**
      * Serializable class types.
      */
     const SERIALIZABLE_TYPES = [

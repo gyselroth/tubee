@@ -57,16 +57,9 @@ class AttributeMapTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $map = new AttributeMap([
-            'string' => ['from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_MERGE],
+            'string' => ['from' => 'foo', 'type' => 'string', 'ensure' => AttributeMapInterface::ENSURE_MERGE],
         ], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
 
-        $result = $map->map(['foo' => 'bar'], new UTCDateTime());
-    }
-
-    public function testAttributeInvalidMap()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $map = new AttributeMap(['foo'], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
         $result = $map->map(['foo' => 'bar'], new UTCDateTime());
     }
 
@@ -88,16 +81,6 @@ class AttributeMapTest extends TestCase
         $this->assertSame(null, $result['null']);
         $this->assertSame(true, $result['bool']);
         $this->assertSame(['bar'], $result['array']);
-    }
-
-    public function testAttributeInvalidType()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'type' => 'foo'],
-        ], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
-
-        $result = $map->map(['foo' => 'bar'], new UTCDateTime());
     }
 
     public function testAttributeRequired()
@@ -281,7 +264,7 @@ class AttributeMapTest extends TestCase
     public function testArrayAttributeAsString()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo'],
+            'foo' => ['from' => 'foo', 'type' => 'string'],
         ], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => ['foo', 'bar']], new UTCDateTime());

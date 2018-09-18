@@ -83,8 +83,6 @@ class Workflow implements WorkflowInterface
 
     /**
      * Initialize.
-     *
-     * @param AttributeMap $attribute_map
      */
     public function __construct(string $name, string $ensure, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
     {

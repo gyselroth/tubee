@@ -15,11 +15,18 @@ use InvalidArgumentException;
 
 class Validator
 {
-    public function validate(array $resource): array
+    /**
+     * Validate resource.
+     */
+    public static function validate(array $resource): array
     {
         foreach ($resource as $attribute => $definition) {
             if (!is_array($definition)) {
                 throw new InvalidArgumentException('map attribute '.$attribute.' definition must be an array');
+            }
+
+            if (!is_string($attribute)) {
+                throw new InvalidArgumentException('map attribute '.$attribute.' name must be a string');
             }
 
             self::validateAttribute($attribute, $definition);
@@ -29,20 +36,23 @@ class Validator
     }
 
     /**
-     * Add attribute.
+     * Validate attribute.
      */
     protected static function validateAttribute(string $name, array $schema): bool
     {
-        $default = [
-            'required' => false,
-        ];
-
         foreach ($schema as $option => $definition) {
             switch ($option) {
                 case 'value':
                 break;
-                case 'from':
                 case 'type':
+                    if (!in_array($definition, AttributeMapInterface::VALID_TYPES)) {
+                        throw new InvalidArgumentException('map attribute '.$name.' has an invalid attribute type '.$definition.', only '.implode(',', AttributeMapInterface::VALID_TYPES).' are supported');
+                    }
+
+                break;
+
+                break;
+                case 'from':
                 case 'script':
                 case 'rewrite':
                 case 'require_regex':
@@ -50,15 +60,11 @@ class Validator
                         throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type string');
                     }
 
-                    $default[$option] = $definition;
-
                 break;
                 case 'required':
                     if (!is_bool($definition)) {
                         throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type boolean');
                     }
-
-                    $default[$option] = $definition;
 
                 break;
                 default:

@@ -24,10 +24,6 @@ use Tubee\Acl\Exception;
 
 class AclTest extends TestCase
 {
-    /*public function __construct(AccessRoleFactory $role, AccessRuleFactory $rule, LoggerInterface $logger)
-    public function isAllowed(ServerRequestInterface $request, Identity $user): bool
-    public function filterOutput(ServerRequestInterface $request, Identity $user, Iterable $resources): Generator*/
-
     public function testDenyIfNoRoles()
     {
         $this->expectException(Exception\NotAllowed::class);

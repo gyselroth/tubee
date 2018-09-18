@@ -80,12 +80,8 @@ class AttributeMap implements AttributeMapInterface
                 unset($attrv);
             }
 
-            if (!is_array($value)) {
-                throw new InvalidArgumentException('attribute '.$attr.' definiton must be an array');
-            }
-
             if (isset($value['ensure'])) {
-                if ($value['ensure'] === AttributeMapInterface::ENSURE_MERGE && $value['type'] !== AttributeMapInterface::TYPE_ARRAY) {
+                if ($value['ensure'] === AttributeMapInterface::ENSURE_MERGE && isset($value['type']) && $value['type'] !== AttributeMapInterface::TYPE_ARRAY) {
                     throw new InvalidArgumentException('attribute '.$attr.' ensure is set to merge but type is not an array');
                 }
 
