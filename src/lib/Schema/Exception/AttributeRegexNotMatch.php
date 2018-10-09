@@ -13,7 +13,7 @@ namespace Tubee\Schema\Exception;
 
 use Micro\Http\ExceptionInterface;
 
-class AttributeRegexNotMatch extends \Tubee\Exception implements ExceptionInterface;
+class AttributeRegexNotMatch extends \Tubee\Exception implements ExceptionInterface
 {
     /**
      * {@inheritdoc}

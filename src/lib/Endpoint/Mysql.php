@@ -16,7 +16,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Mysql\Wrapper as MysqlWrapper;
-use Tubee\Workflow\Factory as WorkflowFactory
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Mysql extends AbstractSqlDatabase
 {
