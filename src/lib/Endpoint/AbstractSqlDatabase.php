@@ -148,10 +148,6 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
 
     /**
      * Build filter.
-     *
-     * @param string $filter
-     *
-     * @return string
      */
     protected function buildFilter($filter): ?string
     {
@@ -181,10 +177,6 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
 
     /**
      * Build filter all.
-     *
-     * @param string $filter
-     *
-     * @return string
      */
     protected function buildFilterAll($filter): ?string
     {

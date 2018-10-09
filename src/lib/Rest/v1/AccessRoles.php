@@ -133,7 +133,7 @@ class AccessRoles
      */
     public function delete(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
-        $this->role_factory->delete($role);
+        $this->role_factory->deleteOne($role);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

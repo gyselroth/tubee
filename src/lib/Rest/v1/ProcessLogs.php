@@ -19,27 +19,25 @@ use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\Job\Factory as JobFactory;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
-class JobErrors
+class ProcessLogs
 {
     /**
      * Init.
      */
-    public function __construct(JobFactory $job, Acl $acl, MandatorFactory $mandator)
+    public function __construct(ProcessFactory $job, Acl $acl)
     {
-        $this->job = $job;
+        $this->job_factory = $job_factory;
         $this->acl = $acl;
-        $this->mandator = $mandator;
     }
 
     /**
      * Get errors.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, ObjectId $job, ObjectId $process): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -47,8 +45,10 @@ class JobErrors
             'query' => [],
         ], $request->getQueryParams());
 
-        $errors = $this->job->getErrors($job, $query['query'], $query['offset'], $query['limit']);
-        $body = $this->acl->filterOutput($request, $identity, $errors);
+        $process = $this->job_factory->getOne($job)->getProcess($process);
+        $logs = $process->getLogs($query['query'], $query['offset'], $query['limit']);
+
+        $body = $this->acl->filterOutput($request, $identity, $logs);
         $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
@@ -61,13 +61,14 @@ class JobErrors
     /**
      * Get errors.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectId $job, ObjectId $error): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectId $job, ObjectId $process, ObjectId $log): ResponseInterface
     {
         $query = $request->getQueryParams();
+        $job = $this->job_factory->getOne($job)->getProcess($process);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->job->getError($error)->decorate($request),
+            $process->getLog($log)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -75,9 +76,9 @@ class JobErrors
     /**
      * Watch errors.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, ObjectId $job, ObjectId $process): ResponseInterface
     {
-        $cursor = $this->job->watchErrors($job);
+        $cursor = $this->job_factory->getOne($job)->getProcess($process)->watchLogs($job);
 
         $iterator = function () use ($cursor, $request) {
             $iterator = new IteratorIterator($cursor);

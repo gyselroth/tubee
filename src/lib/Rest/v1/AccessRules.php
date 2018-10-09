@@ -134,7 +134,7 @@ class AccessRules
     public function delete(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $this->rule_factory->delete($rule);
+        $this->rule_factory->deleteOne($rule);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

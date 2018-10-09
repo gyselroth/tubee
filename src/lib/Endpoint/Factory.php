@@ -123,7 +123,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($datatype, $name);
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $name);
+        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -137,7 +137,8 @@ class Factory extends ResourceFactory
             throw new Exception\NotUnique('endpoint '.$resource['name'].' does already exists');
         }
 
-        $endpoint = self::build($resource, $datatype, $this->workflow, $this->logger);
+        $resource['_id'] = new ObjectId();
+        $endpoint = $this->build($resource, $datatype);
         $endpoint->setup();
 
         $resource['mandator'] = $datatype->getMandator()->getName();

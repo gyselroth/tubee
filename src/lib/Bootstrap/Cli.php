@@ -91,8 +91,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Execute class action.
-     *
-     * @param object $command
      */
     protected function executeCommand($command)
     {
@@ -100,8 +98,14 @@ class Cli extends AbstractBootstrap
         if (is_callable([&$command, $action])) {
             return call_user_func_array([&$command, $action], []);
         }
+        if ($action === null && is_callable([&$command, '__invoke'])) {
+            return $command();
+        }
+        if (is_callable([&$command, 'help'])) {
+            return call_user_func_array([&$command, 'help'], []);
+        }
 
-        return call_user_func_array([&$command, 'help'], []);
+        echo $this->getopt->getHelpText();
     }
 
     /**

@@ -30,11 +30,11 @@ class Jobs
     /**
      * Init.
      */
-    public function __construct(JobFactory $job, Acl $acl, MandatorFactory $mandator)
+    public function __construct(JobFactory $job_factory, Acl $acl, MandatorFactory $mandator_factory)
     {
-        $this->job = $job;
+        $this->job_factory = $job_factory;
         $this->acl = $acl;
-        $this->mandator = $mandator;
+        $this->mandator_factory = $mandator_factory;
     }
 
     /**
@@ -48,7 +48,7 @@ class Jobs
             'query' => [],
         ], $request->getQueryParams());
 
-        $jobs = $this->job->getTasks($query['query'], $query['offset'], $query['limit']);
+        $jobs = $this->job_factory->getAll($query['query'], $query['offset'], $query['limit']);
         $body = $this->acl->filterOutput($request, $identity, $jobs);
         $body = Pager::fromRequest($body, $request);
 
@@ -68,7 +68,7 @@ class Jobs
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->job->getTask($job)->decorate($request),
+            $this->job_factory->getOne($job)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -78,47 +78,9 @@ class Jobs
      */
     public function delete(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
     {
-        $this->job->cancelJob($job);
+        $this->job_factory->deleteOne($job);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
-    }
-
-    /**
-     * Get errors.
-     */
-    public function getErrors(ServerRequestInterface $request, Identity $identity, ObjectId $job, ?ObjectId $error = null): ResponseInterface
-    {
-        exit();
-        $query = array_merge([
-            'offset' => 0,
-            'limit' => 20,
-            'query' => [],
-        ], $request->getQueryParams());
-
-        if ($error !== null) {
-            return new UnformattedResponse(
-                (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-                $this->job->getError($error)->decorate($request),
-                ['pretty' => isset($query['pretty'])]
-            );
-        }
-
-        $errors = $this->job->getErrors($job, $query['query'], $query['offset'], $query['limit']);
-        $body = $this->acl->filterOutput($request, $identity, $errors);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
-    }
-
-    /**
-     * Watch errors.
-     */
-    public function watchErrors(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
-    {
     }
 
     /**
@@ -127,35 +89,33 @@ class Jobs
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $job = [
-            'action' => $action,
+            //'action' => $action,
             'mandator' => [],
             'datatypes' => [],
             'filter' => [],
             'endpoints' => [],
             'simulate' => false,
             'ignore' => true,
+            'options' => [
+                Scheduler::OPTION_AT => 0,
+                Scheduler::OPTION_INTERVAL => 0,
+                Scheduler::OPTION_RETRY => 0,
+                Scheduler::OPTION_RETRY_INTERVAL => 0,
+                Scheduler::OPTION_TIMEOUT => 0,
+            ],
         ];
 
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-
-        $task = [
-            Scheduler::OPTION_AT => 'task-at',
-            Scheduler::OPTION_INTERVAL => 'task-interval',
-            Scheduler::OPTION_RETRY_INTERVAL => 'task-retry-interval',
-            Scheduler::OPTION_RETRY => 'task-retry',
-        ];
-        $task_set = array_intersect_key($body, array_flip($task));
-        $task_set = array_combine(array_intersect_key($task, $task_set), $task_set);
         $job = array_merge($job, $body);
 
         //validate job requst
-        $this->mandator->getAll($job['mandator']);
-        $id = $this->job->create($job, $task_set);
+        $this->mandator_factory->getAll($job['mandator']);
+        $id = $this->job_factory->create($job);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->job->getOne($id)->decorate($request),
+            $this->job_factory->getOne($id)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

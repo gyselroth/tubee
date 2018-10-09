@@ -139,7 +139,7 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, EndpointInterface $endpoint): WorkflowInterface
     {
-        $map = new AttributeMap($resource['map'], $script, $logger);
+        $map = new AttributeMap($resource['map'], $this->script, $this->logger);
 
         return $this->initResource(new Workflow($resource['name'], $resource['ensure'], $this->script, $map, $endpoint, $this->logger, $resource));
     }

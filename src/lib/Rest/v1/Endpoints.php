@@ -98,7 +98,7 @@ class Endpoints
     public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
     {
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $this->endpoint_factory->delete($datatype, $endpoint);
+        $this->endpoint_factory->deleteOne($datatype, $endpoint);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

@@ -16,52 +16,68 @@ use IteratorIterator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use MongoDB\Operation\Find;
+use Psr\Log\LoggerInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Async\Sync;
 use Tubee\Job;
 use Tubee\Job\Error\ErrorInterface;
+use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Resource\Factory as ResourceFactory;
 
 class Factory extends ResourceFactory
 {
     /**
-     * Database.
-     *
-     * @var Database
+     * Collection name.
      */
-    protected $db;
+    public const COLLECTION_NAME = 'jobs';
 
     /**
-     * Datatype.
+     * Job scheduler.
      *
-     * @var DataTypeFactory
+     * @var Scheduler
      */
-    protected $datatype;
+    protected $scheduler;
 
     /**
      * Initialize.
      */
-    public function __construct(Database $db, Scheduler $scheduler)
+    public function __construct(Database $db, Scheduler $scheduler, ProcessFactory $process_factory, LoggerInterface $logger)
     {
-        $this->db = $db;
         $this->scheduler = $scheduler;
+        $this->process_factory = $process_factory;
+        parent::__construct($db, $logger);
     }
 
     /**
-     * Get jobs.
+     * Get all.
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->jobs->find((array) $query, [
+        $result = $this->db->{self::COLLECTION_NAME}->find((array) $query, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $job) {
-            yield (string) $job['_id'] => new Job($job);
+            yield (string) $job['_id'] => $this->build($job);
         }
 
-        return $this->db->jobs->count((array) $query);
+        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
+    }
+
+    /**
+     * Delete by name.
+     */
+    public function deleteOne(ObjectId $id): bool
+    {
+        try {
+            $this->scheduler->cancelJob($id);
+        } catch (\Exception $e) {
+        }
+
+        $resource = $this->getOne($id);
+
+        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $id);
     }
 
     /**
@@ -69,25 +85,39 @@ class Factory extends ResourceFactory
      */
     public function getOne(ObjectId $job): JobInterface
     {
-        $result = $this->db->jobs->findOne(['_id' => $job]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne(['_id' => $job]);
 
         if ($result === null) {
             throw new Exception\NotFound('job not found');
         }
 
-        return new Job($result);
+        return $this->build($result);
     }
 
+    /**
+     * Create resource.
+     */
     public function create(array $resource): ObjectId
     {
-        $result = self::addTo($this->db->jobs, $resource);
-        $this->scheduler->addJob(Sync::class, $resource);
+        $options = isset($resource['options']) ? $resource['options'] : [];
+        $result = $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+
+        $resource += ['job' => $result];
+        $this->scheduler->addJob(Sync::class, $resource, $options);
 
         return $result;
     }
 
     /**
-     * Get jobs errors.
+     * Build instance.
+     */
+    public function build(array $resource): JobInterface
+    {
+        return $this->initResource(new Job($resource, $this->process_factory));
+    }
+
+    /**
+     * Get errors.
      */
     public function getErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
@@ -106,7 +136,7 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Get jobs errors.
+     * Get errors.
      */
     public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {

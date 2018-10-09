@@ -77,9 +77,16 @@ class Routes
             $r->addRoute('POST', '/api/v1/jobs', [v1\Jobs::class, 'post']);
             $r->addRoute('GET', '/api/v1/jobs/{job}', [v1\Jobs::class, 'getOne']);
             $r->addRoute('DELETE', '/api/v1/jobs/{job}', [v1\Jobs::class, 'delete']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/errors', [v1\JobErrors::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/jobs/{job}/errors', [v1\JobErrors::class, 'watchAll']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/errors/{error}', [v1\JobErrors::class, 'getOne']);
+            $r->addRoute('GET', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}', [v1\Processes::class, 'getOne']);
+            $r->addRoute('DELETE', '/api/v1/jobs/{job}/processes/{process}', [v1\Processes::class, 'delete']);
+            $r->addRoute('GET', '/api/v1/jobs/{job}/logs', [v1\JobLogs::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/jobs/{job}/logs', [v1\JobLogs::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/jobs/{job}/logs/{log}', [v1\JobLogs::class, 'getOne']);
+            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/logs', [v1\ProcessLogs::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes/{process}/logs', [v1\ProcessLogs::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/(logs/{log}', [v1\ProcessLogs::class, 'getOne']);
+        });
         });
     }
 }

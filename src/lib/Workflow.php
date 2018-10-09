@@ -413,7 +413,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         try {
-            $exists = $datatype->getOne($prefixed, false);
+            $exists = $datatype->getObject($prefixed, false);
         } catch (DataObjectException\MultipleFound $e) {
             throw $e;
         } catch (DataObjectException\NotFound $e) {

@@ -12,9 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Console;
 
 use GetOpt\GetOpt;
-use MongoDB\BSON\ObjectId;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\Yaml\Yaml;
 use TaskScheduler\Queue;
 use TaskScheduler\Scheduler;
 
@@ -60,69 +58,9 @@ class Jobs
     }
 
     /**
-     * Set options.
-     *
-     * @return []
-     */
-    public static function getOptions(): array
-    {
-        return [];
-    }
-
-    /**
-     * Set options.
-     *
-     * @return []
-     */
-    public static function getOperands(): array
-    {
-        return [
-            \GetOpt\Operand::create('action', \GetOpt\Operand::REQUIRED),
-            \GetOpt\Operand::create('mandator', \GetOpt\Operand::REQUIRED),
-            \GetOpt\Operand::create('datatype', \GetOpt\Operand::REQUIRED),
-            \GetOpt\Operand::create('id', \GetOpt\Operand::OPTIONAL),
-        ];
-    }
-
-    public function help()
-    {
-        echo "delete\n";
-        echo "Delete job by id\n\n";
-        echo "listen\n";
-        echo "Start listening for jobs asynchrounsly\n\n";
-        echo "get\n";
-        echo "Query active jobs\n\n";
-        echo $this->getopt->getHelpText();
-    }
-
-    /**
-     * Delete job by id.
-     */
-    public function delete(): Jobs
-    {
-        $id = new ObjectId($this->getopt->getOperand('id'));
-        $this->scheduler->cancelJob($id);
-
-        return $this;
-    }
-
-    /**
-     * List active jobs.
-     */
-    public function get(): Jobs
-    {
-        foreach ($this->scheduler->getJobs() as $job) {
-            echo Yaml::dump($job, 2, 4);
-            echo "\n";
-        }
-
-        return $this;
-    }
-
-    /**
      * Fire up daemon.
      */
-    public function listen(): bool
+    public function __invoke(): bool
     {
         $this->logger->info('start taskscheduler queue listener', [
             'category' => get_class($this),
@@ -131,5 +69,21 @@ class Jobs
         $this->queue->process();
 
         return true;
+    }
+
+    /**
+     * Get options.
+     */
+    public static function getOptions(): array
+    {
+        return [];
+    }
+
+    /**
+     * Get operands.
+     */
+    public static function getOperands(): array
+    {
+        return [];
     }
 }

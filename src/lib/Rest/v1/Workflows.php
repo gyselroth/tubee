@@ -101,7 +101,7 @@ class Workflows
     {
         $mandator = $this->mandator_factory->getOne($mandator);
         $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
-        $this->workflow_factory->delete($endpoint, $workflow);
+        $this->workflow_factory->deleteOne($endpoint, $workflow);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

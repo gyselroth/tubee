@@ -55,7 +55,7 @@ class Factory
         $result = $collection->insertOne($resource);
         $id = $result->getInsertedId();
 
-        $this->logger->info('created new resource ['.$id.'] in ['.$collection->getName().']', [
+        $this->logger->info('created new resource ['.$id.'] in ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
         ]);
 
@@ -65,15 +65,15 @@ class Factory
     /**
      * Delete resource.
      */
-    public function deleteFrom(Collection $collection, array $resource, array $filter): ObjectId
+    public function deleteFrom(Collection $collection, ObjectId $id): bool
     {
-        $result = $collection->deleteOne($filter);
-
-        $this->logger->info('removed resource ['.$filter.'] from ['.$collection->getName().']', [
+        $this->logger->info('delete resource ['.$id.'] from ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
         ]);
 
-        return $result->getInsertedId();
+        $result = $collection->deleteOne(['_id' => $id]);
+
+        return true;
     }
 
     /**

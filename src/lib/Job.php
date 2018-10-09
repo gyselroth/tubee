@@ -11,42 +11,31 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use Generator;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Job\JobInterface;
+use Tubee\Process\Factory as ProcessFactory;
+use Tubee\Process\ProcessInterface;
+use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
-class Job implements JobInterface
+class Job extends AbstractResource implements JobInterface
 {
     /**
-     * Job.
+     * Scheduler.
      *
-     * @var array
+     * @var Scheduler
      */
-    protected $resource;
+    protected $scheduler;
 
     /**
      * Data object.
      */
-    public function __construct(array $resource)
+    public function __construct(array $resource, ProcessFactory $process_factory)
     {
         $this->resource = $resource;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getId(): ObjectId
-    {
-        return $this->resource['_id'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray(): array
-    {
-        return $this->resource;
+        $this->process_factory = $process_factory;
     }
 
     /**
@@ -54,22 +43,46 @@ class Job implements JobInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $job = array_intersect_key($this->resource, array_flip(['at', 'interval', 'retry', 'retry_interval', 'created', 'status', 'resource', 'class', 'data']));
+        $options = $this->resource['options'];
+        $scheduler = $this->scheduler;
+        $resource = $this->resource;
 
-        $resource = [
+        $result = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Job',
-            'id' => (string) $this->getId(),
+            'options' => [
+                'at' => $options['at'],
+                'interval' => $options['interval'],
+                'retry' => $options['retry'],
+                'retry_interval' => $options['retry_interval'],
+                'timeout' => $options['timeout'],
+            ],
+            'data' => $this->resource,
+            'status' => function () use ($scheduler) {
+                /*$cursor = $scheduler->getJobs([
+                    'data.job' => $resource['_job']
+                ]);*/
+            },
         ];
 
-        if (isset($job['at'])) {
-            $job['at'] = $job['at']->toDateTime()->format('c');
-        }
+        return AttributeResolver::resolve($request, $this, $result);
+    }
 
-        $resource = array_merge($resource, $job);
+    /**
+     * {@inheritdoc}
+     */
+    public function getProcesses(): Generator
+    {
+        return $this->process_factory->getAll($this);
+    }
 
-        return AttributeResolver::resolve($request, $this, $resource);
+    /**
+     * {@inheritdoc}
+     */
+    public function getProcess(ObjectId $id): ProcessInterface
+    {
+        return $this->process_factory->getOne($this, $id);
     }
 }

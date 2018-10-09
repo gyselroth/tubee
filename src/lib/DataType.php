@@ -405,7 +405,7 @@ class DataType extends AbstractResource implements DataTypeInterface
             $ep->setup($simulate);
         }
 
-        foreach ($this->getAll($filter) as $id => $object) {
+        foreach ($this->getObjects($filter) as $id => $object) {
             $this->logger->debug('process write for object ['.(string) $id.'] from data type ['.$this->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
@@ -603,7 +603,7 @@ class DataType extends AbstractResource implements DataTypeInterface
                 ],
         ];
 
-        foreach ($this->getAll($filter, false) as $id => $object) {
+        foreach ($this->getObjects($filter, false) as $id => $object) {
             $this->logger->debug('process garbage workflows for garbage object ['.$id.'] from data type ['.$this->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
