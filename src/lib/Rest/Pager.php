@@ -41,8 +41,10 @@ class Pager
             }
         }
 
-        if ($total === null && $data instanceof Generator) {
+        if ($data instanceof Generator) {
             $total = $data->getReturn();
+        } else {
+            $total = null;
         }
 
         $data = [

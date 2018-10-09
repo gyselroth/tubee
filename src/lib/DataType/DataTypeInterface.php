@@ -52,12 +52,12 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Get one.
      */
-    public function getOne(array $filter, bool $include_dataset = false, int $version = 0): DataObjectInterface;
+    public function getObject(array $filter, bool $include_dataset = false, int $version = 0): DataObjectInterface;
 
     /**
      * Get all data objects.
      */
-    public function getAll(array $filter, bool $include_dataset = false, ?int $offset = null, ?int $limit = null): Generator;
+    public function getObjects(array $filter, bool $include_dataset = false, ?int $offset = null, ?int $limit = null): Generator;
 
     /**
      * Write to destination endpoints.
@@ -77,7 +77,7 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Create object.
      */
-    public function create(array $object, bool $simulate, array $endpoints): ObjectId;
+    public function createObject(array $object, bool $simulate, array $endpoints): ObjectId;
 
     /**
      * Enable object.
@@ -92,12 +92,12 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Change object.
      */
-    public function change(DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int;
+    public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int;
 
     /**
      * Delete object.
      */
-    public function delete(ObjectId $id, bool $simulate = false): bool;
+    public function deleteObject(ObjectId $id, bool $simulate = false): bool;
 
     /**
      * Get identifier.

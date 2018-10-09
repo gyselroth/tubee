@@ -28,7 +28,7 @@ class Mandators
      */
     public function __construct(MandatorFactory $mandator, Acl $acl)
     {
-        $this->mandator = $mandator;
+        $this->mandator_factory = $mandator;
         $this->acl = $acl;
     }
 
@@ -43,7 +43,7 @@ class Mandators
             'query' => [],
         ], $request->getQueryParams());
 
-        $mandators = $this->mandator->getAll($query['query'], (int) $query['offset'], (int) $query['limit']);
+        $mandators = $this->mandator_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit']);
         $body = $this->acl->filterOutput($request, $identity, $mandators);
         $body = Pager::fromRequest($body, $request);
 
@@ -63,7 +63,7 @@ class Mandators
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->mandator->getOne($mandator)->decorate($request),
+            $this->mandator_factory->getOne($mandator)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -74,11 +74,11 @@ class Mandators
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $id = $this->mandator->add($body);
+        $id = $this->mandator_factory->add($body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->mandator->getOne($body['name'])->decorate($request),
+            $this->mandator_factory->getOne($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

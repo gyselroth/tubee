@@ -23,6 +23,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Factory extends ResourceFactory
 {
     /**
+     * Collection name.
+     */
+    public const COLLECTION_NAME = 'endpoints';
+
+    /**
      * Database.
      *
      * @var Database
@@ -34,7 +39,7 @@ class Factory extends ResourceFactory
      *
      * @var WorkflowFactory
      */
-    protected $workflow;
+    protected $workflow_factory;
 
     /**
      * Logger.
@@ -46,11 +51,11 @@ class Factory extends ResourceFactory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, WorkflowFactory $workflow, LoggerInterface $logger)
+    public function __construct(Database $db, WorkflowFactory $workflow_factory, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->logger = $logger;
-        $this->workflow = $workflow;
+        $this->workflow_factory = $workflow_factory;
     }
 
     /**
@@ -58,7 +63,7 @@ class Factory extends ResourceFactory
      */
     public function has(DataTypeInterface $datatype, string $name): bool
     {
-        return $this->db->endpoints->count([
+        return $this->db->{self::COLLECTION_NAME}->count([
             'name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
@@ -81,16 +86,16 @@ class Factory extends ResourceFactory
             ];
         }
 
-        $result = $this->db->endpoints->find($filter, [
+        $result = $this->db->{self::COLLECTION_NAME}->find($filter, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['name'] => self::build($resource, $datatype, $this->workflow, $this->logger);
+            yield (string) $resource['name'] => $this->build($resource, $datatype);
         }
 
-        return $this->db->endpoints->count((array) $query);
+        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
     }
 
     /**
@@ -98,7 +103,7 @@ class Factory extends ResourceFactory
      */
     public function getOne(DataTypeInterface $datatype, string $name): EndpointInterface
     {
-        $result = $this->db->endpoints->findOne([
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
             'name' => $name,
             'mandator' => $datatype->getMandator()->getName(),
             'datatype' => $datatype->getName(),
@@ -108,25 +113,17 @@ class Factory extends ResourceFactory
             throw new Exception\NotFound('endpoint '.$name.' is not registered');
         }
 
-        return self::build($result, $datatype, $this->workflow, $this->logger);
+        return $this->build($result, $datatype);
     }
 
     /**
      * Delete by name.
      */
-    public function delete(DataTypeInterface $datatype, string $name): bool
+    public function deleteOne(DataTypeInterface $datatype, string $name): bool
     {
-        if (!$this->has($datatype, $name)) {
-            throw new Exception\NotFound('endpoint '.$name.' does not exists');
-        }
+        $resource = $this->getOne($datatype, $name);
 
-        $this->db->endpoints->deleteOne([
-            'name' => $name,
-            'mandator' => $datatype->getMandator()->getName(),
-            'datatype' => $datatype->getName(),
-        ]);
-
-        return true;
+        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $name);
     }
 
     /**
@@ -146,16 +143,47 @@ class Factory extends ResourceFactory
         $resource['mandator'] = $datatype->getMandator()->getName();
         $resource['datatype'] = $datatype->getName();
 
-        return parent::addTo($this->db->endpoints, $resource);
+        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+    }
+
+    /**
+     * Ensure indexes.
+     */
+    public function ensureIndex(array $fields): string
+    {
+        $list = iterator_to_array($this->db->{$this->collection}->listIndexes());
+        $keys = array_fill_keys($fields, 1);
+
+        $this->logger->debug('verify if mongodb index exists for import attributes [{import}]', [
+            'category' => get_class($this),
+            'import' => $keys,
+        ]);
+
+        foreach ($list as $index) {
+            if ($index['key'] === $keys) {
+                $this->logger->debug('found existing mongodb index ['.$index['name'].'] for import attributes', [
+                    'category' => get_class($this),
+                    'import' => $keys,
+                ]);
+
+                return $index['name'];
+            }
+        }
+
+        $this->logger->info('create new mongodb index for import attributes', [
+            'category' => get_class($this),
+        ]);
+
+        return $this->db->{$this->collection}->createIndex($keys);
     }
 
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger)
+    public function build(array $resource, DataTypeInterface $datatype)
     {
         $factory = $resource['class'].'\\Factory';
 
-        return $factory::build($resource, $datatype, $workflow, $logger);
+        return $this->initResource($factory::build($resource, $datatype, $this->workflow_factory, $this->logger));
     }
 }

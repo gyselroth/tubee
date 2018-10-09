@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Tubee;
 
 use InvalidArgumentException;
-use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -23,11 +22,12 @@ use Tubee\DataObject\Exception as DataObjectException;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception as EndpointException;
+use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 use Tubee\Workflow\Exception;
 use Tubee\Workflow\WorkflowInterface;
 
-class Workflow implements WorkflowInterface
+class Workflow extends AbstractResource implements WorkflowInterface
 {
     /**
      * Workflow name.
@@ -70,11 +70,6 @@ class Workflow implements WorkflowInterface
     protected $condition;
 
     /**
-     * Resource.
-     */
-    protected $resource;
-
-    /**
      * Expression.
      *
      * @var ExpressionLanguage
@@ -108,22 +103,6 @@ class Workflow implements WorkflowInterface
     public function getName(): string
     {
         return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getId(): ObjectId
-    {
-        return $this->resource['_id'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray(): array
-    {
-        return $this->resource;
     }
 
     /**
@@ -244,6 +223,7 @@ class Workflow implements WorkflowInterface
             break;
             case WorkflowInterface::ENSURE_DISABLED:
                 $datatype->disable($exists->getId(), $simulate);
+                $this->importRelations($exists, $map);
 
                 return true;
 
@@ -255,7 +235,8 @@ class Workflow implements WorkflowInterface
                     ],
                 ];
 
-                $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                $id = $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                $this->importRelations($datatype->getOne(['_id' => $id]), $map);
 
                 return true;
 
@@ -266,6 +247,7 @@ class Workflow implements WorkflowInterface
                 $endoints = [];
                 $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = $object_ts;
                 $datatype->change($exists, $object, $simulate, $endpoints);
+                $this->importRelations($exists, $map);
 
                 return true;
 
@@ -365,6 +347,23 @@ class Workflow implements WorkflowInterface
         }
 
         return false;
+    }
+
+    protected function importRelations(DataObjectInterface $object, array $data): bool
+    {
+        foreach ($this->map->getMap() as $name => $definition) {
+            if (isset($definition['map'])) {
+                $mandator = $this->endpoint->getDataType()->getMandator();
+                $datatype = $mandator->getDataType($definition['datatype']);
+                $relative = $datatype->getOne([
+                    $definition['map']['to'] => $data[$name],
+                ]);
+
+                $object->createRelation($relative);
+            }
+        }
+
+        return true;
     }
 
     /**

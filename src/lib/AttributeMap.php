@@ -279,8 +279,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Require regex value.
-     *
-     * @param iterable|string $value
      */
     protected function requireRegex($value, string $attribute, string $regex): bool
     {

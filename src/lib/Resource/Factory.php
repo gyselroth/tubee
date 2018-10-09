@@ -15,15 +15,16 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Database;
+use Psr\Log\LoggerInterface;
 
 class Factory
 {
     /**
-     * Event types.
+     * Logger.
+     *
+     * @var LoggerInterface
      */
-    /*public const EVENT_ADD = 'ADD';
-    public const EVENT_DELETE = 'DELETE';
-    public const EVENT_UPDATE = 'UPDATE';*/
+    protected $logger;
 
     /**
      * Database.
@@ -35,24 +36,11 @@ class Factory
     /**
      * Initialize.
      */
-    public function __construct(Database $db)
+    public function __construct(Database $db, LoggerInterface $logger)
     {
         $this->db = $db;
+        $this->logger = $logger;
     }
-
-    /**
-     * Add resource.
-     */
-    /*public function addEvent(Collection $collection, string $type, ObjectId $id): ObjectId
-    {
-        $result = $this->db->events->insertOne([
-            'collection' => $collection->getCollectionName(),
-            'object' => $id,
-            'type' => $type,
-        ]);
-
-        return $result->getInsertedId();
-    }*/
 
     /**
      * Add resource.
@@ -65,9 +53,13 @@ class Factory
         ];
 
         $result = $collection->insertOne($resource);
-        $this->addEvent($collection, self::EVENT_ADD, $result->getInsertedId());
+        $id = $result->getInsertedId();
 
-        return $result->getInsertedId();
+        $this->logger->info('created new resource ['.$id.'] in ['.$collection->getName().']', [
+            'category' => get_class($this),
+        ]);
+
+        return $id;
     }
 
     /**
@@ -76,8 +68,23 @@ class Factory
     public function deleteFrom(Collection $collection, array $resource, array $filter): ObjectId
     {
         $result = $collection->deleteOne($filter);
-        //$this->addEvent($collection->getName(), self::EVENT_DELETE, $result->getInsertedId());
+
+        $this->logger->info('removed resource ['.$filter.'] from ['.$collection->getName().']', [
+            'category' => get_class($this),
+        ]);
 
         return $result->getInsertedId();
+    }
+
+    /**
+     * Build.
+     */
+    public function initResource(ResourceInterface $resource)
+    {
+        $this->logger->debug('initialized resource ['.$resource->getId().'] as ['.get_class($resource).']', [
+            'category' => get_class($this),
+        ]);
+
+        return $resource;
     }
 }

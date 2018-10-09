@@ -11,14 +11,16 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use Generator;
 use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
-class DataObject implements DataObjectInterface
+class DataObject extends AbstractResource implements DataObjectInterface
 {
     /**
      * Resource.
@@ -43,26 +45,11 @@ class DataObject implements DataObjectInterface
     /**
      * Data object.
      */
-    public function __construct(array $resource, DataTypeInterface $datatype)
+    public function __construct(array $resource, DataTypeInterface $datatype, DataObjectRelationFactory $relation_factory)
     {
         $this->resource = array_merge($this->resource, $resource);
         $this->datatype = $datatype;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getId(): ObjectId
-    {
-        return $this->resource['_id'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray(): array
-    {
-        return $this->resource;
+        $this->relation_factory = $relation_factory;
     }
 
     /**
@@ -105,38 +92,6 @@ class DataObject implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function getVersion(): int
-    {
-        return $this->resource['version'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getChanged(): ?UTCDateTime
-    {
-        return $this->resource['changed'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCreated(): UTCDateTime
-    {
-        return $this->resource['created'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDeleted(): ?UTCDateTime
-    {
-        return $this->resource['deleted'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getData(): array
     {
         return $this->resource['data'];
@@ -156,5 +111,21 @@ class DataObject implements DataObjectInterface
     public function getEndpoints(): array
     {
         return $this->resource['endpoints'];
+    }
+
+    /**
+     * Add relation.
+     */
+    public function createRelation(DataTypeInterface $datatype, DataObjectInterface $object, array $context = []): ObjectId
+    {
+        return $this->relation_factory->create($this, $object, $context);
+    }
+
+    /**
+     * Get relatives.
+     */
+    public function getRelatives(): Generator
+    {
+        return $this->relation_factory->getAll($this);
     }
 }

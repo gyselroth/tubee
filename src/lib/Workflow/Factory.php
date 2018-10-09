@@ -25,11 +25,9 @@ use Tubee\Workflow\Validator as WorkflowValidator;
 class Factory extends ResourceFactory
 {
     /**
-     * Database.
-     *
-     * @var Database
+     * Collection name.
      */
-    protected $db;
+    public const COLLECTION_NAME = 'workflows';
 
     /**
      * Expression lang.
@@ -39,19 +37,11 @@ class Factory extends ResourceFactory
     protected $script;
 
     /**
-     * Logger.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * Initialize.
      */
     public function __construct(Database $db, ExpressionLanguage $script, LoggerInterface $logger)
     {
-        $this->db = $db;
-        $this->logger = $logger;
+        parent::__construct($db, $logger);
         $this->script = $script;
     }
 
@@ -60,7 +50,7 @@ class Factory extends ResourceFactory
      */
     public function has(EndpointInterface $endpoint, string $name): bool
     {
-        return $this->db->workflows->count([
+        return $this->db->{self::COLLECTION_NAME}->count([
             'name' => $name,
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
@@ -85,16 +75,16 @@ class Factory extends ResourceFactory
             ];
         }
 
-        $result = $this->db->workflows->find($filter, [
+        $result = $this->db->{self::COLLECTION_NAME}->find($filter, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['name'] => self::build($resource, $endpoint, $this->script, $this->logger);
+            yield (string) $resource['name'] => $this->build($resource, $endpoint);
         }
 
-        return $this->db->workflows->count((array) $query);
+        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
     }
 
     /**
@@ -102,7 +92,7 @@ class Factory extends ResourceFactory
      */
     public function getOne(EndpointInterface $endpoint, string $name): WorkflowInterface
     {
-        $result = $this->db->workflows->findOne([
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
             'name' => $name,
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
             'datatype' => $endpoint->getDataType()->getName(),
@@ -113,26 +103,17 @@ class Factory extends ResourceFactory
             throw new Exception\NotFound('workflow '.$name.' is not registered');
         }
 
-        return self::build($result, $endpoint, $this->script, $this->logger);
+        return $this->build($result, $endpoint);
     }
 
     /**
      * Delete by name.
      */
-    public function delete(EndpointInterface $endpoint, string $name): bool
+    public function deleteOne(EndpointInterface $endpoint, string $name): bool
     {
-        if (!$this->has($endpoint, $name)) {
-            throw new Exception\NotFound('workflow '.$name.' does not exists');
-        }
+        $resource = $this->getOne($endpoint, $name);
 
-        $this->db->workflows->deleteOne([
-            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
-            'datatype' => $endpoint->getDataType()->getName(),
-            'endpoint' => $endpoint->getName(),
-            'name' => $name,
-        ]);
-
-        return true;
+        return $this->deleteFrom($this->db->endpoints, $resource->getId());
     }
 
     /**
@@ -150,16 +131,16 @@ class Factory extends ResourceFactory
         $resource['datatype'] = $endpoint->getDataType()->getName();
         $resource['endpoint'] = $endpoint->getName();
 
-        return parent::addTo($this->db->workflows, $resource);
+        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
      * Build instance.
      */
-    public static function build(array $resource, EndpointInterface $endpoint, ExpressionLanguage $script, LoggerInterface $logger): WorkflowInterface
+    public function build(array $resource, EndpointInterface $endpoint): WorkflowInterface
     {
         $map = new AttributeMap($resource['map'], $script, $logger);
 
-        return new Workflow($resource['name'], $resource['ensure'], $script, $map, $endpoint, $logger, $resource);
+        return $this->initResource(new Workflow($resource['name'], $resource['ensure'], $this->script, $map, $endpoint, $this->logger, $resource));
     }
 }

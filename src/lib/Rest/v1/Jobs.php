@@ -19,7 +19,6 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Acl;
-use Tubee\Async\Sync as SyncJob;
 use Tubee\Job;
 use Tubee\Job\Factory as JobFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
@@ -152,11 +151,11 @@ class Jobs
 
         //validate job requst
         $this->mandator->getAll($job['mandator']);
-        $id = $this->job->addJob(SyncJob::class, $job, $task_set);
+        $id = $this->job->create($job, $task_set);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->job->getTask($id)->decorate($request),
+            $this->job->getOne($id)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

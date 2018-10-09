@@ -28,10 +28,10 @@ class Workflows
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator, WorkflowFactory $workflow, Acl $acl)
+    public function __construct(MandatorFactory $mandator_factory, WorkflowFactory $workflow_factory, Acl $acl)
     {
-        $this->mandator = $mandator;
-        $this->workflow = $workflow;
+        $this->mandator_factory = $mandator_factory;
+        $this->workflow_factory = $workflow_factory;
         $this->acl = $acl;
     }
 
@@ -46,7 +46,7 @@ class Workflows
             'query' => [],
         ], $request->getQueryParams());
 
-        $mandator = $this->mandator->getOne($mandator);
+        $mandator = $this->mandator_factory->getOne($mandator);
         $workflows = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $workflows);
@@ -66,7 +66,7 @@ class Workflows
     {
         $query = $request->getQueryParams();
 
-        $mandator = $this->mandator->getOne($mandator);
+        $mandator = $this->mandator_factory->getOne($mandator);
         $workflow = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflow($workflow);
 
         return new UnformattedResponse(
@@ -83,9 +83,9 @@ class Workflows
     {
         $body = $request->getParsedBody();
 
-        $mandator = $this->mandator->getOne($mandator);
+        $mandator = $this->mandator_factory->getOne($mandator);
         $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
-        $this->workflow->add($endpoint, $body);
+        $this->workflow_factory->add($endpoint, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -99,9 +99,9 @@ class Workflows
      */
     public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
     {
-        $mandator = $this->mandator->getOne($mandator);
+        $mandator = $this->mandator_factory->getOne($mandator);
         $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
-        $this->workflow->delete($endpoint, $workflow);
+        $this->workflow_factory->delete($endpoint, $workflow);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
@@ -114,7 +114,7 @@ class Workflows
         $body = $request->getParsedBody();
         var_dump($body);
 
-        $mandator = $this->mandator->getOne($mandator);
+        $mandator = $this->mandator_factory->getOne($mandator);
         $workflow = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflow($workflow);
         $doc = $workflow->toArray();
 
@@ -123,7 +123,7 @@ class Workflows
         var_dump($patched);
         var_dump(json_decode($patched));
 
-        $this->workflow->update($endpoint, $workflow, $update);
+        $this->workflow_factory->update($endpoint, $workflow, $update);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

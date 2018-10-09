@@ -27,19 +27,23 @@ use Middlewares\JsonPayload;
 use Middlewares\FastRoute;
 use Tubee\Migration;
 use Tubee\Rest\Routes;
+use Tubee\Async\WorkerFactory;
+use TaskScheduler\Queue;
+use TaskScheduler\WorkerFactoryInterface;
+use TaskScheduler\WorkerManager;
 
 return [
     Dispatcher::class => [
         'arguments' => [
             'stack' => [
-                ContentTypeMiddleware::class,
-                ExceptionHandler::class,
-                JsonPayload::class,
-                AuthMiddleware::class,
-                AclMiddleware::class,
-                FastRoute::class,
+                '{'.ContentTypeMiddleware::class.'}',
+                '{'.ExceptionHandler::class.'}',
+                '{'.JsonPayload::class.'}',
+                '{'.AuthMiddleware::class.'}',
+                '{'.AclMiddleware::class.'}',
+                '{'.FastRoute::class.'}',
                 //Router::class,
-                RequestHandler::class,
+                '{'.RequestHandler::class.'}',
             ],
             'resolver' => '{'.ContainerResolver::class.'}'
         ],
@@ -55,21 +59,33 @@ return [
                 ]
             ],
             ContentTypeMiddleware::class => [
-                'factory' => [
-                    'method' => 'fromRecommendedSettings',
-                    'arguments' => [
-                        'formats' => [
-                            'json' => [
-                                'extension' => ['json'],
-                                'mime-type' => ['application/json', 'text/json', 'application/x-json'],
-                                'charset' => true,
-                            ],
+                'factory' => 'fromRecommendedSettings',
+                'arguments' => [
+                    'formats' => [
+                        'json' => [
+                            'extension' => ['json'],
+                            'mime-type' => ['application/json', 'text/json', 'application/x-json'],
+                            'charset' => true,
                         ],
-                        'formatters' => [
-                            'application/json' => '{'.Json::class.'}',
-                        ],
-                    ]
+                    ],
+                    'formatters' => [
+                       'application/json' => '{'.Json::class.'}',
+                    ],
                 ],
+            ]
+        ]
+    ],
+    Queue::class => [
+        'services' => [
+            WorkerFactoryInterface::class => [
+                'use' => WorkerFactory::class
+            ]
+        ]
+    ],
+    WorkerManager::class => [
+        'services' => [
+            WorkerFactoryInterface::class => [
+                'use' => WorkerFactory::class
             ]
         ]
     ],

@@ -14,34 +14,33 @@ namespace Tubee\Mandator;
 use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
+use Psr\Log\LoggerInterface;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator;
+use Tubee\Mandator\Validator as MandatorValidator;
 use Tubee\Resource\Factory as ResourceFactory;
-use Tubee\Resource\Validator as ResourceValidator;
 
 class Factory extends ResourceFactory
 {
     /**
-     * Database.
-     *
-     * @var Database
+     * Collection name.
      */
-    protected $db;
+    public const COLLECTION_NAME = 'mandators';
 
     /**
      * Datatype.
      *
      * @var DataTypeFactory
      */
-    protected $datatype;
+    protected $datatype_factory;
 
     /**
      * Initialize.
      */
-    public function __construct(Database $db, DataTypeFactory $datatype)
+    public function __construct(Database $db, DataTypeFactory $datatype_factory, LoggerInterface $logger)
     {
-        $this->db = $db;
-        $this->datatype = $datatype;
+        $this->datatype_factory = $datatype_factory;
+        parent::__construct($db, $logger);
     }
 
     /**
@@ -49,24 +48,24 @@ class Factory extends ResourceFactory
      */
     public function has(string $name): bool
     {
-        return $this->db->mandators->count(['name' => $name]) > 0;
+        return $this->db->{self::COLLECTION_NAME}->count(['name' => $name]) > 0;
     }
 
     /**
-     * Get mandators.
+     * Get all.
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->mandators->find((array) $query, [
+        $result = $this->db->{self::COLLECTION_NAME}->find((array) $query, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['name'] => self::build($resource, $this->datatype);
+            yield (string) $resource['name'] => $this->build($resource);
         }
 
-        return $this->db->mandators->count((array) $query);
+        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
     }
 
     /**
@@ -74,27 +73,23 @@ class Factory extends ResourceFactory
      */
     public function getOne(string $name): MandatorInterface
     {
-        $result = $this->db->mandators->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
 
         if ($result === null) {
             throw new Exception\NotFound('mandator '.$name.' is not registered');
         }
 
-        return self::build($result, $this->datatype);
+        return $this->build($result);
     }
 
     /**
      * Delete by name.
      */
-    public function delete(string $name): bool
+    public function deleteOne(string $name): bool
     {
-        if (!$this->has($name)) {
-            throw new Exception\NotFound('endpoint '.$name.' does not exists');
-        }
+        $resource = $this->getOne($name);
 
-        $this->db->mandators->deleteOne(['name' => $name]);
-
-        return true;
+        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -102,20 +97,20 @@ class Factory extends ResourceFactory
      */
     public function add(array $resource): ObjectId
     {
-        ResourceValidator::validate($resource);
+        MandatorValidator::validate($resource);
 
         if ($this->has($resource['name'])) {
             throw new Exception\NotUnique('mandator '.$resource['name'].' does already exists');
         }
 
-        return parent::addTo($this->db->mandators, $resource);
+        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeFactory $datatype): MandatorInterface
+    public function build(array $resource): MandatorInterface
     {
-        return new Mandator($resource['name'], $datatype, $resource);
+        return $this->initResource(new Mandator($resource['name'], $this->datatype_factory, $resource));
     }
 }

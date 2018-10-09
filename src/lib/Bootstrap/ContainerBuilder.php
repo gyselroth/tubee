@@ -12,8 +12,10 @@ declare(strict_types=1);
 namespace Tubee\Bootstrap;
 
 use Composer\Autoload\ClassLoader as Composer;
+use ErrorException;
 use Micro\Container\Container;
 use Noodlehaus\Config;
+use Psr\Log\LoggerInterface;
 
 class ContainerBuilder
 {
@@ -24,7 +26,8 @@ class ContainerBuilder
     {
         $config = self::loadConfig();
         $container = new Container($config);
-        $container->add(get_class($composer), $composer);
+
+        self::setErrorHandler($container->get(LoggerInterface::class));
 
         return $container;
     }
@@ -41,5 +44,40 @@ class ContainerBuilder
         }
 
         return new Config($configs);
+    }
+
+    /**
+     * Set error handler.
+     */
+    protected static function setErrorHandler(LoggerInterface $logger): void
+    {
+        set_error_handler(function ($severity, $message, $file, $line) use ($logger) {
+            $log = $message.' in '.$file.':'.$line;
+
+            switch ($severity) {
+                case E_ERROR:
+                case E_USER_ERROR:
+                    $logger->error($log, [
+                        'category' => self::class,
+                    ]);
+
+                break;
+                case E_WARNING:
+                case E_USER_WARNING:
+                    $logger->warning($log, [
+                        'category' => self::class,
+                    ]);
+
+                break;
+                default:
+                    $logger->debug($log, [
+                        'category' => self::class,
+                    ]);
+
+                break;
+            }
+
+            throw new ErrorException($message, 0, $severity, $file, $line);
+        });
     }
 }

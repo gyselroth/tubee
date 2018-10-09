@@ -50,6 +50,8 @@ class Validator
                     }
 
                 break;
+                case 'map':
+                break;
 
                 break;
                 case 'from':

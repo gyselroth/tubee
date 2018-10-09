@@ -26,9 +26,9 @@ class AccessRoles
     /**
      * Init.
      */
-    public function __construct(AccessRoleFactory $role, Acl $acl)
+    public function __construct(AccessRoleFactory $role_factory, Acl $acl)
     {
-        $this->role = $role;
+        $this->role_factory = $role_factory;
         $this->acl = $acl;
     }
 
@@ -43,7 +43,7 @@ class AccessRoles
             'query' => [],
         ], $request->getQueryParams());
 
-        $roles = $this->role->getAll($query['query'], $query['offset'], $query['limit']);
+        $roles = $this->role_factory->getAll($query['query'], $query['offset'], $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $roles);
         $body = Pager::fromRequest($body, $request);
@@ -75,8 +75,8 @@ class AccessRoles
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $id = $this->role->add($body);
-        $role = $this->role->getOne($body['name']);
+        $id = $this->role_factory->add($body);
+        $role = $this->role_factory->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -106,9 +106,9 @@ class AccessRoles
     {
         $body = $request->getParsedBody();
 
-        if ($this->role->has()) {
-            $this->role->update($role, $body);
-            $role = $this->role->getOne($role);
+        if ($this->role_factory->has()) {
+            $this->role_factory->update($role, $body);
+            $role = $this->role_factory->getOne($role);
 
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
@@ -118,8 +118,8 @@ class AccessRoles
         }
 
         $body['name'] = $role;
-        $id = $this->role->add($body);
-        $role = $this->role->getOne($body['name']);
+        $id = $this->role_factory->add($body);
+        $role = $this->role_factory->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -133,7 +133,7 @@ class AccessRoles
      */
     public function delete(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
-        $this->role->delete($role);
+        $this->role_factory->delete($role);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

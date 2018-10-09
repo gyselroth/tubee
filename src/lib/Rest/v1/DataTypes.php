@@ -27,10 +27,10 @@ class DataTypes
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator, DataTypeFactory $datatype, Acl $acl)
+    public function __construct(MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, Acl $acl)
     {
-        $this->mandator = $mandator;
-        $this->datatype = $datatype;
+        $this->mandator_factory = $mandator_factory;
+        $this->datatype_factory = $datatype_factory;
         $this->acl = $acl;
     }
 
@@ -45,8 +45,8 @@ class DataTypes
             'query' => [],
         ], $request->getQueryParams());
 
-        $mandator = $this->mandator->getOne($mandator);
-        $datatypes = $this->datatype->getAll($mandator, $query['query'], (int) $query['offset'], (int) $query['limit']);
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $datatypes = $mandator->getDataTypes($query['query'], (int) $query['offset'], (int) $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $datatypes);
         $body = Pager::fromRequest($body, $request);
@@ -65,8 +65,8 @@ class DataTypes
     {
         $query = $request->getQueryParams();
 
-        $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $datatype = $mandator->getDataType($datatype);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
@@ -82,12 +82,12 @@ class DataTypes
     {
         $body = $request->getParsedBody();
 
-        $mandator = $this->mandator->getOne($mandator);
-        $id = $this->datatype->add($mandator, $body);
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $id = $this->datatype_factory->add($mandator, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->datatype->getOne($mandator, $body['name'])->decorate($request),
+            $$this->datatype_factory->getOne($mandator, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

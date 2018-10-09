@@ -13,33 +13,22 @@ namespace Tubee\AccessRole;
 
 use Generator;
 use MongoDB\BSON\ObjectId;
-use MongoDB\Database;
 use Tubee\AccessRole;
 use Tubee\Resource\Factory as ResourceFactory;
 
 class Factory extends ResourceFactory
 {
     /**
-     * Database.
-     *
-     * @var Database
+     * Collection name.
      */
-    protected $db;
-
-    /**
-     * Initialize.
-     */
-    public function __construct(Database $db)
-    {
-        $this->db = $db;
-    }
+    public const COLLECTION_NAME = 'access_roles';
 
     /**
      * Has resource.
      */
     public function has(string $name): bool
     {
-        return $this->db->access_roles->count(['name' => $name]) > 0;
+        return $this->db->{self::COLLECTION_NAME}->count(['name' => $name]) > 0;
     }
 
     /**
@@ -47,16 +36,16 @@ class Factory extends ResourceFactory
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->access_roles->find((array) $query, [
+        $result = $this->db->{self::COLLECTION_NAME}->find((array) $query, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['name'] => self::build($resource);
+            yield (string) $resource['name'] => $this->build($resource);
         }
 
-        return $this->db->access_roles->count((array) $query);
+        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
     }
 
     /**
@@ -64,25 +53,22 @@ class Factory extends ResourceFactory
      */
     public function getOne(string $name): AccessRoleInterface
     {
-        $result = $this->db->access_roles->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
 
         if ($result === null) {
             throw new Exception\NotFound('access role '.$name.' is not registered');
         }
 
-        return self::build($result);
+        return $this->build($result);
     }
 
     /**
      * Delete by name.
      */
-    public function delete(string $name): bool
+    public function deleteOne(string $name): bool
     {
-        if (!$this->has($name)) {
-            throw new Exception\NotFound('access role '.$name.' does not exists');
-        }
-
-        $this->db->access_roles->deleteOne(['name' => $name]);
+        $resource = $this->getOne($name);
+        $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
 
         return true;
     }
@@ -98,14 +84,14 @@ class Factory extends ResourceFactory
             throw new Exception\NotUnique('access role '.$resource['name'].' does already exists');
         }
 
-        return parent::addTo($this->db->access_roles, $resource);
+        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
      * Build instance.
      */
-    public static function build(array $resource): AccessRoleInterface
+    public function build(array $resource): AccessRoleInterface
     {
-        return new AccessRole($resource);
+        return $this->initResource(new AccessRole($resource));
     }
 }

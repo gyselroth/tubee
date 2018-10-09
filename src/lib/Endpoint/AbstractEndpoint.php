@@ -13,16 +13,16 @@ namespace Tubee\Endpoint;
 
 use Generator;
 use InvalidArgumentException;
-use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Helper;
+use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 use Tubee\Workflow\Factory as WorkflowFactory;
 use Tubee\Workflow\WorkflowInterface;
 
-abstract class AbstractEndpoint implements EndpointInterface
+abstract class AbstractEndpoint extends AbstractResource implements EndpointInterface
 {
     /**
      * Endpoint name.
@@ -86,13 +86,6 @@ abstract class AbstractEndpoint implements EndpointInterface
      * @var bool
      */
     protected $history = false;
-
-    /**
-     * Resource.
-     *
-     * @var array
-     */
-    protected $resource = [];
 
     /**
      * Init endpoint.
@@ -161,22 +154,6 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function getId(): ObjectId
-    {
-        return $this->resource['_id'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray(): array
-    {
-        return $this->resource;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function decorate(ServerRequestInterface $request): array
     {
         $datatype = $this->getDataType();
@@ -191,8 +168,8 @@ abstract class AbstractEndpoint implements EndpointInterface
             'kind' => 'Endpoint',
             'name' => $this->name,
             'type' => $this->type,
-            'data_options' => [
-                'options' => $this->options,
+            'resource' => $this->resource['resource'],
+            'data' => [
                 'import' => $this->import,
                 'history' => $this->history,
                 'flush' => $this->flush,

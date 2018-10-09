@@ -26,9 +26,9 @@ class AccessRules
     /**
      * Init.
      */
-    public function __construct(AccessRuleFactory $rule, Acl $acl)
+    public function __construct(AccessRuleFactory $rule_factory, Acl $acl)
     {
-        $this->rule = $rule;
+        $this->rule_factory_factory = $rule_factory;
         $this->acl = $acl;
     }
 
@@ -43,7 +43,7 @@ class AccessRules
             'query' => [],
         ], $request->getQueryParams());
 
-        $rules = $this->rule->getAll($query['query'], $query['offset'], $query['limit']);
+        $rules = $this->rule_factory->getAll($query['query'], $query['offset'], $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $rules);
         $body = Pager::fromRequest($body, $request);
@@ -64,7 +64,7 @@ class AccessRules
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->rule->getOne($rule)->decorate($request),
+            $this->rule_factory->getOne($rule)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -75,8 +75,8 @@ class AccessRules
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $id = $this->rule->add($body);
-        $rule = $this->rule->getOne($body['name']);
+        $id = $this->rule_factory->add($body);
+        $rule = $this->rule_factory->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -106,9 +106,9 @@ class AccessRules
     {
         $body = $request->getParsedBody();
 
-        if ($this->rule->has($rule)) {
-            $this->rule->update($rule, $body);
-            $rule = $this->rule->getOne($rule);
+        if ($this->rule_factory->has($rule)) {
+            $this->rule_factory->update($rule, $body);
+            $rule = $this->rule_factory->getOne($rule);
 
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
@@ -118,8 +118,8 @@ class AccessRules
         }
 
         $body['name'] = $rule;
-        $id = $this->rule->add($body);
-        $rule = $this->rule->getOne($body['name']);
+        $id = $this->rule_factory->add($body);
+        $rule = $this->rule_factory->getOne($body['name']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -134,7 +134,7 @@ class AccessRules
     public function delete(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
     {
         $body = $request->getParsedBody();
-        $this->rule->delete($rule);
+        $this->rule_factory->delete($rule);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

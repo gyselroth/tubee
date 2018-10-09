@@ -19,14 +19,16 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Exception;
+use Tubee\DataObject\Factory as DataObjectFactory;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 use Tubee\Schema\SchemaInterface;
 
-class DataType implements DataTypeInterface
+class DataType extends AbstractResource implements DataTypeInterface
 {
     /**
      * DataType name.
@@ -78,25 +80,49 @@ class DataType implements DataTypeInterface
     protected $endpoints = [];
 
     /**
-     * Resource.
+     * Dataobject factory.
      *
-     * @var array
+     * @var DataObjectFactory
      */
-    protected $resource;
+    protected $object_factory;
+
+    /**
+     * Endpoint factory.
+     *
+     * @var EndpointFactory
+     */
+    protected $endpoint_factory;
 
     /**
      * Initialize.
      */
-    public function __construct(string $name, MandatorInterface $mandator, EndpointFactory $endpoint, SchemaInterface $schema, Database $db, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, MandatorInterface $mandator, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, SchemaInterface $schema, Database $db, LoggerInterface $logger, array $resource = [])
     {
         $this->resource = $resource;
         $this->name = $name;
         $this->collection = 'objects'.'.'.$mandator->getName().'.'.$name;
         $this->mandator = $mandator;
         $this->schema = $schema;
-        $this->endpoint = $endpoint;
+        $this->endpoint_factory = $endpoint_factory;
         $this->db = $db;
         $this->logger = $logger;
+        $this->object_factory = $object_factory;
+    }
+
+    /**
+     * Get collection.
+     */
+    public function getCollection(): string
+    {
+        return $this->collection;
+    }
+
+    /**
+     * Get schema.
+     */
+    public function getSchema(): SchemaInterface
+    {
+        return $this->schema;
     }
 
     /**
@@ -130,7 +156,7 @@ class DataType implements DataTypeInterface
      */
     public function hasEndpoint(string $name): bool
     {
-        return $this->endpoint->has($this, $name);
+        return $this->endpoint_factory->has($this, $name);
     }
 
     /**
@@ -138,7 +164,7 @@ class DataType implements DataTypeInterface
      */
     public function getEndpoint(string $name): EndpointInterface
     {
-        return $this->endpoint->getOne($this, $name);
+        return $this->endpoint_factory->getOne($this, $name);
     }
 
     /**
@@ -146,7 +172,7 @@ class DataType implements DataTypeInterface
      */
     public function getEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->endpoint->getAll($this, $endpoints, $offset, $limit);
+        return $this->endpoint_factory->getAll($this, $endpoints, $offset, $limit);
     }
 
     /**
@@ -159,7 +185,7 @@ class DataType implements DataTypeInterface
             $query = ['$and' => [$query, $endpoints]];
         }
 
-        return $this->endpoint->getAll($this, $query, $offset, $limit);
+        return $this->endpoint_factory->getAll($this, $query, $offset, $limit);
     }
 
     /**
@@ -172,7 +198,7 @@ class DataType implements DataTypeInterface
             $query = ['$and' => [$query, $endpoints]];
         }
 
-        return $this->endpoint->getAll($this, $query, $offset, $limit);
+        return $this->endpoint_factory->getAll($this, $query, $offset, $limit);
     }
 
     /**
@@ -194,77 +220,17 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getId(): ObjectId
+    public function getObjectHistory(ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->resource['_id'];
+        return $this->object_factory->getObjectHistory($this, $id, $filter, $offset, $limit);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function toArray(): array
+    public function getObject(Iterable $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
-        return $this->resource;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getObjectHistory(ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Iterable
-    {
-        $pipeline = [
-            ['$match' => ['_id' => $id]],
-            ['$unwind' => '$history'],
-        ];
-
-        $count = $pipeline;
-
-        if ($filter !== null) {
-            $pipeline[] = ['$match' => $filter];
-        }
-
-        if ($offset !== null) {
-            $pipeline[] = ['$skip' => $offset];
-        }
-
-        if ($limit !== null) {
-            $pipeline[] = ['$limit' => $limit];
-        }
-
-        foreach ($this->db->{$this->collection}->aggregate($pipeline) as $version) {
-            yield $version['version'] => new DataObject($version, $this);
-        }
-
-        $count[] = ['$count' => 'count'];
-        //return $this->db->{$this->collection}->aggregate($count)['count'];
-        return 1;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getOne(Iterable $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
-    {
-        $pipeline = $this->preparePipeline($filter, $include_dataset, $version);
-
-        $this->logger->debug('find one object with pipeline [{pipeline}] from ['.$this->collection.']', [
-            'category' => get_class($this),
-            'pipeline' => $pipeline,
-        ]);
-
-        $cursor = $this->db->{$this->collection}->aggregate($pipeline, [
-            'allowDiskUse' => true,
-        ]);
-        $objects = iterator_to_array($cursor);
-
-        if (count($objects) === 0) {
-            throw new Exception\NotFound('data object '.json_encode($filter).' not found in collection '.$this->collection);
-        }
-        if (count($objects) > 1) {
-            throw new Exception\MultipleFound('multiple data objects found with filter '.json_encode($filter).' in collection '.$this->collection);
-        }
-
-        return new DataObject(array_shift($objects), $this);
+        return $this->object_factory->getOne($this, $filter, $include_dataset, $version);
     }
 
     /**
@@ -278,64 +244,15 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getAll(Iterable $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
+    public function getObjects(Iterable $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
     {
-        $pipeline = [];
-        if ($include_dataset === true) {
-            $pipeline = $this->dataset;
-            if (count($filter) > 0) {
-                array_unshift($pipeline, ['$match' => $filter]);
-            }
-        } elseif (count($filter) > 0) {
-            $pipeline = [['$match' => $filter]];
-        }
-
-        $found = 0;
-
-        if ($offset !== null) {
-            array_unshift($pipeline, ['$skip' => $offset]);
-        }
-
-        if ($limit !== null) {
-            $pipeline[] = ['$limit' => $limit];
-        }
-
-        if (count($pipeline) === 0) {
-            $this->logger->debug('empty pipeline given (no dataset configuration), collect all objects from ['.$this->collection.'] instead', [
-                'category' => get_class($this),
-            ]);
-            $cursor = $this->db->{$this->collection}->find();
-        } else {
-            $this->logger->debug('aggregate pipeline ['.json_encode($pipeline).'] on collection ['.$this->collection.']', [
-                'category' => get_class($this),
-            ]);
-            $cursor = $this->db->{$this->collection}->aggregate($pipeline, [
-                'allowDiskUse' => true,
-            ]);
-        }
-
-        foreach ($cursor as $object) {
-            ++$found;
-            yield (string) $object['_id'] => new DataObject($object, $this);
-        }
-
-        if ($found === 0) {
-            $this->logger->warning('found no data objects in collection ['.$this->collection.'] with aggregation pipeline ['.json_encode($pipeline).']', [
-                'category' => get_class($this),
-            ]);
-        } else {
-            $this->logger->info('found ['.$found.'] data objects in collection ['.$this->collection.'] with aggregation pipeline ['.json_encode($pipeline).']', [
-                'category' => get_class($this),
-            ]);
-        }
-
-        return $this->db->{$this->collection}->count();
+        return $this->object_factory->getAll($this, $filter, $include_dataset, $offset, $limit);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(Iterable $object, bool $simulate = false, ?array $endpoints = null): ObjectId
+    public function createObject(Iterable $object, bool $simulate = false, ?array $endpoints = null): ObjectId
     {
         $this->schema->validate($object);
 
@@ -351,9 +268,7 @@ class DataType implements DataTypeInterface
         ]);
 
         if ($simulate === false) {
-            $result = $this->db->{$this->collection}->insertOne($object);
-
-            return $result->getInsertedId();
+            return $this->object_factory->create($object);
         }
 
         return new ObjectId();
@@ -398,11 +313,11 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function change(DataObjectInterface $object, Iterable $data, bool $simulate = false, array $endpoints = []): int
+    public function changeObject(DataObjectInterface $object, Iterable $data, bool $simulate = false, array $endpoints = []): int
     {
         $this->schema->validate($data);
 
-        $query = [
+        /*$query = [
             '$set' => ['endpoints' => $endpoints],
         ];
 
@@ -428,10 +343,11 @@ class DataType implements DataTypeInterface
             $this->logger->info('object ['.$object->getId().'] version ['.$version.'] in ['.$this->collection.'] is already up2date', [
                 'category' => get_class($this),
             ]);
-        }
+        }*/
 
         if ($simulate === false) {
-            $this->db->{$this->collection}->updateOne(['_id' => $object->getId()], $query);
+            return $this->object_factory->change($object);
+            //$this->db->{$this->collection}->updateOne(['_id' => $object->getId()], $query);
         }
 
         return $version;
@@ -440,14 +356,14 @@ class DataType implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function delete(ObjectId $id, bool $simulate = false): bool
+    public function deleteObject(ObjectId $id, bool $simulate = false): bool
     {
         $this->logger->info('delete object ['.$id.'] from ['.$this->collection.']', [
             'category' => get_class($this),
         ]);
 
         if ($simulate === false) {
-            $this->db->{$this->collection}->deleteOne(['_id' => $id]);
+            return $this->object_factory->deleteOne($id);
         }
 
         return true;
@@ -463,7 +379,8 @@ class DataType implements DataTypeInterface
         ]);
 
         if ($simulate === false) {
-            $this->db->{$this->collection}->deleteMany([]);
+            return $this->object_factory->deleteAll();
+            //$this->db->{$this->collection}->deleteMany([]);
         }
 
         return true;
@@ -625,37 +542,6 @@ class DataType implements DataTypeInterface
         }
 
         return true;
-    }
-
-    /**
-     * Ensure indexes.
-     */
-    public function ensureIndex(array $fields): string
-    {
-        $list = iterator_to_array($this->db->{$this->collection}->listIndexes());
-        $keys = array_fill_keys($fields, 1);
-
-        $this->logger->debug('verify if mongodb index exists for import attributes [{import}]', [
-            'category' => get_class($this),
-            'import' => $keys,
-        ]);
-
-        foreach ($list as $index) {
-            if ($index['key'] === $keys) {
-                $this->logger->debug('found existing mongodb index ['.$index['name'].'] for import attributes', [
-                    'category' => get_class($this),
-                    'import' => $keys,
-                ]);
-
-                return $index['name'];
-            }
-        }
-
-        $this->logger->info('create new mongodb index for import attributes', [
-            'category' => get_class($this),
-        ]);
-
-        return $this->db->{$this->collection}->createIndex($keys);
     }
 
     /**

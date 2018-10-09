@@ -12,14 +12,14 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
-class Mandator implements MandatorInterface
+class Mandator extends AbstractResource implements MandatorInterface
 {
     /**
      * Name.
@@ -27,13 +27,6 @@ class Mandator implements MandatorInterface
      * @var string
      */
     protected $name;
-
-    /**
-     * Data.
-     *
-     * @var array
-     */
-    protected $resource = [];
 
     /**
      * Datatype.
@@ -84,6 +77,11 @@ class Mandator implements MandatorInterface
         return $this->name;
     }
 
+    public function getDataTypeFactory(): DataTypeFactory
+    {
+        return $this->datatype;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -106,21 +104,5 @@ class Mandator implements MandatorInterface
     public function getDataTypes(array $datatypes = [], ?int $offset = null, ?int $limit = null): Generator
     {
         return $this->datatype->getAll($this, $datatypes, $offset, $limit);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getId(): ObjectId
-    {
-        return $this->resource['_id'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray(): array
-    {
-        return $this->resource;
     }
 }

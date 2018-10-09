@@ -17,7 +17,6 @@ use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
@@ -28,11 +27,10 @@ class Endpoints
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator, DataTypeFactory $datatype, EndpointFactory $endpoint, Acl $acl)
+    public function __construct(MandatorFactory $mandator_factory, EndpointFactory $endpoint_factory, Acl $acl)
     {
-        $this->mandator = $mandator;
-        $this->datatype = $datatype;
-        $this->endpoint = $endpoint;
+        $this->mandator_factory = $mandator_factory;
+        $this->endpoint_factory = $endpoint_factory;
         $this->acl = $acl;
     }
 
@@ -47,9 +45,8 @@ class Endpoints
             'query' => [],
         ], $request->getQueryParams());
 
-        $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $endpoints = $this->endpoint->getAll($datatype, $query['query'], (int) $query['offset'], (int) $query['limit']);
+        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
+        $endpoints = $datatype->getEndpoints($query['query'], (int) $query['offset'], (int) $query['limit']);
 
         $body = $this->acl->filterOutput($request, $identity, $endpoints);
         $body = Pager::fromRequest($body, $request);
@@ -68,9 +65,8 @@ class Endpoints
     {
         $query = $request->getQueryParams();
 
-        $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $endpoint = $this->endpoint->getOne($datatype, $endpoint);
+        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
+        $endpoint = $datatype->getEndpoint($endpoint);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
@@ -86,13 +82,12 @@ class Endpoints
     {
         $body = $request->getParsedBody();
 
-        $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $id = $this->endpoint->add($datatype, $body);
+        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
+        $id = $this->endpoint_factory->add($datatype, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->endpoint->getOne($datatype, $body['name'])->decorate($request),
+            $this->endpoint_factory->getOne($datatype, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -102,9 +97,8 @@ class Endpoints
      */
     public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
     {
-        $mandator = $this->mandator->getOne($mandator);
-        $datatype = $this->datatype->getOne($mandator, $datatype);
-        $this->endpoint->delete($datatype, $endpoint);
+        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
+        $this->endpoint_factory->delete($datatype, $endpoint);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

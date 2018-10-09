@@ -18,27 +18,27 @@ use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\DataType\Factory as DataTypeFactory;
+use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
-class Objects
+class ObjectRelatives
 {
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, Acl $acl)
+    public function __construct(MandatorFactory $mandator_factory, DataObjectRelationFactory $relation_factory, Acl $acl)
     {
         $this->mandator_factory = $mandator_factory;
-        $this->datatype_factory = $datatype_factory;
+        $this->relation_factory = $relation_factory;
         $this->acl = $acl;
     }
 
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -47,9 +47,10 @@ class Objects
         ], $request->getQueryParams());
 
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $objects = $datatype->getObjects($query['query'], false, (int) $query['offset'], (int) $query['limit']);
+        $object = $datatype->getObject(['_id' => $object]);
+        $relatives = $object->getRelatives($query['query'], false, (int) $query['offset'], (int) $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $objects);
+        $body = $this->acl->filterOutput($request, $identity, $relatives);
         $body = Pager::fromRequest($body, $request);
 
         return new UnformattedResponse(
@@ -62,16 +63,17 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object, ObjectId $relative): ResponseInterface
     {
         $query = $request->getQueryParams();
 
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object], false);
+        $relative = $object->getRelative($relative);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $object->decorate($request),
+            $relative->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -79,7 +81,7 @@ class Objects
     /**
      * Create object.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
     {
         $query = array_merge([
             'write' => false,
@@ -100,29 +102,6 @@ class Objects
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
             $datatype->getOne(['_id' => $id], false)->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
-    }
-
-    /**
-     * Entrypoint.
-     */
-    public function getHistory(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => 0,
-            'limit' => 20,
-            'query' => [],
-        ], $request->getQueryParams());
-
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $object = $datatype->getObject(['_id' => $object], false);
-        $history = $object->getHistory();
-        $body = Pager::fromRequest($history, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
             ['pretty' => isset($query['pretty'])]
         );
     }

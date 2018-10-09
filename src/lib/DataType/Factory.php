@@ -15,6 +15,7 @@ use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
+use Tubee\DataObject\Factory as DataObjectFactory;
 use Tubee\DataType;
 use Tubee\DataType\Validator as DataTypeValidator;
 use Tubee\Endpoint\Factory as EndpointFactory;
@@ -25,32 +26,32 @@ use Tubee\Schema;
 class Factory extends ResourceFactory
 {
     /**
-     * Database.
-     *
-     * @var Database
+     * Collection name.
      */
-    protected $db;
+    public const COLLECTION_NAME = 'datatypes';
 
     /**
-     * Logger.
+     * Object factory.
+     *
+     * @var ObjectFactory
      */
-    protected $logger;
+    protected $object_factory;
 
     /**
      * Endpoint.
      *
-     * @var EndpointInterface
+     * @var EndpointFactory
      */
-    protected $endpoint;
+    protected $endpoint_factory;
 
     /**
      * Initialize.
      */
-    public function __construct(Database $db, EndpointFactory $endpoint, LoggerInterface $logger)
+    public function __construct(Database $db, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, LoggerInterface $logger)
     {
-        $this->db = $db;
-        $this->logger = $logger;
-        $this->endpoint = $endpoint;
+        $this->endpoint_factory = $endpoint_factory;
+        $this->object_factory = $object_factory;
+        parent::__construct($db, $logger);
     }
 
     /**
@@ -58,7 +59,7 @@ class Factory extends ResourceFactory
      */
     public function has(MandatorInterface $mandator, string $name): bool
     {
-        return $this->db->datatypes->count([
+        return $this->db->{self::COLLECTION_NAME}->count([
             'name' => $name,
             'mandator' => $mandator->getName(),
         ]) > 0;
@@ -79,16 +80,16 @@ class Factory extends ResourceFactory
             ];
         }
 
-        $result = $this->db->datatypes->find($filter, [
+        $result = $this->db->{self::COLLECTION_NAME}->find($filter, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['name'] => self::build($resource, $mandator, $this->db, $this->endpoint, $this->logger);
+            yield (string) $resource['name'] => $this->build($resource, $mandator);
         }
 
-        return $this->db->datatypes->count((array) $query);
+        return $this->db->{self::COLLECTION_NAME}->count($filter);
     }
 
     /**
@@ -96,7 +97,7 @@ class Factory extends ResourceFactory
      */
     public function getOne(MandatorInterface $mandator, string $name): DataTypeInterface
     {
-        $result = $this->db->datatypes->findOne([
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
             'name' => $name,
             'mandator' => $mandator->getName(),
         ]);
@@ -105,24 +106,17 @@ class Factory extends ResourceFactory
             throw new Exception\NotFound('mandator '.$name.' is not registered');
         }
 
-        return self::build($result, $mandator, $this->db, $this->endpoint, $this->logger);
+        return $this->build($result, $mandator);
     }
 
     /**
      * Delete by name.
      */
-    public function delete(MandatorInterface $mandator, string $name): bool
+    public function deleteOne(MandatorInterface $mandator, string $name): bool
     {
-        if (!$this->has($mandator, $name)) {
-            throw new Exception\NotFound('endpoint '.$name.' does not exists');
-        }
+        $resource = $this->getOne($mandator, $name);
 
-        $this->db->datatypes->deleteOne([
-            'mandator' => $mandator->getName(),
-            'name' => $name,
-        ]);
-
-        return true;
+        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -138,16 +132,16 @@ class Factory extends ResourceFactory
 
         $resource['mandator'] = $mandator->getName();
 
-        return parent::addTo($this->db->datatypes, $resource);
+        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
      * Build instance.
      */
-    public static function build(array $resource, MandatorInterface $mandator, Database $db, EndpointFactory $endpoint, LoggerInterface $logger): DataTypeInterface
+    public function build(array $resource, MandatorInterface $mandator): DataTypeInterface
     {
-        $schema = new Schema($resource['schema'], $logger);
+        $schema = new Schema($resource['schema'], $this->logger);
 
-        return new DataType($resource['name'], $mandator, $endpoint, $schema, $db, $logger, $resource);
+        return $this->initResource(new DataType($resource['name'], $mandator, $this->endpoint_factory, $this->object_factory, $schema, $this->db, $this->logger, $resource));
     }
 }

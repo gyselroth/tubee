@@ -46,7 +46,7 @@ class AttributeResolver
 
         return [
             'id' => (string) $data['_id'],
-            'version' => $data['version'],
+            'version' => isset($data['version']) ? $data['version'] : 0,
             'class' => get_class($resource),
             'created' => isset($data['created']) ? $data['created']->toDateTime()->format('c') : null,
             'changed' => isset($data['changed']) ? $data['changed']->toDateTime()->format('c') : null,

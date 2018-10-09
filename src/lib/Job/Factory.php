@@ -14,19 +14,45 @@ namespace Tubee\Job;
 use Generator;
 use IteratorIterator;
 use MongoDB\BSON\ObjectId;
+use MongoDB\Database;
 use MongoDB\Operation\Find;
 use TaskScheduler\Scheduler;
+use Tubee\Async\Sync;
 use Tubee\Job;
 use Tubee\Job\Error\ErrorInterface;
+use Tubee\Resource\Factory as ResourceFactory;
 
-class Factory extends Scheduler
+class Factory extends ResourceFactory
 {
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Datatype.
+     *
+     * @var DataTypeFactory
+     */
+    protected $datatype;
+
+    /**
+     * Initialize.
+     */
+    public function __construct(Database $db, Scheduler $scheduler)
+    {
+        $this->db = $db;
+        $this->scheduler = $scheduler;
+    }
+
     /**
      * Get jobs.
      */
-    public function getTasks(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->queue->find((array) $query, [
+        $result = $this->db->jobs->find((array) $query, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
@@ -35,21 +61,29 @@ class Factory extends Scheduler
             yield (string) $job['_id'] => new Job($job);
         }
 
-        return $this->db->queue->count((array) $query);
+        return $this->db->jobs->count((array) $query);
     }
 
     /**
      * Get job.
      */
-    public function getTask(ObjectId $job): JobInterface
+    public function getOne(ObjectId $job): JobInterface
     {
-        $result = $this->db->queue->findOne(['_id' => $job]);
+        $result = $this->db->jobs->findOne(['_id' => $job]);
 
         if ($result === null) {
             throw new Exception\NotFound('job not found');
         }
 
         return new Job($result);
+    }
+
+    public function create(array $resource): ObjectId
+    {
+        $result = self::addTo($this->db->jobs, $resource);
+        $this->scheduler->addJob(Sync::class, $resource);
+
+        return $result;
     }
 
     /**
