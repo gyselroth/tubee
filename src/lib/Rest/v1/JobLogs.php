@@ -28,7 +28,7 @@ class JobLogs
     /**
      * Init.
      */
-    public function __construct(JobFactory $job, Acl $acl)
+    public function __construct(JobFactory $job_factory, Acl $acl)
     {
         $this->job_factory = $job_factory;
         $this->acl = $acl;

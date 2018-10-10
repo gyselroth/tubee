@@ -16,6 +16,7 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
@@ -81,6 +82,7 @@ class Endpoints
     public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
     {
         $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
 
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $id = $this->endpoint_factory->add($datatype, $body);
@@ -101,5 +103,30 @@ class Endpoints
         $this->endpoint_factory->deleteOne($datatype, $endpoint);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+    }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $datatype = $mandator->getDataType($datatype);
+        $endpoint = $datatype->getEndpoint($endpoint);
+        $doc = $endpoint->getData();
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        $update = json_decode($patched, true);
+
+        $this->endpoint_factory->update($endpoint, $update);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $datatype->getEndpoint($endpoint->getName())->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
     }
 }

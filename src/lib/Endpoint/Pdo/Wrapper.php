@@ -65,7 +65,7 @@ class Wrapper extends PDO
         $result = parent::query($query);
 
         if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->errorInfo()[2].' ('.$link->errorCode().')');
+            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->errorInfo()[2].' ('.$this->errorCode().')');
         }
 
         return $result;
@@ -83,7 +83,7 @@ class Wrapper extends PDO
         $result = $this->exec($query);
 
         if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->errorInfo().' ('.$link->errorCode().')');
+            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->errorInfo().' ('.$this->errorCode().')');
         }
         $this->logger->debug('sql query affected ['.$result.'] rows', [
                 'category' => get_class($this),
@@ -95,7 +95,7 @@ class Wrapper extends PDO
     /**
      * Prepare query.
      */
-    public function prepareValues(string $query, Iterable $values): PDOStatement
+    public function prepareValues(string $query, array $values): PDOStatement
     {
         $this->logger->debug('prepare and execute pdo query ['.$query.'] with values [{values}]', [
             'category' => get_class($this),
@@ -105,7 +105,7 @@ class Wrapper extends PDO
         $stmt = $this->prepare($query);
 
         if (!($stmt instanceof PDOStatement)) {
-            throw new Exception\InvalidQuery('failed to prepare pdo query with error '.$link->error.' ('.$link->errno.')');
+            throw new Exception\InvalidQuery('failed to prepare pdo query with error '.$this->error.' ('.$this->errno.')');
         }
 
         $types = '';

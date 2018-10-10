@@ -11,20 +11,13 @@ declare(strict_types=1);
 
 namespace Tubee;
 
-use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\AccessRule\AccessRuleInterface;
+use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
-class AccessRule implements AccessRuleInterface
+class AccessRule extends AbstractResource implements AccessRuleInterface
 {
-    /**
-     * Resource.
-     *
-     * @var array
-     */
-    protected $resource;
-
     /**
      * Data object.
      */
@@ -39,22 +32,6 @@ class AccessRule implements AccessRuleInterface
     public function getName(): string
     {
         return $this->resource['name'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getId(): ObjectId
-    {
-        return $this->resource['_id'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray(): array
-    {
-        return $this->resource;
     }
 
     /**

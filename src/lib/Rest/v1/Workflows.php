@@ -112,19 +112,22 @@ class Workflows
     public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
     {
         $body = $request->getParsedBody();
-        var_dump($body);
-
+        $query = $request->getQueryParams();
         $mandator = $this->mandator_factory->getOne($mandator);
-        $workflow = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflow($workflow);
-        $doc = $workflow->toArray();
+        $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
+        $workflow = $endpoint->getWorkflow($workflow);
+        $doc = $workflow->getData();
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();
-        var_dump($patched);
-        var_dump(json_decode($patched));
+        $update = json_decode($patched, true);
 
-        $this->workflow_factory->update($endpoint, $workflow, $update);
+        $this->workflow_factory->update($workflow, $update);
 
-        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $endpoint->getWorkflow($workflow->getName())->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
     }
 }

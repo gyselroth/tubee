@@ -83,10 +83,9 @@ class Routes
             $r->addRoute('GET', '/api/v1/jobs/{job}/logs', [v1\JobLogs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/jobs/{job}/logs', [v1\JobLogs::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/jobs/{job}/logs/{log}', [v1\JobLogs::class, 'getOne']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/logs', [v1\ProcessLogs::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes/{process}/logs', [v1\ProcessLogs::class, 'watchAll']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/(logs/{log}', [v1\ProcessLogs::class, 'getOne']);
-        });
+            //$r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/logs', [v1\ProcessLogs::class, 'getAll']);
+            //$r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes/{process}/logs', [v1\ProcessLogs::class, 'watchAll']);
+            //$r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/(logs/{log}', [v1\ProcessLogs::class, 'getOne']);
         });
     }
 }

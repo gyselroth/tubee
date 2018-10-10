@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Job;
+namespace Tubee\Log;
 
 use Generator;
 use IteratorIterator;
@@ -17,8 +17,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use MongoDB\Operation\Find;
 use Psr\Log\LoggerInterface;
-use TaskScheduler\Scheduler;
-use Tubee\Job\Error\ErrorInterface;
+use Tubee\Job\JobInterface;
 use Tubee\Log;
 use Tubee\Resource\Factory as ResourceFactory;
 
@@ -28,13 +27,6 @@ class Factory extends ResourceFactory
      * Collection name.
      */
     public const COLLECTION_NAME = 'logs';
-
-    /**
-     * Job scheduler.
-     *
-     * @var Scheduler
-     */
-    protected $scheduler;
 
     /**
      * Initialize.
@@ -47,37 +39,39 @@ class Factory extends ResourceFactory
     /**
      * Build instance.
      */
-    public function build(array $resource): JobInterface
+    public function build(array $resource): LogInterface
     {
-        return $this->initResource(new Log($resource, $this->process_factory));
+        return $this->initResource(new Log($resource));
     }
 
     /**
-     * Get errors.
+     * Get all.
      */
-    public function getAll(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(JobInterface $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->errors->find([
-            'context.job' => (string) $job,
-        ], [
+        $filter = [
+            'context.job' => (string) $job->getId(),
+        ];
+
+        $result = $this->db->{self::COLLECTION_NAME}->find($filter, [
             'offset' => $offset,
             'limit' => $limit,
         ]);
 
-        foreach ($result as $error) {
-            yield (string) $error['_id'] => new Error($error);
+        foreach ($result as $log) {
+            yield (string) $log['_id'] => $this->build($log);
         }
 
-        return $this->db->erros->count((array) $query);
+        return $this->db->{self::COLLECTION_NAME}->count($filter);
     }
 
     /**
-     * Get errors.
+     * watch all.
      */
-    public function watchAll(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function watchAll(JobInterface $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
     {
-        $result = $this->db->errors->find([
-            'context.job' => (string) $job,
+        $result = $this->db->{self::COLLECTION_NAME}->find([
+            'context.job' => (string) $job->getId(),
         ], [
             'offset' => $offset,
             'limit' => $limit,
@@ -101,21 +95,21 @@ class Factory extends ResourceFactory
 
             $resource = $iterator->current();
             $iterator->next();
-            yield (string) $resource['_id'] => new Error($resource);
+            yield (string) $resource['_id'] => $this->build($resource);
         }
     }
 
     /**
      * Get job.
      */
-    public function getOne(ObjectId $error): ErrorInterface
+    public function getOne(JobInterface $job, ObjectId $log): LogInterface
     {
-        $result = $this->db->errors->findOne(['_id' => $error]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne(['_id' => $log]);
 
         if ($result === null) {
-            throw new Exception\NotFound('error not found');
+            throw new Exception\NotFound('log not found');
         }
 
-        return new Error($result);
+        return $this->build($result);
     }
 }

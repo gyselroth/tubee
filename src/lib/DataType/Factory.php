@@ -142,6 +142,6 @@ class Factory extends ResourceFactory
     {
         $schema = new Schema($resource['schema'], $this->logger);
 
-        return $this->initResource(new DataType($resource['name'], $mandator, $this->endpoint_factory, $this->object_factory, $schema, $this->db, $this->logger, $resource));
+        return $this->initResource(new DataType($resource['name'], $mandator, $this->endpoint_factory, $this->object_factory, $schema, $this->logger, $resource));
     }
 }

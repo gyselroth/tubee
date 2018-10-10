@@ -47,6 +47,11 @@ class Factory
      */
     public function addTo(Collection $collection, array $resource): ObjectId
     {
+        $this->logger->debug('add new resource to ['.$collection->getCollectionName().']', [
+            'category' => get_class($this),
+            'resource' => $resource,
+        ]);
+
         $resource += [
             'created' => new UTCDateTime(),
             'version' => 1,
@@ -60,6 +65,32 @@ class Factory
         ]);
 
         return $id;
+    }
+
+    /**
+     * Update resource.
+     */
+    public function updateIn(Collection $collection, ObjectId $id, array $resource): bool
+    {
+        $this->logger->debug('update resource ['.$id.'] in ['.$collection->getCollectionName().']', [
+            'category' => get_class($this),
+            'resource' => $resource,
+        ]);
+
+        $resource += [
+            'changed' => new UTCDateTime(),
+        ];
+
+        $result = $collection->updateOne(['_id' => $id], [
+            '$set' => $resource,
+            '$inc' => ['version' => 1],
+        ]);
+
+        $this->logger->info('created new resource ['.$id.'] in ['.$collection->getCollectionName().']', [
+            'category' => get_class($this),
+        ]);
+
+        return true;
     }
 
     /**

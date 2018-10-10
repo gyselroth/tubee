@@ -15,6 +15,7 @@ use Generator;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Job\JobInterface;
+use Tubee\Log\Factory as LogFactory;
 use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
@@ -32,10 +33,11 @@ class Job extends AbstractResource implements JobInterface
     /**
      * Data object.
      */
-    public function __construct(array $resource, ProcessFactory $process_factory)
+    public function __construct(array $resource, ProcessFactory $process_factory, LogFactory $log_factory)
     {
         $this->resource = $resource;
         $this->process_factory = $process_factory;
+        $this->log_factory = $log_factory;
     }
 
     /**
@@ -73,9 +75,25 @@ class Job extends AbstractResource implements JobInterface
     /**
      * {@inheritdoc}
      */
-    public function getProcesses(): Generator
+    public function getLogs(array $query = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->process_factory->getAll($this);
+        return $this->log_factory->getAll($this, $query, $offset, $limit);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLog(ObjectId $id): LogInterface
+    {
+        return $this->log_factory->getAll($query, $offset, $limit);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getProcesses(array $query = [], ?int $offset = null, ?int $limit = null): Generator
+    {
+        return $this->process_factory->getAll($this, $query, $offset, $limit);
     }
 
     /**

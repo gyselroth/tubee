@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Resource;
 
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 
 interface ResourceInterface
@@ -25,6 +26,31 @@ interface ResourceInterface
      * Convert resource to array.
      */
     public function toArray(): array;
+
+    /**
+     * Get data without metadata from a resource.
+     */
+    public function getData(): array;
+
+    /**
+     * Get created timestamp.
+     */
+    public function getCreated(): UTCDateTime;
+
+    /**
+     * Get changed timestamp.
+     */
+    public function getChanged(): ?UTCDateTime;
+
+    /**
+     * Get deleted timestamp.
+     */
+    public function getDeleted(): ?UTCDateTime;
+
+    /**
+     * Get resource version.
+     */
+    public function getVersion(): int;
 
     /**
      * Decorate resource from server request.

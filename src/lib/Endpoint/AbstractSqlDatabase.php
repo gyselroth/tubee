@@ -41,6 +41,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     public function setup(bool $simulate = false): EndpointInterface
     {
         $this->socket->connect();
+        $result = $this->socket->select('SELECT count(*) FROM '.$this->table);
 
         return $this;
     }
@@ -159,7 +160,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
                     if ($i !== 0) {
                         $request .= 'AND ';
                     }
-                    $request .= '`'.$attr.'`="'.$value.'"';
+                    $request .= $attr.'=\''.$value.'\'';
                     ++$i;
                 }
 

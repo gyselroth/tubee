@@ -14,7 +14,6 @@ namespace Tubee;
 use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
-use MongoDB\Database;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\DataObject\DataObjectInterface;
@@ -50,13 +49,6 @@ class DataType extends AbstractResource implements DataTypeInterface
      * @var SchemaInterface
      */
     protected $schema;
-
-    /**
-     * Database.
-     *
-     * @var Database
-     */
-    protected $db;
 
     /**
      * Logger.
@@ -96,7 +88,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * Initialize.
      */
-    public function __construct(string $name, MandatorInterface $mandator, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, SchemaInterface $schema, Database $db, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, MandatorInterface $mandator, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, SchemaInterface $schema, LoggerInterface $logger, array $resource = [])
     {
         $this->resource = $resource;
         $this->name = $name;
@@ -104,7 +96,6 @@ class DataType extends AbstractResource implements DataTypeInterface
         $this->mandator = $mandator;
         $this->schema = $schema;
         $this->endpoint_factory = $endpoint_factory;
-        $this->db = $db;
         $this->logger = $logger;
         $this->object_factory = $object_factory;
     }
@@ -228,7 +219,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getObject(Iterable $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
+    public function getObject(array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
         return $this->object_factory->getOne($this, $filter, $include_dataset, $version);
     }
@@ -244,7 +235,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getObjects(Iterable $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
+    public function getObjects(array $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
     {
         return $this->object_factory->getAll($this, $filter, $include_dataset, $offset, $limit);
     }
@@ -252,7 +243,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createObject(Iterable $object, bool $simulate = false, ?array $endpoints = null): ObjectId
+    public function createObject(array $object, bool $simulate = false, ?array $endpoints = null): ObjectId
     {
         $this->schema->validate($object);
 
@@ -268,7 +259,7 @@ class DataType extends AbstractResource implements DataTypeInterface
         ]);
 
         if ($simulate === false) {
-            return $this->object_factory->create($object);
+            return $this->object_factory->create($this, $object);
         }
 
         return new ObjectId();
@@ -286,7 +277,7 @@ class DataType extends AbstractResource implements DataTypeInterface
         $query = ['$unset' => ['deleted' => true]];
 
         if ($simulate === false) {
-            $this->db->{$this->collection}->updateOne(['_id' => $id], $query);
+            //$this->db->{$this->collection}->updateOne(['_id' => $id], $query);
         }
 
         return true;
@@ -304,7 +295,7 @@ class DataType extends AbstractResource implements DataTypeInterface
         $query = ['$set' => ['deleted' => new UTCDateTime()]];
 
         if ($simulate === false) {
-            $this->db->{$this->collection}->updateOne(['_id' => $id], $query);
+            //$this->db->{$this->collection}->updateOne(['_id' => $id], $query);
         }
 
         return true;
@@ -313,7 +304,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function changeObject(DataObjectInterface $object, Iterable $data, bool $simulate = false, array $endpoints = []): int
+    public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int
     {
         $this->schema->validate($data);
 
@@ -547,7 +538,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * Prepare pipeline.
      */
-    protected function preparePipeline(Iterable $filter, bool $include_dataset = true, int $version = 0): array
+    protected function preparePipeline(array $filter, bool $include_dataset = true, int $version = 0): array
     {
         $pipeline = [];
 

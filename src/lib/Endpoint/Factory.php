@@ -127,7 +127,7 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Add mandator.
+     * Add.
      */
     public function add(DataTypeInterface $datatype, array $resource): ObjectId
     {
@@ -145,6 +145,16 @@ class Factory extends ResourceFactory
         $resource['datatype'] = $datatype->getName();
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+    }
+
+    /**
+     * Update.
+     */
+    public function update(EndpointInterface $resource, array $data): bool
+    {
+        $data = EndpointValidator::validate($data);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
     }
 
     /**

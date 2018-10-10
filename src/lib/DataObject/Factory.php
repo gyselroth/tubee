@@ -46,7 +46,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getObjectHistory(DataTypeInterface $datatype, ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Iterable
+    public function getObjectHistory(DataTypeInterface $datatype, ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [
             ['$match' => ['_id' => $id]],
@@ -79,7 +79,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getOne(DataTypeInterface $datatype, Iterable $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
+    public function getOne(DataTypeInterface $datatype, array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
         $pipeline = $this->preparePipeline($filter, $include_dataset, $version);
 
@@ -106,7 +106,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getAll(DataTypeInterface $datatype, Iterable $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(DataTypeInterface $datatype, array $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [];
         if ($include_dataset === true) {
@@ -163,7 +163,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function create(DataTypeInterface $datatype, Iterable $object, ?array $endpoints = null): ObjectId
+    public function create(DataTypeInterface $datatype, array $object, ?array $endpoints = null): ObjectId
     {
         $this->schema->validate($object);
 
@@ -190,7 +190,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function change(DataTypeInterface $datatype, DataObjectInterface $object, Iterable $data, array $endpoints = []): int
+    public function change(DataTypeInterface $datatype, DataObjectInterface $object, array $data, array $endpoints = []): int
     {
         $this->schema->validate($data);
 
@@ -262,7 +262,7 @@ class Factory extends ResourceFactory
     /**
      * Prepare pipeline.
      */
-    protected function preparePipeline(Iterable $filter, bool $include_dataset = true, int $version = 0): array
+    protected function preparePipeline(array $filter, bool $include_dataset = true, int $version = 0): array
     {
         $pipeline = [];
 

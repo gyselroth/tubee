@@ -15,7 +15,7 @@ use InvalidArgumentException;
 
 class Validator
 {
-    public function validate(array $resource): array
+    public static function validate(array $resource): array
     {
         foreach ($resource as $attribute => $definition) {
             if (!is_array($definition)) {

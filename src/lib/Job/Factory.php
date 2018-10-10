@@ -12,15 +12,13 @@ declare(strict_types=1);
 namespace Tubee\Job;
 
 use Generator;
-use IteratorIterator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
-use MongoDB\Operation\Find;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Async\Sync;
 use Tubee\Job;
-use Tubee\Job\Error\ErrorInterface;
+use Tubee\Log\Factory as LogFactory;
 use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Resource\Factory as ResourceFactory;
 
@@ -41,10 +39,11 @@ class Factory extends ResourceFactory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, Scheduler $scheduler, ProcessFactory $process_factory, LoggerInterface $logger)
+    public function __construct(Database $db, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory, LoggerInterface $logger)
     {
         $this->scheduler = $scheduler;
         $this->process_factory = $process_factory;
+        $this->log_factory = $log_factory;
         parent::__construct($db, $logger);
     }
 
@@ -113,73 +112,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): JobInterface
     {
-        return $this->initResource(new Job($resource, $this->process_factory));
-    }
-
-    /**
-     * Get errors.
-     */
-    public function getErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
-    {
-        $result = $this->db->errors->find([
-            'context.job' => (string) $job,
-        ], [
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
-
-        foreach ($result as $error) {
-            yield (string) $error['_id'] => new Error($error);
-        }
-
-        return $this->db->erros->count((array) $query);
-    }
-
-    /**
-     * Get errors.
-     */
-    public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
-    {
-        $result = $this->db->errors->find([
-            'context.job' => (string) $job,
-        ], [
-            'offset' => $offset,
-            'limit' => $limit,
-            'cursorType' => Find::TAILABLE,
-            'noCursorTimeout' => true,
-        ]);
-
-        $iterator = new IteratorIterator($result);
-        $iterator->rewind();
-
-        while (true) {
-            if (null === $iterator->current()) {
-                if ($iterator->getInnerIterator()->isDead()) {
-                    return $this->db->erros->count((array) $query);
-                }
-
-                $iterator->next();
-
-                continue;
-            }
-
-            $resource = $iterator->current();
-            $iterator->next();
-            yield (string) $resource['_id'] => new Error($resource);
-        }
-    }
-
-    /**
-     * Get job.
-     */
-    public function getError(ObjectId $error): ErrorInterface
-    {
-        $result = $this->db->errors->findOne(['_id' => $error]);
-
-        if ($result === null) {
-            throw new Exception\NotFound('error not found');
-        }
-
-        return new Error($result);
+        return $this->initResource(new Job($resource, $this->process_factory, $this->log_factory));
     }
 }

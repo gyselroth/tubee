@@ -117,7 +117,7 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Add mandator.
+     * Add.
      */
     public function add(EndpointInterface $endpoint, array $resource): ObjectId
     {
@@ -132,6 +132,16 @@ class Factory extends ResourceFactory
         $resource['endpoint'] = $endpoint->getName();
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+    }
+
+    /**
+     * Update.
+     */
+    public function update(WorkflowInterface $resource, array $data): bool
+    {
+        $data = WorkflowValidator::validate($data);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
     }
 
     /**

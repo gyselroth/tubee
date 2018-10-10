@@ -42,6 +42,20 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
+    public function getData(): array
+    {
+        return array_diff_key($this->resource, array_flip([
+            'created',
+            'changed',
+            'deleted',
+            '_id',
+            'version',
+        ]));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getVersion(): int
     {
         return $this->resource['version'];

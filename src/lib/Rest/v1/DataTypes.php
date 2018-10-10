@@ -81,13 +81,14 @@ class DataTypes
     public function post(ServerRequestInterface $request, Identity $identity, string $mandator): ResponseInterface
     {
         $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
 
         $mandator = $this->mandator_factory->getOne($mandator);
         $id = $this->datatype_factory->add($mandator, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $$this->datatype_factory->getOne($mandator, $body['name'])->decorate($request),
+            $this->datatype_factory->getOne($mandator, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
