@@ -95,7 +95,13 @@ class Factory extends ResourceFactory
         ]);
 
         foreach ($result as $resource) {
-            yield $resource['_id'] => $this->build($resource, $object);
+            if ($resource['object_1'] == $object->getId()) {
+                $related = $object->getDataType()->getMandator()->switch($resource['mandator_2'])->getDataType($resource['datatype_2'])->getObject(['_id' => $resource['object_2']]);
+            } else {
+                $related = $object->getDataType()->getMandator()->switch($resource['mandator_1'])->getDataType($resource['datatype_1'])->getObject(['_id' => $resource['object_1']]);
+            }
+
+            yield $resource['_id'] => $this->build($resource, $object, $related);
         }
 
         return $this->db->{self::COLLECTION_NAME}->count($filter);
@@ -143,8 +149,8 @@ class Factory extends ResourceFactory
     /**
      * Build.
      */
-    public function build(array $resource, DataObjectInterface $object): DataObjectRelationInterface
+    public function build(array $resource, DataObjectInterface $object, DataObjectInterface $related): DataObjectRelationInterface
     {
-        return $this->initResource(new DataObjectRelation($resource, $object));
+        return $this->initResource(new DataObjectRelation($resource, $object, $related));
     }
 }

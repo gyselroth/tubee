@@ -50,8 +50,8 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
             ],
             'kind' => 'DataObjectRelation',
             'context' => $this->resource['context'],
-            'object' => function () use ($object, $request) {
-                return $object->decorate($request);
+            'object' => function () use ($related, $request) {
+                return $related->decorate($request);
             },
         ];
 

@@ -111,6 +111,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): MandatorInterface
     {
-        return $this->initResource(new Mandator($resource['name'], $this->datatype_factory, $resource));
+        return $this->initResource(new Mandator($resource['name'], $this, $this->datatype_factory, $resource));
     }
 }

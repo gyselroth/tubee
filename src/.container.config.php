@@ -8,6 +8,7 @@ use MongoDB\Client;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Monolog\Logger;
+use Monolog\Processor;
 use Tubee\Console;
 use Zend\Mail\Transport\TransportInterface;
 use Zend\Mail\Transport\Smtp;
@@ -121,7 +122,10 @@ return [
     LoggerInterface::class => [
         'use' => Logger::class,
         'arguments' => [
-            'name' => 'default'
+            'name' => 'default',
+            'processors' => [
+                '{'.Processor\PsrLogMessageProcessor::class.'}',
+            ]
         ],
         'calls' => [
             'mongodb' => [
@@ -157,7 +161,7 @@ return [
                 'arguments' => [
                     'mongo' => '{'.Client::class.'}',
                     'database' => 'tubee',
-                    'collection' => 'errors',
+                    'collection' => 'logs',
                     'level' => 1000,
                 ]
             ],

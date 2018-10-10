@@ -15,6 +15,7 @@ use Generator;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Factory as DataTypeFactory;
+use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Mandator\MandatorInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
@@ -38,11 +39,12 @@ class Mandator extends AbstractResource implements MandatorInterface
     /**
      * Initialize.
      */
-    public function __construct(string $name, DataTypeFactory $datatype, array $resource = [])
+    public function __construct(string $name, MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, array $resource = [])
     {
         $this->name = $name;
         $this->resource = $resource;
-        $this->datatype = $datatype;
+        $this->mandator_factory = $mandator_factory;
+        $this->datatype_factory = $datatype_factory;
     }
 
     /**
@@ -79,7 +81,7 @@ class Mandator extends AbstractResource implements MandatorInterface
 
     public function getDataTypeFactory(): DataTypeFactory
     {
-        return $this->datatype;
+        return $this->datatype_factory;
     }
 
     /**
@@ -87,7 +89,7 @@ class Mandator extends AbstractResource implements MandatorInterface
      */
     public function hasDataType(string $name): bool
     {
-        return $this->datatype->has($this, $name);
+        return $this->datatype_factory->has($this, $name);
     }
 
     /**
@@ -95,7 +97,7 @@ class Mandator extends AbstractResource implements MandatorInterface
      */
     public function getDataType(string $name): DataTypeInterface
     {
-        return $this->datatype->getOne($this, $name);
+        return $this->datatype_factory->getOne($this, $name);
     }
 
     /**
@@ -103,6 +105,14 @@ class Mandator extends AbstractResource implements MandatorInterface
      */
     public function getDataTypes(array $datatypes = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->datatype->getAll($this, $datatypes, $offset, $limit);
+        return $this->datatype_factory->getAll($this, $datatypes, $offset, $limit);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function switch(string $name): MandatorInterface
+    {
+        return $this->mandator_factory->getOne($name);
     }
 }
