@@ -145,6 +145,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, DataObjectInterface $object): DataObjectRelationInterface
     {
-        return $this->initResource(new DataObjectRelation($object, $resource));
+        return $this->initResource(new DataObjectRelation($resource, $object));
     }
 }

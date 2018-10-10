@@ -45,17 +45,21 @@ class Factory
     /**
      * Add resource.
      */
-    public function addTo(Collection $collection, array $resource): ObjectId
+    public function addTo(Collection $collection, array $resource, bool $simulate = false): ObjectId
     {
+        $resource += [
+            'created' => new UTCDateTime(),
+            'version' => 1,
+        ];
+
         $this->logger->debug('add new resource to ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
             'resource' => $resource,
         ]);
 
-        $resource += [
-            'created' => new UTCDateTime(),
-            'version' => 1,
-        ];
+        if ($simulate === true) {
+            return new ObjectId();
+        }
 
         $result = $collection->insertOne($resource);
         $id = $result->getInsertedId();
@@ -70,16 +74,20 @@ class Factory
     /**
      * Update resource.
      */
-    public function updateIn(Collection $collection, ObjectId $id, array $resource): bool
+    public function updateIn(Collection $collection, ObjectId $id, array $resource, bool $simulate = false): bool
     {
+        $resource += [
+            'changed' => new UTCDateTime(),
+        ];
+
         $this->logger->debug('update resource ['.$id.'] in ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
             'resource' => $resource,
         ]);
 
-        $resource += [
-            'changed' => new UTCDateTime(),
-        ];
+        if ($simulate === true) {
+            return true;
+        }
 
         $result = $collection->updateOne(['_id' => $id], [
             '$set' => $resource,
@@ -96,11 +104,15 @@ class Factory
     /**
      * Delete resource.
      */
-    public function deleteFrom(Collection $collection, ObjectId $id): bool
+    public function deleteFrom(Collection $collection, ObjectId $id, bool $simulate = false): bool
     {
         $this->logger->info('delete resource ['.$id.'] from ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
         ]);
+
+        if ($simulate === true) {
+            return true;
+        }
 
         $result = $collection->deleteOne(['_id' => $id]);
 

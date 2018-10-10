@@ -245,24 +245,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function createObject(array $object, bool $simulate = false, ?array $endpoints = null): ObjectId
     {
-        $this->schema->validate($object);
-
-        $object = [
-            'version' => 1,
-            'created' => new UTCDateTime(),
-            'data' => $object,
-        ];
-
-        $this->logger->info('create new object [{object}] in ['.$this->collection.']', [
-            'category' => get_class($this),
-            'object' => $object,
-        ]);
-
-        if ($simulate === false) {
-            return $this->object_factory->create($this, $object);
-        }
-
-        return new ObjectId();
+        return $this->object_factory->create($this, $object, $simulate, $endpoints);
     }
 
     /**
@@ -306,42 +289,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int
     {
-        $this->schema->validate($data);
-
-        /*$query = [
-            '$set' => ['endpoints' => $endpoints],
-        ];
-
-        $version = $object->getVersion();
-
-        if ($object->getData() !== $data) {
-            ++$version;
-
-            $query = array_merge($query, [
-                '$set' => [
-                    'data' => $data,
-                    'changed' => new UTCDateTime(),
-                    'version' => $version,
-                ],
-                '$addToSet' => ['history' => $object->toArray()],
-            ]);
-
-            $this->logger->info('change object ['.$object->getId().'] to version ['.$version.'] in ['.$this->collection.'] to [{data}]', [
-                'category' => get_class($this),
-                'data' => $data,
-            ]);
-        } else {
-            $this->logger->info('object ['.$object->getId().'] version ['.$version.'] in ['.$this->collection.'] is already up2date', [
-                'category' => get_class($this),
-            ]);
-        }*/
-
-        if ($simulate === false) {
-            return $this->object_factory->change($object);
-            //$this->db->{$this->collection}->updateOne(['_id' => $object->getId()], $query);
-        }
-
-        return $version;
+        return $this->object_factory->update($this, $object, $data, $simulate, $endpoints);
     }
 
     /**
@@ -349,15 +297,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function deleteObject(ObjectId $id, bool $simulate = false): bool
     {
-        $this->logger->info('delete object ['.$id.'] from ['.$this->collection.']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($simulate === false) {
-            return $this->object_factory->deleteOne($id);
-        }
-
-        return true;
+        return $this->object_factory->deleteOne($this, $id, $simulate);
     }
 
     /**
@@ -365,16 +305,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function flush(bool $simulate = false): bool
     {
-        $this->logger->info('flush collection ['.$this->collection.']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($simulate === false) {
-            return $this->object_factory->deleteAll();
-            //$this->db->{$this->collection}->deleteMany([]);
-        }
-
-        return true;
+        return $this->object_factory->deleteAll($simulate);
     }
 
     /**

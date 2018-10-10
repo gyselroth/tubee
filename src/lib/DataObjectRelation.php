@@ -13,6 +13,7 @@ namespace Tubee;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObjectRelation\DataObjectRelationInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
@@ -28,10 +29,11 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
     /**
      * Data object.
      */
-    public function __construct(array $resource, DataObjectInterface $object)
+    public function __construct(array $resource, DataObjectInterface $object, DataObjectInterface $related_object)
     {
         $this->resource = $resource;
         $this->object = $object;
+        $this->related_object = $related_object;
     }
 
     /**
@@ -39,17 +41,18 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $datatype = $this->getDataType();
-        $mandator = $datatype->getMandator();
-
+        $related = $this->related_object;
         $resource = [
             '_links' => [
                  'self' => ['href' => (string) $request->getUri()],
-                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
-                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+                 //'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
+                 //'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
             ],
             'kind' => 'DataObjectRelation',
             'context' => $this->resource['context'],
+            'object' => function () use ($object, $request) {
+                return $object->decorate($request);
+            },
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);

@@ -166,7 +166,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                return $this->endpoint->getDataType()->delete($object->getId(), $simulate);
+                return $this->endpoint->getDataType()->deleteObject($object->getId(), $simulate);
 
             break;
             case WorkflowInterface::ENSURE_DISABLED:
@@ -216,7 +216,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                $datatype->delete($exists->getId(), $simulate);
+                $datatype->deleteObject($exists->getId(), $simulate);
 
                 return true;
 
@@ -235,8 +235,8 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ],
                 ];
 
-                $id = $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
-                $this->importRelations($datatype->getOne(['_id' => $id]), $map);
+                $id = $datatype->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                $this->importRelations($datatype->getObject(['_id' => $id]), $map);
 
                 return true;
 
@@ -246,7 +246,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
                 $endoints = [];
                 $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = $object_ts;
-                $datatype->change($exists, $object, $simulate, $endpoints);
+                $datatype->changeObject($exists, $object, $simulate, $endpoints);
                 $this->importRelations($exists, $map);
 
                 return true;
@@ -306,7 +306,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     $endpoints['endpoints.'.$this->endpoint->getName()]['id'] = $result;
                 }
 
-                $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getDataType()->changeObject($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
 
@@ -337,7 +337,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 }
 
                 $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
-                $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getDataType()->changeObject($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
 
@@ -349,14 +349,17 @@ class Workflow extends AbstractResource implements WorkflowInterface
         return false;
     }
 
+    /**
+     * Create object relations.
+     */
     protected function importRelations(DataObjectInterface $object, array $data): bool
     {
-        foreach ($this->map->getMap() as $name => $definition) {
+        foreach ($this->attribute_map->getMap() as $name => $definition) {
             if (isset($definition['map'])) {
                 $mandator = $this->endpoint->getDataType()->getMandator();
-                $datatype = $mandator->getDataType($definition['datatype']);
-                $relative = $datatype->getOne([
-                    $definition['map']['to'] => $data[$name],
+                $datatype = $mandator->getDataType($definition['map']['datatype']);
+                $relative = $datatype->getObject([
+                    'data.'.$definition['map']['to'] => $data[$name],
                 ]);
 
                 $object->createRelation($relative);

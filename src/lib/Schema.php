@@ -78,6 +78,10 @@ class Schema implements SchemaInterface
                 throw new Exception\AttributeNotFound('attribute '.$attribute.' is required');
             }
 
+            if (!isset($data[$attribute])) {
+                continue;
+            }
+
             if ($value['type'] !== null && gettype($data[$attribute]) !== $value['type']) {
                 throw new Exception\AttributeInvalidType('attribute '.$attribute.' value is not of type '.$value['type']);
             }

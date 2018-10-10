@@ -116,7 +116,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * Add relation.
      */
-    public function createRelation(DataTypeInterface $datatype, DataObjectInterface $object, array $context = []): ObjectId
+    public function createRelation(DataObjectInterface $object, array $context = []): ObjectId
     {
         return $this->relation_factory->create($this, $object, $context);
     }

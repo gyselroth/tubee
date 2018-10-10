@@ -163,36 +163,23 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function create(DataTypeInterface $datatype, array $object, ?array $endpoints = null): ObjectId
+    public function create(DataTypeInterface $datatype, array $object, bool $simulate = false, ?array $endpoints = null): ObjectId
     {
-        $this->schema->validate($object);
+        $datatype->getSchema()->validate($object);
 
         $object = [
-            'version' => 1,
-            'created' => new UTCDateTime(),
             'data' => $object,
         ];
 
-        $this->logger->info('create new object [{object}] in ['.$datatype->getCollection().']', [
-            'category' => get_class($this),
-            'object' => $object,
-        ]);
-
-        if ($simulate === false) {
-            $result = $this->db->{$datatype->getCollection()}->insertOne($object);
-
-            return $result->getInsertedId();
-        }
-
-        return new ObjectId();
+        return $this->addTo($this->db->{$datatype->getCollection()}, $object, $simulate);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function change(DataTypeInterface $datatype, DataObjectInterface $object, array $data, array $endpoints = []): int
+    public function change(DataTypeInterface $datatype, DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int
     {
-        $this->schema->validate($data);
+        $datatype->getSchema()->validate($object);
 
         $query = [
             '$set' => ['endpoints' => $endpoints],
@@ -230,21 +217,15 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function deleteOne(DataTypeInterface $datatype, ObjectId $id): bool
+    public function deleteOne(DataTypeInterface $datatype, ObjectId $id, bool $simulate = false): bool
     {
-        $this->logger->info('delete object ['.$id.'] from ['.$datatype->getCollection().']', [
-            'category' => get_class($this),
-        ]);
-
-        $this->deleteFrom($this->db->{$datatype->getCollection()}, $id);
-
-        return true;
+        return $this->deleteFrom($this->db->{$datatype->getCollection()}, $id, $simulate);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteAll(DataTypeInterface $datatype, ObjectId $id): bool
+    public function deleteAll(DataTypeInterface $datatype, ObjectId $id, bool $simulate = false): bool
     {
         $this->logger->info('delete object ['.$id.'] from ['.$datatype->getCollection().']', [
             'category' => get_class($this),

@@ -169,7 +169,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
             'name' => $this->name,
             'type' => $this->type,
             'resource' => $this->resource['resource'],
-            'data' => [
+            'data_options' => [
                 'import' => $this->import,
                 'history' => $this->history,
                 'flush' => $this->flush,

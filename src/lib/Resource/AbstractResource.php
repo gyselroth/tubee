@@ -50,6 +50,9 @@ abstract class AbstractResource implements ResourceInterface
             'deleted',
             '_id',
             'version',
+            'mandator',
+            'datatype',
+            'endpoint',
         ]));
     }
 

@@ -109,7 +109,7 @@ class AttributeMap implements AttributeMapInterface
 
             $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
                 'category' => get_class($this),
-                'value' => $result[$attr],
+                'value' => $attrv,
             ]);
         }
 
@@ -272,6 +272,10 @@ class AttributeMap implements AttributeMapInterface
                 'category' => get_class($this),
                 'exception' => $e,
             ]);
+        }
+
+        if (isset($data[$attr])) {
+            return $data[$attr];
         }
 
         return $result;
