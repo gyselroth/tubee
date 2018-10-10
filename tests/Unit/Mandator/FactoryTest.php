@@ -14,6 +14,7 @@ namespace Tubee\Testsuite\Unit\Mandator;
 use Helmich\MongoMock\MockDatabase;
 use MongoDB\BSON\ObjectId;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\Exception;
 use Tubee\Mandator\Factory as MandatorFactory;
@@ -33,7 +34,7 @@ class FactoryTest extends TestCase
             ],
         ]);
 
-        $this->factory = new MandatorFactory($db, $this->createMock(DataTypeFactory::class));
+        $this->factory = new MandatorFactory($db, $this->createMock(DataTypeFactory::class), $this->createMock(LoggerInterface::class));
     }
 
     public function testAdd()
@@ -103,12 +104,12 @@ class FactoryTest extends TestCase
     public function testDelete()
     {
         $this->factory->add(['name' => 'foo']);
-        $this->assertTrue($this->factory->delete('foo'));
+        $this->assertTrue($this->factory->deleteOne('foo'));
     }
 
     public function testDeleteNotFound()
     {
         $this->expectException(Exception\NotFound::class);
-        $this->assertTrue($this->factory->delete('foo'));
+        $this->assertTrue($this->factory->deleteOne('foo'));
     }
 }

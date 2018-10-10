@@ -15,6 +15,7 @@ use Helmich\MongoMock\MockDatabase;
 use MongoDB\BSON\ObjectId;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Tubee\DataObject\Factory as DataObjectFactory;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Exception;
 use Tubee\DataType\Factory as DataTypeFactory;
@@ -36,7 +37,7 @@ class FactoryTest extends TestCase
             ],
         ]);
 
-        $this->factory = new DataTypeFactory($db, $this->createMock(EndpointFactory::class), $this->createMock(LoggerInterface::class));
+        $this->factory = new DataTypeFactory($db, $this->createMock(EndpointFactory::class), $this->createMock(DataObjectFactory::class), $this->createMock(LoggerInterface::class));
         $this->mandator = $this->getMandatorMock();
     }
 
@@ -105,13 +106,13 @@ class FactoryTest extends TestCase
     public function testDelete()
     {
         $this->factory->add($this->mandator, $this->getDataTypeDefinition('foo'));
-        $this->assertTrue($this->factory->delete($this->mandator, 'foo'));
+        $this->assertTrue($this->factory->deleteOne($this->mandator, 'foo'));
     }
 
     public function testDeleteNotFound()
     {
         $this->expectException(Exception\NotFound::class);
-        $this->assertTrue($this->factory->delete($this->mandator, 'foo'));
+        $this->assertTrue($this->factory->deleteOne($this->mandator, 'foo'));
     }
 
     protected function getMandatorMock()
