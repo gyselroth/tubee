@@ -37,7 +37,7 @@ class Validator extends ResourceValidator
             }
         }
 
-        parent::allowOnly(['verbs', 'roles', 'selectors', 'resources']);
+        parent::allowOnly($resource, ['verbs', 'roles', 'selectors', 'resources']);
 
         return $resource;
     }

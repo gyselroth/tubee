@@ -1,5 +1,6 @@
-mongodb2:
+mongodb3:
     image: mongo:3.6.0
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 openldap-endpoint:
     image: osixia/openldap:latest
     environment:
@@ -27,7 +28,7 @@ moodle-db:
 balloon-endpoint:
     image: gyselroth/balloon:latest-unstable
     links:
-        - mongodb2
+        - mongodb3
     entrypoint: php-fpm
     environment:
         - BALLOON_MONGODB_URI=mongodb://mongodb:27017
@@ -39,8 +40,8 @@ tubee-dev:
     volumes:
         - .:/srv/www/tubee
     links:
-        - mongodb2
+        - mongodb3
         - openldap-endpoint
         - balloon-endpoint
     environment:
-        - TUBEE_MONGODB_URI=mongodb://mongodb2:27017
+        - TUBEE_MONGODB_URI=mongodb://mongodb3:27017

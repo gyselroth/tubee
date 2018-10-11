@@ -88,6 +88,34 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Update.
+     */
+    public function update(AccessRoleInterface $resource, array $data): bool
+    {
+        $data = Validator::validate($data);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
+    }
+
+    /**
+     * Change stream.
+     */
+    public function watch(): Generator
+    {
+        $stream = $this->db->{self::COLLECTION_NAME}->watch();
+
+        for ($stream->rewind(); true; $stream->next()) {
+            if (!$stream->valid()) {
+                continue;
+            }
+
+            $event = $stream->current();
+            yield (string) $event['fullDocument']['_id'] => $this->build($event['fullDocument'])->toArray();
+            //    return;
+        }
+    }
+
+    /**
      * Build instance.
      */
     public function build(array $resource): AccessRoleInterface

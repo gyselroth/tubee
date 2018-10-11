@@ -69,6 +69,7 @@ class Routes
             $r->addRoute('PATCH', '/api/v1/access-rules/{rule}', [v1\AccessRules::class, 'patch']);
             $r->addRoute('GET', '/api/v1/access-roles', [v1\AccessRoles::class, 'getAll']);
             $r->addRoute('POST', '/api/v1/access-roles', [v1\AccessRoles::class, 'post']);
+            $r->addRoute('GET', '/api/v1/watch/access-roles', [v1\AccessRoles::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/access-roles/{rule}', [v1\AccessRoles::class, 'getOne']);
             $r->addRoute('DELETE', '/api/v1/access-roles/{rule}', [v1\AccessRoles::class, 'delete']);
             $r->addRoute('PUT', '/api/v1/access-roles/{rule}', [v1\AccessRoles::class, 'put']);

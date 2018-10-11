@@ -377,7 +377,7 @@ class Sync extends AbstractJob
           ->setBody($body)
           ->setEncoding('UTF-8');
 
-        foreach ($this->data['notification']['received'] as $receiver) {
+        foreach ($this->data['notification']['receiver'] as $receiver) {
             $mail->setTo($receiver);
 
             $this->logger->debug('send job notification ['.$this->data['job'].'] to ['.$receiver.']', [

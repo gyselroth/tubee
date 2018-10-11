@@ -88,6 +88,16 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Update.
+     */
+    public function update(AccessRuleInterface $resource, array $data): bool
+    {
+        $data = Validator::validate($data);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
+    }
+
+    /**
      * Build instance.
      */
     public function build(array $resource): AccessRuleInterface

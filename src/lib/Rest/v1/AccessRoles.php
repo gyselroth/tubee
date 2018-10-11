@@ -16,6 +16,8 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
+use Rs\Json\Patch;
 use Tubee\AccessRole\Factory as AccessRoleFactory;
 use Tubee\Acl;
 use Tubee\Rest\Pager;
@@ -26,10 +28,12 @@ class AccessRoles
     /**
      * Init.
      */
-    public function __construct(AccessRoleFactory $role_factory, Acl $acl)
+    public function __construct(AccessRoleFactory $role_factory, Acl $acl, LoggerInterface $logger)
     {
         $this->role_factory = $role_factory;
         $this->acl = $acl;
+
+        $this->logger = $logger;
     }
 
     /**
@@ -80,20 +84,6 @@ class AccessRoles
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $role->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
-    }
-
-    /**
-     * Update access role.
-     */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
-    {
-        $body = $request->getParsedBody();
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $role->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
@@ -159,5 +149,46 @@ class AccessRoles
             $this->role_factory->getOne($role->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch errors.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    {
+        $dstream = $this->role_factory->watch();
+        $factory = $this->role_factory;
+        foreach ($dstream as $t) {
+            $dstream->rewind();
+        }
+
+        /*
+                    exit();
+                $dstream->rewind();
+                    $stream->rewind();
+                    while (true) {
+                        if ($stream->valid()) {
+                            $document = $stream->current();
+                            $this->logger->error("yield document ".json_encode($document->decorate($request)));
+                            yield "test";
+                        }
+        
+                        $iterator->next();
+                    }
+                };
+        */
+        /*
+                $encoder = (new \Violet\StreamingJsonEncoder\BufferJsonEncoder($dstream));
+                #    ->setOptions(JSON_PRETTY_PRINT);
+        
+                $stream = new \Violet\StreamingJsonEncoder\JsonStream($encoder);
+        
+                while (!$stream->eof()) {
+                    $this->logger->debug("still not eof");
+                    echo $stream->read(1024 * 8);
+                }
+        */
+
+        return (new Response($stream))->withStatus(StatusCodeInterface::STATUS_OK);
     }
 }

@@ -17,6 +17,7 @@ use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
+use Rs\Json\Patch;
 use Tubee\AccessRule\Factory as AccessRuleFactory;
 use Tubee\Acl;
 use Tubee\Rest\Pager;
@@ -81,20 +82,6 @@ class AccessRules
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $rule->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
-    }
-
-    /**
-     * Update access rule.
-     */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
-    {
-        $body = $request->getParsedBody();
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $rule->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
