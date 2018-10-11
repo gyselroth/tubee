@@ -137,4 +137,27 @@ class AccessRoles
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
+        $role = $this->role_factory->getOne($role);
+        $doc = $role->getData();
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        $update = json_decode($patched, true);
+
+        $this->role_factory->update($role, $update);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->role_factory->getOne($role->getName())->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
 }

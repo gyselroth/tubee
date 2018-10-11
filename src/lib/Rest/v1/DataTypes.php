@@ -16,6 +16,7 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
@@ -89,6 +90,30 @@ class DataTypes
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
             $this->datatype_factory->getOne($mandator, $body['name'])->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $datatype = $mandator->getDataType($datatype);
+        $doc = $datatype->getData();
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        $update = json_decode($patched, true);
+
+        $this->datatype_factory->update($datatype, $update);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->datatype_factory->getOne($datatype->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

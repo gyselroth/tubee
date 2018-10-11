@@ -27,11 +27,11 @@ class CoreInstallation implements DeltaInterface
     /**
      * Construct.
      */
-    public function __construct(Database $db, AccessRoleFactory $role, AccessRuleFactory $rule)
+    public function __construct(Database $db, AccessRoleFactory $role_factory, AccessRuleFactory $rule_factory)
     {
         $this->db = $db;
-        $this->role = $role;
-        $this->rule = $rule;
+        $this->role_factory = $role_factory;
+        $this->rule_factory = $rule_factory;
     }
 
     /**
@@ -46,20 +46,22 @@ class CoreInstallation implements DeltaInterface
 
         $this->db->access_roles->createIndex(['name' => 1], ['unique' => true]);
         $this->db->access_rules->createIndex(['name' => 1], ['unique' => true]);
+        $this->db->jobs->createIndex(['name' => 1], ['unique' => true]);
         $this->db->mandators->createIndex(['name' => 1], ['unique' => true]);
         $this->db->datatypes->createIndex(['name' => 1, 'mandator' => 1], ['unique' => true]);
         $this->db->endpoints->createIndex(['name' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
         $this->db->workflows->createIndex(['name' => 1, 'workflow' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
+        $this->db->relations->createIndex(['object_1' => 1, 'object_2' => 1], ['unique' => true]);
 
-        if (!$this->role->has('admin')) {
-            $this->role->add([
+        if (!$this->role_factory->has('admin')) {
+            $this->role_factory->add([
                 'name' => 'admin',
                 'selectors' => ['*'],
             ]);
         }
 
-        if (!$this->rule->has('full-access')) {
-            $this->rule->add([
+        if (!$this->rule_factory->has('full-access')) {
+            $this->rule_factory->add([
                 'name' => 'full-access',
                 'roles' => ['admin'],
                 'verbs' => ['*'],
@@ -68,21 +70,12 @@ class CoreInstallation implements DeltaInterface
             ]);
         }
 
-        if (!in_array('errors', $collections)) {
+        if (!in_array('logs', $collections)) {
             $this->db->createCollection(
-                'errors',
+                'logs',
                 [
                 'capped' => true,
-                'size' => 100000, ]
-            );
-        }
-
-        if (!in_array('events', $collections)) {
-            $this->db->createCollection(
-                'events',
-                [
-                'capped' => true,
-                'size' => 100000, ]
+                'size' => 100000000, ]
             );
         }
 

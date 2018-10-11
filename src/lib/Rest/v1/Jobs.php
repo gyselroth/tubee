@@ -14,10 +14,9 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use TaskScheduler\Scheduler;
+use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Job;
 use Tubee\Job\Factory as JobFactory;
@@ -62,7 +61,7 @@ class Jobs
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
     {
         $query = $request->getQueryParams();
 
@@ -76,7 +75,7 @@ class Jobs
     /**
      * Delete job.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, ObjectId $job): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
     {
         $this->job_factory->deleteOne($job);
 
@@ -88,34 +87,39 @@ class Jobs
      */
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $job = [
-            //'action' => $action,
-            'mandator' => [],
-            'datatypes' => [],
-            'filter' => [],
-            'endpoints' => [],
-            'simulate' => false,
-            'ignore' => true,
-            'options' => [
-                Scheduler::OPTION_AT => 0,
-                Scheduler::OPTION_INTERVAL => 0,
-                Scheduler::OPTION_RETRY => 0,
-                Scheduler::OPTION_RETRY_INTERVAL => 0,
-                Scheduler::OPTION_TIMEOUT => 0,
-            ],
-        ];
-
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $job = array_merge($job, $body);
+        $job = array_merge(['mandators' => []], $body);
 
-        //validate job requst
-        $this->mandator_factory->getAll($job['mandator']);
+        $this->mandator_factory->getAll($job['mandators']);
         $id = $this->job_factory->create($job);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->job_factory->getOne($id)->decorate($request),
+            $this->job_factory->getOne($job['name'])->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
+        $job = $this->job_factory->getOne($job);
+        $doc = $endpoint->getData();
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        $update = json_decode($patched, true);
+
+        $this->job_factory->update($job, $update);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->job_factory->getOne($job)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

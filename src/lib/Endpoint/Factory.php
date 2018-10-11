@@ -16,7 +16,6 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\Endpoint\Validator as EndpointValidator;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -131,7 +130,7 @@ class Factory extends ResourceFactory
      */
     public function add(DataTypeInterface $datatype, array $resource): ObjectId
     {
-        $resource = EndpointValidator::validate($resource);
+        $resource = Validator::validate($resource);
 
         if ($this->has($datatype, $resource['name'])) {
             throw new Exception\NotUnique('endpoint '.$resource['name'].' does already exists');
@@ -140,6 +139,12 @@ class Factory extends ResourceFactory
         $resource['_id'] = new ObjectId();
         $endpoint = $this->build($resource, $datatype);
         $endpoint->setup();
+
+        if ($resource['type'] === EndpointInterface::TYPE_SOURCE) {
+            $this->ensureIndex($datatype, $resource['data_options']['import']);
+        } else {
+            $this->ensureIndex($datatype, array_keys($resource['data_options']['filter_all']));
+        }
 
         $resource['mandator'] = $datatype->getMandator()->getName();
         $resource['datatype'] = $datatype->getName();
@@ -152,40 +157,9 @@ class Factory extends ResourceFactory
      */
     public function update(EndpointInterface $resource, array $data): bool
     {
-        $data = EndpointValidator::validate($data);
+        $data = Validator::validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
-    }
-
-    /**
-     * Ensure indexes.
-     */
-    public function ensureIndex(array $fields): string
-    {
-        $list = iterator_to_array($this->db->{$this->collection}->listIndexes());
-        $keys = array_fill_keys($fields, 1);
-
-        $this->logger->debug('verify if mongodb index exists for import attributes [{import}]', [
-            'category' => get_class($this),
-            'import' => $keys,
-        ]);
-
-        foreach ($list as $index) {
-            if ($index['key'] === $keys) {
-                $this->logger->debug('found existing mongodb index ['.$index['name'].'] for import attributes', [
-                    'category' => get_class($this),
-                    'import' => $keys,
-                ]);
-
-                return $index['name'];
-            }
-        }
-
-        $this->logger->info('create new mongodb index for import attributes', [
-            'category' => get_class($this),
-        ]);
-
-        return $this->db->{$this->collection}->createIndex($keys);
     }
 
     /**
@@ -196,5 +170,36 @@ class Factory extends ResourceFactory
         $factory = $resource['class'].'\\Factory';
 
         return $this->initResource($factory::build($resource, $datatype, $this->workflow_factory, $this->logger));
+    }
+
+    /**
+     * Ensure indexes.
+     */
+    protected function ensureIndex(DataTypeInterface $datatype, array $fields): string
+    {
+        $list = iterator_to_array($this->db->{$datatype->getCollection()}->listIndexes());
+        $keys = array_fill_keys($fields, 1);
+
+        $this->logger->debug('verify if mongodb index exists for import attributes [{import}]', [
+            'category' => get_class($this),
+            'import' => $keys,
+        ]);
+
+        foreach ($list as $index) {
+            if ($index['key'] === $keys) {
+                $this->logger->debug('found existing mongodb index ['.$index['name'].']', [
+                    'category' => get_class($this),
+                    'fields' => $keys,
+                ]);
+
+                return $index['name'];
+            }
+        }
+
+        $this->logger->info('create new mongodb index', [
+            'category' => get_class($this),
+        ]);
+
+        return $this->db->{$datatype->getCollection()}->createIndex($keys);
     }
 }

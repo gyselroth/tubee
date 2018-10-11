@@ -16,6 +16,11 @@ use InvalidArgumentException;
 class Validator
 {
     /**
+     * Resource attributes.
+     */
+    public const RESOURCE_ATTRIBUTES = ['name', 'description'];
+
+    /**
      * Validate resource.
      */
     public static function validate(array $resource): array

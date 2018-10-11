@@ -85,7 +85,7 @@ class Factory extends ResourceFactory
 
         $this->logger->debug('find one object with pipeline [{pipeline}] from ['.$datatype->getCollection().']', [
             'category' => get_class($this),
-            'pipeline' => $pipeline,
+            //'pipeline' => $pipeline,
         ]);
 
         $cursor = $this->db->{$datatype->getCollection()}->aggregate($pipeline, [
@@ -177,7 +177,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function change(DataTypeInterface $datatype, DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int
+    public function update(DataTypeInterface $datatype, DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int
     {
         $datatype->getSchema()->validate($object);
 

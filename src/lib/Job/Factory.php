@@ -67,24 +67,26 @@ class Factory extends ResourceFactory
     /**
      * Delete by name.
      */
-    public function deleteOne(ObjectId $id): bool
+    public function deleteOne(string $name): bool
     {
-        try {
-            $this->scheduler->cancelJob($id);
-        } catch (\Exception $e) {
+        $job = $this->getOne($name);
+
+        foreach ($this->scheduler->getJobs(['data.job' => $name]) as $task) {
+            try {
+                $this->scheduler->cancelJob($task['_id']);
+            } catch (\Exception $e) {
+            }
         }
 
-        $resource = $this->getOne($id);
-
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $id);
+        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $job->getId());
     }
 
     /**
      * Get job.
      */
-    public function getOne(ObjectId $job): JobInterface
+    public function getOne(string $name): JobInterface
     {
-        $result = $this->db->{self::COLLECTION_NAME}->findOne(['_id' => $job]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
 
         if ($result === null) {
             throw new Exception\NotFound('job not found');
@@ -98,13 +100,36 @@ class Factory extends ResourceFactory
      */
     public function create(array $resource): ObjectId
     {
-        $options = isset($resource['options']) ? $resource['options'] : [];
+        $resource = Validator::validate($resource);
+
+        if ($this->has($resource['name'])) {
+            throw new Exception\NotUnique('job '.$resource['name'].' does already exists');
+        }
+
         $result = $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
 
         $resource += ['job' => $result];
-        $this->scheduler->addJob(Sync::class, $resource, $options);
+        $this->scheduler->addJob(Sync::class, $resource, $resource['options']);
 
         return $result;
+    }
+
+    /**
+     * Has.
+     */
+    public function has(string $name): bool
+    {
+        return $this->db->{self::COLLECTION_NAME}->count(['name' => $name]) > 0;
+    }
+
+    /**
+     * Update.
+     */
+    public function update(JobInterface $resource, array $data): bool
+    {
+        $data = Validator::validate($data);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
     }
 
     /**

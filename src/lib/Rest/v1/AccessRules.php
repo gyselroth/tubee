@@ -16,6 +16,7 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rs\Json\Patch;
 use Tubee\AccessRule\Factory as AccessRuleFactory;
 use Tubee\Acl;
 use Tubee\Rest\Pager;
@@ -137,5 +138,28 @@ class AccessRules
         $this->rule_factory->deleteOne($rule);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+    }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
+        $rule = $this->rule_factory->getOne($rule);
+        $doc = $rule->getData();
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        $update = json_decode($patched, true);
+
+        $this->rule_factory->update($rule, $update);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->rule_factory->getOne($rule->getName())->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
     }
 }

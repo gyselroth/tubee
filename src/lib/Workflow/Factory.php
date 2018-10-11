@@ -20,7 +20,6 @@ use Tubee\AttributeMap;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Workflow;
-use Tubee\Workflow\Validator as WorkflowValidator;
 
 class Factory extends ResourceFactory
 {
@@ -121,7 +120,7 @@ class Factory extends ResourceFactory
      */
     public function add(EndpointInterface $endpoint, array $resource): ObjectId
     {
-        $resource = WorkflowValidator::validate($resource);
+        $resource = Validator::validate($resource);
 
         if ($this->has($endpoint, $resource['name'])) {
             throw new Exception\NotUnique('workflow '.$resource['name'].' does already exists');
@@ -139,7 +138,7 @@ class Factory extends ResourceFactory
      */
     public function update(WorkflowInterface $resource, array $data): bool
     {
-        $data = WorkflowValidator::validate($data);
+        $data = Validator::validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
     }

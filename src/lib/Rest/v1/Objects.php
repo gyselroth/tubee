@@ -17,6 +17,7 @@ use Micro\Auth\Identity;
 use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
@@ -123,6 +124,31 @@ class Objects
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $body,
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $datatype = $mandator->getDataType($datatype);
+        $object = $datatype->getObject(['_id' => $object]);
+        $doc = $object->getData();
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        $update = json_decode($patched, true);
+
+        $this->object_factory->update($object, $update);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $datatype->getObject(['_id' => $object->getId()])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

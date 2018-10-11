@@ -13,7 +13,6 @@ namespace Tubee\DataType;
 
 use Generator;
 use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\UTCDateTime;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator;
@@ -58,16 +57,6 @@ interface DataTypeInterface extends ResourceInterface
      * Get all data objects.
      */
     public function getObjects(array $filter, bool $include_dataset = false, ?int $offset = null, ?int $limit = null): Generator;
-
-    /**
-     * Write to destination endpoints.
-     */
-    public function export(UTCDateTime $timestamp, array $filter, array $endpoints, bool $simulate, bool $ignore): bool;
-
-    /**
-     * Import from source endpoints.
-     */
-    public function import(UTCDateTime $timestamp, array $filter, array $endpoints, bool $simulate, bool $ignore): bool;
 
     /**
      * Flush.

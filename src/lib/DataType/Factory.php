@@ -17,7 +17,6 @@ use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataObject\Factory as DataObjectFactory;
 use Tubee\DataType;
-use Tubee\DataType\Validator as DataTypeValidator;
 use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\MandatorInterface;
 use Tubee\Resource\Factory as ResourceFactory;
@@ -124,7 +123,7 @@ class Factory extends ResourceFactory
      */
     public function add(MandatorInterface $mandator, array $resource): ObjectId
     {
-        $resource = DataTypeValidator::validate($resource);
+        $resource = Validator::validate($resource);
 
         if ($this->has($mandator, $resource['name'])) {
             throw new Exception\NotUnique('datatype '.$resource['name'].' does already exists');
@@ -133,6 +132,16 @@ class Factory extends ResourceFactory
         $resource['mandator'] = $mandator->getName();
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+    }
+
+    /**
+     * Update.
+     */
+    public function update(DataTypeInterface $resource, array $data): bool
+    {
+        $data = Validator::validate($data);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
     }
 
     /**
