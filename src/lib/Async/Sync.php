@@ -371,7 +371,7 @@ class Sync extends AbstractJob
             $body = "Hi there\n\nThe sync job ".(string) $this->data['job']." started at $iso finished with no errors.";
         }
 
-        $body = new MimeMessage($message);
+        $body = new MimeMessage($body);
         $mail = (new Message())
           ->setSubject($subject)
           ->setBody($body)
