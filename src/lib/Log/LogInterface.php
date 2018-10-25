@@ -9,10 +9,10 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Job;
+namespace Tubee\Log;
 
 use Tubee\Resource\ResourceInterface;
 
-interface JobInterface extends ResourceInterface
+interface LogInterface extends ResourceInterface
 {
 }

@@ -21,7 +21,7 @@ use Tubee\Acl;
 use Tubee\Job;
 use Tubee\Job\Factory as JobFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\Rest\Pager;
+use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class Jobs
@@ -48,14 +48,8 @@ class Jobs
         ], $request->getQueryParams());
 
         $jobs = $this->job_factory->getAll($query['query'], $query['offset'], $query['limit']);
-        $body = $this->acl->filterOutput($request, $identity, $jobs);
-        $body = Pager::fromRequest($body, $request);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $jobs);
     }
 
     /**
@@ -63,13 +57,9 @@ class Jobs
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
     {
-        $query = $request->getQueryParams();
+        $resource = $this->job_factory->getOne($job);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->job_factory->getOne($job)->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $resource);
     }
 
     /**
@@ -122,5 +112,15 @@ class Jobs
             $this->job_factory->getOne($job)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    {
+        $cursor = $this->job_factory->watch();
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

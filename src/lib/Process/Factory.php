@@ -12,15 +12,14 @@ declare(strict_types=1);
 namespace Tubee\Process;
 
 use Generator;
-use IteratorIterator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
-use MongoDB\Operation\Find;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\Process;
 use TaskScheduler\Scheduler;
 use Tubee\Job;
-use Tubee\Job\Error\ErrorInterface;
+use Tubee\Job\JobInterface;
+use Tubee\Process as ProcessWrapper;
 use Tubee\Resource\Factory as ResourceFactory;
 
 class Factory extends ResourceFactory
@@ -50,7 +49,7 @@ class Factory extends ResourceFactory
             'data.job' => $job->getId(),
         ];
 
-        if ($query !== null) {
+        if (!empty($query)) {
             $filter = ['$and' => [$filter, $query]];
         }
 
@@ -60,7 +59,7 @@ class Factory extends ResourceFactory
             yield $id => $this->build($process, $job);
         }
 
-        return $result->getReturn();
+        return (int) $result->getReturn();
     }
 
     /**
@@ -76,7 +75,7 @@ class Factory extends ResourceFactory
     /**
      * Get job.
      */
-    public function getOne(JobInterface $job, ObjectId $id): JobInterface
+    public function getOne(JobInterface $job, ObjectId $id): ProcessInterface
     {
         $result = $this->scheduler->getJob($id);
 
@@ -84,77 +83,20 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Change stream.
+     */
+    public function watch(JobInterface $job, ?ObjectId $after = null, bool $existing = true): Generator
+    {
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($job) {
+            return $this->build($resource->toArray(), $resource, $job);
+        });
+    }
+
+    /**
      * Wrap process.
      */
-    public function build(Process $resource, JobInterface $job): ProcessInterface
+    public function build(Process $process, JobInterface $job): ProcessInterface
     {
-        return $this->initResource(new Process($resource, $job));
-    }
-
-    /**
-     * Get jobs errors.
-     */
-    public function getErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
-    {
-        $result = $this->db->errors->find([
-            'context.job' => (string) $job,
-        ], [
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
-
-        foreach ($result as $error) {
-            yield (string) $error['_id'] => new Error($error);
-        }
-
-        return $this->db->erros->count((array) $query);
-    }
-
-    /**
-     * Get jobs errors.
-     */
-    public function watchErrors(ObjectId $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
-    {
-        $result = $this->db->errors->find([
-            'context.job' => (string) $job,
-        ], [
-            'offset' => $offset,
-            'limit' => $limit,
-            'cursorType' => Find::TAILABLE,
-            'noCursorTimeout' => true,
-        ]);
-
-        $iterator = new IteratorIterator($result);
-        $iterator->rewind();
-
-        while (true) {
-            if (null === $iterator->current()) {
-                if ($iterator->getInnerIterator()->isDead()) {
-                    return $this->db->erros->count((array) $query);
-                }
-
-                $iterator->next();
-
-                continue;
-            }
-
-            $resource = $iterator->current();
-            $iterator->next();
-            yield (string) $resource['_id'] => new Error($resource);
-        }
-    }
-
-    /**
-     * Get job.
-     */
-    public function getError(ObjectId $error): ErrorInterface
-    {
-        $result = $this->db->errors->findOne(['_id' => $error]);
-
-        if ($result === null) {
-            throw new Exception\NotFound('error not found');
-        }
-
-        return new Error($result);
+        return $this->initResource(new ProcessWrapper($process->toArray(), $process, $job));
     }
 }

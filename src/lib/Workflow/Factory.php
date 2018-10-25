@@ -148,7 +148,7 @@ class Factory extends ResourceFactory
      */
     public function watch(EndpointInterface $endpoint, ?ObjectId $after = null, bool $existing = true): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, function (array $resource) use ($endpoint) {
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($endpoint) {
             return $this->build($resource, $endpoint);
         });
     }

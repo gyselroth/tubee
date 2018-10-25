@@ -124,7 +124,7 @@ class Factory
     /**
      * Change stream.
      */
-    public function watchFrom(Collection $collection, ?ObjectId $after = null, bool $existing = true, ?Closure $build = null): Generator
+    public function watchFrom(Collection $collection, ?ObjectId $after = null, bool $existing = true, array $query = [], ?Closure $build = null): Generator
     {
         if ($build === null) {
             $build = function ($resource) {

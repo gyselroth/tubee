@@ -12,10 +12,8 @@ declare(strict_types=1);
 namespace Tubee\Log;
 
 use Generator;
-use IteratorIterator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
-use MongoDB\Operation\Find;
 use Psr\Log\LoggerInterface;
 use Tubee\Job\JobInterface;
 use Tubee\Log;
@@ -53,6 +51,10 @@ class Factory extends ResourceFactory
             'context.job' => (string) $job->getId(),
         ];
 
+        if (!empty($query)) {
+            $filter = ['$and' => [$filter, $query]];
+        }
+
         $result = $this->db->{self::COLLECTION_NAME}->find($filter, [
             'offset' => $offset,
             'limit' => $limit,
@@ -68,35 +70,13 @@ class Factory extends ResourceFactory
     /**
      * watch all.
      */
-    public function watchAll(JobInterface $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function watch(JobInterface $job, ?ObjectId $after = null, bool $existing = true, ?array $query = null): Generator
     {
-        $result = $this->db->{self::COLLECTION_NAME}->find([
-            'context.job' => (string) $job->getId(),
-        ], [
-            'offset' => $offset,
-            'limit' => $limit,
-            'cursorType' => Find::TAILABLE,
-            'noCursorTimeout' => true,
-        ]);
+        $query = [
+             'context.job' => (string) $job->getId(),
+        ];
 
-        $iterator = new IteratorIterator($result);
-        $iterator->rewind();
-
-        while (true) {
-            if (null === $iterator->current()) {
-                if ($iterator->getInnerIterator()->isDead()) {
-                    return $this->db->erros->count((array) $query);
-                }
-
-                $iterator->next();
-
-                continue;
-            }
-
-            $resource = $iterator->current();
-            $iterator->next();
-            yield (string) $resource['_id'] => $this->build($resource);
-        }
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query);
     }
 
     /**

@@ -11,12 +11,13 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use DateTime;
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\Job\JobInterface;
+use Tubee\Log\LogInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
-class Log extends AbstractResource implements JobInterface
+class Log extends AbstractResource implements LogInterface
 {
     /**
      * Scheduler.
@@ -38,30 +39,29 @@ class Log extends AbstractResource implements JobInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $options = $this->resource['options'];
-        $scheduler = $this->scheduler;
-        $resource = $this->resource;
+        $data = $this->resource;
 
-        $result = [
+        return AttributeResolver::resolve($request, $this, [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
-            'kind' => 'Job',
-            'options' => [
-                'at' => $options['at'],
-                'interval' => $options['interval'],
-                'retry' => $options['retry'],
-                'retry_interval' => $options['retry_interval'],
-                'timeout' => $options['timeout'],
-            ],
-            'data' => $this->resource,
-            'status' => function () use ($scheduler) {
-                /*$cursor = $scheduler->getJobs([
-                    'data.job' => $resource['_job']
-                ]);*/
+            'kind' => 'Log',
+            'id' => (string) $this->getId(),
+            'level' => $this->resource['level'],
+            'level_name' => $this->resource['level_name'],
+            'message' => $this->resource['message'],
+            'created' => (new DateTime($this->resource['datetime']))->format('c'),
+            'category' => $this->resource['context']['category'],
+            'exception' => function ($resource) use ($data) {
+                if (isset($data['context']['exception'])) {
+                    return $data['context']['exception'];
+                }
             },
-        ];
-
-        return AttributeResolver::resolve($request, $this, $result);
+            'object' => function ($resource) use ($data) {
+                if (isset($data['context']['object'])) {
+                    return $data['context']['object'];
+                }
+            },
+        ]);
     }
 }

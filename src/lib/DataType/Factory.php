@@ -149,7 +149,7 @@ class Factory extends ResourceFactory
      */
     public function watch(MandatorInterface $mandator, ?ObjectId $after = null, bool $existing = true): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, function (array $resource) use ($mandator) {
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($mandator) {
             return $this->build($resource, $mandator);
         });
     }

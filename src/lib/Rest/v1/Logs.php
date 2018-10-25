@@ -1,0 +1,83 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * tubee.io
+ *
+ * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
+ */
+
+namespace Tubee\Rest\v1;
+
+use Micro\Auth\Identity;
+use MongoDB\BSON\ObjectId;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Tubee\Acl;
+use Tubee\Job\Factory as JobFactory;
+use Tubee\Log\Factory as LogFactory;
+use Tubee\Rest\Helper;
+
+class Logs
+{
+    /**
+     * Init.
+     */
+    public function __construct(JobFactory $job_factory, Acl $acl, LogFactory $log_factory)
+    {
+        $this->job_factory = $job_factory;
+        $this->log_factory = $log_factory;
+        $this->acl = $acl;
+    }
+
+    /**
+     * Get all.
+     */
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectId $process = null): ResponseInterface
+    {
+        $query = array_merge([
+            'offset' => 0,
+            'limit' => 20,
+            'query' => [],
+        ], $request->getQueryParams());
+
+        $job = $this->job_factory->getOne($job);
+
+        if ($process !== null) {
+            $process = $job->getProcess($process);
+            $query['query']['_id'] = $process->getId();
+        }
+
+        $logs = $job->getLogs($query['query'], $query['offset'], $query['limit']);
+
+        return Helper::getAll($request, $identity, $this->acl, $logs);
+    }
+
+    /**
+     * Get one.
+     */
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $name, ObjectId $log): ResponseInterface
+    {
+        $job = $this->job_factory->getOne($job)->getLog($log);
+
+        return Helper::getOne($request, $identity, $resource);
+    }
+
+    /**
+     * Watch all.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectId $process = null): ResponseInterface
+    {
+        $job = $this->job_factory->getOne($job);
+
+        if ($process !== null) {
+            $process = $job->getProcess($process);
+        }
+
+        $cursor = $this->log_factory->watch($job, $process);
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
+    }
+}

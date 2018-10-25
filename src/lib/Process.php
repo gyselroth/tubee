@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Psr\Http\Message\ServerRequestInterface;
-use TaskScheduler\Process;
+use TaskScheduler\Process as TaskSchedulerProcess;
 use Tubee\Job\JobInterface;
-use Tubee\Job\JobInterface;
+use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
@@ -30,9 +30,10 @@ class Process extends AbstractResource implements ProcessInterface
     /**
      * Process.
      */
-    public function __construct(Process $process, JobInterface $job)
+    public function __construct(array $resource, TaskSchedulerProcess $process, JobInterface $job)
     {
-        $this->resource = $process;
+        $this->resource = $resource;
+        $this->process = $process;
         $this->job = $job;
     }
 
@@ -46,7 +47,9 @@ class Process extends AbstractResource implements ProcessInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Process',
-            'status' => $this->resource->getResult(),
+            'status' => [
+                'code' => $this->process->getStatus(),
+            ],
         ];
 
         return AttributeResolver::resolve($request, $this, $result);
