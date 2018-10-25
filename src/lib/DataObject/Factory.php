@@ -233,6 +233,16 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Change stream.
+     */
+    public function watch(DataTypeInterface $datatype, ?ObjectId $after = null, bool $existing = true): Generator
+    {
+        return $this->watchFrom($this->db->{$datatype->getCollection()}, $after, $existing, function (array $resource) use ($datatype) {
+            return $this->build($datatype, $resource);
+        });
+    }
+
+    /**
      * Build.
      */
     public function build(array $resource, DataTypeInterface $datatype): DataObjectInterface

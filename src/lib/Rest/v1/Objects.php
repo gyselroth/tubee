@@ -19,6 +19,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
 use Tubee\Acl;
+use Tubee\DataObject\Factory as DataObjectFactory;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Rest\Helper;
@@ -30,11 +31,12 @@ class Objects
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, Acl $acl)
+    public function __construct(MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, DataObjectFactory $object_factory, Acl $acl)
     {
         $this->mandator_factory = $mandator_factory;
         $this->datatype_factory = $datatype_factory;
         $this->acl = $acl;
+        $this->object_factory = $object_factory;
     }
 
     /**

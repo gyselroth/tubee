@@ -17,7 +17,6 @@ use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
-use Rs\Json\Patch;
 use Tubee\AccessRule\Factory as AccessRuleFactory;
 use Tubee\Acl;
 use Tubee\Rest\Helper;
@@ -30,7 +29,7 @@ class AccessRules
      */
     public function __construct(AccessRuleFactory $rule_factory, Acl $acl)
     {
-        $this->rule_factory_factory = $rule_factory;
+        $this->rule_factory = $rule_factory;
         $this->acl = $acl;
     }
 

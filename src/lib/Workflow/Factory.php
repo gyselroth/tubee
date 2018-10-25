@@ -144,6 +144,16 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Change stream.
+     */
+    public function watch(EndpointInterface $endpoint, ?ObjectId $after = null, bool $existing = true): Generator
+    {
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, function (array $resource) use ($endpoint) {
+            return $this->build($resource, $endpoint);
+        });
+    }
+
+    /**
      * Build instance.
      */
     public function build(array $resource, EndpointInterface $endpoint): WorkflowInterface

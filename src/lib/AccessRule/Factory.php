@@ -98,6 +98,14 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Change stream.
+     */
+    public function watch(?ObjectId $after = null, bool $existing = true): Generator
+    {
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing);
+    }
+
+    /**
      * Build instance.
      */
     public function build(array $resource): AccessRuleInterface

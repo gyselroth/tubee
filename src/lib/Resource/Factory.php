@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Tubee\Resource;
 
+use Closure;
+use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
@@ -117,6 +119,44 @@ class Factory
         $result = $collection->deleteOne(['_id' => $id]);
 
         return true;
+    }
+
+    /**
+     * Change stream.
+     */
+    public function watchFrom(Collection $collection, ?ObjectId $after = null, bool $existing = true, ?Closure $build = null): Generator
+    {
+        if ($build === null) {
+            $build = function ($resource) {
+                return $this->build($resource);
+            };
+        }
+
+        if ($existing === true) {
+            $result = $collection->find();
+            foreach ($result as $resource) {
+                yield (string) $resource['_id'] => [
+                    'insert',
+                    $build->call($this, $resource),
+                ];
+            }
+        }
+
+        $stream = $collection->watch([], [
+            'resumeAfter' => $after,
+        ]);
+
+        for ($stream->rewind(); true; $stream->next()) {
+            if (!$stream->valid()) {
+                continue;
+            }
+
+            $event = $stream->current();
+            yield (string) $event['fullDocument']['_id'] => [
+                $event['operationType'],
+                $build->call($this, $event['fullDocument']),
+            ];
+        }
     }
 
     /**
