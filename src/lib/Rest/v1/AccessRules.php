@@ -20,7 +20,7 @@ use Rs\Json\Patch;
 use Rs\Json\Patch;
 use Tubee\AccessRule\Factory as AccessRuleFactory;
 use Tubee\Acl;
-use Tubee\Rest\Pager;
+use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class AccessRules
@@ -47,14 +47,7 @@ class AccessRules
 
         $rules = $this->rule_factory->getAll($query['query'], $query['offset'], $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $rules);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $rules);
     }
 
     /**
@@ -62,13 +55,9 @@ class AccessRules
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
     {
-        $request->getQueryParams();
+        $resource = $this->rule_factory->getOne($rule);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->rule_factory->getOne($rule)->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $resource);
     }
 
     /**
@@ -148,5 +137,15 @@ class AccessRules
             $this->rule_factory->getOne($rule->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    {
+        $cursor = $this->rule_factory->watch();
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

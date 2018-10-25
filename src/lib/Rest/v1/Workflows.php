@@ -19,7 +19,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\Rest\Pager;
+use Tubee\Rest\Helper;
 use Tubee\Workflow\Factory as WorkflowFactory;
 use Zend\Diactoros\Response;
 
@@ -49,14 +49,7 @@ class Workflows
         $mandator = $this->mandator_factory->getOne($mandator);
         $workflows = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $workflows);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $workflows);
     }
 
     /**
@@ -64,16 +57,10 @@ class Workflows
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
     {
-        $query = $request->getQueryParams();
-
         $mandator = $this->mandator_factory->getOne($mandator);
         $workflow = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflow($workflow);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $workflow->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $workflow);
     }
 
     /**
@@ -129,5 +116,16 @@ class Workflows
             $endpoint->getWorkflow($workflow->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    {
+        $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
+        $cursor = $this->workflow_factory->watch($endpoint);
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

@@ -20,7 +20,7 @@ use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Endpoint\Factory as EndpointFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\Rest\Pager;
+use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class Endpoints
@@ -49,14 +49,7 @@ class Endpoints
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $endpoints = $datatype->getEndpoints($query['query'], (int) $query['offset'], (int) $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $endpoints);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $endpoints);
     }
 
     /**
@@ -64,16 +57,10 @@ class Endpoints
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
     {
-        $query = $request->getQueryParams();
-
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $endpoint = $datatype->getEndpoint($endpoint);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $endpoint->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $endpoint);
     }
 
     /**
@@ -128,5 +115,16 @@ class Endpoints
             $datatype->getEndpoint($endpoint->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    {
+        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
+        $cursor = $this->endpoint_factory->watch($datatype);
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

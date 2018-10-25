@@ -21,6 +21,7 @@ use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\Rest\Helper;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
@@ -50,14 +51,7 @@ class Objects
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $objects = $datatype->getObjects($query['query'], false, (int) $query['offset'], (int) $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $objects);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $objects);
     }
 
     /**
@@ -65,16 +59,10 @@ class Objects
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
     {
-        $query = $request->getQueryParams();
-
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object], false);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $object->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $object);
     }
 
     /**
@@ -151,5 +139,16 @@ class Objects
             $datatype->getObject(['_id' => $object->getId()])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    {
+        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
+        $cursor = $this->object_factory->watch($datatype);
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

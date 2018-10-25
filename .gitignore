@@ -5,6 +5,7 @@ build
 config
 log/*
 dist
+lib_dev
 data
 composer.lock
 .php_cs.cache

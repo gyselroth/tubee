@@ -20,7 +20,7 @@ use Psr\Log\LoggerInterface;
 use Rs\Json\Patch;
 use Tubee\AccessRole\Factory as AccessRoleFactory;
 use Tubee\Acl;
-use Tubee\Rest\Pager;
+use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class AccessRoles
@@ -32,7 +32,6 @@ class AccessRoles
     {
         $this->role_factory = $role_factory;
         $this->acl = $acl;
-
         $this->logger = $logger;
     }
 
@@ -49,14 +48,7 @@ class AccessRoles
 
         $roles = $this->role_factory->getAll($query['query'], $query['offset'], $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $roles);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $roles);
     }
 
     /**
@@ -64,13 +56,9 @@ class AccessRoles
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
-        $query = $request->getQueryParams();
+        $resource = $this->role_factory->getOne($role);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->acl->getRule($role)->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $resource);
     }
 
     /**
@@ -152,43 +140,12 @@ class AccessRoles
     }
 
     /**
-     * Watch errors.
+     * Watch.
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $dstream = $this->role_factory->watch();
-        $factory = $this->role_factory;
-        foreach ($dstream as $t) {
-            $dstream->rewind();
-        }
+        $cursor = $this->role_factory->watch();
 
-        /*
-                    exit();
-                $dstream->rewind();
-                    $stream->rewind();
-                    while (true) {
-                        if ($stream->valid()) {
-                            $document = $stream->current();
-                            $this->logger->error("yield document ".json_encode($document->decorate($request)));
-                            yield "test";
-                        }
-        
-                        $iterator->next();
-                    }
-                };
-        */
-        /*
-                $encoder = (new \Violet\StreamingJsonEncoder\BufferJsonEncoder($dstream));
-                #    ->setOptions(JSON_PRETTY_PRINT);
-        
-                $stream = new \Violet\StreamingJsonEncoder\JsonStream($encoder);
-        
-                while (!$stream->eof()) {
-                    $this->logger->debug("still not eof");
-                    echo $stream->read(1024 * 8);
-                }
-        */
-
-        return (new Response($stream))->withStatus(StatusCodeInterface::STATUS_OK);
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

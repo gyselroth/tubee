@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
 use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\Rest\Pager;
+use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class Mandators
@@ -44,14 +44,8 @@ class Mandators
         ], $request->getQueryParams());
 
         $mandators = $this->mandator_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit']);
-        $body = $this->acl->filterOutput($request, $identity, $mandators);
-        $body = Pager::fromRequest($body, $request);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $mandators);
     }
 
     /**
@@ -59,13 +53,9 @@ class Mandators
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator): ResponseInterface
     {
-        $query = $request->getQueryParams();
+        $resource = $this->mandator_factory->getOne($mandator);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->mandator_factory->getOne($mandator)->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $resource);
     }
 
     /**
@@ -75,11 +65,22 @@ class Mandators
     {
         $body = $request->getParsedBody();
         $id = $this->mandator_factory->add($body);
+        $query = $request->getQueryParams();
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
             $this->mandator_factory->getOne($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    {
+        $cursor = $this->mandator_factory->watch();
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

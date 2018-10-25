@@ -100,9 +100,21 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(): Generator
+    public function watch(?ObjectId $after = null, bool $existing = true): Generator
     {
-        $stream = $this->db->{self::COLLECTION_NAME}->watch();
+        if ($existing === true) {
+            $result = $this->db->{self::COLLECTION_NAME}->find();
+            foreach ($result as $resource) {
+                yield (string) $resource['_id'] => [
+                    'insert',
+                    $this->build($resource),
+                ];
+            }
+        }
+
+        $stream = $this->db->{self::COLLECTION_NAME}->watch([], [
+            'resumeAfter' => $after,
+        ]);
 
         for ($stream->rewind(); true; $stream->next()) {
             if (!$stream->valid()) {
@@ -110,8 +122,10 @@ class Factory extends ResourceFactory
             }
 
             $event = $stream->current();
-            yield (string) $event['fullDocument']['_id'] => $this->build($event['fullDocument'])->toArray();
-            //    return;
+            yield (string) $event['fullDocument']['_id'] => [
+                $event['operationType'],
+                $this->build($event['fullDocument']),
+            ];
         }
     }
 

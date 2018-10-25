@@ -20,7 +20,7 @@ use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\Rest\Pager;
+use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class DataTypes
@@ -49,14 +49,7 @@ class DataTypes
         $mandator = $this->mandator_factory->getOne($mandator);
         $datatypes = $mandator->getDataTypes($query['query'], (int) $query['offset'], (int) $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $datatypes);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $datatypes);
     }
 
     /**
@@ -64,16 +57,10 @@ class DataTypes
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
     {
-        $query = $request->getQueryParams();
-
         $mandator = $this->mandator_factory->getOne($mandator);
         $datatype = $mandator->getDataType($datatype);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $datatype->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $datatype);
     }
 
     /**
@@ -116,5 +103,16 @@ class DataTypes
             $this->datatype_factory->getOne($datatype->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator): ResponseInterface
+    {
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $cursor = $this->datatype_factory->watch($mandator);
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

@@ -20,7 +20,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
 
 class ObjectRelatives
@@ -50,14 +49,7 @@ class ObjectRelatives
         $object = $datatype->getObject(['_id' => $object]);
         $relatives = $object->getRelatives($query['query'], false, (int) $query['offset'], (int) $query['limit']);
 
-        $body = $this->acl->filterOutput($request, $identity, $relatives);
-        $body = Pager::fromRequest($body, $request);
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $body,
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getAll($request, $identity, $this->acl, $relatives);
     }
 
     /**
@@ -65,17 +57,11 @@ class ObjectRelatives
      */
     public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object, ObjectId $relative): ResponseInterface
     {
-        $query = $request->getQueryParams();
-
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object], false);
         $relative = $object->getRelative($relative);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $relative->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
+        return Helper::getOne($request, $identity, $relative);
     }
 
     /**
@@ -104,5 +90,16 @@ class ObjectRelatives
             $datatype->getOne(['_id' => $id], false)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Watch.
+     */
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $id): ResponseInterface
+    {
+        $object = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getObject($id);
+        $cursor = $this->relation_factory->watch($object);
+
+        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }
