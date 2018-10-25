@@ -18,6 +18,7 @@ use Psr\Http\Message\UriInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\DataType\Factory as DataTypeFactory;
 use Tubee\Mandator;
+use Tubee\Mandator\Factory as MandatorFactory;
 
 class MandatorTest extends TestCase
 {
@@ -34,7 +35,7 @@ class MandatorTest extends TestCase
         }));
         $datatype->method('has')->willReturn(true);
 
-        $this->mandator = new Mandator('foo', $datatype, [
+        $this->mandator = new Mandator('foo', $this->createMock(MandatorFactory::class), $datatype, [
             '_id' => new ObjectId(),
             'name' => 'foo',
             'version' => 1,

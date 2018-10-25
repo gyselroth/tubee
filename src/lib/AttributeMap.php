@@ -274,9 +274,9 @@ class AttributeMap implements AttributeMapInterface
             ]);
         }
 
-        if (isset($data[$attr])) {
-            return $data[$attr];
-        }
+        //if (isset($data[$attr])) {
+        //    return $data[$attr];
+        //}
 
         return $result;
     }
