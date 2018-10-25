@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Storage;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\Endpoint\Balloon\ApiClient;
 
@@ -42,7 +42,7 @@ class Balloon implements StorageInterface
     /**
      * Init storage.
      */
-    public function __construct(ApiClient $balloon, LoggerInterface $logger, ?ObjectId $collection = null)
+    public function __construct(ApiClient $balloon, LoggerInterface $logger, ?ObjectIdInterface $collection = null)
     {
         $this->balloon = $balloon;
         $this->logger = $logger;

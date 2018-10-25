@@ -14,16 +14,38 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class ObjectRelatives
 {
+    /**
+     * mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
+
+    /**
+     * Dataobject relation factory.
+     *
+     * @var DataObjectRelationFactory
+     */
+    protected $relation_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
     /**
      * Init.
      */
@@ -37,7 +59,7 @@ class ObjectRelatives
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -55,7 +77,7 @@ class ObjectRelatives
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object, ObjectId $relative): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object, ObjectIdInterface $relative): ResponseInterface
     {
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object], false);
@@ -67,7 +89,7 @@ class ObjectRelatives
     /**
      * Create object.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object): ResponseInterface
     {
         $query = array_merge([
             'write' => false,
@@ -95,7 +117,7 @@ class ObjectRelatives
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $id): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $id): ResponseInterface
     {
         $object = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getObject($id);
         $cursor = $this->relation_factory->watch($object);

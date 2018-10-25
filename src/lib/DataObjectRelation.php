@@ -27,6 +27,13 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
     protected $object;
 
     /**
+     * Related object.
+     *
+     * @var DataObjectInterface
+     */
+    protected $related_object;
+
+    /**
      * Data object.
      */
     public function __construct(array $resource, DataObjectInterface $object, DataObjectInterface $related_object)

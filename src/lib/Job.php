@@ -12,10 +12,11 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Job\JobInterface;
 use Tubee\Log\Factory as LogFactory;
+use Tubee\Log\LogInterface;
 use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
@@ -24,11 +25,18 @@ use Tubee\Resource\AttributeResolver;
 class Job extends AbstractResource implements JobInterface
 {
     /**
-     * Scheduler.
+     * Process factory.
      *
-     * @var Scheduler
+     * @var ProcessFactory
      */
-    protected $scheduler;
+    protected $process_factory;
+
+    /**
+     * Log factory.
+     *
+     * @var LogFactory
+     */
+    protected $log_factory;
 
     /**
      * Data object.
@@ -46,7 +54,6 @@ class Job extends AbstractResource implements JobInterface
     public function decorate(ServerRequestInterface $request): array
     {
         $options = $this->resource['options'];
-        $scheduler = $this->scheduler;
         $resource = $this->resource;
 
         $result = [
@@ -62,11 +69,11 @@ class Job extends AbstractResource implements JobInterface
                 'timeout' => $options['timeout'],
             ],
             'data' => $this->resource,
-            'status' => function () use ($scheduler) {
-                /*$cursor = $scheduler->getJobs([
+            /*'status' => function () use ($scheduler) {
+                $cursor = $scheduler->getJobs([
                     'data.job' => $resource['_job']
-                ]);*/
-            },
+                ]);
+            },*/
         ];
 
         return AttributeResolver::resolve($request, $this, $result);
@@ -83,9 +90,9 @@ class Job extends AbstractResource implements JobInterface
     /**
      * {@inheritdoc}
      */
-    public function getLog(ObjectId $id): LogInterface
+    public function getLog(ObjectIdInterface $id): LogInterface
     {
-        return $this->log_factory->getAll($query, $offset, $limit);
+        return $this->log_factory->getOne($this, $id);
     }
 
     /**
@@ -99,7 +106,7 @@ class Job extends AbstractResource implements JobInterface
     /**
      * {@inheritdoc}
      */
-    public function getProcess(ObjectId $id): ProcessInterface
+    public function getProcess(ObjectIdInterface $id): ProcessInterface
     {
         return $this->process_factory->getOne($this, $id);
     }

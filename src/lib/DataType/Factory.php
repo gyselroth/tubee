@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\DataType;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataObject\Factory as DataObjectFactory;
@@ -32,7 +32,7 @@ class Factory extends ResourceFactory
     /**
      * Object factory.
      *
-     * @var ObjectFactory
+     * @var DataObjectFactory
      */
     protected $object_factory;
 
@@ -121,7 +121,7 @@ class Factory extends ResourceFactory
     /**
      * Add mandator.
      */
-    public function add(MandatorInterface $mandator, array $resource): ObjectId
+    public function add(MandatorInterface $mandator, array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
@@ -147,7 +147,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(MandatorInterface $mandator, ?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(MandatorInterface $mandator, ?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($mandator) {
             return $this->build($resource, $mandator);

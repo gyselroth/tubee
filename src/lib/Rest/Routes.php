@@ -16,7 +16,7 @@ use Micro\Http\Router;
 
 class Routes
 {
-    public function __construct(Router $roueter)
+    public function __construct(Router $router)
     {
     }
 

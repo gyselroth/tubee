@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Job;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\Scheduler;
@@ -35,6 +35,20 @@ class Factory extends ResourceFactory
      * @var Scheduler
      */
     protected $scheduler;
+
+    /**
+     * Process factory.
+     *
+     * @var ProcessFactory
+     */
+    protected $process_factory;
+
+    /**
+     * Log factory.
+     *
+     * @var LogFactory
+     */
+    protected $log_factory;
 
     /**
      * Initialize.
@@ -98,7 +112,7 @@ class Factory extends ResourceFactory
     /**
      * Create resource.
      */
-    public function create(array $resource): ObjectId
+    public function create(array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
@@ -135,7 +149,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing);
     }

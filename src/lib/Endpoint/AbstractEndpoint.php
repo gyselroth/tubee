@@ -41,7 +41,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * Logger.
      *
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -88,16 +88,23 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     protected $history = false;
 
     /**
+     * Workflow factory.
+     *
+     * @var WorkflowFactory
+     */
+    protected $workflow_factory;
+
+    /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, DataTypeInterface $datatype, WorkflowFactory $workflow_factory, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
         $this->type = $type;
         $this->resource = $resource;
         $this->datatype = $datatype;
         $this->logger = $logger;
-        $this->workflow = $workflow;
+        $this->workflow_factory = $workflow_factory;
 
         if (isset($resource['data_options'])) {
             $this->setOptions($resource['data_options']);
@@ -266,7 +273,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function hasWorkflow(string $name): bool
     {
-        return $this->workflow->has($this, $name);
+        return $this->workflow_factory->has($this, $name);
     }
 
     /**
@@ -274,7 +281,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function getWorkflow(string $name): WorkflowInterface
     {
-        return $this->workflow->getOne($this, $name);
+        return $this->workflow_factory->getOne($this, $name);
     }
 
     /**
@@ -282,7 +289,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function getWorkflows(array $workflows = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->workflow->getAll($this, $workflows, $offset, $limit);
+        return $this->workflow_factory->getAll($this, $workflows, $offset, $limit);
     }
 
     /**

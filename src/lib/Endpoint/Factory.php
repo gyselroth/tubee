@@ -13,6 +13,7 @@ namespace Tubee\Endpoint;
 
 use Generator;
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
@@ -27,13 +28,6 @@ class Factory extends ResourceFactory
     public const COLLECTION_NAME = 'endpoints';
 
     /**
-     * Database.
-     *
-     * @var Database
-     */
-    protected $db;
-
-    /**
      * Factory.
      *
      * @var WorkflowFactory
@@ -41,20 +35,12 @@ class Factory extends ResourceFactory
     protected $workflow_factory;
 
     /**
-     * Logger.
-     *
-     * @var LoggerInterface
-     */
-    protected $logger;
-
-    /**
      * Initialize.
      */
     public function __construct(Database $db, WorkflowFactory $workflow_factory, LoggerInterface $logger)
     {
-        $this->db = $db;
-        $this->logger = $logger;
         $this->workflow_factory = $workflow_factory;
+        parent::__construct($db, $logger);
     }
 
     /**
@@ -128,7 +114,7 @@ class Factory extends ResourceFactory
     /**
      * Add.
      */
-    public function add(DataTypeInterface $datatype, array $resource): ObjectId
+    public function add(DataTypeInterface $datatype, array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
@@ -165,7 +151,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(DataTypeInterface $datatype, ?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(DataTypeInterface $datatype, ?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($datatype) {
             return $this->build($resource, $datatype);

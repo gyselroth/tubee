@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
@@ -41,6 +41,13 @@ class DataObject extends AbstractResource implements DataObjectInterface
      * @var DataTypeInterface
      */
     protected $datatype;
+
+    /**
+     * Data object relation factory.
+     *
+     * @var DataObjectRelationFactory
+     */
+    protected $relation_factory;
 
     /**
      * Data object.
@@ -116,7 +123,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * Add relation.
      */
-    public function createRelation(DataObjectInterface $object, array $context = []): ObjectId
+    public function createRelation(DataObjectInterface $object, array $context = []): ObjectIdInterface
     {
         return $this->relation_factory->create($this, $object, $context);
     }

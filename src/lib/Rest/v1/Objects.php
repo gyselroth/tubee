@@ -14,7 +14,7 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
@@ -28,6 +28,34 @@ use Zend\Diactoros\Response;
 
 class Objects
 {
+    /**
+     * mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
+
+    /**
+     * datatype factory.
+     *
+     * @var DataTypeFactory
+     */
+    protected $datatype_factory;
+
+    /**
+     * Object factory.
+     *
+     * @var DataObjectFactory
+     */
+    protected $object_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
     /**
      * Init.
      */
@@ -59,7 +87,7 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object): ResponseInterface
     {
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object], false);
@@ -98,7 +126,7 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getHistory(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function getHistory(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -121,7 +149,7 @@ class Objects
     /**
      * Patch.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();

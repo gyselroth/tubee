@@ -36,7 +36,7 @@ class Factory
 
             break;
             case Balloon::class:
-                $server = new ApiClient($storage['host']);
+                $server = new ApiClient(['host' => $resource['host']], $logger);
                 $collection = isset($resource['collection']) ? new ObjectId($resource['collection']) : null;
 
                 return new Balloon($server, $logger, $collection);

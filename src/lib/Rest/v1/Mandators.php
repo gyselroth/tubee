@@ -24,6 +24,20 @@ use Zend\Diactoros\Response;
 class Mandators
 {
     /**
+     * Mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
+    /**
      * Init.
      */
     public function __construct(MandatorFactory $mandator, Acl $acl)

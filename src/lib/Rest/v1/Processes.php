@@ -13,7 +13,7 @@ namespace Tubee\Rest\v1;
 
 use Fig\Http\Message\StatusCodeInterface;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
@@ -24,6 +24,27 @@ use Zend\Diactoros\Response;
 
 class Processes
 {
+    /**
+     * Job factory.
+     *
+     * @var JobFactory
+     */
+    protected $job_factory;
+
+    /**
+     * Process factory.
+     *
+     * @var ProcessFactory
+     */
+    protected $process_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
     /**
      * Init.
      */
@@ -53,7 +74,7 @@ class Processes
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $job, ObjectId $process): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $job, ObjectIdInterface $process): ResponseInterface
     {
         $resource = $this->job_factory->getOne($job)->getProcess($process);
 
@@ -63,7 +84,7 @@ class Processes
     /**
      * Stop process.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $job, ObjectId $process): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $job, ObjectIdInterface $process): ResponseInterface
     {
         $this->job_factory->getOne($job)->deleteOne($job);
 

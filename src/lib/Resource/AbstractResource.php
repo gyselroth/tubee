@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Tubee\Resource;
 
-use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\ObjectIdInterface;
+use MongoDB\BSON\UTCDateTimeInterface;
 
 abstract class AbstractResource implements ResourceInterface
 {
@@ -26,7 +26,7 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function getId(): ObjectId
+    public function getId(): ObjectIdInterface
     {
         return $this->resource['_id'];
     }
@@ -67,7 +67,7 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function getChanged(): ?UTCDateTime
+    public function getChanged(): ?UTCDateTimeInterface
     {
         return $this->resource['changed'];
     }
@@ -75,7 +75,7 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function getCreated(): UTCDateTime
+    public function getCreated(): UTCDateTimeInterface
     {
         return $this->resource['created'];
     }
@@ -83,7 +83,7 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
-    public function getDeleted(): ?UTCDateTime
+    public function getDeleted(): ?UTCDateTimeInterface
     {
         return $this->resource['deleted'];
     }

@@ -29,12 +29,26 @@ class Acl
     protected $logger;
 
     /**
+     * Access role factory.
+     *
+     * @var AccessRoleFactory
+     */
+    protected $role_factory;
+
+    /**
+     * Access rule factory.
+     *
+     * @var AccessRuleFactory
+     */
+    protected $rule_factory;
+
+    /**
      * Initialize.
      */
-    public function __construct(AccessRoleFactory $role, AccessRuleFactory $rule, LoggerInterface $logger)
+    public function __construct(AccessRoleFactory $role_factory, AccessRuleFactory $rule_factory, LoggerInterface $logger)
     {
-        $this->role = $role;
-        $this->rule = $rule;
+        $this->role_factory = $role_factory;
+        $this->rule_factory = $rule_factory;
         $this->logger = $logger;
     }
 
@@ -47,7 +61,7 @@ class Acl
             'category' => get_class($this),
         ]);
 
-        $roles = $this->role->getAll([
+        $roles = $this->role_factory->getAll([
             '$or' => [
                 ['selectors' => $user->getIdentifier()],
                 ['selectors' => '*'],
@@ -67,7 +81,7 @@ class Acl
             throw new Exception\NotAllowed('Not allowed to call this resource');
         }
 
-        $rules = $this->rule->getAll([
+        $rules = $this->rule_factory->getAll([
             'roles' => ['$in' => $names],
         ]);
 

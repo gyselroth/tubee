@@ -12,14 +12,14 @@ declare(strict_types=1);
 namespace Tubee\Endpoint\Balloon;
 
 use InvalidArgumentException;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 
 class ApiClient
 {
     /**
      * Logger.
      *
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -57,10 +57,8 @@ class ApiClient
 
     /**
      * construct.
-     *
-     * @param iterable $config
      */
-    public function __construct(?Iterable $config = null, Logger $logger)
+    public function __construct(?Iterable $config = null, LoggerInterface $logger)
     {
         $this->setOptions($config);
         $this->logger = $logger;

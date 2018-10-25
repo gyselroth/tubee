@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Process;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\Process;
@@ -65,7 +65,7 @@ class Factory extends ResourceFactory
     /**
      * Delete by name.
      */
-    public function deleteOne(JobInterface $job, ObjectId $id): bool
+    public function deleteOne(JobInterface $job, ObjectIdInterface $id): bool
     {
         $this->scheduler->cancelJob($id);
 
@@ -75,7 +75,7 @@ class Factory extends ResourceFactory
     /**
      * Get job.
      */
-    public function getOne(JobInterface $job, ObjectId $id): ProcessInterface
+    public function getOne(JobInterface $job, ObjectIdInterface $id): ProcessInterface
     {
         $result = $this->scheduler->getJob($id);
 
@@ -85,9 +85,9 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(JobInterface $job, ?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(JobInterface $job, ?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($job) {
+        return $this->watchFrom($this->db->{$this->scheduler->getCollection()}, $after, $existing, [], function (array $resource) use ($job) {
             return $this->build($resource->toArray(), $resource, $job);
         });
     }

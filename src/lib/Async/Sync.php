@@ -22,16 +22,15 @@ use Tubee\Endpoint\EndpointInterface;
 use Tubee\Job\Validator as JobValidator;
 use Tubee\Mandator\Factory as MandatorFactory;
 use Zend\Mail\Message;
-use Zend\Mime\Message as MimeMessage;
 
 class Sync extends AbstractJob
 {
     /**
-     * Manager.
+     * Mandator factory.
      *
-     * @var Manager
+     * @var MandatorFactory
      */
-    protected $manager;
+    protected $mandator_factory;
 
     /**
      * Scheduler.
@@ -41,6 +40,13 @@ class Sync extends AbstractJob
     protected $scheduler;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Error count.
      *
      * @var int
@@ -48,11 +54,18 @@ class Sync extends AbstractJob
     protected $error_count = 0;
 
     /**
+     * Start timestamp.
+     *
+     * @var UTCDateTime
+     */
+    protected $timestamp;
+
+    /**
      * Sync.
      */
-    public function __construct(MandatorFactory $mandator, Scheduler $scheduler, LoggerInterface $logger)
+    public function __construct(MandatorFactory $mandator_factory, Scheduler $scheduler, LoggerInterface $logger)
     {
-        $this->mandator = $mandator;
+        $this->mandator_factory = $mandator_factory;
         $this->scheduler = $scheduler;
         $this->logger = $logger;
         $this->timestamp = new UTCDateTime();
@@ -64,7 +77,7 @@ class Sync extends AbstractJob
     public function start(): bool
     {
         $filter = !empty($this->data['mandators']) ? ['name' => ['$in' => $this->data['mandators']]] : [];
-        foreach ($this->mandator->getAll($filter) as $mandator_name => $mandator) {
+        foreach ($this->mandator_factory->getAll($filter) as $mandator_name => $mandator) {
             $filter = !empty($this->data['datatypes']) ? ['name' => ['$in' => $this->data['datatypes']]] : [];
             foreach ($mandator->getDataTypes($filter) as $dt_name => $datatype) {
                 $filter = !empty($this->data['endpoints']) ? ['name' => ['$in' => $this->data['endpoints']]] : [];
@@ -188,7 +201,7 @@ class Sync extends AbstractJob
         }
 
         if (count($endpoints) === 0) {
-            $this->logger->warning('no destination endpoint active for datatype ['.$this->getIdentifier().'], skip export', [
+            $this->logger->warning('no destination endpoint active for datatype ['.$datatype->getIdentifier().'], skip export', [
                 'category' => get_class($this),
             ]);
 
@@ -274,7 +287,7 @@ class Sync extends AbstractJob
         }
 
         if ($endpoints->getReturn() === 0) {
-            $this->logger->warning('no source endpoint active for datatype ['.$this->getIdentifier().'], skip import', [
+            $this->logger->warning('no source endpoint active for datatype ['.$datatype->getIdentifier().'], skip import', [
                 'category' => get_class($this),
             ]);
 
@@ -371,7 +384,6 @@ class Sync extends AbstractJob
             $body = "Hi there\n\nThe sync job ".(string) $this->data['job']." started at $iso finished with no errors.";
         }
 
-        $body = new MimeMessage($body);
         $mail = (new Message())
           ->setSubject($subject)
           ->setBody($body)

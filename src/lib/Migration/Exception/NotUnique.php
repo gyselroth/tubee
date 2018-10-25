@@ -9,10 +9,8 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Job\Error;
+namespace Tubee\Migration\Exception;
 
-use Tubee\Resource\ResourceInterface;
-
-interface ErrorInterface extends ResourceInterface
+class NotUnique extends \Tubee\Exception
 {
 }

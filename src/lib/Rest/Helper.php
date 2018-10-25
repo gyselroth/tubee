@@ -14,7 +14,6 @@ namespace Tubee\Rest;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use StreamIterator\StreamIterator;
@@ -55,34 +54,6 @@ class Helper
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $resource->decorate($request),
-            ['pretty' => isset($query['pretty'])]
-        );
-    }
-
-    /**
-     * Create object.
-     */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
-    {
-        $query = array_merge([
-            'write' => false,
-        ], $request->getQueryParams());
-
-        $body = array_merge([
-            'data' => [],
-            'endpoints' => null,
-        ], $request->getParsedBody());
-
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $id = $datatype->createObject($body['data'], false, $body['endpoints']);
-
-        if ($query['write'] === true) {
-            //add job
-        }
-
-        return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $datatype->getOne(['_id' => $id], false)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\DataObject;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
@@ -23,6 +23,13 @@ use Tubee\Resource\Factory as ResourceFactory;
 
 class Factory extends ResourceFactory
 {
+    /**
+     * Data object relation factory.
+     *
+     * @var DataObjectRelationFactory
+     */
+    protected $relation_factory;
+
     /**
      * Initialize.
      */
@@ -46,7 +53,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getObjectHistory(DataTypeInterface $datatype, ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getObjectHistory(DataTypeInterface $datatype, ObjectIdInterface $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [
             ['$match' => ['_id' => $id]],
@@ -110,7 +117,7 @@ class Factory extends ResourceFactory
     {
         $pipeline = [];
         if ($include_dataset === true) {
-            $pipeline = $this->dataset;
+            //$pipeline = $this->dataset;
             if (count($filter) > 0) {
                 array_unshift($pipeline, ['$match' => $filter]);
             }
@@ -163,7 +170,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function create(DataTypeInterface $datatype, array $object, bool $simulate = false, ?array $endpoints = null): ObjectId
+    public function create(DataTypeInterface $datatype, array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $datatype->getSchema()->validate($object);
 
@@ -217,7 +224,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function deleteOne(DataTypeInterface $datatype, ObjectId $id, bool $simulate = false): bool
+    public function deleteOne(DataTypeInterface $datatype, ObjectIdInterface $id, bool $simulate = false): bool
     {
         return $this->deleteFrom($this->db->{$datatype->getCollection()}, $id, $simulate);
     }
@@ -225,7 +232,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function deleteAll(DataTypeInterface $datatype, ObjectId $id, bool $simulate = false): bool
+    public function deleteAll(DataTypeInterface $datatype, ObjectIdInterface $id, bool $simulate = false): bool
     {
         $this->logger->info('delete object ['.$id.'] from ['.$datatype->getCollection().']', [
             'category' => get_class($this),
@@ -235,7 +242,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(DataTypeInterface $datatype, ?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(DataTypeInterface $datatype, ?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{$datatype->getCollection()}, $after, $existing, [], function (array $resource) use ($datatype) {
             return $this->build($datatype, $resource);

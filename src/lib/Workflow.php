@@ -13,6 +13,7 @@ namespace Tubee;
 
 use InvalidArgumentException;
 use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -82,6 +83,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function __construct(string $name, string $ensure, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
+        $this->ensure = $ensure;
         $this->expression = $expression;
         $this->attribute_map = $attribute_map;
         $this->endpoint = $endpoint;
@@ -143,7 +145,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function cleanup(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool
+    public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
         if ($this->checkCondition($attributes, true) === false) {
@@ -178,7 +180,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
             break;
             case WorkflowInterface::ENSURE_LAST:
-                //$object_ts = new UTCDateTime();
+                //$object_ts = new UTCDateTimeInterface();
                 //$operation = $this->getMongoDBOperation($map, $object, $object_ts);
                 //$this->endpoint->getDataType()->change(['_id' => $object['id']], $operation, $simulate);
 
@@ -195,7 +197,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTime $ts, bool $simulate = false): bool
+    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         if ($this->checkCondition($object, false) === false) {
             return false;
@@ -262,7 +264,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function export(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool
+    public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
         if ($this->checkCondition($attributes, false) === false) {
@@ -403,7 +405,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Get import object.
      */
-    protected function getImportObject(DataTypeInterface $datatype, array $map, UTCDateTime $ts): ?DataObjectInterface
+    protected function getImportObject(DataTypeInterface $datatype, array $map, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
         $prefixed = [];
@@ -455,7 +457,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Map.
      */
-    protected function map(Iterable $object, Iterable $mongodb_object, UTCDateTime $ts): Iterable
+    protected function map(Iterable $object, Iterable $mongodb_object, UTCDateTimeInterface $ts): Iterable
     {
         $object = Helper::associativeArrayToPath($object);
         $mongodb_object = Helper::associativeArrayToPath($mongodb_object);

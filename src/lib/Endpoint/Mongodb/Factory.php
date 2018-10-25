@@ -33,6 +33,6 @@ class Factory
 
         $mongodb = new Client(...$options);
 
-        return new MongodbEndpoint($resource['name'], $resource['type'], $mongodb->selectCollection($resource['collection']), $storage, $datatype, $workflow, $logger, $resource);
+        return new MongodbEndpoint($resource['name'], $resource['type'], $mongodb->selectCollection($resource['collection']), $datatype, $workflow, $logger, $resource);
     }
 }

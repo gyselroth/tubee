@@ -14,6 +14,7 @@ namespace Tubee\Resource;
 use Closure;
 use Generator;
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Database;
@@ -47,7 +48,7 @@ class Factory
     /**
      * Add resource.
      */
-    public function addTo(Collection $collection, array $resource, bool $simulate = false): ObjectId
+    public function addTo(Collection $collection, array $resource, bool $simulate = false): ObjectIdInterface
     {
         $resource += [
             'created' => new UTCDateTime(),
@@ -76,7 +77,7 @@ class Factory
     /**
      * Update resource.
      */
-    public function updateIn(Collection $collection, ObjectId $id, array $resource, bool $simulate = false): bool
+    public function updateIn(Collection $collection, ObjectIdInterface $id, array $resource, bool $simulate = false): bool
     {
         $resource += [
             'changed' => new UTCDateTime(),
@@ -106,7 +107,7 @@ class Factory
     /**
      * Delete resource.
      */
-    public function deleteFrom(Collection $collection, ObjectId $id, bool $simulate = false): bool
+    public function deleteFrom(Collection $collection, ObjectIdInterface $id, bool $simulate = false): bool
     {
         $this->logger->info('delete resource ['.$id.'] from ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
@@ -124,7 +125,7 @@ class Factory
     /**
      * Change stream.
      */
-    public function watchFrom(Collection $collection, ?ObjectId $after = null, bool $existing = true, array $query = [], ?Closure $build = null): Generator
+    public function watchFrom(Collection $collection, ?ObjectIdInterface $after = null, bool $existing = true, array $query = [], ?Closure $build = null): Generator
     {
         if ($build === null) {
             $build = function ($resource) {

@@ -26,6 +26,27 @@ use Zend\Diactoros\Response;
 class AccessRoles
 {
     /**
+     * role factory.
+     *
+     * @var AccessRoleFactory
+     */
+    protected $role_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
+    /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Init.
      */
     public function __construct(AccessRoleFactory $role_factory, Acl $acl, LoggerInterface $logger)
@@ -67,6 +88,7 @@ class AccessRoles
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
         $id = $this->role_factory->add($body);
         $role = $this->role_factory->getOne($body['name']);
 
@@ -83,6 +105,7 @@ class AccessRoles
     public function put(ServerRequestInterface $request, Identity $identity, string $role): ResponseInterface
     {
         $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
 
         if ($this->role_factory->has()) {
             $this->role_factory->update($role, $body);

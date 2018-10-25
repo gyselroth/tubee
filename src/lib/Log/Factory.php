@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Log;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\Job\JobInterface;
@@ -70,7 +70,7 @@ class Factory extends ResourceFactory
     /**
      * watch all.
      */
-    public function watch(JobInterface $job, ?ObjectId $after = null, bool $existing = true, ?array $query = null): Generator
+    public function watch(JobInterface $job, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null): Generator
     {
         $query = [
              'context.job' => (string) $job->getId(),
@@ -82,7 +82,7 @@ class Factory extends ResourceFactory
     /**
      * Get job.
      */
-    public function getOne(JobInterface $job, ObjectId $log): LogInterface
+    public function getOne(JobInterface $job, ObjectIdInterface $log): LogInterface
     {
         $result = $this->db->{self::COLLECTION_NAME}->findOne(['_id' => $log]);
 

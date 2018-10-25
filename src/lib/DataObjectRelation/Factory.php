@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\DataObjectRelation;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObjectRelation;
 use Tubee\DataType\DataTypeInterface;
@@ -28,7 +28,7 @@ class Factory extends ResourceFactory
     /**
      * Has resource.
      */
-    public function has(DataObjectInterface $object, ObjectId $id): bool
+    public function has(DataObjectInterface $object, ObjectIdInterface $id): bool
     {
         return $this->db->{self::COLLECTION_NAME}->count([
             '_id' => $id,
@@ -46,7 +46,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getOne(DataObjectInterface $object, ObjectId $id): DataObjectRelationInterface
+    public function getOne(DataObjectInterface $object, ObjectIdInterface $id): DataObjectRelationInterface
     {
         $resource = $this->{self::COLLECTION_NAME}->findOne([
             '_id' => $id,
@@ -110,7 +110,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function create(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectId
+    public function create(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $resource = [
             'datatype_1' => $object_1->getDataType()->getName(),
@@ -135,7 +135,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function deleteOne(DataTypeInterface $datatype, ObjectId $id, bool $simulate = false): bool
+    public function deleteOne(DataTypeInterface $datatype, ObjectIdInterface $id, bool $simulate = false): bool
     {
         $this->logger->info('delete object ['.$id.'] from ['.$datatype->getCollection().']', [
             'category' => get_class($this),
@@ -149,7 +149,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(DataObjectInterface $object, ?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(DataObjectInterface $object, ?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($object) {
             return $this->build($resource, $object);

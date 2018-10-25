@@ -37,7 +37,7 @@ class Migration
      *
      * @var array
      */
-    protected $delta = [];
+    protected $deltas = [];
 
     /**
      * Construct.
@@ -118,9 +118,6 @@ class Migration
 
     /**
      * Inject delta.
-     *
-     *
-     * @return Migration
      */
     public function injectDelta(DeltaInterface $delta, ?string $name = null): self
     {
@@ -133,7 +130,7 @@ class Migration
         ]);
 
         if ($this->hasDelta($name)) {
-            throw new Exception('delta '.$name.' is already registered');
+            throw new Exception\NotUnique('delta '.$name.' is already registered');
         }
 
         $this->deltas[$name] = $delta;
@@ -147,7 +144,7 @@ class Migration
     public function getDelta(string $name): DeltaInterface
     {
         if (!$this->hasDelta($name)) {
-            throw new Exception('delta '.$name.' is not registered');
+            throw new Exception\NotFound('delta '.$name.' is not registered');
         }
 
         return $this->deltas[$name];
@@ -155,9 +152,6 @@ class Migration
 
     /**
      * Get deltas.
-     *
-     *
-     * @return DeltaInterface[]
      */
     public function getDeltas(array $deltas = []): array
     {
@@ -167,7 +161,7 @@ class Migration
         $list = [];
         foreach ($deltas as $name) {
             if (!$this->hasDelta($name)) {
-                throw new Exception('delta '.$name.' is not registered');
+                throw new Exception\NotFound('delta '.$name.' is not registered');
             }
             $list[$name] = $this->deltas[$name];
         }

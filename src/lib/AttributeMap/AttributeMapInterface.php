@@ -15,10 +15,10 @@ use MongoDB\BSON\Binary;
 use MongoDB\BSON\Decimal128;
 use MongoDB\BSON\MaxKey;
 use MongoDB\BSON\MinKey;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\Regex;
 use MongoDB\BSON\Timestamp;
-use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
 
 interface AttributeMapInterface
 {
@@ -67,10 +67,10 @@ interface AttributeMapInterface
         Decimal128::class,
         MaxKey::class,
         MinKey::class,
-        ObjectId::class,
+        ObjectIdInterface::class,
         Regex::class,
         Timestamp::class,
-        UTCDateTime::class,
+        UTCDateTimeInterface::class,
     ];
 
     /**
@@ -86,7 +86,7 @@ interface AttributeMapInterface
     /**
      * Map attributes.
      */
-    public function map(Iterable $data, UTCDateTime $ts): array;
+    public function map(Iterable $data, UTCDateTimeInterface $ts): array;
 
     /**
      * Create attribute diff.

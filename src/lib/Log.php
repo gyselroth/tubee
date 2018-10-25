@@ -20,13 +20,6 @@ use Tubee\Resource\AttributeResolver;
 class Log extends AbstractResource implements LogInterface
 {
     /**
-     * Scheduler.
-     *
-     * @var Scheduler
-     */
-    protected $scheduler;
-
-    /**
      * Data object.
      */
     public function __construct(array $resource)

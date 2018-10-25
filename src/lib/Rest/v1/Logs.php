@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Rest\v1;
 
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
@@ -22,6 +22,27 @@ use Tubee\Rest\Helper;
 
 class Logs
 {
+    /**
+     * Log factory.
+     *
+     * @var LogFactory
+     */
+    protected $log_factory;
+
+    /**
+     * Job factory.
+     *
+     * @var JobFactory
+     */
+    protected $job_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
     /**
      * Init.
      */
@@ -35,7 +56,7 @@ class Logs
     /**
      * Get all.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectId $process = null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectIdInterface $process = null): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -58,9 +79,9 @@ class Logs
     /**
      * Get one.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $name, ObjectId $log): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $job, ObjectIdInterface $log): ResponseInterface
     {
-        $job = $this->job_factory->getOne($job)->getLog($log);
+        $resource = $this->job_factory->getOne($job)->getLog($log);
 
         return Helper::getOne($request, $identity, $resource);
     }
@@ -68,7 +89,7 @@ class Logs
     /**
      * Watch all.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectId $process = null): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectIdInterface $process = null): ResponseInterface
     {
         $job = $this->job_factory->getOne($job);
 

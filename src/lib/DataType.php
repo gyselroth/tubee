@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -83,6 +83,13 @@ class DataType extends AbstractResource implements DataTypeInterface
      * @var EndpointFactory
      */
     protected $endpoint_factory;
+
+    /**
+     * Collection name.
+     *
+     * @var string
+     */
+    protected $collection;
 
     /**
      * Initialize.
@@ -210,7 +217,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getObjectHistory(ObjectId $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getObjectHistory(ObjectIdInterface $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
     {
         return $this->object_factory->getObjectHistory($this, $id, $filter, $offset, $limit);
     }
@@ -242,7 +249,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function createObject(array $object, bool $simulate = false, ?array $endpoints = null): ObjectId
+    public function createObject(array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         return $this->object_factory->create($this, $object, $simulate, $endpoints);
     }
@@ -250,7 +257,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function enable(ObjectId $id, bool $simulate = false): bool
+    public function enable(ObjectIdInterface $id, bool $simulate = false): bool
     {
         $this->logger->info('enable object ['.$id.'] in ['.$this->collection.']', [
             'category' => get_class($this),
@@ -268,7 +275,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function disable(ObjectId $id, bool $simulate = false): bool
+    public function disable(ObjectIdInterface $id, bool $simulate = false): bool
     {
         $this->logger->info('disable object ['.$id.'] in ['.$this->collection.']', [
             'category' => get_class($this),
@@ -294,7 +301,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function deleteObject(ObjectId $id, bool $simulate = false): bool
+    public function deleteObject(ObjectIdInterface $id, bool $simulate = false): bool
     {
         return $this->object_factory->deleteOne($this, $id, $simulate);
     }

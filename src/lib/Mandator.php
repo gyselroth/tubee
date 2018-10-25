@@ -34,7 +34,14 @@ class Mandator extends AbstractResource implements MandatorInterface
      *
      * @var DataTypeFactory
      */
-    protected $datatype;
+    protected $datatype_factory;
+
+    /**
+     * Mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
 
     /**
      * Initialize.

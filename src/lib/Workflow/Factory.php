@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Workflow;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
@@ -118,7 +118,7 @@ class Factory extends ResourceFactory
     /**
      * Add.
      */
-    public function add(EndpointInterface $endpoint, array $resource): ObjectId
+    public function add(EndpointInterface $endpoint, array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
@@ -146,7 +146,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(EndpointInterface $endpoint, ?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(EndpointInterface $endpoint, ?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($endpoint) {
             return $this->build($resource, $endpoint);

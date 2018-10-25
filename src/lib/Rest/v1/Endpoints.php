@@ -26,6 +26,27 @@ use Zend\Diactoros\Response;
 class Endpoints
 {
     /**
+     * mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
+
+    /**
+     * Endpoint factory.
+     *
+     * @var EndpointFactory
+     */
+    protected $endpoint_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
+    /**
      * Init.
      */
     public function __construct(MandatorFactory $mandator_factory, EndpointFactory $endpoint_factory, Acl $acl)

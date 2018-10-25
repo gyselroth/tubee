@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\AccessRule;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Tubee\AccessRule;
 use Tubee\Resource\Factory as ResourceFactory;
 
@@ -76,7 +76,7 @@ class Factory extends ResourceFactory
     /**
      * Add resource.
      */
-    public function add(array $resource): ObjectId
+    public function add(array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
@@ -100,7 +100,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(?ObjectId $after = null, bool $existing = true): Generator
+    public function watch(?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing);
     }

@@ -26,6 +26,27 @@ use Zend\Diactoros\Response;
 class DataTypes
 {
     /**
+     * mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
+
+    /**
+     * datatype factory.
+     *
+     * @var DataTypeFactory
+     */
+    protected $datatype_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
+    /**
      * Init.
      */
     public function __construct(MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, Acl $acl)

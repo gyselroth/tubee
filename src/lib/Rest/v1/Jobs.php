@@ -27,6 +27,27 @@ use Zend\Diactoros\Response;
 class Jobs
 {
     /**
+     * mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
+
+    /**
+     * Job factory.
+     *
+     * @var JobFactory
+     */
+    protected $job_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
+    /**
      * Init.
      */
     public function __construct(JobFactory $job_factory, Acl $acl, MandatorFactory $mandator_factory)
@@ -99,7 +120,7 @@ class Jobs
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
         $job = $this->job_factory->getOne($job);
-        $doc = $endpoint->getData();
+        $doc = $job->getData();
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();

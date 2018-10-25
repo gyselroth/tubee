@@ -20,11 +20,11 @@ use Tubee\Acl as CoreAcl;
 class Acl implements MiddlewareInterface
 {
     /**
-     * Logger.
+     * Acl.
      *
-     * @var Acl
+     * @var CoreAcl
      */
-    protected $logger;
+    protected $acl;
 
     /**
      * Set the resolver instance.

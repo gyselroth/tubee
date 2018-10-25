@@ -28,6 +28,13 @@ class Process extends AbstractResource implements ProcessInterface
     protected $job;
 
     /**
+     * Process (Scheduler).
+     *
+     * @var TaskSchedulerProcess
+     */
+    protected $process;
+
+    /**
      * Process.
      */
     public function __construct(array $resource, TaskSchedulerProcess $process, JobInterface $job)

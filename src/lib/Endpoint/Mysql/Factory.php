@@ -14,6 +14,7 @@ namespace Tubee\Endpoint\Mysql;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Endpoint\Mysql as MysqlEndpoint;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
@@ -32,6 +33,6 @@ class Factory
             'socket' => null,
         ], $resource['resource']));
 
-        return new XmlEndpoint($resource['name'], $resource['type'], $resource['file'], $storage, $datatype, $workflow, $logger, $resource);
+        return new MysqlEndpoint($resource['name'], $resource['type'], $resource['table'], $datatype, $workflow, $logger, $resource);
     }
 }

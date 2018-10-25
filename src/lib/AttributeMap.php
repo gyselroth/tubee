@@ -14,7 +14,7 @@ namespace Tubee;
 use InvalidArgumentException;
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\Regex;
-use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
@@ -72,7 +72,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * {@inheritdoc}
      */
-    public function map(Iterable $data, UTCDateTime $ts): array
+    public function map(Iterable $data, UTCDateTimeInterface $ts): array
     {
         $result = [];
         foreach ($this->map as $attr => $value) {
@@ -244,7 +244,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * Check if attribute is required.
      */
-    protected function resolveValue(string $attr, array $value, array $data, UTCDateTime $ts)
+    protected function resolveValue(string $attr, array $value, array $data, UTCDateTimeInterface $ts)
     {
         $result = null;
 

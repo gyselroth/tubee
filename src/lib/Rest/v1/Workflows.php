@@ -26,6 +26,27 @@ use Zend\Diactoros\Response;
 class Workflows
 {
     /**
+     * Mandator factory.
+     *
+     * @var MandatorFactory
+     */
+    protected $mandator_factory;
+
+    /**
+     * Workflow factory.
+     *
+     * @var WorkflowFactory
+     */
+    protected $workflow_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
+    /**
      * Init.
      */
     public function __construct(MandatorFactory $mandator_factory, WorkflowFactory $workflow_factory, Acl $acl)
@@ -69,6 +90,7 @@ class Workflows
     public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
     {
         $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
 
         $mandator = $this->mandator_factory->getOne($mandator);
         $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);

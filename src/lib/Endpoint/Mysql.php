@@ -25,7 +25,7 @@ class Mysql extends AbstractSqlDatabase
      */
     public function __construct(string $name, string $type, string $table, MysqlWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->socket = $socket
+        $this->socket = $socket;
         $this->table = $table;
         parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }

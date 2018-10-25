@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\DataType;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Mandator;
@@ -66,17 +66,17 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Create object.
      */
-    public function createObject(array $object, bool $simulate, array $endpoints): ObjectId;
+    public function createObject(array $object, bool $simulate, array $endpoints): ObjectIdInterface;
 
     /**
      * Enable object.
      */
-    public function enable(ObjectId $id, bool $simulate = false): bool;
+    public function enable(ObjectIdInterface $id, bool $simulate = false): bool;
 
     /**
      * Disable object.
      */
-    public function disable(ObjectId $id, bool $simulate = false): bool;
+    public function disable(ObjectIdInterface $id, bool $simulate = false): bool;
 
     /**
      * Change object.
@@ -86,7 +86,7 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Delete object.
      */
-    public function deleteObject(ObjectId $id, bool $simulate = false): bool;
+    public function deleteObject(ObjectIdInterface $id, bool $simulate = false): bool;
 
     /**
      * Get identifier.

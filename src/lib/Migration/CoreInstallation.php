@@ -25,6 +25,20 @@ class CoreInstallation implements DeltaInterface
     protected $db;
 
     /**
+     * Access role factory.
+     *
+     * @var AccessRoleFactory
+     */
+    protected $role_factory;
+
+    /**
+     * Access rule factory.
+     *
+     * @var AccessRuleFactory
+     */
+    protected $rule_factory;
+
+    /**
      * Construct.
      */
     public function __construct(Database $db, AccessRoleFactory $role_factory, AccessRuleFactory $rule_factory)

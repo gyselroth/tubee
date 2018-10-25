@@ -25,6 +25,20 @@ use Zend\Diactoros\Response;
 class AccessRules
 {
     /**
+     * rule factory.
+     *
+     * @var AccessRuleFactory
+     */
+    protected $rule_factory;
+
+    /**
+     * Acl.
+     *
+     * @var Acl
+     */
+    protected $acl;
+
+    /**
      * Init.
      */
     public function __construct(AccessRuleFactory $rule_factory, Acl $acl)
@@ -65,6 +79,7 @@ class AccessRules
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
         $id = $this->rule_factory->add($body);
         $rule = $this->rule_factory->getOne($body['name']);
 
@@ -81,6 +96,7 @@ class AccessRules
     public function put(ServerRequestInterface $request, Identity $identity, string $rule): ResponseInterface
     {
         $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
 
         if ($this->rule_factory->has($rule)) {
             $this->rule_factory->update($rule, $body);

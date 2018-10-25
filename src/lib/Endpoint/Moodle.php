@@ -25,9 +25,16 @@ class Moodle extends AbstractEndpoint
     /**
      * Moodle.
      *
-     * @var Moodle
+     * @var ApiClient
      */
     protected $moodle;
+
+    /**
+     * Call map.
+     *
+     * @var array
+     */
+    protected $call_map = [];
 
     /**
      * Init endpoint.
@@ -107,7 +114,7 @@ class Moodle extends AbstractEndpoint
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
-        $id = $this->getEndpointId($endpoint_object);
+        /*$id = $this->getEndpointId($endpoint_object);
         $diff = [$diff];
         $diff[0]['id'] = $id;
 
@@ -122,7 +129,7 @@ class Moodle extends AbstractEndpoint
             $this->moodle->restCall($diff, self::METHODS[$this->resource_type]['change']['function']);
         }
 
-        return null;
+        return null;*/
     }
 
     /**
@@ -130,7 +137,7 @@ class Moodle extends AbstractEndpoint
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
-        foreach ($object as $key => $value) {
+        /*foreach ($object as $key => $value) {
             if (is_array($value)) {
                 throw new Exception\EndpointCanNotHandleArray('endpoint can not handle arrays ["'.$key.'"], did you forget to set a decorator?');
             }
@@ -148,7 +155,7 @@ class Moodle extends AbstractEndpoint
             $this->moodle->restCall($prepared_data, self::METHODS[$this->resource_type]['create']['function']);
         }
 
-        return $identifier;
+        return $identifier;*/
     }
 
     /**
@@ -156,7 +163,7 @@ class Moodle extends AbstractEndpoint
      */
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $id = $this->getEndpointId($endpoint_object);
+        /*$id = $this->getEndpointId($endpoint_object);
         $diff = [[]];
         $diff[0] = $id;
 
@@ -171,7 +178,7 @@ class Moodle extends AbstractEndpoint
             $this->moodle->restCall($diff, self::METHODS[$this->resource_type]['delete']['function']);
         }
 
-        return true;
+        return true;*/
     }
 
     /**
@@ -179,7 +186,7 @@ class Moodle extends AbstractEndpoint
      */
     public function getAll($filter): Generator
     {
-        $this->logger->debug('find all moodle objects with moodle filter ['.$this->filter_all.'] on endpoint ['.$this->getEndpointIdentifier().']', [
+        /*$this->logger->debug('find all moodle objects with moodle filter ['.$this->filter_all.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -187,7 +194,7 @@ class Moodle extends AbstractEndpoint
 
         foreach ($result as $object) {
             yield $object;
-        }
+        }*/
     }
 
     /**
@@ -195,7 +202,7 @@ class Moodle extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): array
     {
-        $filter = $this->getFilterOne($object);
+        /*$filter = $this->getFilterOne($object);
 
         $this->logger->debug('find moodle object with moodle filter ['.$filter.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
@@ -210,7 +217,7 @@ class Moodle extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return (array) array_shift($result);
+        return (array) array_shift($result);*/
     }
 
     /**

@@ -32,6 +32,27 @@ class Wrapper extends PDO
     protected $dsn;
 
     /**
+     * Username.
+     *
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * Password.
+     *
+     * @var string
+     */
+    protected $password;
+
+    /**
+     * Options.
+     *
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * construct.
      */
     public function __construct(string $dsn, LoggerInterface $logger, ?string $username = null, ?string $password = null, ?array $options = null)
@@ -105,7 +126,7 @@ class Wrapper extends PDO
         $stmt = $this->prepare($query);
 
         if (!($stmt instanceof PDOStatement)) {
-            throw new Exception\InvalidQuery('failed to prepare pdo query with error '.$this->error.' ('.$this->errno.')');
+            throw new Exception\InvalidQuery('failed to prepare pdo query with error '.$this->errorInfo().' ('.$this->errorCode().')');
         }
 
         $types = '';

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\Workflow;
 
-use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
@@ -61,17 +61,17 @@ interface WorkflowInterface extends ResourceInterface
     /**
      * Cleanup.
      */
-    public function cleanup(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool;
+    public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Import from endpoint.
      */
-    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTime $ts, bool $simulate = false): bool;
+    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Write to endpoint.
      *
      * @param iterable $object
      */
-    public function export(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool;
+    public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 }
