@@ -26,6 +26,34 @@ class Wrapper extends mysqli
     protected $logger;
 
     /**
+     * Host.
+     *
+     * @var string
+     */
+    protected $host;
+
+    /**
+     * Username.
+     *
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * Password.
+     *
+     * @var string
+     */
+    protected $password;
+
+    /**
+     * Options.
+     *
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * Charset.
      *
      * @var string
@@ -46,7 +74,7 @@ class Wrapper extends mysqli
      */
     public function connect(): Wrapper
     {
-        parent::__construct($this->dsn, $this->username, $this->password, $this->options);
+        parent::__construct($this->host, $this->username, $this->password, $this->options);
 
         return $this;
     }

@@ -50,9 +50,10 @@ return [
         ],
         'services' => [
             Routes::class => [
-                'selects' => [[
+                'factory' => 'collect',
+                /*'selects' => [[
                     'method' => 'collect'
-                ]]
+                ]]*/
             ],
             FastRoute::class => [
                 'arguments' => [

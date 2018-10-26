@@ -13,6 +13,7 @@ namespace Tubee\Endpoint\Balloon;
 
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Endpoint\Balloon as BalloonEndpoint;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -23,6 +24,6 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        return new BalloonEndpoint($resource['name'], $resource['type'], $resource['file'], $datatype, $workflow, $logger, $resource);
+        //return new BalloonEndpoint($resource['name'], $resource['type'], $resource['file'], $datatype, $workflow, $logger, $resource);
     }
 }

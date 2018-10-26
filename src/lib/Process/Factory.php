@@ -56,7 +56,7 @@ class Factory extends ResourceFactory
         $result = $this->scheduler->getJobs($filter, $offset, $limit);
 
         foreach ($result as $id => $process) {
-            yield $id => $this->build($process, $job);
+            yield $id => $this->build($process->toArray(), $job);
         }
 
         return (int) $result->getReturn();
@@ -79,7 +79,7 @@ class Factory extends ResourceFactory
     {
         $result = $this->scheduler->getJob($id);
 
-        return $this->build($result, $job);
+        return $this->build($result->toArray(), $job);
     }
 
     /**
@@ -88,15 +88,15 @@ class Factory extends ResourceFactory
     public function watch(JobInterface $job, ?ObjectIdInterface $after = null, bool $existing = true): Generator
     {
         return $this->watchFrom($this->db->{$this->scheduler->getCollection()}, $after, $existing, [], function (array $resource) use ($job) {
-            return $this->build($resource->toArray(), $resource, $job);
+            return $this->build($resource, $job);
         });
     }
 
     /**
      * Wrap process.
      */
-    public function build(Process $process, JobInterface $job): ProcessInterface
+    public function build(array $process, JobInterface $job): ProcessInterface
     {
-        return $this->initResource(new ProcessWrapper($process->toArray(), $process, $job));
+        return $this->initResource(new ProcessWrapper($process, $job));
     }
 }

@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Psr\Http\Message\ServerRequestInterface;
-use TaskScheduler\Process as TaskSchedulerProcess;
 use Tubee\Job\JobInterface;
 use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
@@ -28,19 +27,11 @@ class Process extends AbstractResource implements ProcessInterface
     protected $job;
 
     /**
-     * Process (Scheduler).
-     *
-     * @var TaskSchedulerProcess
-     */
-    protected $process;
-
-    /**
      * Process.
      */
-    public function __construct(array $resource, TaskSchedulerProcess $process, JobInterface $job)
+    public function __construct(array $resource, JobInterface $job)
     {
         $this->resource = $resource;
-        $this->process = $process;
         $this->job = $job;
     }
 
@@ -55,7 +46,7 @@ class Process extends AbstractResource implements ProcessInterface
             ],
             'kind' => 'Process',
             'status' => [
-                'code' => $this->process->getStatus(),
+                'code' => $this->resource['status'],
             ],
         ];
 

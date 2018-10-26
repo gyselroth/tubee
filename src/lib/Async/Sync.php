@@ -17,6 +17,7 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
+use Tubee\DataObject\Exception;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Job\Validator as JobValidator;
@@ -232,7 +233,7 @@ class Sync extends AbstractJob
             ]);
 
             if ($ep->flushRequired()) {
-                $this->flush($simulate);
+                $datatype->flush($simulate);
             }
 
             $ep->setup($simulate);
