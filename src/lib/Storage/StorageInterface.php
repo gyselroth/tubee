@@ -16,23 +16,12 @@ use Generator;
 interface StorageInterface
 {
     /**
-     * Search files.
-     */
-    public function getFiles(string $pattern): array;
-
-    /**
      * Open write stream.
-     *
-     *
-     * @return array
      */
     public function openWriteStream(string $file);
 
     /**
      * Open read stream.
-     *
-     *
-     * @return array
      */
     public function openReadStream(string $file);
 
@@ -43,8 +32,6 @@ interface StorageInterface
 
     /**
      * Sync writeable stream.
-     *
-     * @param resource $stream
      */
     public function SyncWriteStream($stream, string $file): bool;
 }

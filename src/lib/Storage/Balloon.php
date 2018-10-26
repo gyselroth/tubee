@@ -52,31 +52,6 @@ class Balloon implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getFiles(string $pattern): array
-    {
-        $query = [
-            'filter' => [
-                'directory' => false,
-                'name' => [
-                    '$regex' => $pattern,
-                ],
-            ],
-        ];
-
-        if ($this->collection === null) {
-            $url = '/api/v2/collections/children';
-        } else {
-            $url = '/api/v2/collections/'.$this->collection.'/children';
-        }
-
-        $result = $this->balloon->restCall($url, $query);
-
-        return $result['data'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function openReadStreams(string $pattern): Generator
     {
         $files = $this->getFiles($pattern);
@@ -188,5 +163,30 @@ class Balloon implements StorageInterface
         }
 
         return true;
+    }
+
+    /**
+     * Search balloon for files matching pattern.
+     */
+    protected function getFiles(string $pattern): array
+    {
+        $query = [
+            'filter' => [
+                'directory' => false,
+                'name' => [
+                    '$regex' => $pattern,
+                ],
+            ],
+        ];
+
+        if ($this->collection === null) {
+            $url = '/api/v2/collections/children';
+        } else {
+            $url = '/api/v2/collections/'.$this->collection.'/children';
+        }
+
+        $result = $this->balloon->restCall($url, $query);
+
+        return $result['data'];
     }
 }

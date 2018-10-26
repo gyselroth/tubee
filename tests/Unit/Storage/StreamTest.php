@@ -14,36 +14,28 @@ namespace Tubee\Testsuite\Unit\Storage;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Tubee\Storage\Exception;
-use Tubee\Storage\LocalFilesystem;
+use Tubee\Storage\Stream;
 
-class LocalFilesystemTest extends TestCase
+class StreamTest extends TestCase
 {
     protected $storage;
 
     public function setUp()
     {
         file_put_contents(__DIR__.'/Mock/bar.csv', 'bar;bar');
-        file_put_contents(__DIR__.'/Mock/foo.csv', 'foo;foo');
-        $this->storage = new LocalFilesystem(__DIR__.'/Mock', $this->createMock(LoggerInterface::class));
-    }
-
-    public function testRootNotFound()
-    {
-        $this->expectException(Exception\RootDirectoryNotFound::class);
-        new LocalFilesystem(__DIR__.'/foo', $this->createMock(LoggerInterface::class));
+        $this->storage = new Stream($this->createMock(LoggerInterface::class));
     }
 
     public function testOpenReadStreams()
     {
-        $streams = $this->storage->openReadStreams('*');
+        $streams = $this->storage->openReadStreams(__DIR__.'/Mock/bar.csv');
         $streams = iterator_to_array($streams);
         $this->assertSame('bar;bar', fread($streams[__DIR__.'/Mock/bar.csv'], 100));
-        $this->assertSame('foo;foo', fread($streams[__DIR__.'/Mock/foo.csv'], 100));
     }
 
     public function testOpenReadStream()
     {
-        $stream = $this->storage->openReadStream('bar.csv');
+        $stream = $this->storage->openReadStream(__DIR__.'/Mock/bar.csv');
         $this->assertSame('bar;bar', fread($stream, 100));
     }
 
@@ -52,7 +44,7 @@ class LocalFilesystemTest extends TestCase
         $path = '/tmp/'.uniqid();
         mkdir($path);
         $this->expectException(Exception\OpenStreamFailed::class);
-        $this->storage = new LocalFilesystem($path, $this->createMock(LoggerInterface::class));
+        $this->storage = new Stream($this->createMock(LoggerInterface::class));
         rmdir($path);
         mkdir($path, 0330);
         $stream = @$this->storage->openReadStream('bar');
@@ -60,7 +52,7 @@ class LocalFilesystemTest extends TestCase
 
     public function testOpenWriteStream()
     {
-        $stream = $this->storage->openWriteStream('bar.csv');
+        $stream = $this->storage->openWriteStream('/tmp/bar.csv');
         $this->assertSame(7, fwrite($stream, 'foo;foo'));
     }
 
@@ -69,8 +61,8 @@ class LocalFilesystemTest extends TestCase
         $path = '/tmp/'.uniqid();
         mkdir($path, 0550);
         $this->expectException(Exception\OpenStreamFailed::class);
-        $this->storage = new LocalFilesystem($path, $this->createMock(LoggerInterface::class));
-        $stream = @$this->storage->openWriteStream('bar');
+        $this->storage = new Stream($this->createMock(LoggerInterface::class));
+        $stream = @$this->storage->openWriteStream('foo://bar');
     }
 
     public function testSyncWriteStream()

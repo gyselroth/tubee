@@ -46,14 +46,6 @@ class LocalFilesystem implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getFiles(string $pattern): array
-    {
-        return glob($this->root.DIRECTORY_SEPARATOR.$pattern, GLOB_BRACE);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function openReadStreams(string $pattern): Generator
     {
         $files = $this->getFiles($pattern);
@@ -120,5 +112,13 @@ class LocalFilesystem implements StorageInterface
     public function SyncWriteStream($stream, string $file): bool
     {
         return true;
+    }
+
+    /**
+     * Search local filesystem for matching files.
+     */
+    protected function getFiles(string $pattern): array
+    {
+        return glob($this->root.DIRECTORY_SEPARATOR.$pattern, GLOB_BRACE);
     }
 }

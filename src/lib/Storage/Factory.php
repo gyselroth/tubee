@@ -42,6 +42,10 @@ class Factory
                 return new Balloon($server, $logger, $collection);
 
             break;
+            case Stream::class:
+                return new Stream($logger);
+
+            break;
             default:
                 throw new InvalidArgumentException('storage class does not exists');
         }

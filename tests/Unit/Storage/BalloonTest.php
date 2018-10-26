@@ -25,26 +25,6 @@ class BalloonTest extends TestCase
         file_put_contents(__DIR__.'/Mock/foo.csv', 'foo;foo');
     }
 
-    public function testGetFiles()
-    {
-        $api = $this->createMock(ApiClient::class);
-        $api->method('restCall')->willReturn([
-            'data' => [[
-                'id' => '1',
-                'name' => 'bar.csv',
-            ], [
-                'id' => '2',
-                'name' => 'foo.csv',
-            ]],
-        ]);
-
-        $storage = new Balloon($api, $this->createMock(LoggerInterface::class));
-
-        $files = $storage->getFiles('\.csv$');
-        $this->assertSame('bar.csv', $files[0]['name']);
-        $this->assertSame('bar.csv', $files[0]['name']);
-    }
-
     public function testOpenReadStreams()
     {
         $api = $this->createMock(ApiClient::class);
