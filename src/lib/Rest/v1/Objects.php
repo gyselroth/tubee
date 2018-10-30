@@ -118,7 +118,7 @@ class Objects
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $datatype->getOne(['_id' => $id], false)->decorate($request),
+            $datatype->getObject(['_id' => $id], false)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

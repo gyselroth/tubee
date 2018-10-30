@@ -9,38 +9,27 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Rest;
+namespace Tubee\Rest\Middlewares;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Tubee\Acl as CoreAcl;
+use Zend\Diactoros\Response;
 
-class Acl implements MiddlewareInterface
+class QueryDecoder implements MiddlewareInterface
 {
-    /**
-     * Acl.
-     *
-     * @var CoreAcl
-     */
-    protected $acl;
-
-    /**
-     * Set the resolver instance.
-     */
-    public function __construct(CoreAcl $acl)
-    {
-        $this->acl = $acl;
-    }
-
     /**
      * Process a server request and return a response.
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if ($this->acl->isAllowed($request, $request->getAttribute('identity'))) {
-            return $handler->handle($request);
+        $query = $request->getQueryParams();
+        if (isset($query['query'])) {
+            $query['query'] = json_decode(htmlspecialchars_decode($query['query']), true);
+            $request = $request->withQueryParams($query);
         }
+
+        return $handler->handle($request);
     }
 }

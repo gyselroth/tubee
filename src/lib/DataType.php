@@ -241,9 +241,9 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getObjects(array $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
+    public function getObjects(array $query = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->object_factory->getAll($this, $filter, $include_dataset, $offset, $limit);
+        return $this->object_factory->getAll($this, $query, $include_dataset, $offset, $limit);
     }
 
     /**

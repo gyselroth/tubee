@@ -17,8 +17,9 @@ use Tubee\ExpressionLanguage\DateTimeLanguageProvider;
 use Tubee\ExpressionLanguage\StringLanguageProvider;
 use mindplay\middleman\Dispatcher;
 use mindplay\middleman\ContainerResolver;
-use Tubee\Rest\ExceptionHandler;
-use Tubee\Rest\Acl as AclMiddleware;
+use Tubee\Rest\Middlewares\ExceptionHandler;
+use Tubee\Rest\Middlewares\QueryDecoder;
+use Tubee\Rest\Middlewares\Acl as AclMiddleware;
 use Micro\Http\Middlewares\Router;
 use Micro\Http\Middlewares\RequestHandler;
 use Lcobucci\ContentNegotiation\ContentTypeMiddleware;
@@ -40,6 +41,7 @@ return [
                 '{'.ContentTypeMiddleware::class.'}',
                 '{'.ExceptionHandler::class.'}',
                 '{'.JsonPayload::class.'}',
+                '{'.QueryDecoder::class.'}',
                 '{'.AuthMiddleware::class.'}',
                 '{'.AclMiddleware::class.'}',
                 '{'.FastRoute::class.'}',

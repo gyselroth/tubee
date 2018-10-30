@@ -9,18 +9,41 @@ info:
   license:
     name: "Apache 2.0"
     url: "http://www.apache.org/licenses/LICENSE-2.0.html"
-host: "datamanager"
 basePath: "/api/v1"
-tags:
-- name: "data"
-  description: "Manage data objects"
-- name: "jobs"
-  description: "Manage jobs"
-- name: "config"
-  description: "Request configuration"
 schemes:
 - "https"
 paths:
+  /watch/mandators:
+    get:
+      tags:
+      - "data"
+      summary: "Watch mandators"
+      description: "Watch mandators in realtime"
+      operationId: "watchMandators"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of objects"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
   /mandators:
     get:
       tags:
@@ -33,17 +56,17 @@ paths:
       - "application/yaml"
       parameters:
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of mandators"
@@ -64,11 +87,6 @@ paths:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Mandator"
@@ -117,11 +135,6 @@ paths:
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Mandator"
@@ -149,11 +162,6 @@ paths:
         description: "Mandator name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -179,11 +187,6 @@ paths:
         description: "Mandator name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Mandator"
@@ -224,11 +227,6 @@ paths:
         description: "Mandator name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Mandator"
@@ -243,6 +241,42 @@ paths:
             $ref: "#/definitions/mandator"
         404:
           description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/mandators/{mandator}/datatypes:
+    get:
+      tags:
+      - "data"
+      summary: "Watch datatypes"
+      description: "Watch datatypes in realtime"
+      operationId: "watchDatatypes"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of objects"
         403:
           description: "Access denied"
       security:
@@ -266,17 +300,17 @@ paths:
         required: true
         type: "string"
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of datatypes"
@@ -304,11 +338,6 @@ paths:
         description: "Mandator name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Datatype"
@@ -365,11 +394,6 @@ paths:
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Datatype"
@@ -402,11 +426,6 @@ paths:
         description: "Datatype"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -437,11 +456,6 @@ paths:
         description: "Datatype"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Datatype"
@@ -492,11 +506,6 @@ paths:
         description: "Datatype"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Datatype"
@@ -511,6 +520,47 @@ paths:
             $ref: "#/definitions/datatype"
         404:
           description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/mandators/{mandator}/datatypes/{datatype}/endpoints:
+    get:
+      tags:
+      - "data"
+      summary: "Watch endpoints"
+      description: "Watch updates in realtime"
+      operationId: "watchEndpoints"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of objects"
         403:
           description: "Access denied"
       security:
@@ -539,17 +589,17 @@ paths:
         required: true
         type: "string"
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of endpoints"
@@ -582,11 +632,6 @@ paths:
         description: "Datatype"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Endpoint"
@@ -648,11 +693,6 @@ paths:
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Endpoint"
@@ -690,11 +730,6 @@ paths:
         description: "Endpoint name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -730,11 +765,6 @@ paths:
         description: "Endpoint name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Datatype"
@@ -790,11 +820,6 @@ paths:
         description: "Endpoint name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Datatype"
@@ -809,6 +834,52 @@ paths:
             $ref: "#/definitions/endpoint"
         404:
           description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
+    get:
+      tags:
+      - "data"
+      summary: "Watch workflows"
+      description: "Watch updates in realtime"
+      operationId: "watchWorkflows"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of objects"
         403:
           description: "Access denied"
       security:
@@ -842,17 +913,17 @@ paths:
         required: true
         type: "string"
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of workflows"
@@ -888,11 +959,6 @@ paths:
         description: "Endpoint name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Workflow"
@@ -959,11 +1025,6 @@ paths:
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Workflow"
@@ -1006,11 +1067,6 @@ paths:
         description: "Workflow name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -1051,11 +1107,6 @@ paths:
         description: "Workflow name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Workflow"
@@ -1116,11 +1167,6 @@ paths:
         description: "Workflow name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Workflow"
@@ -1174,11 +1220,6 @@ paths:
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Data object"
@@ -1222,11 +1263,6 @@ paths:
         description: "If true, the objects gets synced to all configured destination endpoints"
         required: false
         type: "boolean"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Object"
@@ -1238,7 +1274,7 @@ paths:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/object"
+            $ref: "#/definitions/data-object"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
@@ -1284,11 +1320,6 @@ paths:
         description: "If true, the objects gets synced to all configured destination endpoints"
         required: false
         type: "boolean"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Object"
@@ -1309,11 +1340,11 @@ paths:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/object"
+            $ref: "#/definitions/data-object"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/object"
+            $ref: "#/definitions/data-object"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
@@ -1359,11 +1390,6 @@ paths:
         description: "If true, the objects gets synced to all configured destination endpoints"
         required: false
         type: "boolean"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
@@ -1373,6 +1399,52 @@ paths:
           description: "If successful the server will respond with 204 No Content"
         404:
           description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives:
+    get:
+      tags:
+      - "data"
+      summary: "Watch object relatives"
+      description: "Watch updates in realtime"
+      operationId: "watchObjectRelatives"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of objects"
         403:
           description: "Access denied"
       security:
@@ -1406,10 +1478,10 @@ paths:
         required: true
         type: "string"
       - in: "query"
-        name: "pretty"
-        description: "Prettify response"
+        name: "query"
+        description: "JSON query"
         required: false
-        type: "boolean"
+        type: "string"
       responses:
         200:
           description: "Object relatives"
@@ -1447,11 +1519,6 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Object"
@@ -1509,11 +1576,6 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Object relative"
@@ -1556,11 +1618,6 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Object"
@@ -1617,11 +1674,6 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "No body if successfully deleted"
@@ -1660,10 +1712,10 @@ paths:
         required: true
         type: "string"
       - in: "query"
-        name: "pretty"
-        description: "Prettify response"
+        name: "query"
+        description: "JSON query"
         required: false
-        type: "boolean"
+        type: "string"
       responses:
         200:
           description: "Object attributes from endpoints"
@@ -1709,11 +1761,6 @@ paths:
         description: "Endpoint nmae"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Object attributes from a specific endpoint"
@@ -1754,17 +1801,17 @@ paths:
         required: true
         type: "string"
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "query"
-        description: "Query objects on endpoint"
-        required: false
-        type: "string"
       - in: "query"
         name: "offset"
         description: "Objects offset, per default it starts from 0"
@@ -1775,16 +1822,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of objects"
           schema:
-            $ref: "#/definitions/objects"
+            $ref: "#/definitions/data-objects"
         404:
           description: "Resource does not exists"
         403:
@@ -1820,10 +1862,10 @@ paths:
         required: true
         type: "string"
       - in: "query"
-        name: "pretty"
-        description: "Prettify response"
+        name: "query"
+        description: "JSON query"
         required: false
-        type: "boolean"
+        type: "string"
       responses:
         200:
           description: "Object history"
@@ -1831,6 +1873,47 @@ paths:
             $ref: "#/definitions/object-history"
         404:
           description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/mandators/{mandator}/datatypes/{datatype}/objects:
+    get:
+      tags:
+      - "data"
+      summary: "Watch objects"
+      description: "Watch updates in realtime"
+      operationId: "watchObjects"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "path"
+        name: "mandator"
+        description: "Mandator name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "datatype"
+        description: "Datatype"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of objects"
         403:
           description: "Access denied"
       security:
@@ -1859,17 +1942,17 @@ paths:
         required: true
         type: "string"
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "query"
-        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
-        required: false
-        type: "string"
       - in: "query"
         name: "offset"
         description: "Objects offset, per default it starts from 0"
@@ -1880,16 +1963,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of objects"
           schema:
-            $ref: "#/definitions/objects"
+            $ref: "#/definitions/data-objects"
         404:
           description: "Resource does not exists"
         403:
@@ -1925,11 +2003,6 @@ paths:
         description: "If true, the objects gets synced to all configured destination endpoints"
         required: false
         type: "boolean"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Object"
@@ -1950,13 +2023,44 @@ paths:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/object"
+            $ref: "#/definitions/data-object"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
             $ref: "#/definitions/job"
         404:
           description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/access-rules:
+    get:
+      tags:
+      - "access-rules"
+      summary: "Watch access rules"
+      description: "Watch updates in realtime"
+      operationId: "watchAccessRules"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of access rules"
         403:
           description: "Access denied"
       security:
@@ -1975,15 +2079,13 @@ paths:
       - "application/yaml"
       parameters:
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "query"
-        description: "Array of rules to query"
         required: false
         type: "array"
         items:
@@ -1998,11 +2100,6 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of access rules"
@@ -2023,11 +2120,6 @@ paths:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: "job"
         description: "The access rule to create"
@@ -2083,11 +2175,6 @@ paths:
         description: "Access rule name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Acccess rule"
@@ -2117,11 +2204,6 @@ paths:
         description: "Access rule name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: "job"
         description: "Access rule json patch"
@@ -2154,11 +2236,6 @@ paths:
         description: "Access rule name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: "job"
         description: "The access rule to create"
@@ -2210,16 +2287,42 @@ paths:
         description: "Access rule name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "Server responds with 204 No Content if access rule removal was successful"
         404:
           description: "Access rule does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/access-roles:
+    get:
+      tags:
+      - "access-roles"
+      summary: "Watch access roles"
+      description: "Watch updates in realtime"
+      operationId: "watchAccessRoles"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of access roles"
         403:
           description: "Access denied"
       security:
@@ -2238,15 +2341,13 @@ paths:
       - "application/yaml"
       parameters:
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "query"
-        description: "Array of roles to query"
         required: false
         type: "array"
         items:
@@ -2261,11 +2362,6 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of access roles"
@@ -2286,11 +2382,6 @@ paths:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: "job"
         description: "The access role to create"
@@ -2331,11 +2422,6 @@ paths:
         description: "Access role name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Acccess role"
@@ -2365,11 +2451,6 @@ paths:
         description: "Access role name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: "job"
         description: "Access role json patch"
@@ -2405,11 +2486,6 @@ paths:
         description: "Access role name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: "job"
         description: "The access role to create"
@@ -2450,11 +2526,6 @@ paths:
         description: "Access role name"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "Server responds with 204 No Content if access role removal was successful"
@@ -2478,17 +2549,17 @@ paths:
       - "application/yaml"
       parameters:
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
         type: "array"
         items:
           type: "string"
-      - in: "query"
-        name: "query"
-        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
-        required: false
-        type: "string"
       - in: "query"
         name: "offset"
         description: "Objects offset, per default it starts from 0"
@@ -2499,11 +2570,6 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "List of active jobs"
@@ -2524,11 +2590,6 @@ paths:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       - in: body
         name: "job"
         description: "The job to create"
@@ -2601,11 +2662,6 @@ paths:
         description: "Job ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -2633,11 +2689,6 @@ paths:
         description: "Job ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         204:
           description: "Server responds with 204 No Content if job removal was successful"
@@ -2686,11 +2737,6 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -2724,11 +2770,6 @@ paths:
         description: "Error id"
         required: true
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -2768,11 +2809,6 @@ paths:
         description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
         required: false
         type: "string"
-      - in: "query"
-        name: "pretty"
-        description: "Prettify response"
-        required: false
-        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -2980,7 +3016,7 @@ definitions:
       id:
         type: "string"
       object:
-        $ref: "#/definitions/object"
+        $ref: "#/definitions/data-object"
       endpoint:
         $ref: "#/definitions/endpoint"
       timestamp:
@@ -3162,7 +3198,7 @@ definitions:
       map:
         type: "object"
         description: "Attribute map"
-  objects:
+  data-objects:
     type: "object"
     properties:
       _links:
@@ -3176,8 +3212,8 @@ definitions:
       data:
         type: "array"
         items:
-          $ref: "#/definitions/object"
-  object:
+          $ref: "#/definitions/data-object"
+  data-object:
     type: "object"
     properties:
       _links:
@@ -3233,7 +3269,7 @@ definitions:
       context:
         type: "object"
       object:
-        $ref: "#/definitions/object"
+        $ref: "#/definitions/data-object"
   object-history:
     type: "object"
     properties:
@@ -3262,7 +3298,7 @@ definitions:
         type: "string"
         format: "date-time"
       object:
-        $ref: "#/definitions/object"
+        $ref: "#/definitions/data-object"
       data:
         type: "object"
   object-endpoints:
