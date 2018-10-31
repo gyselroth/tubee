@@ -16,11 +16,6 @@ use Tubee\Resource\ResourceInterface;
 interface MandatorInterface extends ResourceInterface
 {
     /**
-     * Get name.
-     */
-    public function getName(): string;
-
-    /**
      * Get identifier.
      */
     public function getIdentifier(): string;

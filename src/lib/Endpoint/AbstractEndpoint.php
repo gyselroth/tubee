@@ -16,6 +16,8 @@ use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\EndpointObject;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Helper;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
@@ -311,14 +313,6 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * {@inheritdoc}
      */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getFilterOne(array $object)
     {
         if (is_iterable($this->filter_one)) {
@@ -339,6 +333,14 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     public function getFilterAll()
     {
         return $this->filter_all;
+    }
+
+    /**
+     * Build endpoint object.
+     */
+    protected function build(array $object): EndpointObjectInterface
+    {
+        return new EndpointObject($object, $this);
     }
 
     /**

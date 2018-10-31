@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Json\Exception as JsonException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Storage\StorageInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -104,6 +105,7 @@ class Json extends AbstractFile
         }
 
         $filter = array_merge($filtered, (array) $filter);
+        $i = 0;
 
         foreach ($this->files as $resource_key => $json) {
             foreach ($json['content'] as $object) {
@@ -120,9 +122,12 @@ class Json extends AbstractFile
                     continue;
                 }
 
-                yield $object;
+                yield $this->build($object);
+                ++$i;
             }
         }
+
+        return $i;
     }
 
     /**
@@ -169,7 +174,7 @@ class Json extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, array $attributes = []): array
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $elements = [];
         $filter = $this->getFilterOne($object);
@@ -195,7 +200,7 @@ class Json extends AbstractFile
                 throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
             }
 
-            return array_shift($elements);
+            return $this->build(array_shift($elements));
         }
     }
 }

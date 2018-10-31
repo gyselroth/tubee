@@ -45,7 +45,8 @@ class AttributeResolver
         $data = $resource->toArray();
 
         return [
-            'id' => (string) $data['_id'],
+            'id' => (string) $resource->getId(),
+            'name' => $resource->getName(),
             'version' => isset($data['version']) ? $data['version'] : 0,
             'class' => get_class($resource),
             'created' => isset($data['created']) ? $data['created']->toDateTime()->format('c') : null,

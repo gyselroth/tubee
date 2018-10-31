@@ -13,6 +13,7 @@ namespace Tubee\Endpoint;
 
 use Generator;
 use Tubee\AttributeMap\AttributeMapInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Resource\ResourceInterface;
 use Tubee\Workflow\WorkflowInterface;
 
@@ -57,7 +58,7 @@ interface EndpointInterface extends ResourceInterface
     /**
      * Get object from endpoint.
      */
-    public function getOne(array $object, array $attributes): array;
+    public function getOne(array $object, array $attributes): EndpointObjectInterface;
 
     /**
      * Check if object does exists on endpoint.

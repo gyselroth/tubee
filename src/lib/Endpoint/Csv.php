@@ -16,6 +16,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Storage\StorageInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -134,11 +135,11 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, array $attributes = []): array
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $filter = $this->getFilterOne($object);
         foreach ($this->getAll($filter) as $object) {
-            return $object;
+            return $this->build($object);
         }
 
         throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
@@ -157,6 +158,7 @@ class Csv extends AbstractFile
      */
     public function getAll($filter = []): Generator
     {
+        $i = 0;
         $filter = array_merge((array) $this->filter_all, (array) $filter);
         foreach ($this->files as $csv) {
             while (($line = fgetcsv($csv['resource'], 0, $this->delimiter, $this->enclosure, $this->escape)) !== false) {
@@ -177,9 +179,12 @@ class Csv extends AbstractFile
                     }
                 }
 
-                yield $data;
+                yield $this->build($data);
+                ++$i;
             }
         }
+
+        return $i;
     }
 
     /**

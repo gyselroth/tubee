@@ -21,6 +21,7 @@ use SimpleXMLIterator;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Xml\Exception as XmlException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Storage\StorageInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -195,6 +196,7 @@ class Xml extends AbstractFile
         }
 
         $filter = array_merge($filtered, (array) $filter);
+        $i = 0;
 
         foreach ($this->files as $xml) {
             $data = json_decode(json_encode((array) $xml['xml_element']), true)[$this->node_name];
@@ -218,9 +220,12 @@ class Xml extends AbstractFile
                     }
                 }
 
-                yield $node_data;
+                yield $this->build($node_data);
+                ++$i;
             }
         }
+
+        return $i;
     }
 
     /**
@@ -322,7 +327,7 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, array $attributes = []): array
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         foreach ($this->files as $xml) {
             $filter = $this->getFilterOne($object);
@@ -345,7 +350,7 @@ class Xml extends AbstractFile
 
             $object = json_decode(json_encode((array) array_shift($elements)), true);
 
-            return $object;
+            return $this->build($object);
         }
     }
 

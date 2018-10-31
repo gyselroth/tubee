@@ -17,7 +17,6 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
-use Tubee\DataObject\Exception;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Job\Validator as JobValidator;
@@ -245,10 +244,6 @@ class Sync extends AbstractJob
                 ]);
 
                 try {
-                    if (!is_iterable($object)) {
-                        throw new Exception\InvalidObject('read() generator needs to yield iterable data');
-                    }
-
                     foreach ($ep->getWorkflows() as $workflow) {
                         $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current object', [
                             'category' => get_class($this),

@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Pdo\Wrapper as PdoWrapper;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Pdo extends AbstractSqlDatabase
@@ -45,15 +46,19 @@ class Pdo extends AbstractSqlDatabase
 
         $result = $this->socket->select($sql);
 
+        $i = 0;
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            yield $row;
+            yield $this->build($row);
+            ++$i;
         }
+
+        return $i;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, array $attributes = []): array
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $filter = $this->getFilterOne($object);
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
@@ -66,7 +71,7 @@ class Pdo extends AbstractSqlDatabase
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $result->fetch_assoc();
+        return $this->build($result->fetch_assoc());
     }
 
     /**

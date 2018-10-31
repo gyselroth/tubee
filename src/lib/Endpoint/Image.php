@@ -17,6 +17,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Storage\StorageInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -86,9 +87,9 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, array $attributes = []): array
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        return [];
+        return $this->build([]);
     }
 
     /**
@@ -104,14 +105,18 @@ class Image extends AbstractFile
      */
     public function getAll($filter = []): Generator
     {
+        $i = 0;
         foreach ($this->storage->openReadStreams($this->file) as $name => $stream) {
-            yield [
+            yield $this->build([
                 'name' => $name,
                 'content' => $this->scaleImage($stream),
-            ];
+            ]);
 
             fclose($stream);
+            ++$i;
         }
+
+        return $i;
     }
 
     /**

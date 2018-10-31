@@ -148,4 +148,22 @@ class Endpoints
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
+
+    /**
+     * Entrypoint.
+     */
+    public function getAllObjects(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    {
+        $query = array_merge([
+            'offset' => 0,
+            'limit' => 20,
+            'query' => [],
+        ], $request->getQueryParams());
+
+        $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
+        $endpoint->setup();
+        $objects = $endpoint->getAll(/*$query['query'], (int) $query['offset'], (int) $query['limit']*/);
+
+        return Helper::getAll($request, $identity, $this->acl, $objects);
+    }
 }

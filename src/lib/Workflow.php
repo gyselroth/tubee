@@ -23,6 +23,7 @@ use Tubee\DataObject\Exception as DataObjectException;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception as EndpointException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 use Tubee\Workflow\Exception;
@@ -197,8 +198,9 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
+    public function import(DataTypeInterface $datatype, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
+        $object = $object->getData();
         if ($this->checkCondition($object, false) === false) {
             return false;
         }

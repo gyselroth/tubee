@@ -91,7 +91,7 @@ class Wrapper extends mysqli
         $result = parent::query($query);
 
         if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->error.' ('.$link->errno.')');
+            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->error.' ('.$this->errno.')');
         }
 
         return $result;
@@ -109,7 +109,7 @@ class Wrapper extends mysqli
         $result = parent::query($query);
 
         if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->error.' ('.$link->errno.')');
+            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->error.' ('.$this->errno.')');
         }
 
         return $result;
@@ -128,7 +128,7 @@ class Wrapper extends mysqli
         $stmt = $this->prepare($query);
 
         if (!($stmt instanceof mysqli_stmt)) {
-            throw new Exception\InvalidQuery('failed to prepare sql query with error '.$link->error.' ('.$link->errno.')');
+            throw new Exception\InvalidQuery('failed to prepare sql query with error '.$this->error.' ('.$this->errno.')');
         }
 
         $types = '';

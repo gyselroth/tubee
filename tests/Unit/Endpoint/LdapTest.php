@@ -98,7 +98,7 @@ class LdapTest extends TestCase
             'data_options' => ['filter_one' => '(uid={uid)'],
         ]);
 
-        $result = $ldap->getOne([]);
+        $result = $ldap->getOne([])->getData();
         $this->assertSame(['uid' => 'foo'], $result);
     }
 
@@ -115,7 +115,7 @@ class LdapTest extends TestCase
             'data_options' => ['filter_one' => '(uid={uid)'],
         ]);
 
-        $result = $ldap->getOne([]);
+        $result = $ldap->getOne([])->getData();
     }
 
     public function testGetOneNotFound()
@@ -131,7 +131,7 @@ class LdapTest extends TestCase
             'data_options' => ['filter_one' => '(uid={uid)'],
         ]);
 
-        $result = $ldap->getOne([]);
+        $result = $ldap->getOne([])->getData();
     }
 
     public function testObjectExists()

@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Ldap\Exception as LdapEndpointException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Ldap extends AbstractEndpoint
@@ -269,10 +270,13 @@ class Ldap extends AbstractEndpoint
             'category' => get_class($this),
         ]);
 
+        $i = 0;
         $result = $this->ldap->ldapSearch($this->basedn, $filter);
         foreach ($result->getEntries() as $object) {
-            yield $object;
+            yield $this->build($object);
         }
+
+        return $i;
     }
 
     /**
@@ -317,7 +321,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, ?array $attributes = []): array
+    public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
         $filter = $this->getFilterOne($object);
         $this->logger->debug('find ldap object with ldap filter ['.$filter.'] in ['.$this->basedn.'] on endpoint ['.$this->getIdentifier().']', [
@@ -334,7 +338,7 @@ class Ldap extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $this->prepareRawObject($result->getEntries()[0]);
+        return $this->build($this->prepareRawObject($result->getEntries()[0]));
     }
 
     /**

@@ -18,6 +18,7 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Moodle\ApiClient;
 use Tubee\Endpoint\Moodle\Exception as MoodleEndpointException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Moodle extends AbstractEndpoint
@@ -200,7 +201,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, array $attributes = []): array
+    public function getOne(array $object, array $atitributes = []): EndpointObjectInterface
     {
         /*$filter = $this->getFilterOne($object);
 

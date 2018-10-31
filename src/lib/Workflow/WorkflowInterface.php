@@ -16,6 +16,7 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Resource\ResourceInterface;
 
 interface WorkflowInterface extends ResourceInterface
@@ -66,7 +67,7 @@ interface WorkflowInterface extends ResourceInterface
     /**
      * Import from endpoint.
      */
-    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
+    public function import(DataTypeInterface $datatype, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Write to endpoint.

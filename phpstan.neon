@@ -12,6 +12,7 @@ parameters:
         - '#Tubee\\Endpoint\\Pdo\\Wrapper\:\:__construct\(\) does not call parent constructor from PDO#'
         - '#Call to an undefined method Tubee\\Resource\\Factory::build()#'
         - '#Tubee\\Endpoint\\Mysql\\Wrapper\:\:__construct\(\) does not call parent constructor from mysqli#'
+        - '#Tubee\\Rest\\Helper#'
 
     reportUnmatchedIgnoredErrors: false
 includes:

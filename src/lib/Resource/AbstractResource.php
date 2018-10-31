@@ -34,8 +34,24 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
+    public function getName(): string
+    {
+        if (isset($this->resource['name'])) {
+            return $this->resource['name'];
+        }
+
+        return (string) $this->resource['_id'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function toArray(): array
     {
+        if (!isset($this->resource['name'])) {
+            $this->resource['name'] = (string) $this->resource['_id'];
+        }
+
         return $this->resource;
     }
 
@@ -49,6 +65,7 @@ abstract class AbstractResource implements ResourceInterface
             'changed',
             'deleted',
             '_id',
+            'name',
             'version',
             'mandator',
             'datatype',

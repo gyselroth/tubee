@@ -39,15 +39,12 @@ class AccessRule extends AbstractResource implements AccessRuleInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $result = $this->resource;
-        unset($result['_id']);
-
         $resource = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'AccessRule',
-        ] + $result;
+        ];
 
         return AttributeResolver::resolve($request, $this, $resource);
     }

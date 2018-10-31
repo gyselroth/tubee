@@ -42,6 +42,7 @@ class Routes
             $r->addRoute('DELETE', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}', [v1\Endpoints::class, 'delete']);
             $r->addRoute('PUT', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}', [v1\Endpoints::class, 'put']);
             $r->addRoute('PATCH', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}', [v1\Endpoints::class, 'patch']);
+            $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/objects', [v1\Endpoints::class, 'getAllObjects']);
             $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows', [v1\Workflows::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows', [v1\Workflows::class, 'watchAll']);
             $r->addRoute('POST', '/api/v1/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows', [v1\Workflows::class, 'post']);

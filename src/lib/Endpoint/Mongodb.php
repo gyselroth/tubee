@@ -17,6 +17,7 @@ use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Mongodb extends AbstractEndpoint
@@ -40,9 +41,9 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getOne(array $object, array $attributes = []): array
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        return $this->get($object, $attributes);
+        return $this->build($this->get($object, $attributes));
     }
 
     /**
@@ -68,9 +69,13 @@ class Mongodb extends AbstractEndpoint
     {
         $filter = $this->buildFilterAll((array) $filter['$match']);
 
+        $i = 0;
         foreach ($this->collection->find($filter) as $data) {
-            yield $data;
+            yield $this->build($data);
+            ++$i;
         }
+
+        return $i;
     }
 
     /**
