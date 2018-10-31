@@ -162,7 +162,7 @@ class Endpoints
 
         $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
         $endpoint->setup();
-        $objects = $endpoint->getAll(/*$query['query'], (int) $query['offset'], (int) $query['limit']*/);
+        $objects = $endpoint->getAll($query['query'], (int) $query['offset'], (int) $query['limit']);
 
         return Helper::getAll($request, $identity, $this->acl, $objects);
     }

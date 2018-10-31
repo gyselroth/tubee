@@ -159,6 +159,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): JobInterface
     {
-        return $this->initResource(new Job($resource, $this->process_factory, $this->log_factory));
+        return $this->initResource(new Job($resource, $this->scheduler, $this->process_factory, $this->log_factory));
     }
 }

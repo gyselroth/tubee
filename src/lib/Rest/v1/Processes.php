@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Rest\v1;
 
 use Fig\Http\Message\StatusCodeInterface;
+use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -79,6 +80,23 @@ class Processes
         $resource = $this->job_factory->getOne($job)->getProcess($process);
 
         return Helper::getOne($request, $identity, $resource);
+    }
+
+    /**
+     * Force trigger job.
+     */
+    public function post(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    {
+        $query = $request->getQueryParams();
+        $resource = $this->job_factory->getOne($job);
+        $process = $resource->trigger();
+        $process = $resource->getProcess($process->getId());
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
+            $process->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+       );
     }
 
     /**

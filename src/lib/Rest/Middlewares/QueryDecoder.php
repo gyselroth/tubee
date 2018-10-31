@@ -15,6 +15,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Tubee\Rest\Exception;
 use Zend\Diactoros\Response;
 
 class QueryDecoder implements MiddlewareInterface
@@ -27,6 +28,11 @@ class QueryDecoder implements MiddlewareInterface
         $query = $request->getQueryParams();
         if (isset($query['query'])) {
             $query['query'] = json_decode(htmlspecialchars_decode($query['query']), true);
+
+            if (json_last_error()) {
+                throw new Exception\InvalidInput('failed to decode provided query: '.json_last_error_msg().', query needs to be valid json');
+            }
+
             $request = $request->withQueryParams($query);
         }
 

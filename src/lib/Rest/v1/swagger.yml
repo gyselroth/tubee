@@ -21,7 +21,7 @@ paths:
       description: "Watch mandators in realtime"
       operationId: "watchMandators"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "query"
         name: "query"
@@ -255,7 +255,7 @@ paths:
       description: "Watch datatypes in realtime"
       operationId: "watchDatatypes"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -534,7 +534,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchEndpoints"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -848,7 +848,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchWorkflows"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1413,7 +1413,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchObjectRelatives"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1826,7 +1826,7 @@ paths:
         200:
           description: "List of objects"
           schema:
-            $ref: "#/definitions/data-objects"
+            $ref: "#/definitions/endpoint-objects"
         404:
           description: "Resource does not exists"
         403:
@@ -1887,7 +1887,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchObjects"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -2044,7 +2044,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchAccessRules"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "query"
         name: "query"
@@ -2306,7 +2306,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchAccessRoles"
       produces:
-      - "application/json+stream"
+      - "application/json+patch"
       parameters:
       - in: "query"
         name: "query"
@@ -2700,12 +2700,49 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /jobs/{job}/errors:
+    patch:
+      tags:
+      - "jobs"
+      summary: "Patch job as rfc6902 request"
+      description: "Update specific attributes of a job"
+      operationId: "updateJob"
+      consumes:
+      - "application/json-patch+json"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: body
+        name: data
+        description: "Object"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/job"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}/processes:
     get:
       tags:
       - "jobs"
-      summary: "Get all errors of a job"
-      operationId: "getJobErrors"
+      summary: "Get all processes from a job"
+      operationId: "getProcesses"
       produces:
       - "application/json"
       - "application/yaml"
@@ -2716,6 +2753,11 @@ paths:
         required: true
         type: "string"
       - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
         name: "attributes"
         description: "Filter attributes"
         required: false
@@ -2723,10 +2765,155 @@ paths:
         items:
           type: "string"
       - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      responses:
+        200:
+          description: "Process"
+          schema:
+            $ref: "#/definitions/processes"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/jobs/{job}/processes:
+    get:
+      tags:
+      - "jobs"
+      summary: "Watch job processes"
+      operationId: "watchProcesses"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "query"
         name: "query"
-        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
+        description: "JSON query"
         required: false
         type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Processes"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}/processes/{process}:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get a single process of a job"
+      operationId: "getProcess"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "process"
+        description: "Process ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Log"
+          schema:
+            $ref: "#/definitions/process"
+        404:
+          description: "Process does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    delete:
+      tags:
+      - "jobs"
+      summary: "Abort running process"
+      operationId: "deleteProcess"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "process"
+        description: "Process ID"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Server responds with 204 No Content if process abort was successful"
+        404:
+          description: "Process does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}/logs:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get logs of a job"
+      operationId: "getJobLogs"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
       - in: "query"
         name: "offset"
         description: "Objects offset, per default it starts from 0"
@@ -2741,7 +2928,7 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/job-errors"
+            $ref: "#/definitions/log"
         404:
           description: "Job does not exists"
         403:
@@ -2750,12 +2937,12 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /jobs/{job}/errors/{error}:
+  /jobs/{job}/logs/{log}:
     get:
       tags:
       - "jobs"
       summary: "Get a single job error"
-      operationId: "getJobError"
+      operationId: "getJobLog"
       produces:
       - "application/json"
       - "application/yaml"
@@ -2766,15 +2953,15 @@ paths:
         required: true
         type: "string"
       - in: "path"
-        name: "error"
-        description: "Error id"
+        name: "log"
+        description: "Log id"
         required: true
         type: "string"
       responses:
         200:
-          description: "Job"
+          description: "Log"
           schema:
-            $ref: "#/definitions/job-error"
+            $ref: "#/definitions/log"
         404:
           description: "Job does not exists"
         403:
@@ -2783,19 +2970,67 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /watch/jobs/{job}/errors:
+  /watch/jobs/{job}/logs:
     get:
       tags:
       - "jobs"
-      summary: "Monitor  job erros as live stream (Long running http request, needs to be resend after timeout)"
-      operationId: "watchJobErrors"
+      summary: "Watch log stream"
+      operationId: "watchJobLogs"
       produces:
-      - "application/json;watch=true"
+      - "application/json+stream"
       parameters:
       - in: "path"
         name: "job"
         description: "Job ID"
         required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Logs"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}/processes/{process}/logs:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get logs of a process"
+      operationId: "getProcessLogs"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "process"
+        description: "Process ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
         type: "string"
       - in: "query"
         name: "attributes"
@@ -2805,15 +3040,100 @@ paths:
         items:
           type: "string"
       - in: "query"
-        name: "query"
-        description: "Complex query to get a specific set of objects (A mongodb compatible query can be applied)"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
         required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      responses:
+        200:
+          description: "Log"
+          schema:
+            $ref: "#/definitions/log"
+        404:
+          description: "Process does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /jobs/{job}/process/{process}/logs/{log}:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get a single process log"
+      operationId: "getProcessLog"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "process"
+        description: "Process ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "log"
+        description: "Log id"
+        required: true
         type: "string"
       responses:
         200:
-          description: "Job"
+          description: "Log"
           schema:
-            $ref: "#/definitions/job-errors"
+            $ref: "#/definitions/log"
+        404:
+          description: "Log does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+  /watch/jobs/{job}/processes/{process}/logs:
+    get:
+      tags:
+      - "jobs"
+      summary: "Watch log stream"
+      operationId: "watchProcessLogs"
+      produces:
+      - "application/json+stream"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "process"
+        description: "Process ID"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "Logs"
         404:
           description: "Job does not exists"
         403:
@@ -2822,6 +3142,7 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+
 definitions:
   json-patch:
     type: "object"
@@ -2947,6 +3268,50 @@ definitions:
         type: "array"
         items:
           type: "string"
+  processes:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/process"
+  process:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      status:
+        type: "integer"
+        format: "int"
+        minimum: 0
+        maximum: 4
+      created:
+        type: "string"
+        format: "date-time"
+      ended:
+        type: "string"
+        format: "date-time"
+      at:
+        type: "string"
+        format: "date-time"
+      interval:
+        type: "integer"
+      retry:
+        type: "integer"
+      retry_interval:
+        type: "integer"
   jobs:
     type: "object"
     properties:
@@ -2991,7 +3356,7 @@ definitions:
         type: "integer"
       retry_interval:
         type: "integer"
-  job-errors:
+  logs:
     type: "object"
     properties:
       _links:
@@ -3005,8 +3370,8 @@ definitions:
       data:
         type: "array"
         items:
-          $ref: "#/definitions/job-error"
-  job-error:
+          $ref: "#/definitions/log"
+  log:
     type: "object"
     properties:
       _links:
@@ -3015,10 +3380,6 @@ definitions:
         type: "string"
       id:
         type: "string"
-      object:
-        $ref: "#/definitions/data-object"
-      endpoint:
-        $ref: "#/definitions/endpoint"
       timestamp:
         type: "string"
         format: "date-time"
@@ -3198,6 +3559,40 @@ definitions:
       map:
         type: "object"
         description: "Attribute map"
+  endpoint-objects:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      count:
+        type: "number"
+      total:
+        type: "number"
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/endpoint-object"
+  endpoint-object:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/list-links"
+      kind:
+        type: "string"
+      id:
+        type: "string"
+      version:
+        type: "integer"
+      created:
+        type: "string"
+        format: "date-time"
+      changed:
+        type: "string"
+        format: "date-time"
+      data:
+        type: "object"
   data-objects:
     type: "object"
     properties:

@@ -14,6 +14,9 @@ namespace Tubee;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TaskScheduler\Process;
+use TaskScheduler\Scheduler;
+use Tubee\Async\Sync;
 use Tubee\Job\JobInterface;
 use Tubee\Log\Factory as LogFactory;
 use Tubee\Log\LogInterface;
@@ -39,13 +42,21 @@ class Job extends AbstractResource implements JobInterface
     protected $log_factory;
 
     /**
+     * Taskscheduler.
+     *
+     * @var Scheduler
+     */
+    protected $scheduler;
+
+    /**
      * Data object.
      */
-    public function __construct(array $resource, ProcessFactory $process_factory, LogFactory $log_factory)
+    public function __construct(array $resource, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory)
     {
         $this->resource = $resource;
         $this->process_factory = $process_factory;
         $this->log_factory = $log_factory;
+        $this->scheduler = $scheduler;
     }
 
     /**
@@ -85,6 +96,20 @@ class Job extends AbstractResource implements JobInterface
     public function getLogs(array $query = [], ?int $offset = null, ?int $limit = null): Generator
     {
         return $this->log_factory->getAll($this, $query, $offset, $limit);
+    }
+
+    /**
+     * Trigger job by force.
+     */
+    public function trigger(): Process
+    {
+        $resource = $this->resource;
+        $options = $this->resource['options'];
+        unset($options['at'], $options['interval']);
+
+        $resource += ['job' => $this->getId()];
+
+        return $this->scheduler->addJob(Sync::class, $resource, $options);
     }
 
     /**
