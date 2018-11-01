@@ -11,38 +11,24 @@ declare(strict_types=1);
 
 namespace Tubee\Rest\Middlewares;
 
+use Micro\Auth\Middleware\Auth as MicroAuth;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Tubee\Acl as CoreAcl;
 
-class Acl implements MiddlewareInterface
+class Auth extends MicroAuth
 {
-    /**
-     * Acl.
-     *
-     * @var CoreAcl
-     */
-    protected $acl;
-
-    /**
-     * Set the resolver instance.
-     */
-    public function __construct(CoreAcl $acl)
-    {
-        $this->acl = $acl;
-    }
-
     /**
      * Process a server request and return a response.
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $identity = $request->getAttribute('identity');
+        $target = $request->getRequestTarget();
 
-        if ($identity === null || $this->acl->isAllowed($request, $identity)) {
+        if (preg_match('#^/spec/#', $target)) {
             return $handler->handle($request);
         }
+
+        return parent::process($request, $handler);
     }
 }

@@ -7,8 +7,8 @@ info:
   contact:
     email: "opensource@gyselroth.net"
   license:
-    name: "Apache 2.0"
-    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+    name: "MIT"
+    url: "https://opensource.org/licenses/MIT"
 basePath: "/api/v1"
 schemes:
 - "https"
@@ -2779,6 +2779,33 @@ paths:
           description: "Process"
           schema:
             $ref: "#/definitions/processes"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
+    post:
+      tags:
+      - "jobs"
+      summary: "Trigger a process for given job by force"
+      operationId: "triggerProcess"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "path"
+        name: "job"
+        description: "Job ID"
+        required: true
+        type: "string"
+      responses:
+        202:
+          description: "Returns a 202 if successful"
+          schema:
+            $ref: "#/definitions/process"
         404:
           description: "Job does not exists"
         403:
