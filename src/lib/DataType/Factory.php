@@ -79,8 +79,8 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function(array $resource) use($mandator) {
-            return $this->build($mandator, $resource)
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($mandator) {
+            return $this->build($resource, $mandator);
         });
     }
 

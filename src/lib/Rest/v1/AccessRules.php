@@ -158,6 +158,12 @@ class AccessRules
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $cursor = $this->rule_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
