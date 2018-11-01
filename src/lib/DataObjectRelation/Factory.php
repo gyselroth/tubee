@@ -66,7 +66,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getAll(DataObjectInterface $object, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(DataObjectInterface $object, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         $filter = [
             '$or' => [
@@ -89,22 +89,15 @@ class Factory extends ResourceFactory
             ];
         }
 
-        $result = $this->db->{self::COLLECTION_NAME}->find($filter, [
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
-
-        foreach ($result as $resource) {
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object) {
             if ($resource['object_1'] == $object->getId()) {
                 $related = $object->getDataType()->getMandator()->switch($resource['mandator_2'])->getDataType($resource['datatype_2'])->getObject(['_id' => $resource['object_2']]);
             } else {
                 $related = $object->getDataType()->getMandator()->switch($resource['mandator_1'])->getDataType($resource['datatype_1'])->getObject(['_id' => $resource['object_1']]);
             }
 
-            yield $resource['_id'] => $this->build($resource, $object, $related);
-        }
-
-        return $this->db->{self::COLLECTION_NAME}->count($filter);
+            return $this->build($resource, $object, $related);
+        });
     }
 
     /**
@@ -149,11 +142,11 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(DataObjectInterface $object, ?ObjectIdInterface $after = null, bool $existing = true): Generator
+    public function watch(DataObjectInterface $object, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($object) {
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($object) {
             return $this->build($resource, $object, $object);
-        });
+        }, $offset, $limit, $sort);
     }
 
     /**

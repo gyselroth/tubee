@@ -55,10 +55,9 @@ class AccessRules
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
-        $rules = $this->rule_factory->getAll($query['query'], $query['offset'], $query['limit']);
+        $rules = $this->rule_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $rules);
     }
@@ -159,7 +158,7 @@ class AccessRules
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $cursor = $this->rule_factory->watch();
+        $cursor = $this->rule_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

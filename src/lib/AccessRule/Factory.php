@@ -34,18 +34,9 @@ class Factory extends ResourceFactory
     /**
      * Get resources.
      */
-    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $result = $this->db->access_rules->find((array) $query, [
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
-
-        foreach ($result as $resource) {
-            yield (string) $resource['name'] => $this->build($resource);
-        }
-
-        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
     }
 
     /**
@@ -100,9 +91,9 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(?ObjectIdInterface $after = null, bool $existing = true): Generator
+    public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing);
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, $offset, $limit, $sort);
     }
 
     /**

@@ -26,15 +26,36 @@ class QueryDecoder implements MiddlewareInterface
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $query = $request->getQueryParams();
+
+        if (isset($query['offset'])) {
+            $query['offset'] = (int) $query['offset'];
+        }
+
+        if (isset($query['limit'])) {
+            $query['limit'] = (int) $query['limit'];
+        }
+
         if (isset($query['query'])) {
             $query['query'] = json_decode(htmlspecialchars_decode($query['query']), true);
 
             if (json_last_error()) {
                 throw new Exception\InvalidInput('failed to decode provided query: '.json_last_error_msg().', query needs to be valid json');
             }
-
-            $request = $request->withQueryParams($query);
+        } else {
+            $query['query'] = [];
         }
+
+        if (isset($query['sort'])) {
+            $query['sort'] = json_decode(htmlspecialchars_decode($query['sort']), true);
+
+            if (json_last_error()) {
+                throw new Exception\InvalidInput('failed to decode provided sort: '.json_last_error_msg().', sort needs to be valid json');
+            }
+        } else {
+            $query['sort'] = [];
+        }
+
+        $request = $request->withQueryParams($query);
 
         return $handler->handle($request);
     }

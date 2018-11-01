@@ -123,9 +123,9 @@ class Factory
     }
 
     /**
-     * Change stream.
+     * Get all.
      */
-    public function watchFrom(Collection $collection, ?ObjectIdInterface $after = null, bool $existing = true, array $query = [], ?Closure $build = null): Generator
+    public function getAllFrom(Collection $collection, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null, ?Closure $build = null): Generator
     {
         if ($build === null) {
             $build = function ($resource) {
@@ -133,8 +133,52 @@ class Factory
             };
         }
 
+        $total = $collection->count($query);
+
+        if ($offset < 0 && $total >= $offset * -1) {
+            $offset = $total + $offset;
+        }
+
+        $result = $collection->find($query, [
+            'skip' => $offset,
+            'limit' => $limit,
+            'sort' => $sort,
+        ]);
+
+        foreach ($result as $resource) {
+            yield (string) $resource['_id'] => $build->call($this, $resource);
+        }
+
+        return $total;
+    }
+
+    /**
+     * Change stream.
+     */
+    public function watchFrom(Collection $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = [], ?Closure $build = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    {
+        if ($build === null) {
+            $build = function ($resource) {
+                return $this->build($resource);
+            };
+        }
+
+        $pipeline = $query;
+        if (!empty($pipeline)) {
+            $pipeline = [['$match' => $pipeline]];
+        }
+
+        $stream = $collection->watch($pipeline, [
+            'resumeAfter' => $after,
+        ]);
+
         if ($existing === true) {
-            $result = $collection->find();
+            $result = $collection->find($query, [
+                'offset' => $offset,
+                'limit' => $limit,
+                'sort' => $sort,
+            ]);
+
             foreach ($result as $resource) {
                 yield (string) $resource['_id'] => [
                     'insert',
@@ -142,10 +186,6 @@ class Factory
                 ];
             }
         }
-
-        $stream = $collection->watch([], [
-            'resumeAfter' => $after,
-        ]);
 
         for ($stream->rewind(); true; $stream->next()) {
             if (!$stream->valid()) {

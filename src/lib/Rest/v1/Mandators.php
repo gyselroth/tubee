@@ -54,10 +54,9 @@ class Mandators
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
-        $mandators = $this->mandator_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit']);
+        $mandators = $this->mandator_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $mandators);
     }
@@ -93,7 +92,13 @@ class Mandators
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $cursor = $this->mandator_factory->watch();
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
+        $cursor = $this->mandator_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

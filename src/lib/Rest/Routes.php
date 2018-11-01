@@ -85,6 +85,7 @@ class Routes
             $r->addRoute('GET', '/api/v1/watch/jobs', [v1\Jobs::class, 'watchAll']);
             $r->addRoute('POST', '/api/v1/jobs', [v1\Jobs::class, 'post']);
             $r->addRoute('GET', '/api/v1/jobs/{job}', [v1\Jobs::class, 'getOne']);
+            $r->addRoute('PATCH', '/api/v1/jobs/{job}', [v1\Jobs::class, 'patch']);
             $r->addRoute('DELETE', '/api/v1/jobs/{job}', [v1\Jobs::class, 'delete']);
             $r->addRoute('POST', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'post']);
             $r->addRoute('GET', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'getAll']);

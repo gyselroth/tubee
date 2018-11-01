@@ -64,10 +64,9 @@ class Processes
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
-        $processes = $this->job_factory->getOne($job)->getProcesses($query['query'], $query['offset'], $query['limit']);
+        $processes = $this->job_factory->getOne($job)->getProcesses($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $processes);
     }
@@ -114,8 +113,14 @@ class Processes
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $job = $this->job_factory->getOne($job);
-        $cursor = $this->process_factory->watch($job);
+        $cursor = $this->process_factory->watch($job, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

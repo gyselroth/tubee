@@ -113,9 +113,13 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getAll(DataTypeInterface $datatype, array $filter = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(DataTypeInterface $datatype, ?array $query = null, bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $pipeline = [];
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort, function (array $resource) use ($datatype) {
+            return $this->build($datatype, $resource);
+        });
+
+        /*$pipeline = [];
         if ($include_dataset === true) {
             //$pipeline = $this->dataset;
             if (count($filter) > 0) {
@@ -164,7 +168,7 @@ class Factory extends ResourceFactory
             ]);
         }
 
-        return $this->db->{$datatype->getCollection()}->count();
+        return $this->db->{$datatype->getCollection()}->count();*/
     }
 
     /**
@@ -242,11 +246,11 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(DataTypeInterface $datatype, ?ObjectIdInterface $after = null, bool $existing = true): Generator
+    public function watch(DataTypeInterface $datatype, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{$datatype->getCollection()}, $after, $existing, [], function (array $resource) use ($datatype) {
+        return $this->watchFrom($this->db->{$datatype->getCollection()}, $after, $existing, $query, function (array $resource) use ($datatype) {
             return $this->build($datatype, $resource);
-        });
+        }, $offset, $limit, $sort);
     }
 
     /**

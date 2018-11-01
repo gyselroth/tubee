@@ -2537,6 +2537,38 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
+  /watch/jobs:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get realtime updates"
+      description: "A job is an asynchronous server process"
+      operationId: "watchJobs"
+      produces:
+      - "application/json"
+      - "application/yaml"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      responses:
+        200:
+          description: "List of active jobs"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
   /jobs:
     get:
       tags:

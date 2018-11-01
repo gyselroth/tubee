@@ -64,11 +64,10 @@ class Workflows
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
         $mandator = $this->mandator_factory->getOne($mandator);
-        $workflows = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit']);
+        $workflows = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $workflows);
     }
@@ -145,8 +144,14 @@ class Workflows
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
-        $cursor = $this->workflow_factory->watch($endpoint);
+        $cursor = $this->workflow_factory->watch($endpoint, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

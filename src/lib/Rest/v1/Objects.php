@@ -75,11 +75,10 @@ class Objects
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $objects = $datatype->getObjects($query['query'], false, (int) $query['offset'], (int) $query['limit']);
+        $objects = $datatype->getObjects($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $objects);
     }
@@ -176,8 +175,14 @@ class Objects
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $cursor = $this->object_factory->watch($datatype);
+        $cursor = $this->object_factory->watch($datatype, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

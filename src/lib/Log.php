@@ -40,21 +40,23 @@ class Log extends AbstractResource implements LogInterface
             ],
             'kind' => 'Log',
             'id' => (string) $this->getId(),
-            'level' => $this->resource['level'],
-            'level_name' => $this->resource['level_name'],
-            'message' => $this->resource['message'],
-            'created' => (new DateTime($this->resource['datetime']))->format('c'),
-            'category' => $this->resource['context']['category'],
-            'exception' => function ($resource) use ($data) {
-                if (isset($data['context']['exception'])) {
-                    return $data['context']['exception'];
-                }
-            },
-            'object' => function ($resource) use ($data) {
-                if (isset($data['context']['object'])) {
-                    return $data['context']['object'];
-                }
-            },
+            'data' => [
+                'level' => $this->resource['level'],
+                'level_name' => $this->resource['level_name'],
+                'message' => $this->resource['message'],
+                'created' => (new DateTime($this->resource['datetime']))->format('c'),
+                'category' => $this->resource['context']['category'],
+                'exception' => function ($resource) use ($data) {
+                    if (isset($data['context']['exception'])) {
+                        return $data['context']['exception'];
+                    }
+                },
+                'object' => function ($resource) use ($data) {
+                    if (isset($data['context']['object'])) {
+                        return $data['context']['object'];
+                    }
+                },
+            ],
         ]);
     }
 }

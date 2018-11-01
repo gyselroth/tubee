@@ -64,10 +64,9 @@ class AccessRoles
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
-        $roles = $this->role_factory->getAll($query['query'], $query['offset'], $query['limit']);
+        $roles = $this->role_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $roles);
     }
@@ -167,7 +166,13 @@ class AccessRoles
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $cursor = $this->role_factory->watch();
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
+        $cursor = $this->role_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

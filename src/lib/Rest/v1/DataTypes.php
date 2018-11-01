@@ -64,11 +64,10 @@ class DataTypes
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
         $mandator = $this->mandator_factory->getOne($mandator);
-        $datatypes = $mandator->getDataTypes($query['query'], (int) $query['offset'], (int) $query['limit']);
+        $datatypes = $mandator->getDataTypes($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $datatypes);
     }
@@ -131,8 +130,14 @@ class DataTypes
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $mandator = $this->mandator_factory->getOne($mandator);
-        $cursor = $this->datatype_factory->watch($mandator);
+        $cursor = $this->datatype_factory->watch($mandator, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

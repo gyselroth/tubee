@@ -43,7 +43,7 @@ class Factory extends ResourceFactory
     /**
      * Get jobs.
      */
-    public function getAll(JobInterface $job, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(JobInterface $job, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort=null): Generator
     {
         $filter = [
             'data.job' => $job->getId(),
@@ -53,13 +53,9 @@ class Factory extends ResourceFactory
             $filter = ['$and' => [$filter, $query]];
         }
 
-        $result = $this->scheduler->getJobs($filter, $offset, $limit);
-
-        foreach ($result as $id => $process) {
-            yield $id => $this->build($process->toArray(), $job);
-        }
-
-        return (int) $result->getReturn();
+        return $this->getAllFrom($this->db->{$this->scheduler->getCollection()}, $filter, $offset, $limit, $sort, function(array $resource) use($job) {
+            return $this->build($resource, $job)
+        });
     }
 
     /**
@@ -85,11 +81,11 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(JobInterface $job, ?ObjectIdInterface $after = null, bool $existing = true): Generator
+    public function watch(JobInterface $job, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort=null): Generator
     {
-        return $this->watchFrom($this->db->{$this->scheduler->getCollection()}, $after, $existing, [], function (array $resource) use ($job) {
+        return $this->watchFrom($this->db->{$this->scheduler->getCollection()}, $after, $existing, $query, function (array $resource) use ($job) {
             return $this->build($resource, $job);
-        });
+        }, $offset, $limit, $sort);
     }
 
     /**

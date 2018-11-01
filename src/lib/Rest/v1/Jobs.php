@@ -65,10 +65,9 @@ class Jobs
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
-        $jobs = $this->job_factory->getAll($query['query'], $query['offset'], $query['limit']);
+        $jobs = $this->job_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $jobs);
     }
@@ -125,12 +124,11 @@ class Jobs
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();
         $update = json_decode($patched, true);
-
         $this->job_factory->update($job, $update);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->job_factory->getOne($job)->decorate($request),
+            $this->job_factory->getOne($job->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -140,7 +138,13 @@ class Jobs
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $cursor = $this->job_factory->watch();
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
+        $cursor = $this->job_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

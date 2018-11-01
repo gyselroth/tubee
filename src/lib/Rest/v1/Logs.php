@@ -61,7 +61,6 @@ class Logs
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
         $job = $this->job_factory->getOne($job);
@@ -71,7 +70,7 @@ class Logs
             $query['query']['_id'] = $process->getId();
         }
 
-        $logs = $job->getLogs($query['query'], $query['offset'], $query['limit']);
+        $logs = $job->getLogs($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $logs);
     }
@@ -91,13 +90,19 @@ class Logs
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectIdInterface $process = null): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $job = $this->job_factory->getOne($job);
 
         if ($process !== null) {
             $process = $job->getProcess($process);
         }
 
-        $cursor = $this->log_factory->watch($job, $process);
+        $cursor = $this->log_factory->watch($job, $process, $query['existing'], $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

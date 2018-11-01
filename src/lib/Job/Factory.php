@@ -64,18 +64,9 @@ class Factory extends ResourceFactory
     /**
      * Get all.
      */
-    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $result = $this->db->{self::COLLECTION_NAME}->find((array) $query, [
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
-
-        foreach ($result as $job) {
-            yield (string) $job['_id'] => $this->build($job);
-        }
-
-        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort);
     }
 
     /**
@@ -122,8 +113,8 @@ class Factory extends ResourceFactory
 
         $result = $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
 
-        $resource += ['job' => $result];
-        $this->scheduler->addJob(Sync::class, $resource, $resource['options']);
+        $resource['data'] += ['job' => $result];
+        $this->scheduler->addJob(Sync::class, $resource['data'], $resource['data']['options']);
 
         return $result;
     }
@@ -141,6 +132,7 @@ class Factory extends ResourceFactory
      */
     public function update(JobInterface $resource, array $data): bool
     {
+        $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
@@ -149,9 +141,9 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(?ObjectIdInterface $after = null, bool $existing = true): Generator
+    public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing);
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
     }
 
     /**

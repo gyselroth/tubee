@@ -60,7 +60,7 @@ class Factory extends ResourceFactory
     /**
      * Get all.
      */
-    public function getAll(EndpointInterface $endpoint, ?array $query = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getAll(EndpointInterface $endpoint, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort=null): Generator
     {
         $filter = [
             'mandator' => $endpoint->getDataType()->getMandator()->getName(),
@@ -74,16 +74,9 @@ class Factory extends ResourceFactory
             ];
         }
 
-        $result = $this->db->{self::COLLECTION_NAME}->find($filter, [
-            'offset' => $offset,
-            'limit' => $limit,
-        ]);
-
-        foreach ($result as $resource) {
-            yield (string) $resource['name'] => $this->build($resource, $endpoint);
-        }
-
-        return $this->db->{self::COLLECTION_NAME}->count((array) $query);
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function(array $resource) use($endpoint) {
+            return $this->build($resource, $endpoint)
+        });
     }
 
     /**
@@ -146,11 +139,11 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(EndpointInterface $endpoint, ?ObjectIdInterface $after = null, bool $existing = true): Generator
+    public function watch(EndpointInterface $endpoint, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort=null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, [], function (array $resource) use ($endpoint) {
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($endpoint) {
             return $this->build($resource, $endpoint);
-        });
+        }, $offset, $limit, $sort);
     }
 
     /**

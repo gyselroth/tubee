@@ -64,11 +64,10 @@ class Endpoints
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $endpoints = $datatype->getEndpoints($query['query'], (int) $query['offset'], (int) $query['limit']);
+        $endpoints = $datatype->getEndpoints($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $endpoints);
     }
@@ -143,8 +142,14 @@ class Endpoints
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $cursor = $this->endpoint_factory->watch($datatype);
+        $cursor = $this->endpoint_factory->watch($datatype, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
@@ -157,12 +162,11 @@ class Endpoints
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
         $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
         $endpoint->setup();
-        $objects = $endpoint->getAll($query['query'], (int) $query['offset'], (int) $query['limit']);
+        $objects = $endpoint->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $objects);
     }

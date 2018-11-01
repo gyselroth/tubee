@@ -64,12 +64,11 @@ class ObjectRelatives
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
-            'query' => [],
         ], $request->getQueryParams());
 
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object]);
-        $relatives = $object->getRelatives($query['query'], false, (int) $query['offset'], (int) $query['limit']);
+        $relatives = $object->getRelatives($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $relatives);
     }
@@ -119,8 +118,14 @@ class ObjectRelatives
      */
     public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $id): ResponseInterface
     {
+        $query = array_merge([
+            'offset' => null,
+            'limit' => null,
+            'existing' => true,
+        ], $request->getQueryParams());
+
         $object = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getObject($id);
-        $cursor = $this->relation_factory->watch($object);
+        $cursor = $this->relation_factory->watch($object, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

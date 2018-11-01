@@ -64,27 +64,32 @@ class Job extends AbstractResource implements JobInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $options = $this->resource['options'];
-        $resource = $this->resource;
+        $resource = $this;
+        $scheduler = $this->scheduler;
 
         $result = [
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Job',
-            'options' => [
-                'at' => $options['at'],
-                'interval' => $options['interval'],
-                'retry' => $options['retry'],
-                'retry_interval' => $options['retry_interval'],
-                'timeout' => $options['timeout'],
-            ],
-            'data' => $this->resource,
-            /*'status' => function () use ($scheduler) {
-                $cursor = $scheduler->getJobs([
-                    'data.job' => $resource['_job']
-                ]);
-            },*/
+            'data' => $this->getData()['data'],
+            'status' => function () use ($resource, $scheduler) {
+                $process = iterator_to_array($scheduler->getJobs([
+                    'data.job' => $resource->getId(),
+                ]));
+
+                $process = end($process);
+                if ($process === false) {
+                    return [
+                        'status' => false,
+                    ];
+                }
+
+                return [
+                    'status' => true,
+                    'process' => (string) $process->getId(),
+                ];
+            },
         ];
 
         return AttributeResolver::resolve($request, $this, $result);
@@ -93,9 +98,9 @@ class Job extends AbstractResource implements JobInterface
     /**
      * {@inheritdoc}
      */
-    public function getLogs(array $query = [], ?int $offset = null, ?int $limit = null): Generator
+    public function getLogs(array $query = [], ?int $offset = null, ?int $limit = null, ?array $sort = []): Generator
     {
-        return $this->log_factory->getAll($this, $query, $offset, $limit);
+        return $this->log_factory->getAll($this, $query, $offset, $limit, $sort);
     }
 
     /**
@@ -103,8 +108,8 @@ class Job extends AbstractResource implements JobInterface
      */
     public function trigger(): Process
     {
-        $resource = $this->resource;
-        $options = $this->resource['options'];
+        $resource = $this->resource['data'];
+        $options = $this->resource['data']['options'];
         unset($options['at'], $options['interval']);
 
         $resource += ['job' => $this->getId()];
@@ -123,9 +128,9 @@ class Job extends AbstractResource implements JobInterface
     /**
      * {@inheritdoc}
      */
-    public function getProcesses(array $query = [], ?int $offset = null, ?int $limit = null): Generator
+    public function getProcesses(array $query = [], ?int $offset = null, ?int $limit = null, array $sort = []): Generator
     {
-        return $this->process_factory->getAll($this, $query, $offset, $limit);
+        return $this->process_factory->getAll($this, $query, $offset, $limit, $sort);
     }
 
     /**

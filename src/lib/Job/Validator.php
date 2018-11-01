@@ -38,6 +38,7 @@ class Validator extends ResourceValidator
     public static function validate(array $resource): array
     {
         $defaults = [
+            'data' => [
             'notification' => [
                 'enabled' => false,
                 'receiver' => [],
@@ -57,12 +58,13 @@ class Validator extends ResourceValidator
                 'retry_interval' => 0,
                 'timeout' => 0,
             ],
+            ],
         ];
 
-        $resource = array_merge($defaults, $resource);
+        $resource = array_replace_recursive($defaults, $resource);
         $resource = parent::validate($resource);
 
-        foreach ($resource as $option => $value) {
+        foreach ($resource['data'] as $option => $value) {
             switch ($option) {
                 case 'mandators':
                 case 'datatypes':
@@ -93,7 +95,7 @@ class Validator extends ResourceValidator
 
                 break;
                 case 'log_level':
-                    if (!isset(self::LOG_LEVELS[$resource['log_level']])) {
+                    if (!isset(self::LOG_LEVELS[$value])) {
                         throw new InvalidArgumentException('invalid log_level provided (one of '.implode(',', self::LOG_LEVELS).')');
                     }
 
