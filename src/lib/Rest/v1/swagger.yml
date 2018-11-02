@@ -342,17 +342,7 @@ paths:
         name: data
         description: "Datatype"
         schema:
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: "Name"
-            descripiton:
-              type: string
-              description: "Description"
-            schema:
-              $ref: "#/definitions/schema"
+           $ref: "#/definitions/datatype"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -460,17 +450,7 @@ paths:
         name: data
         description: "Datatype"
         schema:
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: "Name"
-            descripiton:
-              type: string
-              description: "Description"
-            schema:
-              $ref: "#/definitions/schema"
+          $ref: "#/definitions/datatype"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -636,17 +616,7 @@ paths:
         name: data
         description: "Endpoint"
         schema:
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: "Name"
-            descripiton:
-              type: string
-              description: "Description"
-            schema:
-              $ref: "#/definitions/schema"
+          $ref: "#/definitions/endpoint"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -767,7 +737,7 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Datatype"
+        description: "Endpoint"
         schema:
           required:
             - name
@@ -778,8 +748,6 @@ paths:
             descripiton:
               type: string
               description: "Description"
-            schema:
-              $ref: "#/definitions/schema"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -1870,7 +1838,7 @@ paths:
         200:
           description: "Object history"
           schema:
-            $ref: "#/definitions/object-history"
+            $ref: "#/definitions/data-objects"
         404:
           description: "Resource does not exists"
         403:
@@ -2983,6 +2951,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Job"
@@ -3055,6 +3028,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Logs"
@@ -3231,374 +3219,456 @@ definitions:
     properties:
       href:
         type: "string"
+  list:
+    type: "object"
+    properties:
+      _links:
+        description: "Holds a list of links rfc1738 to other resources."
+        $ref: "#/definitions/list-links"
+      kind:
+        description: "The resource type, always List."
+        type: "string"
+        default: "List"
+      count:
+        description: "Holds the number of items in the current list response."
+        type: "number"
+      total:
+        description: "Holds the number of total available items on the server. Note that a List resource is always paged. You need to traverse with offset and limit to request further resources in the list."
+        type: "number"
+  resource:
+    type: "object"
+    properties:
+      _links:
+        $ref: "#/definitions/links"
+      name:
+        type: "string"
+      id:
+        type: "string"
+      version:
+        type: "number"
+      created:
+        type: "string"
+      changed:
+        type: "string"
   mandators:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/mandator"
-  mandator:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      name:
-        type: "string"
-  access-rules:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/access-rule"
-  access-rule:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      name:
-        type: "string"
-      roles:
-        type: "array"
-        items:
-          type: "string"
-      verbs:
-        type: "array"
-        items:
-          type: "string"
-      selectors:
-        type: "array"
-        items:
-          type: "string"
-      resources:
-        type: "array"
-        items:
-          type: "string"
-  access-roles:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/access-role"
-  access-role:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      name:
-        type: "string"
-      identifiers:
-        type: "array"
-        items:
-          type: "string"
-  processes:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/process"
-  process:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      status:
-        type: "integer"
-        format: "int"
-        minimum: 0
-        maximum: 4
-      created:
-        type: "string"
-        format: "date-time"
-      ended:
-        type: "string"
-        format: "date-time"
-      at:
-        type: "string"
-        format: "date-time"
-      interval:
-        type: "integer"
-      retry:
-        type: "integer"
-      retry_interval:
-        type: "integer"
-  jobs:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/job"
-  job:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      status:
-        type: "integer"
-        format: "int"
-        minimum: 0
-        maximum: 4
-      created:
-        type: "string"
-        format: "date-time"
-      ended:
-        type: "string"
-        format: "date-time"
-      at:
-        type: "string"
-        format: "date-time"
-      interval:
-        type: "integer"
-      retry:
-        type: "integer"
-      retry_interval:
-        type: "integer"
-  logs:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/log"
-  log:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      timestamp:
-        type: "string"
-        format: "date-time"
-      message:
-        type: "string"
-      class:
-        type: "string"
-  datatypes:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/datatype"
-  datatype:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      name:
-        type: "string"
-        description: "Datatype name"
-      mandator:
-        $ref: "#/definitions/mandator"
-      enabled:
-        type: "boolean"
-        description: "Is true if datatype is enabled"
-      class:
-        type: "string"
-        description: "Name of implementation, usually Tubee\\Datatype"
-      collection:
-        type: "string"
-        description: "Collection name which holds objects of this datatype"
-      dataset:
-        type: "string"
-        description: "Dataset aggregation query"
-  endpoints:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/endpoint"
-  endpoint:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      name:
-        type: "string"
-        description: "Endpoint name"
-      status:
-        type: object
+    description: "A list of mandators."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
         properties:
-          online:
-            type: boolean
-          timeout:
-            type: number
-      datatype:
-        $ref: "#/definitions/datatype"
-      mandator:
-        $ref: "#/definitions/mandator"
-      type:
-        type: "string"
-        description: "Type of endpoint (Either source or destination)"
-      class:
-        type: "string"
-        description: "Name of implementation (Endpoint type/protocol)"
-      history:
-        type: "boolean"
-        description: "Is true if history tracking is enabled to this endpoint"
-      import:
-        type: "array"
-        description: "Array of attributes which are used as identifier"
-        items:
-          type: "string"
-      filter_one:
-        type: "string"
-        description: "Filter to identitfy exactly one object"
-      filter_all:
-        type: "string"
-        description: "Filter whole endpoint"
-      resource:
-        type: "object"
-        description: "Endpoint specific configuration"
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/mandator"
+  mandator:
+    description: "A mandator is a namespace to separate resources."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Mandator."
+            type: "string"
+            default: "Mandator"
+  access-rules:
+    description: "A list of access rules."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/access-rule"
+  access-rule:
+    description: "An access rule allows to specify what access roles can access which resources."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always AccessRule."
+            type: "string"
+            default: "AccessRule"
+          data:
+            type: "object"
+            properties:
+              roles:
+                description: "A list of access-role names to match the given rule."
+                type: "array"
+                items:
+                  type: "string"
+              verbs:
+                description: "List of allowed HTTP rfc7231 verbs, you may also specify a wildcard to match all verbs."
+                type: "array"
+                items:
+                  type: "string"
+                  enum:
+                    - "*"
+                    - GET
+                    - POST
+                    - PUT
+                    - PATCH
+                    - DELETE
+                    - HEAD
+              selectors:
+                description: "A list of selectors to match resources, for example mandator, datatype, endpoint, ..."
+                type: "array"
+                items:
+                  type: "string"
+              resources:
+                description: "Values according to your selector list required to match a request."
+                type: "array"
+                items:
+                  type: "string"
+  access-roles:
+    description: "A list of access roles."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/access-role"
+  access-role:
+    description: "An access role is defined list which matches authenticated user identifiers."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always AccessRole."
+            type: "string"
+            default: "AccessRole"
+          data:
+            type: "object"
+            properties:
+              identifiers:
+                description: "A list of user identifiers which the access role should match. It is also possible to specify a wildcard to match all identifiers."
+                type: "array"
+                items:
+                  type: "string"
+  processes:
+    description: "A list of processes."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/process"
+  process:
+    description: "A process is a sub resource of a job. Each process represents one job execution."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Process."
+            type: "string"
+            default: "Process"
+          status:
+            description: "Holds the status of this resource. Note that status is immutable."
+            type: "object"
+            properties:
+              code:
+                description: "The result code of the process."
+                type: "number"
+
+  jobs:
+    description: "A list of jobs."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/job"
+  job:
+    description: "A job is a synchronization job which declares when and what datatypes should be synchronized."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Job."
+            type: "string"
+            default: "Job"
+          data:
+            type: "object"
+            properties:
+              notification:
+                type: "object"
+                properties:
+                  enabled:
+                    description: "You may enable mail notification for a given job."
+                    default: false
+                    type: boolean
+                  receiver:
+                    description: "A list of mail adresses which the notification should be sent to. This option has no affect if notification is disabled."
+                    type: array
+                    items:
+                      type: string
+              mandators:
+                description: "A list of mandators (name) the job should match. You may use a wildcard to specify all mandators."
+                type: array
+                items:
+                  type: string
+                default: ["*"]
+              datatypes:
+                description: "A list of datatypes (name) the job should match. You may use a wildcard to specify all datatypes."
+                type: array
+                items:
+                  type: string
+                default: ["*"]                    
+              endpoints:
+                description: "A list of endoints (name) the job should match. You may use a wildcard to specify all endpoints."
+                type: array
+                items:
+                  type: string                    
+                default: ["*"]
+              loadbalance:
+                description: "If enabled the server tries to splitt the job into multiple parallel processes."
+                type: boolean
+                default: true
+              ignore:
+                description: "If enabled the server does ignores any sync errors and continue with the process."
+                type: boolean
+                default: false
+              log_level:
+                description: "You may change the log level which gets applied during a sync job. Note that a log level too verbose has a big impact on the sync performance."
+                type: string
+                default: error
+                enum:
+                  - emerg
+                  - error
+                  - warn
+                  - info
+                  - notice
+                  - debug
+              options:
+                description: "Holds options about when a job should start and with what interval."
+                type: object
+                properties:      
+                  at:
+                    description: "Holds a unix timestamp at what time the job should be executed."
+                    type: "string"
+                    format: "integer"
+                    default: 0
+                  interval:
+                    description: "The number of secconds after the job should be executed again. The default is only run once."
+                    type: "integer"
+                    default: 0
+                  retry:
+                    description: "The number of times a failed job should be restarted. The default is never."
+                    type: "integer"
+                    default: 0
+                  retry_interval:
+                    description: "The number of secconds beween failed job retries. The default is 300 (5min)."
+                    type: "integer"
+                    default: 0
+  logs:
+    description: "A list of logs."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/log"
+  log:
+    description: "A log messagage from a process."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Log."
+            type: "string"
+            default: "Log"
+          data:
+            type: "object"
+            properties:
+              level:
+                type: "integer"
+              level_name:
+                type: "string"
+              message:
+                description: "The log message."
+                type: "string"
+              category:
+                description: "The server component which logged the message."
+                type: "string"
+              exception:
+                description: "Holds an exception object if the log message holds an exception reference."
+                type: "object"
+  datatypes:
+    description: "A list of datatypes."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/datatypes"
+  datatype:
+    description: "A datatype is a collection of data objects, meaning a collection of similar objects."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always DataType."
+            type: "string"
+            default: "DataType"
+          data:
+            type: "object"
+  endpoints:
+    description: "A list of endpoints."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/endpoint"
+  endpoint:
+    description: "An endpoint represents an external resource with objects. This may be a database, a file, a http service, ..."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Endpoint."
+            type: "string"
+            default: "Endpoint"
+          data:
+            type: "object"
+            properties:
+              class:  
+                description: "The implementation of the endpoint"
+                type: "string"
+                enum:
+                  - Pdo
+                  - Mysql
+                  - Xml
+                  - Csv
+                  - Image
+                  - Json
+                  - MongoDB
+                  - Moodle
+                  - Balloon
+              type:
+                description: "Specify the type of the endpoint."
+                type: "string"
+                enum:
+                  - virtual
+                  - source
+                  - destination
+                  - bidirectional
+              resource:
+                description: "Holds the entpoint type relevant options to connect to."
+                type: "object"
+              options:
+                type: "object"
+                properties:
+                  import:
+                    description: "A list of attributes which gets used to uniquely identify an object on the endpoint."
+                    type: "array"
+                    items: 
+                      type: string
+                  flush:
+                    description: "If true and the endpoint is of type source, the endpoint gets flushed before export. If the type is destination, the endpoints datatype gets flushed before import. Pay attention with flush as it may result in data loss!"
+                    type: "boolean"
+                    default: false
+                  filter_one:
+                    description: "Specify an endpoint filter which gets used to filter for a single object."
+                    type: "array"
+                    items: 
+                      type: string
+                  filter_all:
+                    description: "Specify a filter which always gets applied to the endpoint if objects are retrieved."
+                    default: []
+                    type: "array"
+                    items: 
+                      type: string
   workflows:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/workflow"
+    description: "A list of workflows."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/workflow"
   workflow:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      name:
-        type: "string"
-        description: "Workflow name"
-      datatype:
-        $ref: "#/definitions/datatype"
-      mandator:
-        $ref: "#/definitions/mandator"
-      endpoint:
-        type: "string"
-        description: "Workflow name"
-      class:
-        type: "string"
-        description: "Name of implementation, usually Tubee\\Workflow"
-      ensure:
-        type: "string"
-        description: "Specifies what type of workflow this is."
-      condition:
-        type: "string"
-        description: "Workflow condition"
-  schema:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      datatype:
-        $ref: "#/definitions/datatype"
-      mandator:
-        $ref: "#/definitions/mandator"
-      schema:
-        type: "object"
-        description: "Datatype schema"
+    description: "A workflow gets used if an endpoint gets imported or exported. A workflow defines if and what object and also if and what attributes of an object should be written to or from an endpoint."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Workflow."
+            type: "string"
+            default: "Workflow"
+          data:
+            type: "object"
+            properties:
+              ensure:
+                type: string
+                enum:
+                  - last
+                  - exists
+                  - absent
+              condition:
+                description: "Holds a scripted condition if a given workflow gets matched and executed."
+                type: string
+              map:
+                description: "Map attributes from the endpoint to the datatype schema (if the endpoint is of type source) or map attributes from the datatype to the endpoint if the endpoint is of type destination."
+                type: object
   attribute-map:
     type: "object"
     properties:
@@ -3619,157 +3689,103 @@ definitions:
         type: "object"
         description: "Attribute map"
   endpoint-objects:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/endpoint-object"
+    description: "A list of endpoint objects."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always EndpointObject."
+            type: "string"
+            default: "EndpointObject"
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/endpoint-object"
   endpoint-object:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      version:
-        type: "integer"
-      created:
-        type: "string"
-        format: "date-time"
-      changed:
-        type: "string"
-        format: "date-time"
-      data:
-        type: "object"
+    description: "An endpoint object is the actual object on an endpoint itself."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            description: "Attributes"
+            type: "object"
   data-objects:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/data-object"
+    description: "List of data objects."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/data-object"
   data-object:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      version:
-        type: "integer"
-      created:
-        type: "string"
-        format: "date-time"
-      changed:
-        type: "string"
-        format: "date-time"
-      deleted:
-        type: "string"
-        format: "date-time"
-      mandator:
-        type: "string"
-      datatype:
-        type: "string"
-      locked:
-        type: "string"
-        format: "date-time"
-      data:
-        type: "object"
+    description: "A data object represents a single object in a datatype (data collection)."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always DataObject."
+            type: "string"
+            default: "DataObject"
+          data:
+            description: "Attributes"
+            type: "object"
   object-relatives:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/object-relative"
+    description: "A list of related objects."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/object-relative"
   object-relative:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      relative_id:
-        type: "string"
-      context:
-        type: "object"
-      object:
-        $ref: "#/definitions/data-object"
-  object-history:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/object-history-object"
-  object-history-object:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      version:
-        type: "integer"
-      timestamp:
-        type: "string"
-        format: "date-time"
-      object:
-        $ref: "#/definitions/data-object"
-      data:
-        type: "object"
+    description: "An object relation represents a releationship between two data objects. A relationship may apply to objects of different datatypes and/or mandators."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Mandator."
+            type: "string"
+            default: "Mandator"
+          data:
+            type: object
+            properties: 
+              context:
+                description: "Optional context context data which describes the relationship."
+                type: "object"
+                default: {}
+              object:
+                $ref: "#/definitions/data-object"
   object-endpoints:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      count:
-        type: "number"
-      total:
-        type: "number"
-      data:
-        type: "array"
-        items:
-          $ref: "#/definitions/object-endpoint"
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/object-endpoint"
   object-endpoint:
     type: "object"
     properties:

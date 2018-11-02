@@ -137,7 +137,7 @@ class DataTypes
         ], $request->getQueryParams());
 
         $mandator = $this->mandator_factory->getOne($mandator);
-        $cursor = $this->datatype_factory->watch($mandator, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->datatype_factory->watch($mandator, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

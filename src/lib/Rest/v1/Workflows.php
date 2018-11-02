@@ -151,7 +151,7 @@ class Workflows
         ], $request->getQueryParams());
 
         $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
-        $cursor = $this->workflow_factory->watch($endpoint, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->workflow_factory->watch($endpoint, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
