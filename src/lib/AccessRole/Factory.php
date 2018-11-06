@@ -83,6 +83,7 @@ class Factory extends ResourceFactory
      */
     public function update(AccessRoleInterface $resource, array $data): bool
     {
+        $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);

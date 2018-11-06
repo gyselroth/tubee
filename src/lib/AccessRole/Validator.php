@@ -23,11 +23,9 @@ class Validator extends ResourceValidator
     {
         $resource = parent::validate($resource);
 
-        if (!isset($resource['selectors']) || !is_array($resource['selectors'])) {
+        if (!isset($resource['data']['selectors']) || !is_array($resource['data']['selectors'])) {
             throw new InvalidArgumentException('an access role must have selectors as array');
         }
-
-        parent::allowOnly($resource, ['selectors']);
 
         return $resource;
     }

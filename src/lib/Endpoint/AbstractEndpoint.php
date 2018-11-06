@@ -108,8 +108,8 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
         $this->logger = $logger;
         $this->workflow_factory = $workflow_factory;
 
-        if (isset($resource['data_options'])) {
-            $this->setOptions($resource['data_options']);
+        if (isset($resource['data']['options'])) {
+            $this->setOptions($resource['data']['options']);
         }
     }
 
@@ -175,8 +175,8 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
            ],
             'kind' => 'Endpoint',
-            'name' => $this->name,
-            'type' => $this->type,
+            'data' => $this->getData(),
+            /*'type' => $this->type,
             'resource' => $this->resource['resource'],
             'data_options' => [
                 'import' => $this->import,
@@ -184,7 +184,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
                 'flush' => $this->flush,
                 'filter_one' => $this->filter_one,
                 'filter_all' => $this->filter_all,
-            ],
+            ],*/
             'status' => function ($endpoint) {
                 try {
                     $endpoint->setup();

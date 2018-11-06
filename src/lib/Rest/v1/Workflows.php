@@ -124,7 +124,7 @@ class Workflows
         $mandator = $this->mandator_factory->getOne($mandator);
         $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
         $workflow = $endpoint->getWorkflow($workflow);
-        $doc = $workflow->getData();
+        $doc = ['data' => $workflow->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();

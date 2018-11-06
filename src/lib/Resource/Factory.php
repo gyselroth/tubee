@@ -135,7 +135,9 @@ class Factory
 
         $total = $collection->count($query);
 
-        if ($offset < 0 && $total >= $offset * -1) {
+        if ($offset !== null && $total === 0) {
+            $offset = null;
+        } elseif ($offset < 0 && $total >= $offset * -1) {
             $offset = $total + $offset;
         }
 
@@ -168,13 +170,21 @@ class Factory
             $pipeline = [['$match' => $pipeline]];
         }
 
-        $stream = $collection->watch($pipeline, [
+        $stream = $collection->watch([], [
             'resumeAfter' => $after,
         ]);
 
         if ($existing === true) {
+            $total = $collection->count($query);
+
+            if ($offset !== null && $total === 0) {
+                $offset = null;
+            } elseif ($offset < 0 && $total >= $offset * -1) {
+                $offset = $total + $offset;
+            }
+
             $result = $collection->find($query, [
-                'offset' => $offset,
+                'skip' => $offset,
                 'limit' => $limit,
                 'sort' => $sort,
             ]);

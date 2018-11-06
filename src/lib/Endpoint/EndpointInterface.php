@@ -24,6 +24,14 @@ interface EndpointInterface extends ResourceInterface
      */
     const TYPE_SOURCE = 'source';
     const TYPE_DESTINATION = 'destination';
+    const TYPE_BROWSE = 'browse';
+    const TYPE_BIDIRECTIONAL = 'bidirectional';
+    const VALID_TYPES = [
+        self::TYPE_SOURCE,
+        self::TYPE_DESTINATION,
+        self::TYPE_BROWSE,
+        self::TYPE_BIDIRECTIONAL,
+    ];
 
     /**
      * Setup endpoint.

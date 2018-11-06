@@ -115,7 +115,7 @@ class Factory extends ResourceFactory
      */
     public function getAll(DataTypeInterface $datatype, ?array $query = null, bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($datatype->getCollection(), $query, $offset, $limit, $sort, function (array $resource) use ($datatype) {
+        return $this->getAllFrom($this->db->{$datatype->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($datatype) {
             return $this->build($datatype, $resource);
         });
 

@@ -138,7 +138,7 @@ class AccessRules
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
         $rule = $this->rule_factory->getOne($rule);
-        $doc = $rule->getData();
+        $doc = ['data' => $rule->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();
@@ -164,7 +164,7 @@ class AccessRules
             'existing' => true,
         ], $request->getQueryParams());
 
-        $cursor = $this->rule_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->rule_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

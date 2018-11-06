@@ -14,7 +14,7 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectIdInterface;
+use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
@@ -59,7 +59,7 @@ class ObjectRelatives
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -76,7 +76,7 @@ class ObjectRelatives
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object, ObjectIdInterface $relative): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object, ObjectId $relative): ResponseInterface
     {
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object], false);
@@ -88,7 +88,7 @@ class ObjectRelatives
     /**
      * Create object.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $object): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
     {
         $query = array_merge([
             'write' => false,
@@ -116,7 +116,7 @@ class ObjectRelatives
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectIdInterface $id): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $id): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,

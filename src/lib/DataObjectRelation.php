@@ -56,7 +56,9 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
                  //'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
             ],
             'kind' => 'DataObjectRelation',
-            'context' => $this->resource['context'],
+            /*'data' => [
+                'context' => $this->resource['context'],
+            ]*/
             'object' => function () use ($related, $request) {
                 return $related->decorate($request);
             },

@@ -119,7 +119,7 @@ class Jobs
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
         $job = $this->job_factory->getOne($job);
-        $doc = $job->getData();
+        $doc = ['data' => $job->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();

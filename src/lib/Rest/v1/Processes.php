@@ -120,7 +120,7 @@ class Processes
         ], $request->getQueryParams());
 
         $job = $this->job_factory->getOne($job);
-        $cursor = $this->process_factory->watch($job, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->process_factory->watch($job, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

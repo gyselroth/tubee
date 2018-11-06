@@ -64,7 +64,6 @@ class Mandator extends AbstractResource implements MandatorInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Mandator',
-            'name' => $this->name,
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);
@@ -81,11 +80,6 @@ class Mandator extends AbstractResource implements MandatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
     public function getDataTypeFactory(): DataTypeFactory
     {
         return $this->datatype_factory;

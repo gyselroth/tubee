@@ -39,25 +39,25 @@ class Validator extends ResourceValidator
     {
         $defaults = [
             'data' => [
-            'notification' => [
-                'enabled' => false,
-                'receiver' => [],
-            ],
-            'mandators' => [],
-            'datatypes' => [],
-            'endpoints' => [],
-            'filter' => [],
-            'loadbalance' => true,
-            'simulate' => false,
-            'log_level' => 'error',
-            'ignore' => false,
-            'options' => [
-                'at' => 0,
-                'interval' => 0,
-                'retry' => 0,
-                'retry_interval' => 0,
-                'timeout' => 0,
-            ],
+                'notification' => [
+                    'enabled' => false,
+                    'receiver' => [],
+                ],
+                'mandators' => [],
+                'datatypes' => [],
+                'endpoints' => [],
+                'filter' => [],
+                'loadbalance' => true,
+                'simulate' => false,
+                'log_level' => 'error',
+                'ignore' => false,
+                'options' => [
+                    'at' => 0,
+                    'interval' => 0,
+                    'retry' => 0,
+                    'retry_interval' => 0,
+                    'timeout' => 0,
+                ],
             ],
         ];
 

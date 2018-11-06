@@ -27,6 +27,6 @@ class Factory
     {
         $ldap = new LdapServer();
 
-        return new LdapEndpoint($resource['name'], $resource['type'], $ldap, $datatype, $workflow, $logger, $resource);
+        return new LdapEndpoint($resource['name'], $resource['data']['type'], $ldap, $datatype, $workflow, $logger, $resource);
     }
 }

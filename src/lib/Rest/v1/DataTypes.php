@@ -84,6 +84,17 @@ class DataTypes
     }
 
     /**
+     * Delete.
+     */
+    public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    {
+        $mandator = $this->mandator_factory->getOne($mandator);
+        $this->datatype_factory->deleteOne($mandator, $datatype);
+
+        return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+    }
+
+    /**
      * Create.
      */
     public function post(ServerRequestInterface $request, Identity $identity, string $mandator): ResponseInterface
@@ -110,7 +121,7 @@ class DataTypes
         $query = $request->getQueryParams();
         $mandator = $this->mandator_factory->getOne($mandator);
         $datatype = $mandator->getDataType($datatype);
-        $doc = $datatype->getData();
+        $doc = ['data' => $datatype->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();

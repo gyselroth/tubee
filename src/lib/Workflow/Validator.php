@@ -24,20 +24,24 @@ class Validator extends ResourceValidator
     {
         $resource = parent::validate($resource);
 
-        if (!isset($resource['ensure']) || !in_array($resource['ensure'], WorkflowInterface::VALID_ENSURES)) {
+        $defaults = [
+            'data' => [
+                'ensure' => WorkflowInterface::ENSURE_LAST,
+                'map' => [],
+            ],
+        ];
+
+        $resource = array_replace_recursive($defaults, $resource);
+
+        if (!isset($resource['data']['ensure']) || !in_array($resource['data']['ensure'], WorkflowInterface::VALID_ENSURES)) {
             throw new InvalidArgumentException('ensure as string must be provided (one of exists,last,disabled,absent)');
         }
 
-        if (!isset($resource['map'])) {
-            throw new InvalidArgumentException('map must be provided');
-        }
-
-        if (isset($resource['condition']) && !is_string($resource['condition'])) {
+        if (isset($resource['data']['condition']) && !is_string($resource['data']['condition'])) {
             throw new InvalidArgumentException('provided condition must be a string');
         }
 
-        parent::allowOnly($resource, ['ensure', 'condition', 'map']);
-        AttributeMapValidator::validate($resource['map']);
+        AttributeMapValidator::validate($resource['data']['map']);
 
         return $resource;
     }

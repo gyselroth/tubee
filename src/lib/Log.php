@@ -40,6 +40,8 @@ class Log extends AbstractResource implements LogInterface
             ],
             'kind' => 'Log',
             'id' => (string) $this->getId(),
+            'created' => (new DateTime($this->resource['datetime']))->format('c'),
+            'changed' => (new DateTime($this->resource['datetime']))->format('c'),
             'data' => [
                 'level' => $this->resource['level'],
                 'level_name' => $this->resource['level_name'],

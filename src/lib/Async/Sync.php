@@ -77,16 +77,16 @@ class Sync extends AbstractJob
     public function start(): bool
     {
         $filter = !empty($this->data['mandators']) ? ['name' => ['$in' => $this->data['mandators']]] : [];
-        foreach ($this->mandator_factory->getAll($filter) as $mandator_name => $mandator) {
+        foreach ($this->mandator_factory->getAll($filter) as $mandator) {
             $filter = !empty($this->data['datatypes']) ? ['name' => ['$in' => $this->data['datatypes']]] : [];
-            foreach ($mandator->getDataTypes($filter) as $dt_name => $datatype) {
+            foreach ($mandator->getDataTypes($filter) as $datatype) {
                 $filter = !empty($this->data['endpoints']) ? ['name' => ['$in' => $this->data['endpoints']]] : [];
-                foreach ($datatype->getEndpoints($filter) as $ep_name => $endpoint) {
+                foreach ($datatype->getEndpoints($filter) as $endpoint) {
                     if ($this->data['loadbalance'] === true) {
                         $data = $this->data;
                         $data = array_merge($data, [
-                            'mandators' => [$mandator_name],
-                            'endpoints' => [$ep_name],
+                            'mandators' => [$mandator->getName()],
+                            'endpoints' => [$endpoint->getName()],
                             'loadbalance' => false,
                         ]);
 
@@ -96,15 +96,15 @@ class Sync extends AbstractJob
                             'job' => (string) $this->data['job'],
                             'process' => (string) $this->getId(),
                             'start' => $this->timestamp,
-                            'mandator' => $mandator_name,
-                            'datatype' => $dt_name,
-                            'endpoint' => $ep_name,
+                            'mandator' => $mandator->getName(),
+                            'datatype' => $datatype->getName(),
+                            'endpoint' => $endpoint->getName(),
                         ]);
 
                         if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
-                            $this->import($datatype, $this->data['filter'], ['name' => $ep_name], $this->data['simulate'], $this->data['ignore']);
+                            $this->import($datatype, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
                         } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-                            $this->export($datatype, $this->data['filter'], ['name' => $ep_name], $this->data['simulate'], $this->data['ignore']);
+                            $this->export($datatype, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
                         }
 
                         $this->logger->popProcessor();

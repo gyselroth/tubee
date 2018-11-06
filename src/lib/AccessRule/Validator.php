@@ -23,7 +23,7 @@ class Validator extends ResourceValidator
     {
         $resource = parent::validate($resource);
 
-        foreach ($resource as $option => $value) {
+        foreach ($resource['data'] as $option => $value) {
             switch ($option) {
                 case 'verbs':
                 case 'roles':
@@ -34,10 +34,10 @@ class Validator extends ResourceValidator
                     }
 
                 break;
+                default:
+                    throw new InvalidArgumentException('invalid option '.$option.' given');
             }
         }
-
-        parent::allowOnly($resource, ['verbs', 'roles', 'selectors', 'resources']);
 
         return $resource;
     }

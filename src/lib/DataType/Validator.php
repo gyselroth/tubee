@@ -23,13 +23,19 @@ class Validator extends ResourceValidator
     public static function validate(array $resource): array
     {
         $resource = parent::validate($resource);
+        $defaults = [
+            'data' => [
+                'schema' => [],
+            ],
+        ];
 
-        if (!isset($resource['schema'])) {
-            throw new InvalidArgumentException('schema must be provided');
+        $resource = array_replace_recursive($defaults, $resource);
+
+        if (!is_array($resource['data']['schema'])) {
+            throw new InvalidArgumentException('data.schema must be an array');
         }
 
-        parent::allowOnly($resource, ['schema']);
-        SchemaValidator::validate($resource['schema']);
+        SchemaValidator::validate($resource['data']['schema']);
 
         return $resource;
     }

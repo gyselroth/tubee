@@ -25,8 +25,8 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $storage = StorageFactory::build($resource['resource'], $logger);
+        $storage = StorageFactory::build($resource['data']['resource'], $logger);
 
-        return new XmlEndpoint($resource['name'], $resource['type'], $resource['file'], $storage, $datatype, $workflow, $logger, $resource);
+        return new XmlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['file'], $storage, $datatype, $workflow, $logger, $resource);
     }
 }

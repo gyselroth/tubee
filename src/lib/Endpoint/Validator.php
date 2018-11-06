@@ -23,27 +23,33 @@ class Validator extends ResourceValidator
     {
         $resource = parent::validate($resource);
 
-        if (!isset($resource['type']) || $resource['type'] !== 'destination' && $resource['type'] !== 'source') {
-            throw new InvalidArgumentException('Either destination or source must be provided as type');
+        $defaults = [
+            'data' => [
+                'type' => EndpointInterface::TYPE_BROWSE,
+            ],
+        ];
+
+        $resource = array_replace_recursive($defaults, $resource);
+
+        if (!in_array($resource['data']['type'], EndpointInterface::VALID_TYPES)) {
+            throw new InvalidArgumentException('invalid endpoint type provided, provide one of ['.join(',', EndpointInterface::VALID_TYPES).']');
         }
 
-        if ($resource['type'] === EndpointInterface::TYPE_SOURCE && (!is_array($resource['data_options']['import']) || count($resource['data_options']['import']) === 0)) {
+        if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE && (!is_array($resource['data']['options']['import']) || count($resource['data']['options']['import']) === 0)) {
             throw new InvalidArgumentException('source endpoint must include at least one data_options.import attribute');
         }
 
-        if ($resource['type'] === EndpointInterface::TYPE_DESTINATION && (!isset($resource['data_options']['filter_one']) || !is_string($resource['data_options']['filter_one']))) {
+        if ($resource['data']['type'] === EndpointInterface::TYPE_DESTINATION && (!isset($resource['data']['options']['filter_one']) || !is_string($resource['data']['options']['filter_one']))) {
             throw new InvalidArgumentException('destintation endpoint must have single object filter data_options.filter_one');
         }
 
-        if (!isset($resource['class']) || !is_string($resource['class'])) {
+        if (!isset($resource['data']['class']) || !is_string($resource['data']['class'])) {
             throw new InvalidArgumentException('class as string must be provided');
         }
 
-        if (!isset($resource['resource']) || !is_array($resource['resource'])) {
+        if (!isset($resource['data']['resource']) || !is_array($resource['data']['resource'])) {
             throw new InvalidArgumentException('resource as array must be provided');
         }
-
-        //parent::allowOnly($resource, ['type','class','import', 'resource']);
 
         return self::validateEndpoint($resource);
     }
@@ -53,21 +59,23 @@ class Validator extends ResourceValidator
      */
     protected static function validateEndpoint(array $resource): array
     {
-        if (strpos($resource['class'], '\\') === false) {
+        if (strpos($resource['data']['class'], '\\') === false) {
             $class = 'Tubee\\Endpoint\\'.$resource['class'];
         } else {
-            $class = $resource['class'];
+            $class = $resource['data']['class'];
         }
 
         if (!class_exists($class)) { //|| !class_exists($resource['class'].'\\Validator')) {
             throw new InvalidArgumentException("Endpoint $class does not exists");
         }
 
-        $resource['class'] = $class;
+        $resource['data']['class'] = $class;
 
         $validator = $class.'\\Validator';
         if (class_exists($validator)) {
-            return $resource = $validator::validate($resource);
+            $resource['data'] = $validator::validate($resource['data']);
+
+            return $resource;
         }
 
         return $resource;

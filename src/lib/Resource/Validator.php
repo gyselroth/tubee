@@ -25,12 +25,22 @@ class Validator
      */
     public static function validate(array $resource): array
     {
+        $defaults = [
+            'data' => [],
+        ];
+
+        $resource = array_replace_recursive($defaults, $resource);
+
         if (!isset($resource['name']) || !is_string($resource['name'])) {
             throw new InvalidArgumentException('name as string must be provided');
         }
 
         if (isset($resource['description']) && !is_string($resource['description'])) {
             throw new InvalidArgumentException('description must be a string');
+        }
+
+        if (isset($resource['data']) && !is_array($resource['data'])) {
+            throw new InvalidArgumentException('data must be an array');
         }
 
         return $resource;

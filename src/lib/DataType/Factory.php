@@ -95,7 +95,7 @@ class Factory extends ResourceFactory
         ]);
 
         if ($result === null) {
-            throw new Exception\NotFound('mandator '.$name.' is not registered');
+            throw new Exception\NotFound('datatype '.$name.' is not registered');
         }
 
         return $this->build($result, $mandator);
@@ -152,7 +152,7 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, MandatorInterface $mandator): DataTypeInterface
     {
-        $schema = new Schema($resource['schema'], $this->logger);
+        $schema = new Schema($resource['data']['schema'], $this->logger);
 
         return $this->initResource(new DataType($resource['name'], $mandator, $this->endpoint_factory, $this->object_factory, $schema, $this->logger, $resource));
     }

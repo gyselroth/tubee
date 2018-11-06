@@ -44,6 +44,7 @@ class AccessRole extends AbstractResource implements AccessRoleInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'AccessRole',
+            'data' => $this->getData(),
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);

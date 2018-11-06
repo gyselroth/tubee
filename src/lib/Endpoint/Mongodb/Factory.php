@@ -29,10 +29,10 @@ class Factory
             'uri' => 'mongodb://127.0.0.1',
             'uri_options' => null,
             'driver_options' => null,
-        ], $resource['resource']));
+        ], $resource['data']['resource']));
 
         $mongodb = new Client(...$options);
 
-        return new MongodbEndpoint($resource['name'], $resource['type'], $mongodb->selectCollection($resource['collection']), $datatype, $workflow, $logger, $resource);
+        return new MongodbEndpoint($resource['name'], $resource['data']['type'], $mongodb->selectCollection($resource['data']['collection']), $datatype, $workflow, $logger, $resource);
     }
 }

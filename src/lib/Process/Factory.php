@@ -53,7 +53,7 @@ class Factory extends ResourceFactory
             $filter = ['$and' => [$filter, $query]];
         }
 
-        return $this->getAllFrom($this->db->{$this->scheduler->getCollection()}, $filter, $offset, $limit, $sort, function (array $resource) use ($job) {
+        return $this->getAllFrom($this->db->{$this->scheduler->getJobQueue()}, $filter, $offset, $limit, $sort, function (array $resource) use ($job) {
             return $this->build($resource, $job);
         });
     }
@@ -83,7 +83,7 @@ class Factory extends ResourceFactory
      */
     public function watch(JobInterface $job, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{$this->scheduler->getCollection()}, $after, $existing, $query, function (array $resource) use ($job) {
+        return $this->watchFrom($this->db->{$this->scheduler->getJobQueue()}, $after, $existing, $query, function (array $resource) use ($job) {
             return $this->build($resource, $job);
         }, $offset, $limit, $sort);
     }

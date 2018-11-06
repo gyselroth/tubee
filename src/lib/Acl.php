@@ -63,8 +63,8 @@ class Acl
 
         $roles = $this->role_factory->getAll([
             '$or' => [
-                ['selectors' => $user->getIdentifier()],
-                ['selectors' => '*'],
+                ['data.selectors' => $user->getIdentifier()],
+                ['data.selectors' => '*'],
             ],
         ]);
 
@@ -82,33 +82,33 @@ class Acl
         }
 
         $rules = $this->rule_factory->getAll([
-            'roles' => ['$in' => $names],
+            'data.roles' => ['$in' => $names],
         ]);
 
         $method = $request->getMethod();
         $attributes = $request->getAttributes();
 
         foreach ($rules as $rule) {
-            $rule = $rule->toArray();
+            $data = $rule->getData();
 
-            $this->logger->debug('verify access rule ['.$rule['name'].']', [
+            $this->logger->debug('verify access rule ['.$rule->getName().']', [
                 'category' => get_class($this),
             ]);
 
-            if (empty(array_intersect($names, $rule['roles'])) && !in_array('*', $rule['roles'])) {
+            if (empty(array_intersect($names, $data['roles'])) && !in_array('*', $data['roles'])) {
                 continue;
             }
 
-            if (!in_array($method, $rule['verbs']) && !in_array('*', $rule['verbs'])) {
+            if (!in_array($method, $data['verbs']) && !in_array('*', $data['verbs'])) {
                 continue;
             }
 
-            foreach ($rule['selectors'] as $selector) {
+            foreach ($data['selectors'] as $selector) {
                 if ($selector === '*') {
                     return true;
                 }
 
-                if (isset($attributes[$selector]) && (in_array($attributes[$selector], $rule['resources']) || in_array('*', $rule['resources']))) {
+                if (isset($attributes[$selector]) && (in_array($attributes[$selector], $data['resources']) || in_array('*', $data['resources']))) {
                     return true;
                 }
             }

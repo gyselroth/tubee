@@ -31,8 +31,8 @@ class Factory
             'dbname' => null,
             'port' => null,
             'socket' => null,
-        ], $resource['resource']));
+        ], $resource['data']['resource']));
 
-        return new MysqlEndpoint($resource['name'], $resource['type'], $resource['table'], $datatype, $workflow, $logger, $resource);
+        return new MysqlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $datatype, $workflow, $logger, $resource);
     }
 }

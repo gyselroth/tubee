@@ -29,10 +29,10 @@ class Factory
             'username' => null,
             'passwd' => null,
             'options' => null,
-        ], $resource['resource']);
+        ], $resource['data']['resource']);
 
         $wrapper = new Wrapper($options['dsn'], $logger, $options['username'], $options['passwd'], $options['options']);
 
-        return new PdoEndpoint($resource['name'], $resource['type'], $resource['table'], $wrapper, $datatype, $workflow, $logger, $resource);
+        return new PdoEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $wrapper, $datatype, $workflow, $logger, $resource);
     }
 }

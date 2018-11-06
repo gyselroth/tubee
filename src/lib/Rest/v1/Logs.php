@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Rest\v1;
 
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectIdInterface;
+use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
@@ -56,7 +56,7 @@ class Logs
     /**
      * Get all.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectIdInterface $process = null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectId $process = null): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -78,7 +78,7 @@ class Logs
     /**
      * Get one.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $job, ObjectIdInterface $log): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $job, ObjectId $log): ResponseInterface
     {
         $resource = $this->job_factory->getOne($job)->getLog($log);
 
@@ -88,7 +88,7 @@ class Logs
     /**
      * Watch all.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectIdInterface $process = null): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $job, ?ObjectId $process = null): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -100,9 +100,10 @@ class Logs
 
         if ($process !== null) {
             $process = $job->getProcess($process);
+            $query['query']['data']['context']['process'] = $process->getId();
         }
 
-        $cursor = $this->log_factory->watch($job, $process, $query['existing'], $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->log_factory->watch($job, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

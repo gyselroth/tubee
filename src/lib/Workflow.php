@@ -103,14 +103,6 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
-    {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function decorate(ServerRequestInterface $request): array
     {
         $resource = [
@@ -118,10 +110,11 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Workflow',
-            'name' => $this->name,
-            'ensure' => $this->ensure,
-            'condition' => $this->condition,
-            'map' => $this->attribute_map->getMap(),
+            'data' => [
+                'ensure' => $this->ensure,
+                'condition' => $this->condition,
+                'map' => $this->attribute_map->getMap(),
+            ],
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);

@@ -146,12 +146,11 @@ class AccessRoles
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
         $role = $this->role_factory->getOne($role);
-        $doc = $role->getData();
+        $doc = ['data' => $role->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();
         $update = json_decode($patched, true);
-
         $this->role_factory->update($role, $update);
 
         return new UnformattedResponse(
@@ -172,7 +171,7 @@ class AccessRoles
             'existing' => true,
         ], $request->getQueryParams());
 
-        $cursor = $this->role_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->role_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

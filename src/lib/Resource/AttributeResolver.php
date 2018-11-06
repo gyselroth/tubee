@@ -21,7 +21,7 @@ class AttributeResolver
      */
     public static function resolve(ServerRequestInterface $request, ResourceInterface $resource, array $resolvable): array
     {
-        $resolvable += self::addResourceMetaData($resource);
+        $resolvable += self::addResourceMetaData($request, $resource);
 
         $params = $request->getQueryParams();
         $attributes = [];
@@ -40,11 +40,14 @@ class AttributeResolver
     /**
      * Add metadata.
      */
-    protected static function addResourceMetadata(ResourceInterface $resource): array
+    protected static function addResourceMetadata(ServerRequestInterface $request, ResourceInterface $resource): array
     {
         $data = $resource->toArray();
 
         return [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
             'id' => (string) $resource->getId(),
             'name' => $resource->getName(),
             'version' => isset($data['version']) ? $data['version'] : 0,

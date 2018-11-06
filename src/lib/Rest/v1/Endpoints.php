@@ -122,7 +122,7 @@ class Endpoints
         $mandator = $this->mandator_factory->getOne($mandator);
         $datatype = $mandator->getDataType($datatype);
         $endpoint = $datatype->getEndpoint($endpoint);
-        $doc = $endpoint->getData();
+        $doc = ['data' => $endpoint->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();

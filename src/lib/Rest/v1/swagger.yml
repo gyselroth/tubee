@@ -35,6 +35,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -67,6 +82,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of mandators"
@@ -89,18 +119,8 @@ paths:
       parameters:
       - in: body
         name: data
-        description: "Mandator"
         schema:
-          type: object
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: "Name"
-            descripiton:
-              type: string
-              description: "Description"
+          $ref: "#/definitions/mandator"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -189,15 +209,8 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Mandator"
         schema:
-          type: object
-          required:
-            - name
-          properties:
-            descripiton:
-              type: string
-              description: "Description"
+          $ref: "#/definitions/mandator"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -274,6 +287,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -311,6 +339,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of datatypes"
@@ -340,7 +383,6 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Datatype"
         schema:
            $ref: "#/definitions/datatype"
       responses:
@@ -448,7 +490,6 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Datatype"
         schema:
           $ref: "#/definitions/datatype"
       responses:
@@ -538,6 +579,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -580,6 +636,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of endpoints"
@@ -614,7 +685,6 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Endpoint"
         schema:
           $ref: "#/definitions/endpoint"
       responses:
@@ -737,17 +807,8 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Endpoint"
         schema:
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: "Name"
-            descripiton:
-              type: string
-              description: "Description"
+          $ref: "#/definitions/endpoint"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -845,6 +906,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -892,6 +968,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of workflows"
@@ -929,19 +1020,8 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Workflow"
         schema:
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: "Name"
-            descripiton:
-              type: string
-              description: "Description"
-            map:
-              $ref: "#/definitions/attribute-map"
+          $ref: "#/definitions/workflow"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -1077,19 +1157,8 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Workflow"
         schema:
-          required:
-            - name
-          properties:
-            name:
-              type: string
-              description: "Name"
-            descripiton:
-              type: string
-              description: "Description"
-            map:
-              $ref: "#/definitions/attribute-map"
+          $ref: "#/definitions/workflow"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -1290,20 +1359,8 @@ paths:
         type: "boolean"
       - in: body
         name: data
-        description: "Object"
         schema:
-          type: object
-          required:
-            - data
-          properties:
-            data:
-              type: object
-              description: "Object attributes"
-            endpoints:
-              type: array
-              items:
-                type: "string"
-              description: "Specify destination endpoints, if not set the objects get exported to all destination endpoints"
+          $ref: "#/definitions/data-object"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -1410,6 +1467,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -1448,6 +1520,28 @@ paths:
       - in: "query"
         name: "query"
         description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
         required: false
         type: "string"
       responses:
@@ -1489,18 +1583,8 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Object"
         schema:
-          type: object
-          required:
-            - relative
-          properties:
-            relative:
-              type: string
-              description: "ObjectID to the object to refernece to"
-            context:
-              type: object
-              description: "Add context data which describes the relation"
+          $ref: "#/definitions/object-relative"
       responses:
         200:
           description: "Object relative"
@@ -1588,18 +1672,8 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Object"
         schema:
-          type: object
-          required:
-            - relative
-          properties:
-            relative:
-              type: string
-              description: "ObjectID to the object to refernece to"
-            context:
-              type: object
-              description: "Add context data which describes the relation"
+          $ref: "#/definitions/object-relative"
       responses:
         200:
           description: "Object relative"
@@ -1682,6 +1756,28 @@ paths:
       - in: "query"
         name: "query"
         description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
         required: false
         type: "string"
       responses:
@@ -1782,7 +1878,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -1790,6 +1886,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -1832,6 +1933,28 @@ paths:
       - in: "query"
         name: "query"
         description: "JSON query"
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
         required: false
         type: "string"
       responses:
@@ -1879,6 +2002,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -1923,7 +2061,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -1931,6 +2069,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of objects"
@@ -1973,20 +2116,8 @@ paths:
         type: "boolean"
       - in: body
         name: data
-        description: "Object"
         schema:
-          type: object
-          required:
-            - data
-          properties:
-            data:
-              type: object
-              description: "Object attributes"
-            endpoints:
-              type: array
-              items:
-                type: "string"
-              description: "Specify destination endpoints, if not set the objects get exported to all destination endpoints"
+          $ref: "#/definitions/data-object"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -2026,6 +2157,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of access rules"
@@ -2060,7 +2206,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -2068,6 +2214,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of access rules"
@@ -2089,34 +2240,9 @@ paths:
       - "application/yaml"
       parameters:
       - in: body
-        name: "job"
-        description: "The access rule to create"
+        name: data
         schema:
-          type: object
-          properties:
-            name:
-              description: "Unique name of the access rule"
-              type: "string"
-            verbs:
-              description: "array of http verbs, you may also specify a wildcard ['*']"
-              type: "array"
-              items:
-                type: "string"
-            selectors:
-              description: "Array of resources to verify, for example mandator, datatype, object, you may also specify a wildcard ['*']"
-              type: "array"
-              items:
-                type: "string"
-            resources:
-              description: "Resource identifiers to check with selectors, you may also specify a wildcard ['*']"
-              type: "array"
-              items:
-                type: "string"
-            roles:
-              description: "Array of role names to apply the rule"
-              type: "array"
-              items:
-                type: "string"
+          $ref: "#/definitions/access-rule"
       responses:
         201:
           description: "The created access rule"
@@ -2205,31 +2331,9 @@ paths:
         required: true
         type: "string"
       - in: body
-        name: "job"
-        description: "The access rule to create"
+        name: data
         schema:
-          type: object
-          properties:
-            verbs:
-              description: "array of http verbs, you may also specify a wildcard ['*']"
-              type: "array"
-              items:
-                type: "string"
-            selectors:
-              description: "Array of resources to verify, for example mandator, datatype, object, you may also specify a wildcard ['*']"
-              type: "array"
-              items:
-                type: "string"
-            resources:
-              description: "Resource identifiers to check with selectors, you may also specify a wildcard ['*']"
-              type: "array"
-              items:
-                type: "string"
-            roles:
-              description: "Array of role names to apply the rule"
-              type: "array"
-              items:
-                type: "string"
+          $ref: "#/definitions/access-rule"
       responses:
         201:
           description: "The created access rule"
@@ -2288,6 +2392,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of access roles"
@@ -2322,7 +2441,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -2330,6 +2449,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of access roles"
@@ -2351,19 +2475,9 @@ paths:
       - "application/yaml"
       parameters:
       - in: body
-        name: "job"
-        description: "The access role to create"
+        name: data
         schema:
-          type: object
-          properties:
-            name:
-              description: "Unique name of the access role"
-              type: "string"
-            users:
-              description: "Array of user identifiers to which the role shall be applied"
-              type: "array"
-              items:
-                type: "string"
+          $ref: "#/definitions/access-role"
       responses:
         201:
           description: "The created access role"
@@ -2455,16 +2569,9 @@ paths:
         required: true
         type: "string"
       - in: body
-        name: "job"
-        description: "The access role to create"
+        name: data
         schema:
-          type: object
-          properties:
-            users:
-              description: "Array of user identifiers to which the role shall be applied"
-              type: "array"
-              items:
-                type: "string"
+          $ref: "#/definitions/access-role"
       responses:
         200:
           description: "The updated access role"
@@ -2528,6 +2635,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of active jobs"
@@ -2562,7 +2684,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -2570,6 +2692,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "List of active jobs"
@@ -2591,49 +2718,9 @@ paths:
       - "application/yaml"
       parameters:
       - in: body
-        name: "job"
-        description: "The job to create"
+        name: data
         schema:
-          type: object
-          properties:
-            type:
-              description: "Type of sync job: 1 (import), 2 (export), (4) import/export"
-              type: "number"
-            mandator:
-              description: "Array of mandators, if not given all mandators are used"
-              type: "array"
-              items:
-                type: "string"
-            datatypes:
-              description: "Array of datatypes, if not given all datatypes are used"
-              type: "array"
-              items:
-                type: "string"
-            endpoints:
-              description: "Array of source endpoints, if not given all mandators are used"
-              type: "array"
-              items:
-                type: "string"
-            ignore:
-              description: "Ignore object error and continue with the next one"
-              type: "boolean"
-              default: true
-            simulate:
-              description: "Simulate job"
-              type: "boolean"
-              default: false
-            interval:
-              description: "Specify an interval for this job. If not specified the jobs runs once."
-              type: "integer"
-              default: 0
-            retry:
-              description: "Specify a retry count for this job. If not specified the job does not repeat if failed before."
-              type: "integer"
-              default: 0
-            execute_at:
-              description: "Specify an exact timestamp when the job should get executed. The job will get executed not before this time and not before there is a free slot"
-              type: "integer"
-              default: 0
+          $ref: "#/definitions/job"
       responses:
         202:
           description: "The created job"
@@ -2766,7 +2853,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -2774,6 +2861,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Process"
@@ -2840,6 +2932,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Processes"
@@ -2943,7 +3050,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -3030,7 +3137,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -3088,7 +3195,7 @@ paths:
           type: "string"
       - in: "query"
         name: "offset"
-        description: "Objects offset, per default it starts from 0"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
         required: false
         type: "number"
       - in: "query"
@@ -3096,6 +3203,11 @@ paths:
         description: "Objects limit, per default 20 objects will get returned"
         required: false
         type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Log"
@@ -3178,6 +3290,21 @@ paths:
         type: "array"
         items:
           type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "JSON sort"
+        required: false
+        type: "string"
       responses:
         200:
           description: "Logs"
@@ -3189,9 +3316,9 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-
 definitions:
   json-patch:
+    description: "A JSON Patch according rfc6902."
     type: "object"
     properties:
       op:
@@ -3201,6 +3328,7 @@ definitions:
       value:
         type: "string"
   links:
+    description: "Contains resource links (URL) to other resources."
     type: "object"
     properties:
       self:
@@ -3241,14 +3369,19 @@ definitions:
       _links:
         $ref: "#/definitions/links"
       name:
+        description: "Resource identifier. Note that the name is immutable once created on the server."
         type: "string"
       id:
+        description: "Unique 12-byte resource identifier. Note this is a MongoDB ObjectId. The name is the standard resource identifier, the id only useful to verify that a given resource was completely recreated. An ID is immutable and will be created on the server."
         type: "string"
       version:
+        description: "The version of the resource. A version gets increased once the resource have been modified."
         type: "number"
       created:
+        description: "ISO 8601 timestamp when the resource was created."
         type: "string"
       changed:
+        description: "ISO 8601 timestamp when the resource was changed."
         type: "string"
   mandators:
     description: "A list of mandators."
@@ -3443,12 +3576,12 @@ definitions:
                 type: array
                 items:
                   type: string
-                default: ["*"]                    
+                default: ["*"]
               endpoints:
                 description: "A list of endoints (name) the job should match. You may use a wildcard to specify all endpoints."
                 type: array
                 items:
-                  type: string                    
+                  type: string
                 default: ["*"]
               loadbalance:
                 description: "If enabled the server tries to splitt the job into multiple parallel processes."
@@ -3472,7 +3605,7 @@ definitions:
               options:
                 description: "Holds options about when a job should start and with what interval."
                 type: object
-                properties:      
+                properties:
                   at:
                     description: "Holds a unix timestamp at what time the job should be executed."
                     type: "string"
@@ -3556,6 +3689,10 @@ definitions:
             default: "DataType"
           data:
             type: "object"
+            properties:
+              schema:
+                type: "object"
+                default: {}
   endpoints:
     description: "A list of endpoints."
     allOf:
@@ -3583,7 +3720,7 @@ definitions:
           data:
             type: "object"
             properties:
-              class:  
+              class:
                 description: "The implementation of the endpoint"
                 type: "string"
                 enum:
@@ -3613,7 +3750,7 @@ definitions:
                   import:
                     description: "A list of attributes which gets used to uniquely identify an object on the endpoint."
                     type: "array"
-                    items: 
+                    items:
                       type: string
                   flush:
                     description: "If true and the endpoint is of type source, the endpoint gets flushed before export. If the type is destination, the endpoints datatype gets flushed before import. Pay attention with flush as it may result in data loss!"
@@ -3622,13 +3759,13 @@ definitions:
                   filter_one:
                     description: "Specify an endpoint filter which gets used to filter for a single object."
                     type: "array"
-                    items: 
+                    items:
                       type: string
                   filter_all:
                     description: "Specify a filter which always gets applied to the endpoint if objects are retrieved."
                     default: []
                     type: "array"
-                    items: 
+                    items:
                       type: string
   workflows:
     description: "A list of workflows."
@@ -3663,12 +3800,15 @@ definitions:
                   - last
                   - exists
                   - absent
+                  - merge
+                default: last
               condition:
                 description: "Holds a scripted condition if a given workflow gets matched and executed."
                 type: string
               map:
                 description: "Map attributes from the endpoint to the datatype schema (if the endpoint is of type source) or map attributes from the datatype to the endpoint if the endpoint is of type destination."
                 type: object
+                default: {}
   attribute-map:
     type: "object"
     properties:
@@ -3768,7 +3908,7 @@ definitions:
             default: "Mandator"
           data:
             type: object
-            properties: 
+            properties:
               context:
                 description: "Optional context context data which describes the relationship."
                 type: "object"
