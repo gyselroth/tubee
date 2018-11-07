@@ -686,7 +686,7 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/endpoint"
+          type: object
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -3489,7 +3489,7 @@ definitions:
           data:
             type: "object"
             properties:
-              identifiers:
+              selectors:
                 description: "A list of user identifiers which the access role should match. It is also possible to specify a wildcard to match all identifiers."
                 type: "array"
                 items:
@@ -3741,9 +3741,6 @@ definitions:
                   - source
                   - destination
                   - bidirectional
-              resource:
-                description: "Holds the entpoint type relevant options to connect to."
-                type: "object"
               options:
                 type: "object"
                 properties:
@@ -3767,6 +3764,29 @@ definitions:
                     type: "array"
                     items:
                       type: string
+  pdo-endpoint:
+    description: "Pdo endpoint"
+    allOf:
+      - $ref: '#/definitions/endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            properties:
+              table:
+                description: "Table or view"
+                type: "string"              
+              resource:
+                description: "Holds the entpoint type relevant options to connect to."
+                type: "object"
+                properties:
+                  dsn: 
+                    type: string
+                  username:
+                    type: string
+                  passwd:
+                    type: string
   workflows:
     description: "A list of workflows."
     allOf:

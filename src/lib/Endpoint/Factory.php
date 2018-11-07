@@ -119,10 +119,10 @@ class Factory extends ResourceFactory
         $endpoint = $this->build($resource, $datatype);
         $endpoint->setup();
 
-        if ($resource['type'] === EndpointInterface::TYPE_SOURCE) {
-            $this->ensureIndex($datatype, $resource['data_options']['import']);
+        if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE) {
+            $this->ensureIndex($datatype, $resource['data']['options']['import']);
         } else {
-            $this->ensureIndex($datatype, array_keys($resource['data_options']['filter_all']));
+            $this->ensureIndex($datatype, array_keys($resource['data']['options']['filter_all']));
         }
 
         $resource['mandator'] = $datatype->getMandator()->getName();
@@ -136,6 +136,7 @@ class Factory extends ResourceFactory
      */
     public function update(EndpointInterface $resource, array $data): bool
     {
+        $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
@@ -156,7 +157,7 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, DataTypeInterface $datatype)
     {
-        $factory = $resource['class'].'\\Factory';
+        $factory = $resource['data']['class'].'\\Factory';
 
         return $this->initResource($factory::build($resource, $datatype, $this->workflow_factory, $this->logger));
     }

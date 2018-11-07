@@ -71,7 +71,7 @@ class Schema implements SchemaInterface
     /**
      * {@inheritdoc}
      */
-    public function validate(Iterable $data): bool
+    public function validate(array $data): bool
     {
         foreach ($this->schema as $attribute => $value) {
             if (isset($value['required']) && $value['required'] === true && !isset($data[$attribute])) {

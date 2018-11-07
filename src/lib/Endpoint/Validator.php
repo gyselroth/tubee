@@ -60,7 +60,7 @@ class Validator extends ResourceValidator
     protected static function validateEndpoint(array $resource): array
     {
         if (strpos($resource['data']['class'], '\\') === false) {
-            $class = 'Tubee\\Endpoint\\'.$resource['class'];
+            $class = 'Tubee\\Endpoint\\'.$resource['data']['class'];
         } else {
             $class = $resource['data']['class'];
         }

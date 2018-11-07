@@ -90,6 +90,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
         $this->endpoint = $endpoint;
         $this->logger = $logger;
         $this->resource = $resource;
+        $this->condition = $resource['data']['condition'];
     }
 
     /**
@@ -106,9 +107,6 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function decorate(ServerRequestInterface $request): array
     {
         $resource = [
-            '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
-            ],
             'kind' => 'Workflow',
             'data' => [
                 'ensure' => $this->ensure,
@@ -207,11 +205,19 @@ class Workflow extends AbstractResource implements WorkflowInterface
         $exists = $this->getImportObject($datatype, $map, $ts);
         $object_ts = new UTCDateTime();
 
-        if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
+        /* if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
+             return false;
+         }*/
+
+        $ensure = $this->ensure;
+        if ($exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
         }
+        if ($exists === null && $this->ensure === WorkflowInterface::ENSURE_LAST) {
+            $ensure = WorkflowInterface::ENSURE_EXISTS;
+        }
 
-        switch ($this->ensure) {
+        switch ($ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
                 $datatype->deleteObject($exists->getId(), $simulate);
 

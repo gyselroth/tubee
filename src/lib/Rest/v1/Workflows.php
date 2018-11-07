@@ -131,6 +131,7 @@ class Workflows
         $update = json_decode($patched, true);
 
         $this->workflow_factory->update($workflow, $update);
+        exit();
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

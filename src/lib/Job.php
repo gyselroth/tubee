@@ -72,7 +72,7 @@ class Job extends AbstractResource implements JobInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Job',
-            'data' => $this->getData()['data'],
+            'data' => $this->getData(),
             'status' => function () use ($resource, $scheduler) {
                 $process = iterator_to_array($scheduler->getJobs([
                     'data.job' => $resource->getId(),

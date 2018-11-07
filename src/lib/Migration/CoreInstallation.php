@@ -63,8 +63,8 @@ class CoreInstallation implements DeltaInterface
         $this->db->jobs->createIndex(['name' => 1], ['unique' => true]);
         $this->db->mandators->createIndex(['name' => 1], ['unique' => true]);
         $this->db->datatypes->createIndex(['name' => 1, 'mandator' => 1], ['unique' => true]);
-        $this->db->endpoints->createIndex(['name' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
-        $this->db->workflows->createIndex(['name' => 1, 'workflow' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
+        $this->db->endpoints->createIndex(['name' => 1, 'datatype' => 1, 'mandator' => 1], ['unique' => true]);
+        $this->db->workflows->createIndex(['name' => 1, 'datatype' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
         $this->db->relations->createIndex(['object_1' => 1, 'object_2' => 1], ['unique' => true]);
 
         if (!$this->role_factory->has('admin')) {

@@ -178,7 +178,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function getSourceEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        $query = ['type' => 'source'];
+        $query = ['data.type' => 'source'];
         if ($endpoints !== []) {
             $query = ['$and' => [$query, $endpoints]];
         }
@@ -191,7 +191,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function getDestinationEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        $query = ['type' => 'destination'];
+        $query = ['data.type' => 'destination'];
         if ($endpoints !== []) {
             $query = ['$and' => [$query, $endpoints]];
         }

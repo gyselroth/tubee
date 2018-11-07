@@ -23,11 +23,11 @@ class Validator extends ResourceValidator
     public static function validate(array $resource): array
     {
         $resource = parent::validate($resource);
-
         $defaults = [
             'data' => [
                 'ensure' => WorkflowInterface::ENSURE_LAST,
                 'map' => [],
+                'condition' => null,
             ],
         ];
 

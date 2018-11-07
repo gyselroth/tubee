@@ -50,8 +50,10 @@ class Factory
      */
     public function addTo(Collection $collection, array $resource, bool $simulate = false): ObjectIdInterface
     {
+        $ts = new UTCDateTime();
         $resource += [
-            'created' => new UTCDateTime(),
+            'created' => $ts,
+            'changed' => $ts,
             'version' => 1,
         ];
 
@@ -97,7 +99,7 @@ class Factory
             '$inc' => ['version' => 1],
         ]);
 
-        $this->logger->info('created new resource ['.$id.'] in ['.$collection->getCollectionName().']', [
+        $this->logger->info('updated resource ['.$id.'] in ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
         ]);
 
@@ -139,6 +141,8 @@ class Factory
             $offset = null;
         } elseif ($offset < 0 && $total >= $offset * -1) {
             $offset = $total + $offset;
+        } elseif ($offset < 0) {
+            $offset = 0;
         }
 
         $result = $collection->find($query, [

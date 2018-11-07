@@ -105,7 +105,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($endpoint, $name);
 
-        return $this->deleteFrom($this->db->endpoints, $resource->getId());
+        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -131,6 +131,7 @@ class Factory extends ResourceFactory
      */
     public function update(WorkflowInterface $resource, array $data): bool
     {
+        $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
@@ -151,8 +152,8 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, EndpointInterface $endpoint): WorkflowInterface
     {
-        $map = new AttributeMap($resource['map'], $this->script, $this->logger);
+        $map = new AttributeMap($resource['data']['map'], $this->script, $this->logger);
 
-        return $this->initResource(new Workflow($resource['name'], $resource['ensure'], $this->script, $map, $endpoint, $this->logger, $resource));
+        return $this->initResource(new Workflow($resource['name'], $resource['data']['ensure'], $this->script, $map, $endpoint, $this->logger, $resource));
     }
 }

@@ -43,6 +43,8 @@ class Validator
             throw new InvalidArgumentException('data must be an array');
         }
 
+        $resource = array_intersect_key($resource, array_flip(['name', 'data', 'description']));
+
         return $resource;
     }
 
