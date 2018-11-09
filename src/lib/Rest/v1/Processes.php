@@ -18,20 +18,12 @@ use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\Job\Factory as JobFactory;
 use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class Processes
 {
-    /**
-     * Job factory.
-     *
-     * @var JobFactory
-     */
-    protected $job_factory;
-
     /**
      * Process factory.
      *
@@ -49,9 +41,8 @@ class Processes
     /**
      * Init.
      */
-    public function __construct(JobFactory $job_factory, Acl $acl, ProcessFactory $process_factory)
+    public function __construct(Acl $acl, ProcessFactory $process_factory)
     {
-        $this->job_factory = $job_factory;
         $this->acl = $acl;
         $this->process_factory = $process_factory;
     }
@@ -59,14 +50,14 @@ class Processes
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, ?string $job = null): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $processes = $this->job_factory->getOne($job)->getProcesses($query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $processes = $this->process_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $processes);
     }
@@ -74,9 +65,9 @@ class Processes
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $job, ObjectIdInterface $process): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectIdInterface $process): ResponseInterface
     {
-        $resource = $this->job_factory->getOne($job)->getProcess($process);
+        $resource = $this->process_factory->getOne($process);
 
         return Helper::getOne($request, $identity, $resource);
     }
@@ -84,26 +75,26 @@ class Processes
     /**
      * Force trigger job.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
+        $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $resource = $this->job_factory->getOne($job);
-        $process = $resource->trigger();
-        $process = $resource->getProcess($process->getId());
+        $id = $this->process_factory->create($body);
+        $process = $this->process_factory->getOne($id);
 
         return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
+            (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
             $process->decorate($request),
             ['pretty' => isset($query['pretty'])]
-       );
+        );
     }
 
     /**
      * Stop process.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $job, ObjectIdInterface $process): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, ObjectId $process): ResponseInterface
     {
-        $this->job_factory->getOne($job)->deleteOne($job);
+        $this->process_factory->getOne($process)->deleteOne($process);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
@@ -111,7 +102,7 @@ class Processes
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -119,8 +110,7 @@ class Processes
             'existing' => true,
         ], $request->getQueryParams());
 
-        $job = $this->job_factory->getOne($job);
-        $cursor = $this->process_factory->watch($job, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->process_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

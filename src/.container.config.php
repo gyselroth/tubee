@@ -27,6 +27,8 @@ use Lcobucci\ContentNegotiation\ContentTypeMiddleware;
 use Lcobucci\ContentNegotiation\Formatter\Json;
 use Middlewares\JsonPayload;
 use Middlewares\FastRoute;
+use Middlewares\AccessLog;
+use Middlewares\TrailingSlash;
 use Tubee\Migration;
 use Tubee\Rest\Routes;
 use Tubee\Async\WorkerFactory;
@@ -44,6 +46,8 @@ return [
                 '{'.QueryDecoder::class.'}',
                 '{'.AuthMiddleware::class.'}',
                 '{'.AclMiddleware::class.'}',
+                '{'.TrailingSlash::class.'}',
+                '{'.AccessLog::class.'}',
                 '{'.FastRoute::class.'}',
                 //Router::class,
                 '{'.RequestHandler::class.'}',

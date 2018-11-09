@@ -47,10 +47,12 @@ class AclTest extends TestCase
         $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-foo',
-                'roles' => ['foo'],
-                'selectors' => ['*'],
-                'verbs' => ['*'],
-                'resources' => ['*'],
+                'data' => [
+                    'roles' => ['foo'],
+                    'selectors' => ['*'],
+                    'verbs' => ['*'],
+                    'resources' => ['*'],
+                ],
             ]);
         }));
 
@@ -64,10 +66,12 @@ class AclTest extends TestCase
         $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-all',
-                'roles' => ['all'],
-                'selectors' => ['*'],
-                'verbs' => ['*'],
-                'resources' => ['*'],
+                'data' => [
+                    'roles' => ['all'],
+                    'selectors' => ['*'],
+                    'verbs' => ['*'],
+                    'resources' => ['*'],
+                ],
             ]);
         }));
 
@@ -83,10 +87,12 @@ class AclTest extends TestCase
         $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
-                'roles' => ['all'],
-                'selectors' => ['*'],
-                'verbs' => ['POST'],
-                'resources' => ['*'],
+                'data' => [
+                    'roles' => ['all'],
+                    'selectors' => ['*'],
+                    'verbs' => ['POST'],
+                    'resources' => ['*'],
+                ],
             ]);
         }));
 
@@ -103,10 +109,12 @@ class AclTest extends TestCase
         $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
-                'roles' => ['all'],
-                'selectors' => ['*'],
-                'verbs' => ['POST'],
-                'resources' => ['*'],
+                'data' => [
+                    'roles' => ['all'],
+                    'selectors' => ['*'],
+                    'verbs' => ['POST'],
+                    'resources' => ['*'],
+                ],
             ]);
         }));
 
@@ -125,10 +133,12 @@ class AclTest extends TestCase
         $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
-                'roles' => ['all'],
-                'selectors' => ['foo'],
-                'verbs' => ['*'],
-                'resources' => ['bar'],
+                'data' => [
+                    'roles' => ['all'],
+                    'selectors' => ['foo'],
+                    'verbs' => ['*'],
+                    'resources' => ['bar'],
+                ],
             ]);
         }));
 
@@ -147,10 +157,12 @@ class AclTest extends TestCase
         $rule->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRule([
                 'name' => 'allow-post-all',
-                'roles' => ['all'],
-                'selectors' => ['foo'],
-                'verbs' => ['*'],
-                'resources' => ['bar'],
+                'data' => [
+                    'roles' => ['all'],
+                    'selectors' => ['foo'],
+                    'verbs' => ['*'],
+                    'resources' => ['bar'],
+                ],
             ]);
         }));
 
@@ -169,7 +181,9 @@ class AclTest extends TestCase
         $role->method('getAll')->will($this->returnCallback(function () {
             yield new AccessRole([
                 'name' => 'all',
-                'selectors' => ['*'],
+                'data' => [
+                    'selectors' => ['*'],
+                ],
             ]);
         }));
 

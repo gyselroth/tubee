@@ -100,13 +100,15 @@ class Job extends AbstractResource implements JobInterface
      */
     public function getLogs(array $query = [], ?int $offset = null, ?int $limit = null, ?array $sort = []): Generator
     {
-        return $this->log_factory->getAll($this, $query, $offset, $limit, $sort);
+        $query['context.job'] = (string) $this->getId();
+
+        return $this->log_factory->getAll($query, $offset, $limit, $sort);
     }
 
     /**
      * Trigger job by force.
      */
-    public function trigger(): Process
+    /*public function trigger(): Process
     {
         $resource = $this->resource['data'];
         $options = $this->resource['data']['options'];
@@ -115,14 +117,14 @@ class Job extends AbstractResource implements JobInterface
         $resource += ['job' => $this->getId()];
 
         return $this->scheduler->addJob(Sync::class, $resource, $options);
-    }
+    }*/
 
     /**
      * {@inheritdoc}
      */
     public function getLog(ObjectIdInterface $id): LogInterface
     {
-        return $this->log_factory->getOne($this, $id);
+        return $this->log_factory->getOne($id);
     }
 
     /**
@@ -130,7 +132,9 @@ class Job extends AbstractResource implements JobInterface
      */
     public function getProcesses(array $query = [], ?int $offset = null, ?int $limit = null, array $sort = []): Generator
     {
-        return $this->process_factory->getAll($this, $query, $offset, $limit, $sort);
+        $query['job'] = $this->getId();
+
+        return $this->process_factory->getAll($query, $offset, $limit, $sort);
     }
 
     /**
@@ -138,6 +142,6 @@ class Job extends AbstractResource implements JobInterface
      */
     public function getProcess(ObjectIdInterface $id): ProcessInterface
     {
-        return $this->process_factory->getOne($this, $id);
+        return $this->process_factory->getOne($id);
     }
 }

@@ -21,6 +21,7 @@ class Routes
     public static function collect()
     {
         return FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
+            $r->addRoute('GET', '/api/v1', [v1\Api::class, 'get']);
             $r->addRoute('GET', '/spec/api/v1', [Specifications::class, 'getApiv1']);
             $r->addRoute('GET', '/api/v1/mandators', [v1\Mandators::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/mandators', [v1\Mandators::class, 'watchAll']);
@@ -86,18 +87,26 @@ class Routes
             $r->addRoute('POST', '/api/v1/jobs', [v1\Jobs::class, 'post']);
             $r->addRoute('GET', '/api/v1/jobs/{job}', [v1\Jobs::class, 'getOne']);
             $r->addRoute('PATCH', '/api/v1/jobs/{job}', [v1\Jobs::class, 'patch']);
-            $r->addRoute('DELETE', '/api/v1/jobs/{job}', [v1\Jobs::class, 'delete']);
+            $r->addRoute('GET', '/api/v1/processes', [v1\Processes::class, 'getAll']);
+            $r->addRoute('POST', '/api/v1/processes', [v1\Processes::class, 'post']);
+            $r->addRoute('GET', '/api/v1/watch/processes', [v1\Processes::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/processes/{process}', [v1\Processes::class, 'getOne']);
+            $r->addRoute('DELETE', '/api/v1/processes/{process}', [v1\Processes::class, 'delete']);
+            /*$r->addRoute('GET', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'getAll']);
             $r->addRoute('POST', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'post']);
             $r->addRoute('GET', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes', [v1\Processes::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}', [v1\Processes::class, 'getOne']);
-            $r->addRoute('DELETE', '/api/v1/jobs/{job}/processes/{process}', [v1\Processes::class, 'delete']);
+            $r->addRoute('DELETE', '/api/v1/jobs/{job}/processes/{process}', [v1\Processes::class, 'delete']);*/
             $r->addRoute('GET', '/api/v1/jobs/{job}/logs', [v1\Logs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/jobs/{job}/logs', [v1\Logs::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/jobs/{job}/logs/{log}', [v1\Logs::class, 'getOne']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/logs', [v1\Logs::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
+            //$r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/logs', [v1\Logs::class, 'getAll']);
+            //$r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
+            //$r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
+            $r->addRoute('GET', '/api/v1/processes/{process}/logs', [v1\Logs::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
         });
     }
 }

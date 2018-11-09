@@ -95,7 +95,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data_options' => ['filter_one' => '(uid={uid)'],
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $result = $ldap->getOne([])->getData();
@@ -112,7 +112,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data_options' => ['filter_one' => '(uid={uid)'],
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $result = $ldap->getOne([])->getData();
@@ -128,7 +128,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data_options' => ['filter_one' => '(uid={uid)'],
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $result = $ldap->getOne([])->getData();
@@ -149,7 +149,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data_options' => ['filter_one' => '(uid={uid)'],
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $this->assertTrue($ldap->exists([]));
@@ -163,7 +163,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data_options' => ['filter_one' => '(uid={uid)'],
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $this->assertTrue($ldap->exists([]));
@@ -177,7 +177,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data_options' => ['filter_one' => '(uid={uid)'],
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $this->assertFalse($ldap->exists([]));

@@ -45,28 +45,16 @@ class Factory extends ResourceFactory
     /**
      * Get all.
      */
-    public function getAll(JobInterface $job, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $filter = [
-            'context.job' => (string) $job->getId(),
-        ];
-
-        if (!empty($query)) {
-            $filter = ['$and' => [$filter, $query]];
-        }
-
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort);
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
     }
 
     /**
      * watch all.
      */
-    public function watch(JobInterface $job, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function watch(/*JobInterface $job, */?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $query = [
-             'context.job' => (string) $job->getId(),
-        ];
-
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
     }
 

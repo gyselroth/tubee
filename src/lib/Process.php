@@ -12,7 +12,8 @@ declare(strict_types=1);
 namespace Tubee;
 
 use Psr\Http\Message\ServerRequestInterface;
-use Tubee\Job\JobInterface;
+use Tubee\Log\Factory as LogFactory;
+use Tubee\Log\LogInterface;
 use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
@@ -20,19 +21,19 @@ use Tubee\Resource\AttributeResolver;
 class Process extends AbstractResource implements ProcessInterface
 {
     /**
-     * Job.
+     * Log factory.
      *
-     * @var JobInterface
+     * @var LogFactory
      */
-    protected $job;
+    protected $log_factory;
 
     /**
      * Process.
      */
-    public function __construct(array $resource, JobInterface $job)
+    public function __construct(array $resource, LogFactory $log_factory)
     {
         $this->resource = $resource;
-        $this->job = $job;
+        $this->log_factory = $log_factory;
     }
 
     /**
@@ -51,5 +52,23 @@ class Process extends AbstractResource implements ProcessInterface
         ];
 
         return AttributeResolver::resolve($request, $this, $result);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLogs(array $query = [], ?int $offset = null, ?int $limit = null, ?array $sort = []): Generator
+    {
+        $query['context.process'] = (string) $this->getId();
+
+        return $this->log_factory->getAll($query, $offset, $limit, $sort);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLog(ObjectIdInterface $id): LogInterface
+    {
+        return $this->log_factory->getOne($id);
     }
 }

@@ -13,6 +13,21 @@ basePath: "/api/v1"
 schemes:
 - "https"
 paths:
+  /:
+    get:
+      summary: "Get api entrypoint"
+      operationId: "root"
+      produces:
+      - "application/json+patch"
+      responses:
+        200:
+          description: "List of objects"
+        403:
+          description: "Access denied"
+      security:
+      - petstore_auth:
+        - "write:pets"
+        - "read:pets"
   /watch/mandators:
     get:
       tags:
@@ -2824,21 +2839,16 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /jobs/{job}/processes:
+  /processes:
     get:
       tags:
       - "jobs"
-      summary: "Get all processes from a job"
+      summary: "Get all processes"
       operationId: "getProcesses"
       produces:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
       - in: "query"
         name: "query"
         description: "JSON query"
@@ -2882,17 +2892,16 @@ paths:
     post:
       tags:
       - "jobs"
-      summary: "Trigger a process for given job by force"
-      operationId: "triggerProcess"
+      summary: "Trigger a new process"
+      operationId: "addProcess"
       produces:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
+      - in: body
+        name: data
+        schema:
+          $ref: "#/definitions/process"
       responses:
         202:
           description: "Returns a 202 if successful"
@@ -2906,7 +2915,7 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /watch/jobs/{job}/processes:
+  /watch/processes:
     get:
       tags:
       - "jobs"
@@ -2915,11 +2924,6 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
       - in: "query"
         name: "query"
         description: "JSON query"
@@ -2958,7 +2962,7 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /jobs/{job}/processes/{process}:
+  /processes/{process}:
     get:
       tags:
       - "jobs"
@@ -2969,18 +2973,13 @@ paths:
       - "application/yaml"
       parameters:
       - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
-      - in: "path"
         name: "process"
         description: "Process ID"
         required: true
         type: "string"
       responses:
         200:
-          description: "Log"
+          description: "Process"
           schema:
             $ref: "#/definitions/process"
         404:
@@ -3000,11 +2999,6 @@ paths:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3161,7 +3155,7 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /jobs/{job}/processes/{process}/logs:
+  /processes/{process}/logs:
     get:
       tags:
       - "jobs"
@@ -3171,11 +3165,6 @@ paths:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3221,7 +3210,7 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /jobs/{job}/process/{process}/logs/{log}:
+  /process/{process}/logs/{log}:
     get:
       tags:
       - "jobs"
@@ -3231,11 +3220,6 @@ paths:
       - "application/json"
       - "application/yaml"
       parameters:
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3259,7 +3243,7 @@ paths:
       - petstore_auth:
         - "write:pets"
         - "read:pets"
-  /watch/jobs/{job}/processes/{process}/logs:
+  /watch/processes/{process}/logs:
     get:
       tags:
       - "jobs"
@@ -3268,11 +3252,6 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
