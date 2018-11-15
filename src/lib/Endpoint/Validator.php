@@ -26,6 +26,12 @@ class Validator extends ResourceValidator
         $defaults = [
             'data' => [
                 'type' => EndpointInterface::TYPE_BROWSE,
+                'options' => [
+                    'flush' => false,
+                    'import' => [],
+                    'filter_one' => [],
+                    'filter_all' => [],
+                ],
             ],
         ];
 
@@ -36,11 +42,11 @@ class Validator extends ResourceValidator
         }
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE && (!is_array($resource['data']['options']['import']) || count($resource['data']['options']['import']) === 0)) {
-            throw new InvalidArgumentException('source endpoint must include at least one data_options.import attribute');
+            throw new InvalidArgumentException('source endpoint must include at least one options.import attribute');
         }
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_DESTINATION && (!isset($resource['data']['options']['filter_one']) || !is_string($resource['data']['options']['filter_one']))) {
-            throw new InvalidArgumentException('destintation endpoint must have single object filter data_options.filter_one');
+            throw new InvalidArgumentException('destintation endpoint must have single object filter options.filter_one as a string');
         }
 
         if (!isset($resource['data']['class']) || !is_string($resource['data']['class'])) {

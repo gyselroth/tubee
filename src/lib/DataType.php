@@ -294,7 +294,7 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int
+    public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
     {
         return $this->object_factory->update($this, $object, $data, $simulate, $endpoints);
     }

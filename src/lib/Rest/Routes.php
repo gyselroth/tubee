@@ -59,8 +59,6 @@ class Routes
             $r->addRoute('DELETE', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}', [v1\Objects::class, 'delete']);
             $r->addRoute('PATCH', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}', [v1\Objects::class, 'patch']);
             $r->addRoute('PUT', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}', [v1\Objects::class, 'put']);
-            $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints', [v1\Objects::class, 'getEndpoints']);
-            $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints/{endpoint}', [v1\Objects::class, 'getEndpoint']);
             $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}/history', [v1\Objects::class, 'getHistory']);
             $r->addRoute('GET', '/api/v1/mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives', [v1\ObjectRelatives::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives', [v1\ObjectRelatives::class, 'watchAll']);

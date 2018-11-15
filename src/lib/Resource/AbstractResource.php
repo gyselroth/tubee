@@ -61,17 +61,6 @@ abstract class AbstractResource implements ResourceInterface
     public function getData(): array
     {
         return $this->resource['data'];
-        /*return array_diff_key($this->resource, array_flip([
-            'created',
-            'changed',
-            'deleted',
-            '_id',
-            'name',
-            'version',
-            'mandator',
-            'datatype',
-            'endpoint',
-        ]));*/
     }
 
     /**

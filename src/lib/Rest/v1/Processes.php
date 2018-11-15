@@ -14,7 +14,7 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectIdInterface;
+use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
@@ -50,7 +50,7 @@ class Processes
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, ?string $job = null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -65,7 +65,7 @@ class Processes
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectIdInterface $process): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectId $process): ResponseInterface
     {
         $resource = $this->process_factory->getOne($process);
 
@@ -73,7 +73,7 @@ class Processes
     }
 
     /**
-     * Force trigger job.
+     * Force trigger process.
      */
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {

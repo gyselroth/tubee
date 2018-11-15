@@ -90,6 +90,7 @@ class Helper
 
         return (new Response($stream))
             ->withHeader('X-Accel-Buffering', 'no')
+            ->withHeader('Content-Type', 'application/json;stream=watch')
             ->withStatus(StatusCodeInterface::STATUS_OK);
     }
 }

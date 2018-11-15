@@ -11,37 +11,11 @@ declare(strict_types=1);
 
 namespace Tubee\DataObject;
 
-use MongoDB\BSON\UTCDateTimeInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Resource\ResourceInterface;
 
 interface DataObjectInterface extends ResourceInterface
 {
-    /**
-     * Get object version.
-     */
-    public function getVersion(): int;
-
-    /**
-     * Get deleted timestamp.
-     */
-    public function getDeleted(): ?UTCDateTimeInterface;
-
-    /**
-     * Get changed timestamp.
-     */
-    public function getChanged(): ?UTCDateTimeInterface;
-
-    /**
-     *Get created timestamp.
-     */
-    public function getCreated(): UTCDateTimeInterface;
-
-    /**
-     * Get data.
-     */
-    public function getData(): array;
-
     /**
      * Get data type.
      */

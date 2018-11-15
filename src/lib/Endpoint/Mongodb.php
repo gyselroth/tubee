@@ -182,10 +182,6 @@ class Mongodb extends AbstractEndpoint
 
     /**
      * Build filter all.
-     *
-     * @param string $filter
-     *
-     * @return string
      */
     protected function buildFilterAll($filter): array
     {

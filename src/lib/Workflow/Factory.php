@@ -134,7 +134,7 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**

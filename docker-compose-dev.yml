@@ -36,7 +36,7 @@ balloon-endpoint:
 tubee-dev:
     image: gyselroth/tubee-development:latest
     ports:
-        - "8090:80"
+        - "8090:443"
     volumes:
         - .:/srv/www/tubee
     links:

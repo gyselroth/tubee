@@ -9,8 +9,8 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\Balloon\Exception;
+namespace Tubee\Endpoint\Rest\Exception;
 
-class InvalidApiResponse extends \Tubee\Exception
+class NotIterable extends \Tubee\Exception
 {
 }

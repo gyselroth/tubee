@@ -131,7 +131,7 @@ class DataTypes
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->datatype_factory->getOne($datatype->getName())->decorate($request),
+            $this->datatype_factory->getOne($mandator, $datatype->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

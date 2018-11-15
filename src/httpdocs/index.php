@@ -28,6 +28,15 @@ $composer = require 'vendor/autoload.php';
 
 $dic = ContainerBuilder::get($composer);
 $request = Zend\Diactoros\ServerRequestFactory::fromGlobals();
+$logger = $dic->get(Psr\Log\LoggerInterface::class);
+
+        set_exception_handler(function ($e) use ($logger) {
+            $logger->emergency('uncaught exception: '.$e->getMessage(), [
+                'category' => 'Http',
+                'exception' => $e,
+            ]);
+        });
+
 $dic->get(Tubee\Rest\Routes::class);
 $dispatcher = $dic->get(\mindplay\middleman\Dispatcher::class);
 $response = $dispatcher->dispatch($request);

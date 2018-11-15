@@ -16,6 +16,12 @@
             "Tubee\\Testsuite\\": "tests"
         }
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/raffis/php-mongomock"
+        }
+    ],
     "require": {
         "php": ">=7.2",
         "psr/log": "1.*",
@@ -31,7 +37,7 @@
         "zendframework/zend-mail": "2.9.*",
         "gyselroth/mongodb-php-task-scheduler": "^3.0.0",
         "hassankhan/config": "*",
-        "symfony/yaml": "^4.1",
+        "symfony/yaml": "~3.1",
         "monolog/monolog": "^1.23",
         "bramus/monolog-colored-line-formatter": "~2.0",
         "zendframework/zend-servicemanager": "^3.3",
@@ -54,7 +60,8 @@
         "php-jsonpatch/php-jsonpatch": "^3.0",
         "stolt/json-merge-patch": "^1.0",
         "psr/http-message": "^1.0",
-        "gyselroth/stream-iterator": "dev-master"
+        "gyselroth/stream-iterator": "dev-master",
+        "guzzlehttp/guzzle": "~6.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
@@ -66,7 +73,6 @@
         "ext-xml": "*"
     },
     "require-dev": {
-        "guzzlehttp/guzzle": "*",
         "friendsofphp/php-cs-fixer": "*",
         "phpunit/phpunit": "^6.0.0",
         "helmich/mongomock": "dev-master#bf141f5",

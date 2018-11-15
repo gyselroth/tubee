@@ -23,19 +23,6 @@ use Tubee\Resource\AttributeResolver;
 class DataObject extends AbstractResource implements DataObjectInterface
 {
     /**
-     * Resource.
-     *
-     * @var array
-     */
-    protected $resource = [
-        'version' => 1,
-        'data' => [],
-        'endpoints' => [],
-        'deleted' => null,
-        'changed' => null,
-    ];
-
-    /**
      * Datatype.
      *
      * @var DataTypeInterface
@@ -54,7 +41,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
      */
     public function __construct(array $resource, DataTypeInterface $datatype, DataObjectRelationFactory $relation_factory)
     {
-        $this->resource = array_merge($this->resource, $resource);
+        $this->resource = $resource;
         $this->datatype = $datatype;
         $this->relation_factory = $relation_factory;
     }
@@ -78,7 +65,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
             'status' => function ($object) {
                 $endpoints = $object->getEndpoints();
                 foreach ($endpoints as &$endpoint) {
-                    //$endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
+                    $endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
                 }
 
                 return $endpoints;
@@ -91,9 +78,9 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function getHistory(?int $offset = null, ?int $limit = null): Iterable
+    public function getHistory(?array $query = null, ?int $offset = null, ?int $limit = null): Iterable
     {
-        return $this->datatype->getObjectHistory($this->resource['_id']);
+        return $this->datatype->getObjectHistory($this->getId(), $query, $offset, $limit);
     }
 
     /**

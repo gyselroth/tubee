@@ -121,7 +121,7 @@ class Factory extends ResourceFactory
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE) {
             $this->ensureIndex($datatype, $resource['data']['options']['import']);
-        } else {
+        } elseif (!empty($resource['data']['options']['filter_all'])) {
             $this->ensureIndex($datatype, array_keys($resource['data']['options']['filter_all']));
         }
 
@@ -139,7 +139,7 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource->getId(), $data);
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**

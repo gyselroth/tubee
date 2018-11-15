@@ -32,11 +32,8 @@ class EndpointObject extends AbstractResource implements EndpointObjectInterface
      */
     public function __construct(array $resource, EndpointInterface $endpoint)
     {
-        $this->resource = array_merge([
-            '_id' => new ObjectId(),
-            'data' => $resource,
-        ], $resource);
-
+        $resource['_id'] = new ObjectId();
+        $this->resource = $resource;
         $this->endpoint = $endpoint;
     }
 
@@ -56,14 +53,6 @@ class EndpointObject extends AbstractResource implements EndpointObjectInterface
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getData(): array
-    {
-        return $this->resource['data'];
     }
 
     /**

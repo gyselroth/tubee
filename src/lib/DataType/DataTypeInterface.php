@@ -81,7 +81,7 @@ interface DataTypeInterface extends ResourceInterface
     /**
      * Change object.
      */
-    public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int;
+    public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool;
 
     /**
      * Delete object.

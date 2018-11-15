@@ -13,7 +13,6 @@ namespace Tubee\DataObject;
 
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
-use MongoDB\BSON\UTCDateTime;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataObject;
@@ -74,8 +73,11 @@ class Factory extends ResourceFactory
             $pipeline[] = ['$limit' => $limit];
         }
 
+        $current = $this->getOne($datatype, ['_id' => $id]);
+        yield $current;
+
         foreach ($this->db->{$datatype->getCollection()}->aggregate($pipeline) as $version) {
-            yield $version['version'] => $this->build($version, $datatype);
+            yield $version['version'] => $this->build(array_merge($current->toArray(), $version['history']), $datatype);
         }
 
         $count[] = ['$count' => 'count'];
@@ -180,6 +182,7 @@ class Factory extends ResourceFactory
 
         $object = [
             'data' => $object,
+            'endpoints' => $endpoints,
         ];
 
         return $this->addTo($this->db->{$datatype->getCollection()}, $object, $simulate);
@@ -188,41 +191,17 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function update(DataTypeInterface $datatype, DataObjectInterface $object, array $data, bool $simulate = false, array $endpoints = []): int
+    public function update(DataTypeInterface $datatype, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
     {
-        $datatype->getSchema()->validate($object->getData());
+        $datatype->getSchema()->validate($data);
 
-        $query = [
-            '$set' => ['endpoints' => $endpoints],
-        ];
+        $data = ['data' => $data];
 
-        $version = $object->getVersion();
-
-        if ($object->getData() !== $data) {
-            ++$version;
-
-            $query = array_merge($query, [
-                '$set' => [
-                    'data' => $data,
-                    'changed' => new UTCDateTime(),
-                    'version' => $version,
-                ],
-                '$addToSet' => ['history' => $object->toArray()],
-            ]);
-
-            $this->logger->info('change object ['.$object->getId().'] to version ['.$version.'] in ['.$datatype->getCollection().'] to [{data}]', [
-                'category' => get_class($this),
-                'data' => $data,
-            ]);
-        } else {
-            $this->logger->info('object ['.$object->getId().'] version ['.$version.'] in ['.$datatype->getCollection().'] is already up2date', [
-                'category' => get_class($this),
-            ]);
+        if ($endpoints !== null) {
+            $data['endpoints'] = $endpoints;
         }
 
-        $this->db->{$datatype->getCollection()}->updateOne(['_id' => $object->getId()], $query);
-
-        return $version;
+        return $this->updateIn($this->db->{$datatype->getCollection()}, $object, $data, $simulate);
     }
 
     /**

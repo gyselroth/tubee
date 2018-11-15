@@ -46,6 +46,8 @@ class Process extends AbstractResource implements ProcessInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Process',
+            'changed' => $this->getCreated()->toDateTime()->format('c'),
+            'data' => $this->getData(),
             'status' => [
                 'code' => $this->resource['status'],
             ],

@@ -97,6 +97,13 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     protected $workflow_factory;
 
     /**
+     * Endpoint object identifiers.
+     *
+     * @var string
+     */
+    protected $identifiers = [];
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, DataTypeInterface $datatype, WorkflowFactory $workflow_factory, LoggerInterface $logger, array $resource = [])
@@ -138,6 +145,10 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
                 break;
                 case 'import':
                     $this->import = (array) $value;
+
+                break;
+                case 'identifiers':
+                    $this->identifiers = (array) $value;
 
                 break;
                 case 'filter_one':
@@ -236,6 +247,14 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     public function getDataType(): DataTypeInterface
     {
         return $this->datatype;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdentifiers(): array
+    {
+        return $this->identifiers;
     }
 
     /**
@@ -340,7 +359,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     protected function build(array $object): EndpointObjectInterface
     {
-        return new EndpointObject($object, $this);
+        return new EndpointObject(['data' => $object], $this);
     }
 
     /**

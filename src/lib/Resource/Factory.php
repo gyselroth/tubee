@@ -79,27 +79,40 @@ class Factory
     /**
      * Update resource.
      */
-    public function updateIn(Collection $collection, ObjectIdInterface $id, array $resource, bool $simulate = false): bool
+    public function updateIn(Collection $collection, ResourceInterface $resource, array $update, bool $simulate = false): bool
     {
-        $resource += [
-            'changed' => new UTCDateTime(),
+        $this->logger->debug('update resource ['.$resource->getId().'] in ['.$collection->getCollectionName().']', [
+            'category' => get_class($this),
+            'update' => $update,
+        ]);
+
+        $op = [
+            '$set' => $update,
         ];
 
-        $this->logger->debug('update resource ['.$id.'] in ['.$collection->getCollectionName().']', [
-            'category' => get_class($this),
-            'resource' => $resource,
-        ]);
+        if (!isset($update['data']) || $resource->getData() === $update['data']) {
+            $this->logger->info('resource ['.$resource->getId().'] version ['.$resource->getVersion().'] in ['.$collection->getCollectionName().'] is already up2date', [
+                'category' => get_class($this),
+            ]);
+        } else {
+            $this->logger->info('add new history record for resource ['.$resource->getId().'] in ['.$collection->getCollectionName().']', [
+                'category' => get_class($this),
+            ]);
+
+            $op['$set']['changed'] = new UTCDateTime();
+            $op += [
+                '$addToSet' => ['history' => array_intersect_key($resource->toArray(), array_flip(['data', 'version', 'changed', 'description']))],
+                '$inc' => ['version' => 1],
+            ];
+        }
 
         if ($simulate === true) {
             return true;
         }
 
-        $result = $collection->updateOne(['_id' => $id], [
-            '$set' => $resource,
-            '$inc' => ['version' => 1],
-        ]);
+        $result = $collection->updateOne(['_id' => $resource->getId()], $op);
 
-        $this->logger->info('updated resource ['.$id.'] in ['.$collection->getCollectionName().']', [
+        $this->logger->info('updated resource ['.$resource->getId().'] in ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
         ]);
 
@@ -171,10 +184,13 @@ class Factory
 
         $pipeline = $query;
         if (!empty($pipeline)) {
-            $pipeline = [['$match' => $pipeline]];
+            $pipeline = [['$match' => []]];
+            foreach ($query as $key => $value) {
+                $pipeline[0]['$match']['fullDocument.'.$key] = $value;
+            }
         }
 
-        $stream = $collection->watch([], [
+        $stream = $collection->watch($pipeline, [
             'resumeAfter' => $after,
         ]);
 

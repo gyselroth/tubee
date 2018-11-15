@@ -18,16 +18,12 @@ paths:
       summary: "Get api entrypoint"
       operationId: "root"
       produces:
-      - "application/json+patch"
+      - "application/json"
       responses:
         200:
           description: "List of objects"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/mandators:
     get:
       tags:
@@ -36,11 +32,11 @@ paths:
       description: "Watch mandators in realtime"
       operationId: "watchMandators"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -62,7 +58,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -70,10 +66,6 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators:
     get:
       tags:
@@ -83,11 +75,10 @@ paths:
       operationId: "getMandators"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -109,7 +100,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -119,10 +110,6 @@ paths:
             $ref: "#/definitions/mandators"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "mandators"
@@ -130,7 +117,6 @@ paths:
       operationId: "addMandator"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: body
         name: data
@@ -143,10 +129,6 @@ paths:
             $ref: "#/definitions/mandator"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}:
     get:
       tags:
@@ -156,7 +138,6 @@ paths:
       operationId: "getMandator"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -179,10 +160,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "mandators"
@@ -190,7 +167,6 @@ paths:
       operationId: "deleteMandator"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -204,10 +180,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "mandators"
@@ -215,7 +187,6 @@ paths:
       operationId: "replaceMandator"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -237,18 +208,14 @@ paths:
             $ref: "#/definitions/mandator"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "mandators"
       summary: "Patch mandator as rfc6902 request"
+      operationId: "updateMandator"
       description: "Update specific attributes of a mandator"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -271,10 +238,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/mandators/{mandator}/datatypes:
     get:
       tags:
@@ -283,7 +246,7 @@ paths:
       description: "Watch datatypes in realtime"
       operationId: "watchDatatypes"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -292,7 +255,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -314,7 +277,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -322,10 +285,6 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes:
     get:
       tags:
@@ -335,7 +294,6 @@ paths:
       operationId: "getDatatypes"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -344,7 +302,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -366,7 +324,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -378,10 +336,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "datatypes"
@@ -389,7 +343,6 @@ paths:
       operationId: "addDatatype"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -409,10 +362,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}:
     get:
       tags:
@@ -422,7 +371,6 @@ paths:
       operationId: "getDatatype"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -450,10 +398,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "datatypes"
@@ -461,7 +405,6 @@ paths:
       operationId: "deleteDatatype"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -480,10 +423,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "datatypes"
@@ -491,7 +430,6 @@ paths:
       operationId: "replaceDatatype"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -518,10 +456,6 @@ paths:
             $ref: "#/definitions/datatype"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "datatypes"
@@ -530,7 +464,6 @@ paths:
       operationId: "updateDatatype"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -558,10 +491,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/mandators/{mandator}/datatypes/{datatype}/endpoints:
     get:
       tags:
@@ -570,7 +499,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchEndpoints"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -584,7 +513,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -606,7 +535,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -614,10 +543,6 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/endpoints:
     get:
       tags:
@@ -627,7 +552,6 @@ paths:
       operationId: "getEndpoints"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -641,7 +565,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -663,7 +587,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -675,10 +599,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "endpoints"
@@ -686,7 +606,6 @@ paths:
       operationId: "addEndpoint"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -711,10 +630,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}:
     get:
       tags:
@@ -724,7 +639,6 @@ paths:
       operationId: "getEndpoint"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -757,10 +671,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "endpoints"
@@ -768,7 +678,6 @@ paths:
       operationId: "deleteEndpoint"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -792,10 +701,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "endpoints"
@@ -803,7 +708,6 @@ paths:
       operationId: "replaceEndpoint"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -835,10 +739,6 @@ paths:
             $ref: "#/definitions/endpoint"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "endpoints"
@@ -847,7 +747,6 @@ paths:
       operationId: "updateEndpoint"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -880,10 +779,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
     get:
       tags:
@@ -892,7 +787,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchWorkflows"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -911,7 +806,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -933,7 +828,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -941,10 +836,6 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
     get:
       tags:
@@ -954,7 +845,6 @@ paths:
       operationId: "getWorkflows"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -973,7 +863,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -995,7 +885,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -1005,10 +895,6 @@ paths:
             $ref: "#/definitions/workflows"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "workflows"
@@ -1016,7 +902,6 @@ paths:
       operationId: "addWorkflow"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1046,10 +931,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}:
     get:
       tags:
@@ -1059,7 +940,6 @@ paths:
       operationId: "getWorkflow"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1097,10 +977,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "workflows"
@@ -1108,7 +984,6 @@ paths:
       operationId: "deleteWorkflow"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1137,10 +1012,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "workflows"
@@ -1148,7 +1019,6 @@ paths:
       operationId: "replaceWorkflow"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1185,10 +1055,6 @@ paths:
             $ref: "#/definitions/workflow"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "workflows"
@@ -1197,7 +1063,6 @@ paths:
       operationId: "updateWorkflow"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1235,10 +1100,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/objects/{object}:
     get:
       tags:
@@ -1248,7 +1109,6 @@ paths:
       operationId: "getObject"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1279,10 +1139,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "data"
@@ -1293,7 +1149,6 @@ paths:
       - "application/json-patch+json"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1310,11 +1165,6 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "write"
-        description: "If true, the objects gets synced to all configured destination endpoints"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         description: "Object"
@@ -1335,10 +1185,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "data"
@@ -1346,11 +1192,9 @@ paths:
       description: "Replace all data attributes of an object (Or create one if not exists)"
       operationId: "replaceObject"
       consumes:
-      - "application/yaml"
       - "application/json"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1393,10 +1237,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "data"
@@ -1404,11 +1244,9 @@ paths:
       description: "Delete a specific object"
       operationId: "deleteObject"
       consumes:
-      - "application/yaml"
       - "application/json"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1425,11 +1263,6 @@ paths:
         description: "Object ID"
         required: true
         type: "string"
-      - in: "query"
-        name: "write"
-        description: "If true, the objects gets synced to all configured destination endpoints"
-        required: false
-        type: "boolean"
       responses:
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
@@ -1441,10 +1274,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives:
     get:
       tags:
@@ -1453,7 +1282,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchObjectRelatives"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1472,7 +1301,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -1494,7 +1323,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -1502,10 +1331,6 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives:
     get:
       tags:
@@ -1515,7 +1340,6 @@ paths:
       operationId: "getObjectRelatives"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1534,7 +1358,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -1556,7 +1380,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -1568,10 +1392,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "data"
@@ -1579,7 +1399,6 @@ paths:
       operationId: "addObjectRelative"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1609,10 +1428,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives/{relative}:
     get:
       tags:
@@ -1621,7 +1436,6 @@ paths:
       operationId: "getObjectRelative"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1652,10 +1466,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "data"
@@ -1663,7 +1473,6 @@ paths:
       operationId: "updateObjectRelative"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1698,10 +1507,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "data"
@@ -1709,7 +1514,6 @@ paths:
       operationId: "deleteObjectRelative"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1738,121 +1542,6 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints:
-    get:
-      tags:
-      - "data"
-      summary: "Get object from endpoints"
-      description: "Get object from all endpoints the object is related to"
-      operationId: "getObjectEndpoints"
-      produces:
-      - "application/json"
-      - "application/yaml"
-      parameters:
-      - in: "path"
-        name: "mandator"
-        description: "Mandator name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "datatype"
-        description: "Datatype"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "JSON query"
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "JSON sort"
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "Object attributes from endpoints"
-          schema:
-            $ref: "#/definitions/object-endpoints"
-        403:
-          description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
-  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/endpoints/{endpoint}:
-    get:
-      tags:
-      - "data"
-      summary: "Get object from endpoint"
-      description: "Get object from all endpoints the object is related to"
-      operationId: "getObjectEndpoint"
-      consumes:
-      - "application/yaml"
-      - "application/json"
-      produces:
-      - "application/json"
-      - "application/yaml"
-      parameters:
-      - in: "path"
-        name: "mandator"
-        description: "Mandator name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "datatype"
-        description: "Datatype"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint nmae"
-        required: true
-        type: "string"
-      responses:
-        200:
-          description: "Object attributes from a specific endpoint"
-          schema:
-            $ref: "#/definitions/object-endpoint"
-        404:
-          description: "Resource does not exists"
-        403:
-          description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/objects:
     get:
       tags:
@@ -1862,7 +1551,6 @@ paths:
       operationId: "getEndpointObjects"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1881,7 +1569,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -1903,7 +1591,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -1915,20 +1603,15 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/objects/{object}/history:
     get:
       tags:
       - "data"
       summary: "Get object history"
       description: "Get the history of all modifications from a specific object"
-      operationId: "getHistory"
+      operationId: "getObjectHistory"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -1947,7 +1630,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -1969,7 +1652,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -1981,10 +1664,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/mandators/{mandator}/datatypes/{datatype}/objects:
     get:
       tags:
@@ -1993,7 +1672,7 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchObjects"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "path"
         name: "mandator"
@@ -2007,7 +1686,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2029,7 +1708,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2037,10 +1716,6 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /mandators/{mandator}/datatypes/{datatype}/objects:
     get:
       tags:
@@ -2050,7 +1725,6 @@ paths:
       operationId: "getObjects"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -2064,7 +1738,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2086,7 +1760,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2098,21 +1772,15 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "data"
       summary: "Add a new object of a specifc datatype"
       operationId: "addObject"
       consumes:
-      - "application/yaml"
       - "application/json"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "mandator"
@@ -2124,11 +1792,6 @@ paths:
         description: "Datatype"
         required: true
         type: "string"
-      - in: "query"
-        name: "write"
-        description: "If true, the objects gets synced to all configured destination endpoints"
-        required: false
-        type: "boolean"
       - in: body
         name: data
         schema:
@@ -2146,10 +1809,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/access-rules:
     get:
       tags:
@@ -2158,11 +1817,11 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchAccessRules"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2184,7 +1843,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2192,10 +1851,6 @@ paths:
           description: "List of access rules"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /access-rules:
     get:
       tags:
@@ -2205,11 +1860,10 @@ paths:
       operationId: "getAccessRules"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2231,7 +1885,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2241,10 +1895,6 @@ paths:
             $ref: "#/definitions/access-rules"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "access-rules"
@@ -2252,7 +1902,6 @@ paths:
       operationId: "addAccessRule"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: body
         name: data
@@ -2265,10 +1914,6 @@ paths:
             $ref: "#/definitions/access-rule"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /access-rules/{access-rule}:
     get:
       tags:
@@ -2277,7 +1922,6 @@ paths:
       operationId: "getAccessRule"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-rule"
@@ -2293,10 +1937,6 @@ paths:
           description: "access rule does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "access-rules"
@@ -2306,7 +1946,6 @@ paths:
       - "application/json-patch+json"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-rule"
@@ -2327,10 +1966,6 @@ paths:
             $ref: "#/definitions/access-rule"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "access-rules"
@@ -2338,7 +1973,6 @@ paths:
       operationId: "replaceAccessRule"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-rule"
@@ -2356,10 +1990,6 @@ paths:
             $ref: "#/definitions/access-rule"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "access-rules"
@@ -2367,7 +1997,6 @@ paths:
       operationId: "deleteAccessRule"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-rule"
@@ -2381,10 +2010,6 @@ paths:
           description: "Access rule does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/access-roles:
     get:
       tags:
@@ -2393,11 +2018,11 @@ paths:
       description: "Watch updates in realtime"
       operationId: "watchAccessRoles"
       produces:
-      - "application/json+patch"
+      - "application/json;stream=watch"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2419,7 +2044,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2427,10 +2052,6 @@ paths:
           description: "List of access roles"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /access-roles:
     get:
       tags:
@@ -2440,11 +2061,10 @@ paths:
       operationId: "getAccessRoles"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2466,7 +2086,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2476,10 +2096,6 @@ paths:
             $ref: "#/definitions/access-roles"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "access-roles"
@@ -2487,7 +2103,6 @@ paths:
       operationId: "addAccessRole"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: body
         name: data
@@ -2500,10 +2115,6 @@ paths:
             $ref: "#/definitions/access-role"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /access-roles/{access-role}:
     get:
       tags:
@@ -2512,7 +2123,6 @@ paths:
       operationId: "getAccessRole"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-role"
@@ -2528,10 +2138,6 @@ paths:
           description: "access role does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "access-roles"
@@ -2541,7 +2147,6 @@ paths:
       - "application/json-patch+json"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-role"
@@ -2562,10 +2167,6 @@ paths:
             $ref: "#/definitions/access-role"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     put:
       tags:
       - "access-roles"
@@ -2573,10 +2174,8 @@ paths:
       operationId: "replaceAccessRole"
       consumes:
       - "application/json"
-      - "application/yaml"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-role"
@@ -2598,10 +2197,6 @@ paths:
             $ref: "#/definitions/access-role"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "access-roles"
@@ -2609,7 +2204,6 @@ paths:
       operationId: "deleteAccessRole"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "access-role"
@@ -2623,10 +2217,6 @@ paths:
           description: "Access role does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/jobs:
     get:
       tags:
@@ -2636,11 +2226,10 @@ paths:
       operationId: "watchJobs"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2662,7 +2251,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2670,10 +2259,6 @@ paths:
           description: "List of active jobs"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /jobs:
     get:
       tags:
@@ -2683,11 +2268,10 @@ paths:
       operationId: "getJobs"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2709,7 +2293,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2719,10 +2303,6 @@ paths:
             $ref: "#/definitions/jobs"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "jobs"
@@ -2730,7 +2310,6 @@ paths:
       operationId: "addJob"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: body
         name: data
@@ -2745,10 +2324,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /jobs/{job}:
     get:
       tags:
@@ -2757,7 +2332,6 @@ paths:
       operationId: "getJob"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -2773,10 +2347,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "jobs"
@@ -2784,7 +2354,6 @@ paths:
       operationId: "deleteJob"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -2798,10 +2367,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     patch:
       tags:
       - "jobs"
@@ -2812,7 +2377,6 @@ paths:
       - "application/json-patch+json"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -2835,10 +2399,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /processes:
     get:
       tags:
@@ -2847,11 +2407,10 @@ paths:
       operationId: "getProcesses"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2873,7 +2432,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2885,10 +2444,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     post:
       tags:
       - "jobs"
@@ -2896,7 +2451,6 @@ paths:
       operationId: "addProcess"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: body
         name: data
@@ -2911,10 +2465,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/processes:
     get:
       tags:
@@ -2926,7 +2476,7 @@ paths:
       parameters:
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -2948,7 +2498,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -2958,10 +2508,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /processes/{process}:
     get:
       tags:
@@ -2970,7 +2516,6 @@ paths:
       operationId: "getProcess"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "process"
@@ -2986,10 +2531,6 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
     delete:
       tags:
       - "jobs"
@@ -2997,7 +2538,6 @@ paths:
       operationId: "deleteProcess"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "process"
@@ -3011,10 +2551,6 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /jobs/{job}/logs:
     get:
       tags:
@@ -3023,7 +2559,6 @@ paths:
       operationId: "getJobLogs"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -3032,7 +2567,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -3054,7 +2589,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -3066,10 +2601,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /jobs/{job}/logs/{log}:
     get:
       tags:
@@ -3078,7 +2609,6 @@ paths:
       operationId: "getJobLog"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "job"
@@ -3099,10 +2629,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/jobs/{job}/logs:
     get:
       tags:
@@ -3119,7 +2645,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -3141,7 +2667,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -3151,10 +2677,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /processes/{process}/logs:
     get:
       tags:
@@ -3163,7 +2685,6 @@ paths:
       operationId: "getProcessLogs"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "process"
@@ -3172,7 +2693,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -3194,7 +2715,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -3206,10 +2727,6 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /process/{process}/logs/{log}:
     get:
       tags:
@@ -3218,7 +2735,6 @@ paths:
       operationId: "getProcessLog"
       produces:
       - "application/json"
-      - "application/yaml"
       parameters:
       - in: "path"
         name: "process"
@@ -3239,10 +2755,6 @@ paths:
           description: "Log does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
   /watch/processes/{process}/logs:
     get:
       tags:
@@ -3259,7 +2771,7 @@ paths:
         type: "string"
       - in: "query"
         name: "query"
-        description: "JSON query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
         required: false
         type: "string"
       - in: "query"
@@ -3281,7 +2793,7 @@ paths:
         type: "number"
       - in: "query"
         name: "sort"
-        description: "JSON sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
       responses:
@@ -3291,10 +2803,6 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-      security:
-      - petstore_auth:
-        - "write:pets"
-        - "read:pets"
 definitions:
   json-patch:
     description: "A JSON Patch according rfc6902."
@@ -3488,7 +2996,7 @@ definitions:
   process:
     description: "A process is a sub resource of a job. Each process represents one job execution."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/job'
       - type: object
         required:
           - rootCause
@@ -3504,7 +3012,6 @@ definitions:
               code:
                 description: "The result code of the process."
                 type: "number"
-
   jobs:
     description: "A list of jobs."
     allOf:
@@ -3562,6 +3069,9 @@ definitions:
                 items:
                   type: string
                 default: ["*"]
+              filter:
+                description: "Data object filter."
+                type: object
               loadbalance:
                 description: "If enabled the server tries to splitt the job into multiple parallel processes."
                 type: boolean
@@ -3723,6 +3233,11 @@ definitions:
               options:
                 type: "object"
                 properties:
+                  identifier:
+                    description: "A list of attributes which gets used to uniquely identify an object on the endpoint."
+                    type: "array"
+                    items:
+                      type: string
                   import:
                     description: "A list of attributes which gets used to uniquely identify an object on the endpoint."
                     type: "array"
@@ -3734,15 +3249,10 @@ definitions:
                     default: false
                   filter_one:
                     description: "Specify an endpoint filter which gets used to filter for a single object."
-                    type: "array"
-                    items:
-                      type: string
+                    type: "object"
                   filter_all:
                     description: "Specify a filter which always gets applied to the endpoint if objects are retrieved."
-                    default: []
-                    type: "array"
-                    items:
-                      type: string
+                    type: "object"
   pdo-endpoint:
     description: "Pdo endpoint"
     allOf:
@@ -3755,17 +3265,152 @@ definitions:
             properties:
               table:
                 description: "Table or view"
-                type: "string"              
+                type: "string"
               resource:
-                description: "Holds the entpoint type relevant options to connect to."
+                description: "Holds the relevant options of how to connect to the endpoint."
                 type: "object"
                 properties:
-                  dsn: 
+                  dsn:
+                    description: "Data source name (DSN)."
                     type: string
                   username:
+                    description: "Username if required."
                     type: string
                   passwd:
+                    description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
                     type: string
+                  has_password:
+                    description: "Is true if a password has been set."
+                    type: boolean
+                    default: false
+                  options:
+                    description: "Driver specific connection options."
+                    type: object
+                    default: {}
+  mysql-endpoint:
+    description: "MySQL/MariaDB (and other MySQL forks) endpoint"
+    allOf:
+      - $ref: '#/definitions/endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            properties:
+              table:
+                description: "Table or view"
+                type: "string"
+              resource:
+                description: "Holds the relevant options of how to connect to the endpoint."
+                type: "object"
+                properties:
+                  host:
+                    description: "MySQL Server (Or compatible MySQL fork like MariaDB)."
+                    type: string
+                  username:
+                    description: "Username."
+                    type: string
+                  passwd:
+                    description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                    type: string
+                  has_password:
+                    description: "Is true if a password has been set."
+                    type: boolean
+                    default: false
+                  port:
+                    description: "Specifies the port number to attempt to connect to the MySQL server."
+                    type: integer
+                    default: 3306
+                  socket:
+                    description: "Specifies the socket or named pipe that should be used."
+                    type: string
+  ldap-endpoint:
+    description: "LDAP (OpenLDAP, Microsoft AD and other LDAP compatible Server) endpoint"
+    allOf:
+      - $ref: '#/definitions/endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            properties:
+              resource:
+                description: "Holds the relevant options of how to connect to the endpoint."
+                type: "object"
+                properties:
+                  uri:
+                    description: "A full LDAP URI of the form ldap://hostname:port or ldaps://hostname:port for SSL encryption."
+                    type: string
+                  binddn:
+                    description: "Bind DN if required."
+                    type: string
+                  bindpw:
+                    description: "Bind password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                    type: string
+                  has_password:
+                    description: "Is true if a password has been set."
+                    type: boolean
+                    default: false
+                  basedn:
+                    description: "Specifies the base dn (Like dc=example,dc=net)."
+                    type: string
+                  tls:
+                    description: "Set to true if TLS shall be used."
+                    type: boolean
+                    default: false
+                  options:
+                    description: "More ldap specific settings (http://php.net/manual/en/function.ldap-set-option.php)."
+                    type: object
+  rest-endpoint:
+    description: "Propper REST API endpoint"
+    allOf:
+      - $ref: '#/definitions/endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            properties:
+              resource:
+                description: "Holds the relevant options of how to connect to the endpoint."
+                type: "object"
+                properties:
+                  base_uri:
+                    description: "Base uri to resourses (Like https://rest.api/v1/resources)."
+                    type: string
+                  auth:
+                    description: "Authentication adapter, either of none, http basic authentication or oauth2 using client_credentials flow."
+                    type: string
+                    enum:
+                      - basic
+                      - oauth2
+                  basic:
+                    description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
+                    type: object
+                    properties:
+                      username:
+                        description: "Basic authentication username."
+                        type: string
+                      password:
+                        description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                        type: string
+                      has_password:
+                        description: "Is true if a password has been set."
+                        type: boolean
+                        default: false
+                  oauth2:
+                    description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
+                    type: object
+                    properties:
+                      token_uri:
+                        description: "URI to token endpoint."
+                        type: string
+                      client_id:
+                        description: "OAuth2 client_id."
+                        type: string
+                      client_secret:
+                        description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
+                        type: string
   workflows:
     description: "A list of workflows."
     allOf:
@@ -3914,37 +3559,3 @@ definitions:
                 default: {}
               object:
                 $ref: "#/definitions/data-object"
-  object-endpoints:
-    allOf:
-      - $ref: '#/definitions/list'
-      - type: object
-        required:
-          - rootCause
-        properties:
-          data:
-            type: "array"
-            items:
-              $ref: "#/definitions/object-endpoint"
-  object-endpoint:
-    type: "object"
-    properties:
-      _links:
-        $ref: "#/definitions/list-links"
-      kind:
-        type: "string"
-      id:
-        type: "string"
-      data:
-        type: "object"
-securityDefinitions:
-  petstore_auth:
-    type: "oauth2"
-    authorizationUrl: "http://petstore.swagger.io/oauth/dialog"
-    flow: "implicit"
-    scopes:
-      write:pets: "modify pets in your account"
-      read:pets: "read your pets"
-  api_key:
-    type: "apiKey"
-    name: "api_key"
-    in: "header"

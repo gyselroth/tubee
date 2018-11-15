@@ -202,7 +202,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
             'map' => array_keys($map),
         ]);
 
-        $exists = $this->getImportObject($datatype, $map, $ts);
+        $exists = $this->getImportObject($datatype, $map, $object, $ts);
         $object_ts = new UTCDateTime();
 
         /* if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
@@ -232,9 +232,13 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
             break;
             case WorkflowInterface::ENSURE_EXISTS:
+                //$id = array_intersect_key($object, array_flip($this->endpoint->getIdentifiers()));
+                //$id = array_shift($id);
+
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $object_ts,
+                        //'id' => $id,
                     ],
                 ];
 
@@ -245,10 +249,20 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
             break;
             case WorkflowInterface::ENSURE_LAST:
+                //$id = array_intersect_key($object, array_flip($this->endpoint->getIdentifiers()));
+                //$id = array_shift($id);
+
                 $object = $this->map($map, $exists->getData(), $object_ts);
 
-                $endoints = [];
-                $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = $object_ts;
+                $endpoints = [
+                    $this->endpoint->getName() => [
+                        'last_sync' => $object_ts,
+                        //'id' => $id,
+                    ],
+                ];
+
+                var_dump($object);
+
                 $datatype->changeObject($exists, $object, $simulate, $endpoints);
                 $this->importRelations($exists, $map);
 
@@ -406,7 +420,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Get import object.
      */
-    protected function getImportObject(DataTypeInterface $datatype, array $map, UTCDateTimeInterface $ts): ?DataObjectInterface
+    protected function getImportObject(DataTypeInterface $datatype, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
         $prefixed = [];
@@ -414,7 +428,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
             $prefixed['data.'.$attribute] = $value;
         }
 
-        if (count($filter) !== count($this->endpoint->getImport())) {
+        if (empty($filter) || count($filter) !== count($this->endpoint->getImport())) {
             throw new Exception\ImportConditionNotMet('import condition attributes are not available from mapping');
         }
 
@@ -427,6 +441,9 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         $endpoints = $exists->getEndpoints();
+
+        var_dump($exists->toArray());
+
         if ($exists !== false && isset($endpoints[$this->endpoint->getName()])
         && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
             throw new Exception\ImportConditionNotMet('import filter matched multiple source objects');
@@ -465,7 +482,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
         foreach ($this->attribute_map->getMap() as $attr => $value) {
             if (!isset($value['ensure'])) {
-                continue;
+                $value['ensure'] = WorkflowInterface::ENSURE_LAST;
             }
 
             $exists = isset($mongodb_object[$attr]);

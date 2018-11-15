@@ -53,8 +53,10 @@ class Factory extends ResourceFactory
     /**
      * watch all.
      */
-    public function watch(/*JobInterface $job, */?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        $this->logger->debug(json_encode($query));
+
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
     }
 

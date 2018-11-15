@@ -111,10 +111,6 @@ class Objects
         $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
         $id = $datatype->createObject($body['data'], false, $body['endpoints']);
 
-        if ($query['write'] === true) {
-            //add job
-        }
-
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
             $datatype->getObject(['_id' => $id], false)->decorate($request),
@@ -155,13 +151,12 @@ class Objects
         $mandator = $this->mandator_factory->getOne($mandator);
         $datatype = $mandator->getDataType($datatype);
         $object = $datatype->getObject(['_id' => $object]);
-        $doc = $object->getData();
-
+        $doc = ['data' => $object->getData()];
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();
         $update = json_decode($patched, true);
 
-        $this->object_factory->update($object, $update);
+        $this->object_factory->update($datatype, $object, $update);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

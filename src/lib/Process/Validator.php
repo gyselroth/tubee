@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\Process;
 
-use InvalidArgumentException;
 use Tubee\Job\Validator as JobValidator;
 
 class Validator extends JobValidator
@@ -21,17 +20,9 @@ class Validator extends JobValidator
      */
     public static function validate(array $resource): array
     {
-        $defaults = [
-            'data' => [],
-        ];
-
-        $resource = array_replace_recursive($defaults, $resource);
-
-        if (isset($resource['data']) && !is_array($resource['data'])) {
-            throw new InvalidArgumentException('data must be an array');
-        }
-
-        $resource = array_intersect_key($resource, array_flip(['data']));
+        $resource['name'] = 'dummy';
+        $resource = parent::validate($resource);
+        unset($resource['name']);
 
         return $resource;
     }

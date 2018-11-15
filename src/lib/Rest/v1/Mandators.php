@@ -76,7 +76,7 @@ class Mandators
      */
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
-        $body = $request->getParsedBody();
+        $body = (array) $request->getParsedBody();
         $id = $this->mandator_factory->add($body);
         $query = $request->getQueryParams();
 
@@ -98,7 +98,7 @@ class Mandators
             'existing' => true,
         ], $request->getQueryParams());
 
-        $cursor = $this->mandator_factory->watch($query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->mandator_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

@@ -93,7 +93,6 @@ class Sync extends AbstractJob
                         $id = $this->scheduler->addJob(self::class, $data);
                     } else {
                         $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
-                            'job' => (string) $this->data['job'],
                             'process' => (string) $this->getId(),
                             'start' => $this->timestamp,
                             'mandator' => $mandator->getName(),
@@ -122,6 +121,10 @@ class Sync extends AbstractJob
      */
     protected function setupLogger(int $level, array $context): bool
     {
+        if (isset($this->data['job'])) {
+            $context['job'] = (string) $this->data['job'];
+        }
+
         foreach ($this->logger->getHandlers() as $handler) {
             if ($handler instanceof MongoDBHandler) {
                 $handler->setLevel($level);
@@ -357,7 +360,7 @@ class Sync extends AbstractJob
     protected function notify(): bool
     {
         if ($this->data['notification']['enabled'] === false) {
-            $this->logger->debug('skip notifiaction for job ['.$this->data['job'].'], notification is disabled', [
+            $this->logger->debug('skip notifiaction for process ['.$this->getId().'], notification is disabled', [
                 'category' => get_class($this),
             ]);
 
@@ -365,7 +368,7 @@ class Sync extends AbstractJob
         }
 
         if (count($this->data['notification']['receiver']) === 0) {
-            $this->logger->debug('skip notifiaction for job ['.$this->data['job'].'], no receiver configured', [
+            $this->logger->debug('skip notifiaction for process ['.$this->getId().'], no receiver configured', [
                 'category' => get_class($this),
             ]);
         }
@@ -374,10 +377,10 @@ class Sync extends AbstractJob
 
         if ($this->error_count === 0) {
             $subject = "Job ended with $this->error_count errors";
-            $body = "Hi there\n\nThe sync job ".(string) $this->data['job']." started at $iso ended with $this->error_count errors.";
+            $body = "Hi there\n\nThe sync process ".(string) $this->getId()." started at $iso ended with $this->error_count errors.";
         } else {
             $subject = 'Good job! The job finished with no errors';
-            $body = "Hi there\n\nThe sync job ".(string) $this->data['job']." started at $iso finished with no errors.";
+            $body = "Hi there\n\nThe sync process ".(string) $this->getId()." started at $iso finished with no errors.";
         }
 
         $mail = (new Message())
@@ -388,7 +391,7 @@ class Sync extends AbstractJob
         foreach ($this->data['notification']['receiver'] as $receiver) {
             $mail->setTo($receiver);
 
-            $this->logger->debug('send job notification ['.$this->data['job'].'] to ['.$receiver.']', [
+            $this->logger->debug('send process notification ['.$this->getId().'] to ['.$receiver.']', [
                 'category' => get_class($this),
             ]);
 
