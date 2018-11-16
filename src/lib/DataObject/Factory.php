@@ -90,14 +90,14 @@ class Factory extends ResourceFactory
      */
     public function getOne(DataTypeInterface $datatype, array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
-        $pipeline = $this->preparePipeline($filter, $include_dataset, $version);
+        //$pipeline = $this->preparePipeline($filter, $include_dataset, $version);
 
         $this->logger->debug('find one object with pipeline [{pipeline}] from ['.$datatype->getCollection().']', [
             'category' => get_class($this),
             //'pipeline' => $pipeline,
         ]);
 
-        $cursor = $this->db->{$datatype->getCollection()}->aggregate($pipeline, [
+        $cursor = $this->db->{$datatype->getCollection()}->aggregate([['$match' => $filter]], [
             'allowDiskUse' => true,
         ]);
         $objects = iterator_to_array($cursor);
@@ -117,7 +117,11 @@ class Factory extends ResourceFactory
      */
     public function getAll(DataTypeInterface $datatype, ?array $query = null, bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $total = $collection->count($query);
+        return $this->getAllFrom($this->db->{$datatype->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($datatype) {
+            return $this->build($resource, $datatype);
+        });
+
+        /*$total = $collection->count($query);
         $pipeline[] = ['$match' => $filter];
         $found = 0;
         $offset = $this->calcOffset($total, $offset);
@@ -157,7 +161,7 @@ class Factory extends ResourceFactory
             ]);
         }
 
-        return $total;
+        return $total;*/
     }
 
     /**
@@ -230,7 +234,7 @@ class Factory extends ResourceFactory
     /**
      * Prepare pipeline.
      */
-    protected function preparePipeline(): array
+    /*protected function preparePipeline(): array
     {
         $pipeline = [];
         $pipeline[] = [
@@ -251,5 +255,5 @@ class Factory extends ResourceFactory
         ]
 
         return $pipeline;
-    }
+    }*/
 }

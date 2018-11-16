@@ -203,12 +203,6 @@ class Workflow extends AbstractResource implements WorkflowInterface
         ]);
 
         $exists = $this->getImportObject($datatype, $map, $object, $ts);
-        $object_ts = new UTCDateTime();
-
-        /* if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
-             return false;
-         }*/
-
         $ensure = $this->ensure;
         if ($exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
@@ -232,39 +226,29 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
             break;
             case WorkflowInterface::ENSURE_EXISTS:
-                //$id = array_intersect_key($object, array_flip($this->endpoint->getIdentifiers()));
-                //$id = array_shift($id);
-
                 $endpoints = [
                     $this->endpoint->getName() => [
-                        'last_sync' => $object_ts,
-                        //'id' => $id,
+                        'last_sync' => $ts,
                     ],
                 ];
 
                 $id = $datatype->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
-                $this->importRelations($datatype->getObject(['_id' => $id]), $map);
+                $this->importRelations($datatype->getObject(['_id' => $id]), $map, $endpoints);
 
                 return true;
 
             break;
             case WorkflowInterface::ENSURE_LAST:
-                //$id = array_intersect_key($object, array_flip($this->endpoint->getIdentifiers()));
-                //$id = array_shift($id);
-
-                $object = $this->map($map, $exists->getData(), $object_ts);
+                $object = $this->map($map, $exists->getData(), $ts);
 
                 $endpoints = [
                     $this->endpoint->getName() => [
-                        'last_sync' => $object_ts,
-                        //'id' => $id,
+                        'last_sync' => $ts,
                     ],
                 ];
 
-                var_dump($object);
-
                 $datatype->changeObject($exists, $object, $simulate, $endpoints);
-                $this->importRelations($exists, $map);
+                $this->importRelations($exists, $map, $endpoints);
 
                 return true;
 
@@ -293,7 +277,6 @@ class Workflow extends AbstractResource implements WorkflowInterface
         ]);
 
         $exists = $this->getExportObject($map);
-        $object_ts = new UTCDateTime();
 
         $ensure = $this->ensure;
         if ($exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
@@ -323,7 +306,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
                 $endpoints = [
                     $this->endpoint->getName() => [
-                        'last_sync' => $object_ts,
+                        'last_sync' => $ts,
                         'result' => $result,
                     ],
                 ];
@@ -353,7 +336,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     if ($result !== null) {
                         $endpoints = [
                             $this->endpoint->getName() => [
-                                'last_sync' => $object_ts,
+                                'last_sync' => $ts,
                             ],
                         ];
 
@@ -381,7 +364,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Create object relations.
      */
-    protected function importRelations(DataObjectInterface $object, array $data): bool
+    protected function importRelations(DataObjectInterface $object, array $data, array $endpoints): bool
     {
         foreach ($this->attribute_map->getMap() as $name => $definition) {
             if (isset($definition['map'])) {
@@ -391,7 +374,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     'data.'.$definition['map']['to'] => $data[$name],
                 ]);
 
-                $object->createRelationIfNotExists($relative);
+                $object->createOrUpdateRelation($relative, [], $endpoints);
             }
         }
 
@@ -452,12 +435,12 @@ class Workflow extends AbstractResource implements WorkflowInterface
             return null;
         }
 
-        $endpoints = $exists->getEndpoints();
+        /*$endpoints = $exists->getEndpoints();
 
         if ($exists !== false && isset($endpoints[$this->endpoint->getName()])
         && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
             throw new Exception\ImportConditionNotMet('import filter matched multiple source objects');
-        }
+        }*/
 
         return $exists;
     }

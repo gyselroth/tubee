@@ -15,7 +15,6 @@ use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObjectRelation;
-use Tubee\DataType\DataTypeInterface;
 use Tubee\Resource\Factory as ResourceFactory;
 
 class Factory extends ResourceFactory
@@ -103,7 +102,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function create(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
+    public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $resource = [
             'datatype_1' => $object_1->getDataType()->getName(),
@@ -112,8 +111,30 @@ class Factory extends ResourceFactory
             'datatype_2' => $object_2->getDataType()->getName(),
             'mandator_2' => $object_2->getDataType()->getMandator()->getName(),
             'object_2' => $object_2->getId(),
-            'context' => $context,
-        ];
+            'data' => $context,
+         ];
+
+        $exists = $this->db->{self::COLLECTION_NAME}->findOne([
+            '$or' => [
+                [
+                    'object_1' => $object_1->getId(),
+                    'object_2' => $object_2->getId(),
+                ],
+                [
+                    'object_1' => $object_2->getId(),
+                    'object_2' => $object_1->getId(),
+                ],
+            ],
+        ]);
+
+        if ($endpoints !== null) {
+            $resource['endpoints'] = $endpoints;
+        }
+
+        if ($exists !== null) {
+            $exists = $this->build($exists, $object_1, $object_2);
+            $this->update($exists, $resource, $simulate);
+        }
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
@@ -121,14 +142,15 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function change(DataTypeInterface $datatype, DataObjectInterface $object, Iterable $data, bool $simulate = false, array $endpoints = []): int
+    public function update(DataObjectRelationInterface $relation, array $data, bool $simulate = false, array $endpoints = []): bool
     {
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $relation, $data);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteOne(DataTypeInterface $datatype, ObjectIdInterface $id, bool $simulate = false): bool
+    public function deleteOne(DataObjectRelationInterface $relation, bool $simulate = false): bool
     {
         $this->logger->info('delete object ['.$id.'] from ['.$datatype->getCollection().']', [
             'category' => get_class($this),

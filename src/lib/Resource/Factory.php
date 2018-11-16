@@ -149,7 +149,7 @@ class Factory
         }
 
         $total = $collection->count($query);
-        $offset = $this->getOffset($total, $offset);
+        $offset = $this->calcOffset($total, $offset);
 
         $result = $collection->find($query, [
             'skip' => $offset,
@@ -247,5 +247,7 @@ class Factory
         } elseif ($offset < 0) {
             $offset = 0;
         }
+
+        return $offset;
     }
 }
