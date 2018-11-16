@@ -65,12 +65,36 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = []): Generator
+    public function transformQuery(?array $query = null)
     {
-        $filter = $this->buildFilterAll((array) $filter['$match']);
+        $result = null;
+        if ($this->filter_all !== null) {
+            $result = json_decode(stripslashes($this->filter_all), true);
+        }
 
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
+                $result = $query;
+            } else {
+                $result = [
+                    '$and' => [
+                        json_decode(stripslashes($this->filter_all), true),
+                        $query,
+                    ],
+                ];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(?array $query = null): Generator
+    {
         $i = 0;
-        foreach ($this->collection->find($filter) as $data) {
+        foreach ($this->collection->find($this->transformQuery($query)) as $data) {
             yield $this->build($data);
             ++$i;
         }
@@ -178,23 +202,5 @@ class Mongodb extends AbstractEndpoint
         }
 
         return (array) array_shift($result);
-    }
-
-    /**
-     * Build filter all.
-     */
-    protected function buildFilterAll($filter): array
-    {
-        if ($filter !== null && $this->filter_all !== null) {
-            return array_merge($filter, $this->filter_all);
-        }
-        if ($filter !== null) {
-            return $filter;
-        }
-        if ($this->filter_all !== null) {
-            return $this->filter_all;
-        }
-
-        return null;
     }
 }

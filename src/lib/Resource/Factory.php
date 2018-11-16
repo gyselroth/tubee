@@ -149,14 +149,7 @@ class Factory
         }
 
         $total = $collection->count($query);
-
-        if ($offset !== null && $total === 0) {
-            $offset = null;
-        } elseif ($offset < 0 && $total >= $offset * -1) {
-            $offset = $total + $offset;
-        } elseif ($offset < 0) {
-            $offset = 0;
-        }
+        $offset = $this->getOffset($total, $offset);
 
         $result = $collection->find($query, [
             'skip' => $offset,
@@ -240,5 +233,19 @@ class Factory
         ]);
 
         return $resource;
+    }
+
+    /**
+     * Calculate offset.
+     */
+    protected function calcOffset(int $total, ?int $offset = null): ?int
+    {
+        if ($offset !== null && $total === 0) {
+            $offset = null;
+        } elseif ($offset < 0 && $total >= $offset * -1) {
+            $offset = $total + $offset;
+        } elseif ($offset < 0) {
+            $offset = 0;
+        }
     }
 }

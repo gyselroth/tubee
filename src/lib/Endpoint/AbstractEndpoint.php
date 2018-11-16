@@ -50,14 +50,14 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * Filter All.
      *
-     * @var mixed
+     * @var string
      */
-    protected $filter_all = [];
+    protected $filter_all;
 
     /**
      * Filter One.
      *
-     * @var mixed
+     * @var string
      */
     protected $filter_one;
 
@@ -152,11 +152,11 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
 
                 break;
                 case 'filter_one':
-                        $this->filter_one = $value;
+                        $this->filter_one = /*(string)*/$value;
 
                 break;
                 case 'filter_all':
-                        $this->filter_all = $value;
+                        $this->filter_all = /*(string)*/$value;
 
                 break;
                 case 'history':
@@ -334,15 +334,6 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function getFilterOne(array $object)
     {
-        if (is_iterable($this->filter_one)) {
-            $filter = [];
-            foreach ($this->filter_one as $key => $attr) {
-                $filter[$key] = $this->parseAttribute($attr, $object);
-            }
-
-            return $filter;
-        }
-
         return $this->parseAttribute($this->filter_one, $object);
     }
 
@@ -367,7 +358,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     private function parseAttribute(string $string, array $data): string
     {
-        return preg_replace_callback('/(\{(([^\}]*)+)\})(\}?)/', function ($match) use ($string, $data) {
+        return preg_replace_callback('/(\{(([^\}\"]*)+)\})(\}?)/', function ($match) use ($string, $data) {
             if (substr($match[0], 0, 2) === '{{' && $match[4][0] === '}') {
                 return $match[2].$match[4];
             }

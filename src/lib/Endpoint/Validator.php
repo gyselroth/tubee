@@ -29,14 +29,13 @@ class Validator extends ResourceValidator
                 'options' => [
                     'flush' => false,
                     'import' => [],
-                    'filter_one' => [],
-                    'filter_all' => [],
+                    'filter_one' => null,
+                    'filter_all' => null,
                 ],
             ],
         ];
 
         $resource = array_replace_recursive($defaults, $resource);
-
         if (!in_array($resource['data']['type'], EndpointInterface::VALID_TYPES)) {
             throw new InvalidArgumentException('invalid endpoint type provided, provide one of ['.join(',', EndpointInterface::VALID_TYPES).']');
         }

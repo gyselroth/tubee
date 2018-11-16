@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Ldap\Exception as LdapEndpointException;
+use Tubee\Endpoint\Ldap\QueryTransformer;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -248,24 +249,31 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = null): Generator
+    public function transformQuery(?array $query = null)
     {
-        $filter = $this->filter_all;
-        $request = '';
-        if (is_iterable($filter)) {
-            $request = '';
-            foreach ($filter as $attr => $value) {
-                $request .= '('.$attr.'='.$value.')';
-            }
-            if (count($filter > 1)) {
-                $request = '&('.$filter.')';
+        $result = null;
+
+        if($this->filter_all !== null) {
+            $result = $this->filter_all;
+        }
+
+        if(!empty($query)) {
+            if($this->filter_all === null) {
+                $result = QueryTransformer::transform($query);
+            } else {
+                $result = '&('.$this->filter_all.')('.QueryTransformer::transform($query).')';
             }
         }
 
-        if (!empty($request)) {
-            $filter = '(&('.$filter.')('.$request.'))';
-        }
+        return $result;
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(?array $query=null: Generator
+    {
+        $filter = $this->transformQuery($query);
         $this->logger->debug('find all ldap objects with ldap filter ['.$filter.'] on endpoint ['.$this->name.']', [
             'category' => get_class($this),
         ]);

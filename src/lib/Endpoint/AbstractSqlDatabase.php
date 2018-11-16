@@ -13,6 +13,7 @@ namespace Tubee\Endpoint;
 
 use InvalidArgumentException;
 use Tubee\AttributeMap\AttributeMapInterface;
+use Tubee\Endpoint\Pdo\QueryTransformer;
 
 abstract class AbstractSqlDatabase extends AbstractEndpoint
 {
@@ -120,6 +121,27 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function transformQuery(?array $query = null)
+    {
+        $result = null;
+        if ($this->filter_all !== null) {
+            $result = $this->filter_all;
+        }
+
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
+                $result = QueryTransformer::transform($query);
+            } else {
+                $result = '('.$this->filter_all.') AND ('.QueryTransformer::transform($query).')';
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Prepare.
      */
     protected function prepareCreate(Iterable $object, bool $simulate = false)
@@ -174,26 +196,5 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         }
 
         return $filter;
-    }
-
-    /**
-     * Build filter all.
-     */
-    protected function buildFilterAll($filter): ?string
-    {
-        $filter = $this->buildFilter($filter);
-        $all = $this->buildFilter($this->filter_all);
-
-        if ($filter !== null && $all !== null) {
-            return '('.$all.') AND ('.$filter.')';
-        }
-        if ($filter !== null) {
-            return $filter;
-        }
-        if ($all !== null) {
-            return $all;
-        }
-
-        return null;
     }
 }

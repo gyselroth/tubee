@@ -34,9 +34,9 @@ class Pdo extends AbstractSqlDatabase
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = null): Generator
+    public function getAll(?array $query = null): Generator
     {
-        $filter = $this->buildFilterAll($filter);
+        $filter = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = 'SELECT * FROM '.$this->table;

@@ -3249,10 +3249,10 @@ definitions:
                     default: false
                   filter_one:
                     description: "Specify an endpoint filter which gets used to filter for a single object."
-                    type: "object"
+                    type: "string"
                   filter_all:
                     description: "Specify a filter which always gets applied to the endpoint if objects are retrieved."
-                    type: "object"
+                    type: "string"
   pdo-endpoint:
     description: "Pdo endpoint"
     allOf:

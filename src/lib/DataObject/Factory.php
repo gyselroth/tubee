@@ -117,21 +117,10 @@ class Factory extends ResourceFactory
      */
     public function getAll(DataTypeInterface $datatype, ?array $query = null, bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($this->db->{$datatype->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($datatype) {
-            return $this->build($resource, $datatype);
-        });
-
-        /*$pipeline = [];
-        if ($include_dataset === true) {
-            //$pipeline = $this->dataset;
-            if (count($filter) > 0) {
-                array_unshift($pipeline, ['$match' => $filter]);
-            }
-        } elseif (count($filter) > 0) {
-            $pipeline = [['$match' => $filter]];
-        }
-
+        $total = $collection->count($query);
+        $pipeline[] = ['$match' => $filter];
         $found = 0;
+        $offset = $this->calcOffset($total, $offset);
 
         if ($offset !== null) {
             array_unshift($pipeline, ['$skip' => $offset]);
@@ -141,19 +130,15 @@ class Factory extends ResourceFactory
             $pipeline[] = ['$limit' => $limit];
         }
 
-        if (count($pipeline) === 0) {
-            $this->logger->debug('empty pipeline given (no dataset configuration), collect all objects from ['.$datatype->getCollection().'] instead', [
-                'category' => get_class($this),
-            ]);
-            $cursor = $this->db->{$datatype->getCollection()}->find();
-        } else {
-            $this->logger->debug('aggregate pipeline ['.json_encode($pipeline).'] on collection ['.$datatype->getCollection().']', [
-                'category' => get_class($this),
-            ]);
-            $cursor = $this->db->{$datatype->getCollection()}->aggregate($pipeline, [
-                'allowDiskUse' => true,
-            ]);
-        }
+        $pipeline  = array_merge($pipeline, $this->preparePipeline());
+        $this->logger->debug('aggregate pipeline [{pipeline}] on collection ['.$datatype->getCollection().']', [
+            'category' => get_class($this),
+            'pipeline' => $pipeline
+        ]);
+
+        $cursor = $this->db->{$datatype->getCollection()}->aggregate($pipeline, [
+            'allowDiskUse' => true,
+        ]);
 
         foreach ($cursor as $object) {
             ++$found;
@@ -161,16 +146,18 @@ class Factory extends ResourceFactory
         }
 
         if ($found === 0) {
-            $this->logger->warning('found no data objects in collection ['.$datatype->getCollection().'] with aggregation pipeline ['.json_encode($pipeline).']', [
+            $this->logger->warning('found no data objects in collection ['.$datatype->getCollection().'] with aggregation pipeline [{pipeline}]', [
                 'category' => get_class($this),
+                'pipeline' => $pipeline
             ]);
         } else {
-            $this->logger->info('found ['.$found.'] data objects in collection ['.$datatype->getCollection().'] with aggregation pipeline ['.json_encode($pipeline).']', [
+            $this->logger->info('found ['.$found.'] data objects in collection ['.$datatype->getCollection().'] with aggregation pipeline [{pipeline}]', [
                 'category' => get_class($this),
+                'pipeline' => $pipeline
             ]);
         }
 
-        return $this->db->{$datatype->getCollection()}->count();*/
+        return $total;
     }
 
     /**
@@ -243,35 +230,25 @@ class Factory extends ResourceFactory
     /**
      * Prepare pipeline.
      */
-    protected function preparePipeline(array $filter, bool $include_dataset = true, int $version = 0): array
+    protected function preparePipeline(): array
     {
         $pipeline = [];
-
-        /*if ($include_dataset === true) {
-            $pipeline = $this->dataset;
-            array_unshift($pipeline, $filter);
-        } else {
-            $pipeline = [['$match' => $filter]];
-        }*/
-        $pipeline = [['$match' => $filter]];
-
-        if ($version === 0) {
-            $pipeline[] = [
-                '$project' => ['history' => false],
+        $pipeline[] = [
+            '$lookup' => [
+                'from': 'relations',
+                'localField': '_id',
+                'foreignField': 'object_1',
+                'as': 'relations_1',
             ];
-        } else {
-            $pipeline[] = [
-                '$unwind' => ['path' => '$history'],
+        ];
+        $pipeline[] = [
+            '$lookup' => [
+                'from': 'relations',
+                'localField': '_id',
+                'foreignField': 'object_2',
+                'as': 'relations_2',
             ];
-
-            $pipeline[] = [
-                '$match' => ['history.version' => $version],
-            ];
-
-            $pipeline[] = [
-                '$replaceRoot' => ['newRoot' => '$history'],
-            ];
-        }
+        ]
 
         return $pipeline;
     }

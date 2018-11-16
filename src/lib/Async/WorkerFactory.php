@@ -19,6 +19,7 @@ use Psr\Log\LoggerInterface;
 use TaskScheduler\Scheduler;
 use TaskScheduler\Worker;
 use TaskScheduler\WorkerFactoryInterface;
+use TaskScheduler\WorkerManager;
 use Tubee\Bootstrap\ContainerBuilder;
 
 class WorkerFactory implements WorkerFactoryInterface
@@ -41,12 +42,22 @@ class WorkerFactory implements WorkerFactoryInterface
     /**
      * {@inheritdoc}
      */
-    public function build(ObjectId $id): Worker
+    public function buildWorker(ObjectId $id): Worker
     {
         $dic = ContainerBuilder::get($this->composer);
         $this->setErrorHandler($dic->get(LoggerInterface::class));
 
         return new Worker($id, $dic->get(Scheduler::class), $dic->get(Database::class), $dic->get(LoggerInterface::class), $dic);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildManager(): WorkerManager
+    {
+        $dic = ContainerBuilder::get($this->composer);
+
+        return $dic->get(WorkerManager::class);
     }
 
     /**

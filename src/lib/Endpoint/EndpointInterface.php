@@ -114,5 +114,10 @@ interface EndpointInterface extends ResourceInterface
     /**
      * Read endpoint.
      */
-    public function getAll($filter): Generator;
+    public function getAll(?array $query = null): Generator;
+
+    /**
+     * Transform mongodb like query into endpoints native query language.
+     */
+    public function transformQuery(?array $query = null);
 }
