@@ -87,6 +87,14 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
+    public function transformQuery(?array $query = null)
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         return $this->build([]);

@@ -9,8 +9,9 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\User
+namespace Tubee\User;
 
+use InvalidArgumentException;
 use Tubee\Resource\Validator as ResourceValidator;
 
 class Validator extends ResourceValidator
@@ -27,7 +28,7 @@ class Validator extends ResourceValidator
         }
 
         if (!preg_match($policy, $resource['data']['password'])) {
-            throw new InvalidArgumentException('password does not match password policy '.$this->password_policy);
+            throw new InvalidArgumentException('password does not match password policy '.$policy);
         }
 
         return $resource;

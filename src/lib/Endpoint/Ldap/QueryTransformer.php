@@ -16,7 +16,7 @@ class QueryTransformer
     /**
      * Convert mongodb like query to ldap query.
      */
-    public static function build(array $query): string
+    public static function transform(array $query): string
     {
         $result = '&';
 
@@ -25,14 +25,14 @@ class QueryTransformer
                 case '$and':
                     $result .= '&';
                     foreach ($value as $sub) {
-                        $result .= '('.self::build($sub).')';
+                        $result .= '('.self::transform($sub).')';
                     }
 
                 break;
                 case '$or':
                     $result .= '|';
                     foreach ($value as $sub) {
-                        $result .= '('.self::build($sub).')';
+                        $result .= '('.self::transform($sub).')';
                     }
 
                 break;

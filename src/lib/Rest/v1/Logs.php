@@ -38,6 +38,13 @@ class Logs
     protected $job_factory;
 
     /**
+     * Process factory.
+     *
+     * @var ProcessFactory
+     */
+    protected $process_factory;
+
+    /**
      * Acl.
      *
      * @var Acl

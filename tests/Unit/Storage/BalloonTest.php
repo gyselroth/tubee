@@ -13,8 +13,8 @@ namespace Tubee\Testsuite\Unit\Storage;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Tubee\Endpoint\Balloon\ApiClient;
 use Tubee\Storage\Balloon;
+use Tubee\Storage\Balloon\ApiClient;
 use Tubee\Storage\Exception;
 
 class BalloonTest extends TestCase

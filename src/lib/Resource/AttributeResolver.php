@@ -13,6 +13,7 @@ namespace Tubee\Resource;
 
 use Closure;
 use Psr\Http\Message\ServerRequestInterface;
+use Tubee\Secret\Factory as SecretFactory;
 
 class AttributeResolver
 {

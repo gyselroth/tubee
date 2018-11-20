@@ -116,9 +116,7 @@ class Validator extends ResourceValidator
 
                 break;
                 default:
-                    if (!in_array($option, self::RESOURCE_ATTRIBUTES)) {
-                        throw new InvalidArgumentException('invalid option '.$option.' provided');
-                    }
+                    throw new InvalidArgumentException('invalid option '.$option.' provided');
             }
         }
 

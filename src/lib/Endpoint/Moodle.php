@@ -185,7 +185,15 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter): Generator
+    public function transformQuery(?array $query = null)
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(?array $query = []): Generator
     {
         /*$this->logger->debug('find all moodle objects with moodle filter ['.$this->filter_all.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),

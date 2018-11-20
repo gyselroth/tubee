@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\Rest\Middlewares;
 
+use InvalidArgumentException;
 use Middlewares\Utils\RequestHandlerContainer;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -126,7 +127,7 @@ $param->getClass()->getName() === ServerRequestInterface::class) {
                 }
 
                 if (null === $param_value && false === $optional) {
-                    throw new Exception\MissingInputArgument('misssing
+                    throw new InvalidArgumentException('misssing
 required input parameter '.$param->name);
                 }
 
@@ -138,7 +139,7 @@ $param_value
 
             return $return;
         } catch (ReflectionException $e) {
-            throw new Exception\MissingInputArgument('misssing or
+            throw new InvalidArgumentException('misssing or
 invalid required request parameter');
         }
     }

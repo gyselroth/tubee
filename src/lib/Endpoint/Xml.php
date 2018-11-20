@@ -184,6 +184,14 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
+    public function transformQuery(?array $query = null)
+    {
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAll($filter = []): Generator
     {
         $filtered = [];

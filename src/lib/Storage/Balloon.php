@@ -14,7 +14,7 @@ namespace Tubee\Storage;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Log\LoggerInterface;
-use Tubee\Endpoint\Balloon\ApiClient;
+use Tubee\Storage\Balloon\ApiClient;
 
 class Balloon implements StorageInterface
 {

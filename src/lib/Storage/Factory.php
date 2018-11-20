@@ -15,7 +15,7 @@ use Icewind\SMB\NativeServer;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use Psr\Log\LoggerInterface;
-use Tubee\Endpoint\Balloon\ApiClient;
+use Tubee\Storage\Balloon\ApiClient;
 
 class Factory
 {

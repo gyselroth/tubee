@@ -108,7 +108,7 @@ class Routes
             $r->addRoute('POST', '/api/v1/users', [v1\Users::class, 'post']);
             $r->addRoute('GET', '/api/v1/users/{user}', [v1\Users::class, 'getOne']);
             $r->addRoute('DELETE', '/api/v1/users/{user}', [v1\Users::class, 'delete']);
-            $r->addRoute('PUT', '/api/v1/users/{user}', [v1\USers::class, 'put']);
+            $r->addRoute('PUT', '/api/v1/users/{user}', [v1\Users::class, 'put']);
             $r->addRoute('PATCH', '/api/v1/users', [v1\Users::class, 'patch']);
         });
     }

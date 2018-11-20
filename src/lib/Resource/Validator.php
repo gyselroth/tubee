@@ -16,11 +16,6 @@ use InvalidArgumentException;
 class Validator
 {
     /**
-     * Resource attributes.
-     */
-    public const RESOURCE_ATTRIBUTES = ['name', 'description'];
-
-    /**
      * Validate resource.
      */
     public static function validate(array $resource): array
@@ -35,6 +30,10 @@ class Validator
             throw new InvalidArgumentException('name as string must be provided');
         }
 
+        if (preg_match('/[^a-z\.\-0-9]/', $resource['name'])) {
+            throw new InvalidArgumentException('resoure name can only consists from lower case alphanumeric characters and . or -');
+        }
+
         if (isset($resource['description']) && !is_string($resource['description'])) {
             throw new InvalidArgumentException('description must be a string');
         }
@@ -46,20 +45,5 @@ class Validator
         $resource = array_intersect_key($resource, array_flip(['name', 'data', 'description']));
 
         return $resource;
-    }
-
-    /**
-     * Allow only.
-     */
-    public static function allowOnly(array $resource, array $attributes): bool
-    {
-        $allow = array_merge(['name', 'description'], $attributes);
-        foreach ($resource as $attribute => $value) {
-            if (!in_array($attribute, $allow)) {
-                throw new InvalidArgumentException('given attribute '.$attribute.' is not valid at this place');
-            }
-        }
-
-        return true;
     }
 }

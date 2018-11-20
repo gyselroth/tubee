@@ -41,14 +41,17 @@ class Helper
     {
         if (isset($array[$path])) {
             unset($array[$path]);
+
             return $array;
         }
         $keys = explode($separator, $path);
 
-        $i=1;
+        $i = 1;
+        $key = null;
+
         foreach ($keys as $key) {
             if (!isset($array[$key])) {
-                return $array
+                return $array;
             }
 
             $last = $array;
@@ -56,9 +59,9 @@ class Helper
         }
 
         unset($last[$key]);
+
         return $array;
     }
-
 
     /**
      * Set array value via string path.
@@ -67,17 +70,19 @@ class Helper
     {
         if (isset($array[$path])) {
             $array[$path] = $value;
+
             return $array;
         }
         $keys = explode($separator, $path);
 
-        $i=1;
+        $i = 1;
         foreach ($keys as $key) {
             if (count($keys) !== $i && !isset($array[$key])) {
                 $array[$key] = $array[$key] = [];
+
                 continue;
             }
-            $i++;
+            ++$i;
 
             $array[$key] = $value;
         }

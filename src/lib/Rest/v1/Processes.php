@@ -83,7 +83,7 @@ class Processes
         $process = $this->process_factory->getOne($id);
 
         return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
+            (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
             $process->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );

@@ -253,12 +253,12 @@ class Ldap extends AbstractEndpoint
     {
         $result = null;
 
-        if($this->filter_all !== null) {
+        if ($this->filter_all !== null) {
             $result = $this->filter_all;
         }
 
-        if(!empty($query)) {
-            if($this->filter_all === null) {
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
                 $result = QueryTransformer::transform($query);
             } else {
                 $result = '&('.$this->filter_all.')('.QueryTransformer::transform($query).')';
@@ -271,7 +271,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getAll(?array $query=null: Generator
+    public function getAll(?array $query = null): Generator
     {
         $filter = $this->transformQuery($query);
         $this->logger->debug('find all ldap objects with ldap filter ['.$filter.'] on endpoint ['.$this->name.']', [

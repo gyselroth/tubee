@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use Generator;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Log\Factory as LogFactory;
 use Tubee\Log\LogInterface;

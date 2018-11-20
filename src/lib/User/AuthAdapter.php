@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\User;
 
 use Micro\Auth\Adapter\Basic\AbstractBasic;
+use Micro\Auth\IdentityInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\User\Factory as UserFactory;
 
@@ -50,9 +51,9 @@ class Db extends AbstractBasic
     /**
      * Get attributes.
      */
-    public function getAttributes(): array
+    public function getAttributes(IdentityInterface $identity): array
     {
-        return $this->attributes;
+        return [];
     }
 
     /**
@@ -86,7 +87,7 @@ class Db extends AbstractBasic
             return false;
         }
 
-        $this->attributes = $result;
+        //$this->attributes = $result;
         $this->identifier = $username;
 
         return true;

@@ -25,7 +25,7 @@ class QueryTransformer
                 case '$and':
                     $result .= 'and (';
                     foreach ($value as $sub) {
-                        $result .= self::build($sub);
+                        $result .= self::transform($sub);
                     }
                     $result .= ')';
 
@@ -33,7 +33,7 @@ class QueryTransformer
                 case '$or':
                     $result .= 'or (';
                     foreach ($value as $sub) {
-                        $result .= self::build($sub);
+                        $result .= self::transform($sub);
                     }
                     $result .= ')';
 

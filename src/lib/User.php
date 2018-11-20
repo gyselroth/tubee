@@ -14,9 +14,9 @@ namespace Tubee;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
-use Tubee\Secret\SecretInterface;
+use Tubee\User\UserInterface;
 
-class Secret extends AbstractResource implements SecretInterface
+class User extends AbstractResource implements UserInterface
 {
     /**
      * Name.
@@ -42,7 +42,7 @@ class Secret extends AbstractResource implements SecretInterface
             '_links' => [
                 'self' => ['href' => (string) $request->getUri()],
             ],
-            'kind' => 'Secret',
+            'kind' => 'User',
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);

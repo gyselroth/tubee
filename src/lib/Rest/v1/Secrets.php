@@ -94,8 +94,8 @@ class Secrets
         $id = $this->secret_factory->add($body);
 
         return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->secret_factory->getOne($secret['name'])->decorate($request),
+            (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
+            $this->secret_factory->getOne($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

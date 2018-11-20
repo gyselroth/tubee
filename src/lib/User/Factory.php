@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\User;
 
 use Generator;
+use InvalidArgumentException;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
@@ -42,9 +43,8 @@ class Factory extends ResourceFactory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, EncryptionKey $key, LoggerInterface $logger, array $options = [])
+    public function __construct(Database $db, LoggerInterface $logger, array $options = [])
     {
-        $this->key = $key;
         $this->setOptions($options);
         parent::__construct($db, $logger);
     }

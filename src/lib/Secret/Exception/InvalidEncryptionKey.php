@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\Secret\Exception;
 
-use Tubee\Rest\Exception\ExceptionInterface;
-
-class InvalidEncryptionKey extends \Tubee\Exception implements ExceptionInterface
+class InvalidEncryptionKey extends \Tubee\Exception
 {
 }

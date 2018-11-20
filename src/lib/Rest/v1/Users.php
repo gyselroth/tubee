@@ -94,8 +94,8 @@ class Users
         $id = $this->user_factory->add($body);
 
         return new UnformattedResponse(
-            (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->user_factory->getOne($user['name'])->decorate($request),
+            (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
+            $this->user_factory->getOne($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

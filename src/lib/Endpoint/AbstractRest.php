@@ -52,7 +52,7 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * Update put vs patch.
      *
-     * @var PUT
+     * @var string
      */
     protected $update_method = 'PATCH';
 
@@ -231,12 +231,12 @@ abstract class AbstractRest extends AbstractEndpoint
             if (isset($data[$this->container])) {
                 $data = $data[$this->container];
             } else {
-                throw new Exception\InvalidContainer('specified container '.$this->container.' does not exists in response');
+                throw new RestException\InvalidContainer('specified container '.$this->container.' does not exists in response');
             }
         }
 
         if (!is_array($data)) {
-            throw new Exception\NotIterable('response is not iterable');
+            throw new RestException\NotIterable('response is not iterable');
         }
 
         return $data;

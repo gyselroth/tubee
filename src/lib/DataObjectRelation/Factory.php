@@ -152,11 +152,11 @@ class Factory extends ResourceFactory
      */
     public function deleteOne(DataObjectRelationInterface $relation, bool $simulate = false): bool
     {
-        $this->logger->info('delete object ['.$id.'] from ['.$datatype->getCollection().']', [
+        $this->logger->info('delete object ['.$relation->getId().'] from ['.self::COLLECTION_NAME.']', [
             'category' => get_class($this),
         ]);
 
-        $this->db->{$datatype->getCollection()}->deleteOne(['_id' => $id]);
+        $this->db->{self::COLLECTION_NAME}->deleteOne(['_id' => $relation->getId()]);
 
         return true;
     }
