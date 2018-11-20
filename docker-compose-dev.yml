@@ -45,3 +45,4 @@ tubee-dev:
         - balloon-endpoint
     environment:
         - TUBEE_MONGODB_URI=mongodb://mongodb3:27017
+        - TUBEE_VAULT_URI=http://vault:8200

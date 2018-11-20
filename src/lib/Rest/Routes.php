@@ -80,6 +80,13 @@ class Routes
             $r->addRoute('DELETE', '/api/v1/access-roles/{role}', [v1\AccessRoles::class, 'delete']);
             $r->addRoute('PUT', '/api/v1/access-roles/{role}', [v1\AccessRoles::class, 'put']);
             $r->addRoute('PATCH', '/api/v1/access-roles/{role}', [v1\AccessRoles::class, 'patch']);
+            $r->addRoute('GET', '/api/v1/secrets', [v1\Secrets::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/secrets', [v1\Secrets::class, 'watchAll']);
+            $r->addRoute('POST', '/api/v1/secrets', [v1\Secrets::class, 'post']);
+            $r->addRoute('GET', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'getOne']);
+            $r->addRoute('DELETE', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'delete']);
+            $r->addRoute('PUT', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'put']);
+            $r->addRoute('PATCH', '/api/v1/secrets', [v1\Secrets::class, 'patch']);
             $r->addRoute('GET', '/api/v1/jobs', [v1\Jobs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/jobs', [v1\Jobs::class, 'watchAll']);
             $r->addRoute('POST', '/api/v1/jobs', [v1\Jobs::class, 'post']);
@@ -90,18 +97,9 @@ class Routes
             $r->addRoute('GET', '/api/v1/watch/processes', [v1\Processes::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/processes/{process}', [v1\Processes::class, 'getOne']);
             $r->addRoute('DELETE', '/api/v1/processes/{process}', [v1\Processes::class, 'delete']);
-            /*$r->addRoute('GET', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'getAll']);
-            $r->addRoute('POST', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'post']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/processes', [v1\Processes::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes', [v1\Processes::class, 'watchAll']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}', [v1\Processes::class, 'getOne']);
-            $r->addRoute('DELETE', '/api/v1/jobs/{job}/processes/{process}', [v1\Processes::class, 'delete']);*/
             $r->addRoute('GET', '/api/v1/jobs/{job}/logs', [v1\Logs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/jobs/{job}/logs', [v1\Logs::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/jobs/{job}/logs/{log}', [v1\Logs::class, 'getOne']);
-            //$r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/logs', [v1\Logs::class, 'getAll']);
-            //$r->addRoute('GET', '/api/v1/watch/jobs/{job}/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
-            //$r->addRoute('GET', '/api/v1/jobs/{job}/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
             $r->addRoute('GET', '/api/v1/processes/{process}/logs', [v1\Logs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
