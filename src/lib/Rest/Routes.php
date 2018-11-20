@@ -103,6 +103,13 @@ class Routes
             $r->addRoute('GET', '/api/v1/processes/{process}/logs', [v1\Logs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
+            $r->addRoute('GET', '/api/v1/users', [v1\Secrets::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/users', [v1\Users::class, 'watchAll']);
+            $r->addRoute('POST', '/api/v1/users', [v1\Users::class, 'post']);
+            $r->addRoute('GET', '/api/v1/users/{user}', [v1\Users::class, 'getOne']);
+            $r->addRoute('DELETE', '/api/v1/users/{user}', [v1\Users::class, 'delete']);
+            $r->addRoute('PUT', '/api/v1/users/{user}', [v1\USers::class, 'put']);
+            $r->addRoute('PATCH', '/api/v1/users', [v1\Users::class, 'patch']);
         });
     }
 }

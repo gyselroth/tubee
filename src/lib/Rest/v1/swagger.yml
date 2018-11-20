@@ -1809,6 +1809,408 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
+  /watch/secrets:
+    get:
+      tags:
+      - "secrets"
+      summary: "Watch secrets"
+      description: "Watch updates in realtime"
+      operationId: "watchSecrets"
+      produces:
+      - "application/json;stream=watch"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "List of secrets"
+        403:
+          description: "Access denied"
+  /secrets:
+    get:
+      tags:
+      - "secrets"
+      summary: "Get secrets"
+      description: "An secret defines what role is granted access to what resource"
+      operationId: "getSecrets"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "List of secrets"
+          schema:
+            $ref: "#/definitions/secrets"
+        403:
+          description: "Access denied"
+    post:
+      tags:
+      - "secrets"
+      summary: "Create a new secret"
+      operationId: "addSecret"
+      produces:
+      - "application/json"
+      parameters:
+      - in: body
+        name: data
+        schema:
+          $ref: "#/definitions/secret"
+      responses:
+        201:
+          description: "The created secret"
+          schema:
+            $ref: "#/definitions/secret"
+        403:
+          description: "Access denied"
+  /secrets/{secret}:
+    get:
+      tags:
+      - "secrets"
+      summary: "Get secret by name"
+      operationId: "getSecret"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "secret"
+        description: "secret name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "secret"
+          schema:
+            $ref: "#/definitions/secret"
+        404:
+          description: "secret does not exists"
+        403:
+          description: "Access denied"
+    patch:
+      tags:
+      - "secrets"
+      summary: "Patch secret as rfc6902 request"
+      operationId: "updateSecret"
+      consumes:
+      - "application/json-patch+json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "secret"
+        description: "secret name"
+        required: true
+        type: "string"
+      - in: body
+        name: "job"
+        description: "secret json patch"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "The updated secret"
+          schema:
+            $ref: "#/definitions/secret"
+        403:
+          description: "Access denied"
+    put:
+      tags:
+      - "secrets"
+      summary: "Create or replace an secret"
+      operationId: "replaceSecret"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "secret"
+        description: "secret name"
+        required: true
+        type: "string"
+      - in: body
+        name: data
+        schema:
+          $ref: "#/definitions/secret"
+      responses:
+        201:
+          description: "The created secret"
+          schema:
+            $ref: "#/definitions/secret"
+        403:
+          description: "Access denied"
+    delete:
+      tags:
+      - "secrets"
+      summary: "Delete secret by name"
+      operationId: "deleteSecret"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "secret"
+        description: "secret name"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Server responds with 204 No Content if secret removal was successful"
+        404:
+          description: "secret does not exists"
+        403:
+          description: "Access denied"
+  /watch/users:
+    get:
+      tags:
+      - "users"
+      summary: "Watch users"
+      description: "Watch updates in realtime"
+      operationId: "watchUsers"
+      produces:
+      - "application/json;stream=watch"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "List of users"
+        403:
+          description: "Access denied"
+  /users:
+    get:
+      tags:
+      - "users"
+      summary: "Get users"
+      description: "An User defines what role is granted access to what resource"
+      operationId: "getUsers"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "query"
+        name: "query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "List of users"
+          schema:
+            $ref: "#/definitions/users"
+        403:
+          description: "Access denied"
+    post:
+      tags:
+      - "users"
+      summary: "Create a new User"
+      operationId: "addUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: body
+        name: data
+        schema:
+          $ref: "#/definitions/user"
+      responses:
+        201:
+          description: "The created User"
+          schema:
+            $ref: "#/definitions/user"
+        403:
+          description: "Access denied"
+  /users/{User}:
+    get:
+      tags:
+      - "users"
+      summary: "Get User by name"
+      operationId: "getUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "User"
+        description: "User name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "User"
+          schema:
+            $ref: "#/definitions/user"
+        404:
+          description: "User does not exists"
+        403:
+          description: "Access denied"
+    patch:
+      tags:
+      - "users"
+      summary: "Patch User as rfc6902 request"
+      operationId: "updateUser"
+      consumes:
+      - "application/json-patch+json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "User"
+        description: "User name"
+        required: true
+        type: "string"
+      - in: body
+        name: "job"
+        description: "User json patch"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/json-patch"
+      responses:
+        200:
+          description: "The updated User"
+          schema:
+            $ref: "#/definitions/user"
+        403:
+          description: "Access denied"
+    put:
+      tags:
+      - "users"
+      summary: "Create or replace an User"
+      operationId: "replaceUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "User"
+        description: "User name"
+        required: true
+        type: "string"
+      - in: body
+        name: data
+        schema:
+          $ref: "#/definitions/user"
+      responses:
+        201:
+          description: "The created User"
+          schema:
+            $ref: "#/definitions/user"
+        403:
+          description: "Access denied"
+    delete:
+      tags:
+      - "users"
+      summary: "Delete User by name"
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "User"
+        description: "User name"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Server responds with 204 No Content if User removal was successful"
+        404:
+          description: "User does not exists"
+        403:
+          description: "Access denied"
   /watch/access-rules:
     get:
       tags:
@@ -2856,7 +3258,7 @@ definitions:
       _links:
         $ref: "#/definitions/links"
       name:
-        description: "Resource identifier. Note that the name is immutable once created on the server."
+        description: "Resource identifier. Note that the name is immutable once created on the server and must be unique in its own resource context."
         type: "string"
       id:
         description: "Unique 12-byte resource identifier. Note this is a MongoDB ObjectId. The name is the standard resource identifier, the id only useful to verify that a given resource was completely recreated. An ID is immutable and will be created on the server."
@@ -2869,6 +3271,23 @@ definitions:
         type: "string"
       changed:
         description: "ISO 8601 timestamp when the resource was changed."
+        type: "string"
+      secrets:
+        description: "Injected secrets in this resource."
+        type: "array"
+        items:
+          $ref: "#/definitions/secret-mount"
+  secret-mount:
+    type: "object"
+    properties:
+      secret:
+        description: "The name of the secret from which the key's value should be injected."
+        type: "string"
+      key:
+        description: "The name of the key which should be taken from a secret (You may use a recursive path by delimiting keys with '.', for example: password)."
+        type: "string"
+      to:
+        description: "The resource path where the secret value should be injected (You may use a recursive path by delimiting keys with '.', for example: data.resource.password)."
         type: "string"
   mandators:
     description: "A list of mandators."
@@ -2894,6 +3313,63 @@ definitions:
             description: "The resource type, always Mandator."
             type: "string"
             default: "Mandator"
+  secrets:
+    description: "A list of secrets."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/secret"
+  secret:
+    description: "A secret is sensitive information which can be injected into another resource. A secret gets specially encrypted on the server and is always base64 encoded."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always Secret."
+            type: "string"
+            default: "Secret"
+          data:
+            description: "The secrets data. You may specify multiple keys. Important: You need to base64 encode the values!"
+            type: "object"
+  users:
+    description: "A list of users."
+    allOf:
+      - $ref: '#/definitions/list'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          data:
+            type: "array"
+            items:
+              $ref: "#/definitions/user"
+  user:
+    description: "A local tubee user."
+    allOf:
+      - $ref: '#/definitions/resource'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The resource type, always User."
+            type: "string"
+            default: "User"
+          data:
+            description: "The user information."
+            type: "object"
+            properties:
+              password:
+                description: "The users password. Gets hashed on the server and can not be retrieved after."
   access-rules:
     description: "A list of access rules."
     allOf:

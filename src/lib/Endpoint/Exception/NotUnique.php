@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint\Exception;
 
-use Micro\Http\ExceptionInterface;
+use Tubee\Rest\Exception\ExceptionInterface;
 
 class NotUnique extends \Tubee\Exception implements ExceptionInterface
 {

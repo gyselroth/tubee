@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\DataObject\Exception;
 
-use Micro\Http\ExceptionInterface;
+use Tubee\Rest\Exception\ExceptionInterface;
 
 class MultipleFound extends \Tubee\Exception implements ExceptionInterface
 {

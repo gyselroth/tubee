@@ -21,8 +21,7 @@ use Tubee\Rest\Middlewares\ExceptionHandler;
 use Tubee\Rest\Middlewares\QueryDecoder;
 use Tubee\Rest\Middlewares\Acl as AclMiddleware;
 use Tubee\Rest\Middlewares\Auth as AuthMiddleware;
-use Micro\Http\Middlewares\Router;
-use Micro\Http\Middlewares\RequestHandler;
+use Tubee\Rest\Middlewares\RequestHandler;
 use Lcobucci\ContentNegotiation\ContentTypeMiddleware;
 use Lcobucci\ContentNegotiation\Formatter\Json;
 use Middlewares\JsonPayload;
@@ -35,6 +34,9 @@ use Tubee\Async\WorkerFactory;
 use TaskScheduler\Queue;
 use TaskScheduler\WorkerFactoryInterface;
 use TaskScheduler\WorkerManager;
+use ParagonIE\Halite\Symmetric\EncryptionKey;
+use ParagonIE\Halite\KeyFactory;
+use ParagonIE\Halite\HiddenString;
 
 return [
     Dispatcher::class => [
@@ -49,7 +51,6 @@ return [
                 '{'.TrailingSlash::class.'}',
                 '{'.AccessLog::class.'}',
                 '{'.FastRoute::class.'}',
-                //Router::class,
                 '{'.RequestHandler::class.'}',
             ],
             'resolver' => '{'.ContainerResolver::class.'}'
@@ -57,9 +58,6 @@ return [
         'services' => [
             Routes::class => [
                 'factory' => 'collect',
-                /*'selects' => [[
-                    'method' => 'collect'
-                ]]*/
             ],
             FastRoute::class => [
                 'arguments' => [
@@ -80,6 +78,20 @@ return [
                        'application/json' => '{'.Json::class.'}',
                     ],
                 ],
+            ]
+        ]
+    ],
+    EncryptionKey::class => [
+        'use' => KeyFactory::class,
+        'factory' => 'importEncryptionKey',
+        'arguments' => [
+            'keyData' => '{'.HiddenString::class.'}'
+        ],
+        'services' => [
+            HiddenString::class => [
+                'arguments' => [
+                    'value' => "{ENV(BALLOON_ENCRYPTION_KEY,3140040033da9bd0dedd8babc8b89cda7f2132dd5009cc43c619382863d0c75e172ebf18e713e1987f35d6ea3ace43b561c50d9aefc4441a8c4418f6928a70e4655de5a9660cd323de63b4fd2fb76525470f25311c788c5e366e29bf60c438c4ac0b440e)}"
+                ]
             ]
         ]
     ],

@@ -13,12 +13,12 @@ namespace Tubee\Rest\Middlewares;
 
 use Exception;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
-use Micro\Http\ExceptionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use Tubee\Rest\Exception\ExceptionInterface;
 use Zend\Diactoros\Response;
 
 class ExceptionHandler implements MiddlewareInterface

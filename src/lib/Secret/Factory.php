@@ -19,7 +19,9 @@ use ParagonIE\Halite\KeyFactory;
 use ParagonIE\Halite\Symmetric\Crypto as Symmetric;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 use Psr\Log\LoggerInterface;
+use Tubee\Helper;
 use Tubee\Resource\Factory as ResourceFactory;
+use Tubee\Resource\ResourceInterface;
 use Tubee\Secret;
 
 class Factory extends ResourceFactory
@@ -81,6 +83,38 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Resolve resource secrets.
+     */
+    public function resolve(array $resource): array
+    {
+        if (isset($resource['secrets'])) {
+            $this->logger->info('found secrets to resolve for resource ['.$resource['name'].']', [
+                'category' => get_class($this),
+            ]);
+
+            foreach ($resource['secrets'] as $secret) {
+                $blob = $this->getOne($secret['from'])->getData();
+                $data = base64_decode(Helper::getArrayValue($blob, $secret['key']));
+                $resource = Helper::setArrayValue($resource, $secret['to'], $data);
+            }
+        }
+
+        return $resource;
+    }
+
+    /**
+     * Reverse resolved secrets.
+     */
+    public static function reverse(ResourceInterface $resource, array $result): array
+    {
+        foreach ($resource->getSecrets() as $secret) {
+            Helper::deleteArrayValue($result, $secret['to']);
+        }
+
+        return $result;
+    }
+
+    /**
      * Delete by name.
      */
     public function deleteOne(string $name): bool
@@ -88,6 +122,18 @@ class Factory extends ResourceFactory
         $resource = $this->getOne($name);
 
         return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+    }
+
+    /**
+     * Update.
+     */
+    public function update(SecretInterface $resource, array $data): bool
+    {
+        $data['name'] = $resource->getName();
+        $data = Validator::validate($data);
+        $resource = $this->crypt($resource);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -101,13 +147,7 @@ class Factory extends ResourceFactory
             throw new Exception\NotUnique('secret '.$resource['name'].' does already exists');
         }
 
-        if (KeyFactory::export($this->key)->getString() === self::DEFAULT_KEY) {
-            throw new Exception\InvalidEncryptionKey('encryption key required to be changed');
-        }
-
-        $message = new HiddenString(json_encode($resource['data']));
-        $resource['blob'] = Symmetric::encrypt($message, $this->key);
-        unset($resource['data']);
+        $resource = $this->crypt($resource);
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
@@ -130,5 +170,21 @@ class Factory extends ResourceFactory
         unset($resource['blob']);
 
         return $this->initResource(new Secret($resource));
+    }
+
+    /**
+     * Encrypt resource data.
+     */
+    protected function crypt(array $resource): array
+    {
+        if (KeyFactory::export($this->key)->getString() === self::DEFAULT_KEY) {
+            throw new Exception\InvalidEncryptionKey('encryption key required to be changed');
+        }
+
+        $message = new HiddenString(json_encode($resource['data']));
+        $resource['blob'] = Symmetric::encrypt($message, $this->key);
+        unset($resource['data']);
+
+        return $resource;
     }
 }

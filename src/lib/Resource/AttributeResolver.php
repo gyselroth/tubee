@@ -34,7 +34,7 @@ class AttributeResolver
             return self::translateAttributes($resolvable, $resource);
         }
 
-        return self::translateAttributes($resolvable, array_intersect_key($resolvable, array_flip($attributes)));
+        return SecretFactory::reverse($resource, self::translateAttributes($resolvable, array_intersect_key($resolvable, array_flip($attributes))));
     }
 
     /**

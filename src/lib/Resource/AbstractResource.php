@@ -66,6 +66,14 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
+    public function getSecrets(): array
+    {
+        return $this->resource['secrets'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getVersion(): int
     {
         return $this->resource['version'];

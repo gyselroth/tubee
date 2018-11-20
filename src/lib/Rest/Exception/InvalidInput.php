@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\Rest\Exception;
 
-use Micro\Http\ExceptionInterface;
-
 class InvalidInput extends \Tubee\Exception implements ExceptionInterface
 {
     /**

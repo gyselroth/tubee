@@ -14,7 +14,7 @@ namespace Tubee;
 class Helper
 {
     /**
-     * Get array value via string path.
+     * Get array value by string path.
      */
     public static function getArrayValue(Iterable $array, string $path, string $separator = '.')
     {
@@ -35,9 +35,58 @@ class Helper
     }
 
     /**
+     * Remove array value by string path.
+     */
+    public static function deleteArrayValue(Iterable $array, string $path, string $separator = '.')
+    {
+        if (isset($array[$path])) {
+            unset($array[$path]);
+            return $array;
+        }
+        $keys = explode($separator, $path);
+
+        $i=1;
+        foreach ($keys as $key) {
+            if (!isset($array[$key])) {
+                return $array
+            }
+
+            $last = $array;
+            $array = $array[$key];
+        }
+
+        unset($last[$key]);
+        return $array;
+    }
+
+
+    /**
+     * Set array value via string path.
+     */
+    public static function setArrayValue(Iterable $array, string $path, $value, string $separator = '.')
+    {
+        if (isset($array[$path])) {
+            $array[$path] = $value;
+            return $array;
+        }
+        $keys = explode($separator, $path);
+
+        $i=1;
+        foreach ($keys as $key) {
+            if (count($keys) !== $i && !isset($array[$key])) {
+                $array[$key] = $array[$key] = [];
+                continue;
+            }
+            $i++;
+
+            $array[$key] = $value;
+        }
+
+        return $array;
+    }
+
+    /**
      * Convert assoc array to single array.
-     *
-     * @param string $nkey
      */
     public static function associativeArrayToPath(Iterable $arr, Iterable $narr = [], $nkey = ''): array
     {
@@ -58,9 +107,6 @@ class Helper
 
     /**
      * Convert array with keys like a.b to associative array.
-     *
-     *
-     * @return iterable
      */
     public static function pathArrayToAssociative(Iterable $array): array
     {

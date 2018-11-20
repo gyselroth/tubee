@@ -33,6 +33,11 @@ interface ResourceInterface
     public function getData(): array;
 
     /**
+     * Get resource secret mounts.
+     */
+    public function getSecrets(): array;
+
+    /**
      * Get created timestamp.
      */
     public function getCreated(): UTCDateTimeInterface;
