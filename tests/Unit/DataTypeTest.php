@@ -14,7 +14,6 @@ namespace Tubee\Testsuite\Unit;
 use Helmich\MongoMock\MockDatabase;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\ObjectIdInterface;
-use MongoDB\BSON\UTCDateTimeInterface;
 use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
@@ -96,116 +95,7 @@ class DataTypeTest extends TestCase
     {
         $id = $this->datatype->createObject(['foo' => 'bar']);
         $this->assertInstanceOf(ObjectIdInterface::class, $id);
-
-        /*$object = $this->datatype->getObject(['_id' => $id], false);
-        $this->assertEquals($id, $object->getId());
-        $this->assertSame('bar', $object->getData()['foo']);*/
     }
-
-    /*public function testGetOneMultipleFound()
-    {
-        $this->expectException(ObjectException\MultipleFound::class);
-        $this->datatype->createObject(['foo' => 'bar']);
-        $this->datatype->createObject(['foo' => 'bar']);
-        $object = $this->datatype->getObject(['data.foo' => 'bar'], false);
-    }*/
-
-    public function testGetAllObjectsNoFilter()
-    {
-        $id1 = $this->datatype->createObject(['foo' => 'bar']);
-        $id2 = $this->datatype->createObject(['foo' => 'foo']);
-        $objects = $this->datatype->getObjects([], false);
-        /*$objects = iterator_to_array($objects);
-        $this->assertEquals('bar', $objects[(string) $id1]->getData()['foo']);
-        $this->assertEquals('foo', $objects[(string) $id2]->getData()['foo']);*/
-    }
-
-    /*public function testGetAllNoObjects()
-    {
-        $objects = $this->datatype->getObjects([], false);
-        $objects = iterator_to_array($objects);
-        $this->assertEmpty($objects);
-    }*/
-
-    public function testDeleteObjectSimulate()
-    {
-        $id = $this->datatype->createObject(['foo' => 'bar']);
-        $this->datatype->deleteObject($id, true);
-        //$object = $this->datatype->getObject(['data.foo' => 'bar'], false);
-        //$this->assertSame('bar', $object->getData()['foo']);
-    }
-
-    public function testDeleteObject()
-    {
-        //$this->expectException(ObjectException\NotFound::class);
-        $id = $this->datatype->createObject(['foo' => 'bar']);
-        //$this->datatype->deleteObject($id);
-        //$object = $this->datatype->getObject(['data.foo' => 'bar'], false);
-    }
-
-    /*public function testUpdateObjectSimulate()
-    {
-        $id = $this->datatype->createObject(['foo' => 'bar']);
-        $object = $this->datatype->getObject(['_id' => $id], false);
-        $version = $this->datatype->changeObject($object, ['foo' => 'foo'], true);
-        $this->assertSame(--$version, $object->getVersion());
-        $object = $this->datatype->getObject(['data.foo' => 'bar'], false);
-        $this->assertSame('bar', $object->getData()['foo']);
-    }
-
-    public function testUpdateObject()
-    {
-        $id = $this->datatype->createObject(['foo' => 'bar']);
-        $object = $this->datatype->getObject(['_id' => $id], false);
-        $version = $this->datatype->changeObject($object, ['foo' => 'foo']);
-        $this->assertSame(--$version, $object->getVersion());
-        $object = $this->datatype->getObject(['data.foo' => 'foo'], false);
-        $this->assertSame('foo', $object->getData()['foo']);
-    }*/
-
-    public function testUpdateObjectNoChange()
-    {
-        $id = $this->datatype->createObject(['foo' => 'bar']);
-        $object = $this->datatype->getObject(['_id' => $id], false);
-        //$this->assertSame($version, $object->getVersion());
-    }
-
-    /*public function testGetSpecificObjectVersion()
-    {
-        $id = $this->datatype->createObject(['foo' => 'bar']);
-        $object = $this->datatype->getObject(['_id' => $id], false);
-        $version = $this->datatype->changeObject($object, ['foo' => 'foo']);
-        $object = $this->datatype->getObject(['_id' => $id], false, 1);
-        $this->assertSame(1, $object->getVersion());
-        $this->assertSame('bar', $object->getData()['foo']);
-    }*/
-
-    /*public function testFlushSimulate()
-    {
-        $this->datatype->createObject(['foo' => 'bar']);
-        $this->datatype->flush(true);
-        $object = $this->datatype->getObject(['data.foo' => 'bar'], false);
-        $this->assertSame('bar', $object->getData()['foo']);
-    }
-
-    public function testFlush()
-    {
-        $this->expectException(ObjectException\NotFound::class);
-        $this->datatype->createObject(['foo' => 'bar']);
-        $this->datatype->flush();
-        $object = $this->datatype->getObject(['data.foo' => 'bar'], false);
-    }*/
-
-    /*public function testNewDataObject()
-    {
-        $id = $this->datatype->createObject(['foo' => 'bar']);
-        $object = $this->datatype->getObject(['_id' => $id], false);
-        $this->assertInstanceOf(UTCDateTimeInterface::class, $object->getCreated());
-        $this->assertSame(1, $object->getVersion());
-        $this->assertSame(['foo' => 'bar'], $object->getData());
-        $this->assertSame($id, $object->getId());
-        $this->assertNull($object->getDeleted());
-    }*/
 
     public function testDecorate()
     {

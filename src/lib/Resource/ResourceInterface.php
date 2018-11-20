@@ -23,6 +23,11 @@ interface ResourceInterface
     public function getId(): ObjectIdInterface;
 
     /**
+     * Get name.
+     */
+    public function getName(): string;
+
+    /**
      * Convert resource to array.
      */
     public function toArray(): array;
