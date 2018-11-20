@@ -2,5 +2,7 @@ Package: tubee
 Version: {version}
 Architecture: all
 Maintainer: Raffael Sahli <sahli@gyselroth.com>
-Homepage: https://github.com/gyselroth
+Homepage: https://github.com/gyselroth/tubee
+Depends: php7.2, php7.2-mbstring, php-mongodb, php7.2-opcache, php7.2-curl, php7.2-cli, php7.2-fpm, php7.2-apcu
+Suggests: nginx, mongodb, php7.2-xml, php7.2-ldap, php-imagick, php7.2-pdo, php7.2-mysqli
 Description: tubee

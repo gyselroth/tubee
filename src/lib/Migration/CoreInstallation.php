@@ -42,7 +42,7 @@ class CoreInstallation implements DeltaInterface
     /**
      * User factory.
      *
-     * @var User
+     * @var UserFactory
      */
     protected $user_factory;
 

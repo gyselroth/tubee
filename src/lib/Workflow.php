@@ -220,7 +220,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
             break;
             case WorkflowInterface::ENSURE_DISABLED:
                 $datatype->disable($exists->getId(), $simulate);
-                $this->importRelations($exists, $map);
+                //$this->importRelations($exists, $map);
 
                 return true;
 

@@ -42,6 +42,7 @@ class Helper
         $nodes = explode($separator, $path);
         $last = null;
         $element = &$array;
+        $node = null;
 
         foreach ($nodes as &$node) {
             $last = &$element;
