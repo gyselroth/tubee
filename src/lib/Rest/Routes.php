@@ -86,7 +86,7 @@ class Routes
             $r->addRoute('GET', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'getOne']);
             $r->addRoute('DELETE', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'delete']);
             $r->addRoute('PUT', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'put']);
-            $r->addRoute('PATCH', '/api/v1/secrets', [v1\Secrets::class, 'patch']);
+            $r->addRoute('PATCH', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'patch']);
             $r->addRoute('GET', '/api/v1/jobs', [v1\Jobs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/jobs', [v1\Jobs::class, 'watchAll']);
             $r->addRoute('POST', '/api/v1/jobs', [v1\Jobs::class, 'post']);
@@ -103,13 +103,13 @@ class Routes
             $r->addRoute('GET', '/api/v1/processes/{process}/logs', [v1\Logs::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
             $r->addRoute('GET', '/api/v1/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
-            $r->addRoute('GET', '/api/v1/users', [v1\Secrets::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/users', [v1\Users::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/users', [v1\Users::class, 'watchAll']);
             $r->addRoute('POST', '/api/v1/users', [v1\Users::class, 'post']);
             $r->addRoute('GET', '/api/v1/users/{user}', [v1\Users::class, 'getOne']);
             $r->addRoute('DELETE', '/api/v1/users/{user}', [v1\Users::class, 'delete']);
             $r->addRoute('PUT', '/api/v1/users/{user}', [v1\Users::class, 'put']);
-            $r->addRoute('PATCH', '/api/v1/users', [v1\Users::class, 'patch']);
+            $r->addRoute('PATCH', '/api/v1/users/{user}', [v1\Users::class, 'patch']);
         });
     }
 }

@@ -42,8 +42,42 @@ class Validator
             throw new InvalidArgumentException('data must be an array');
         }
 
-        $resource = array_intersect_key($resource, array_flip(['name', 'data', 'description']));
+        if (isset($resource['secrets'])) {
+            if (!is_array($resource['secrets'])) {
+                throw new InvalidArgumentException('secrets must be an array');
+            }
+
+            self::validateSecrets($resource['secrets']);
+        }
+
+        $resource = array_intersect_key($resource, array_flip(['name', 'data', 'description', 'secrets']));
 
         return $resource;
+    }
+
+    /**
+     * Validate secrets.
+     */
+    protected static function validateSecrets(array $secrets): array
+    {
+        foreach ($secrets as $key => $value) {
+            if (!isset($value['secret']) || !is_string($value['secret'])) {
+                throw new InvalidArgumentException('secrets.secret [string] is required');
+            }
+
+            if (!isset($value['key']) || !is_string($value['key'])) {
+                throw new InvalidArgumentException('secrets.key [string] is required');
+            }
+
+            if (!isset($value['to']) || !is_string($value['to'])) {
+                throw new InvalidArgumentException('secrets.to [string] is required');
+            }
+
+            if (!in_array($key, ['secret', 'key', 'to'])) {
+                throw new InvalidArgumentException('secrets.'.$key.' is an unknown option');
+            }
+        }
+
+        return $secrets;
     }
 }

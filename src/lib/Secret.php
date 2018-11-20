@@ -43,7 +43,8 @@ class Secret extends AbstractResource implements SecretInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Secret',
-        ];
+            'data' => $this->getData(),
+       ];
 
         return AttributeResolver::resolve($request, $this, $resource);
     }

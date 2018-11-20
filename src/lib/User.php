@@ -19,18 +19,19 @@ use Tubee\User\UserInterface;
 class User extends AbstractResource implements UserInterface
 {
     /**
-     * Name.
-     *
-     * @var string
-     */
-    protected $name;
-
-    /**
      * Initialize.
      */
     public function __construct(array $resource = [])
     {
         $this->resource = $resource;
+    }
+
+    /**
+     * Validate password.
+     */
+    public function validatePassword(string $password): bool
+    {
+        return password_verify($password, $this->resource['hash']);
     }
 
     /**

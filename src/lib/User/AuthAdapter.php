@@ -16,7 +16,7 @@ use Micro\Auth\IdentityInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\User\Factory as UserFactory;
 
-class Db extends AbstractBasic
+class AuthAdapter extends AbstractBasic
 {
     /**
      * User factory.
@@ -36,19 +36,6 @@ class Db extends AbstractBasic
     }
 
     /**
-     * Find identity.
-     */
-    public function findIdentity(string $username): ?array
-    {
-        $user = $this->user_factory->findOne($username);
-
-        return [
-            'username' => $user->getName(),
-            'password' => $user->getPasswordHash(),
-        ];
-    }
-
-    /**
      * Get attributes.
      */
     public function getAttributes(IdentityInterface $identity): array
@@ -59,37 +46,28 @@ class Db extends AbstractBasic
     /**
      * Auth.
      */
-    public function plainAuth(string $username, string $password): bool
+    public function plainAuth(string $username, string $password): ?array
     {
-        $result = $this->findIdentity($username);
+        $result = $this->user_factory->getOne($username);
 
         if (null === $result) {
             $this->logger->info('found no user named ['.$username.'] in database', [
                 'category' => get_class($this),
             ]);
 
-            return false;
+            return null;
         }
 
-        if (!isset($result['password']) || empty($result['password'])) {
-            $this->logger->info('found no password for ['.$username.'] in database', [
-                'category' => get_class($this),
-            ]);
-
-            return false;
-        }
-
-        if (!password_verify($password, $result['password'])) {
+        if (!$result->validatePassword($password)) {
             $this->logger->info('failed match given password for ['.$username.'] with stored hash in database', [
                 'category' => get_class($this),
             ]);
 
-            return false;
+            return null;
         }
 
-        //$this->attributes = $result;
-        $this->identifier = $username;
-
-        return true;
+        return [
+            'uid' => $result->getName(),
+        ];
     }
 }

@@ -37,28 +37,20 @@ class Helper
     /**
      * Remove array value by string path.
      */
-    public static function deleteArrayValue(Iterable $array, string $path, string $separator = '.')
+    public static function deleteArrayValue(array $array, string $path, string $separator = '.')
     {
-        if (isset($array[$path])) {
-            unset($array[$path]);
+        $nodes = explode($separator, $path);
+        $last = null;
+        $element = &$array;
 
-            return $array;
-        }
-        $keys = explode($separator, $path);
-
-        $i = 1;
-        $key = null;
-
-        foreach ($keys as $key) {
-            if (!isset($array[$key])) {
-                return $array;
-            }
-
-            $last = $array;
-            $array = $array[$key];
+        foreach ($nodes as &$node) {
+            $last = &$element;
+            $element = &$element[$node];
         }
 
-        unset($last[$key]);
+        if ($last !== null) {
+            unset($last[$node]);
+        }
 
         return $array;
     }
@@ -68,26 +60,9 @@ class Helper
      */
     public static function setArrayValue(Iterable $array, string $path, $value, string $separator = '.')
     {
-        if (isset($array[$path])) {
-            $array[$path] = $value;
+        $result = self::pathArrayToAssociative([$path => $value], $separator);
 
-            return $array;
-        }
-        $keys = explode($separator, $path);
-
-        $i = 1;
-        foreach ($keys as $key) {
-            if (count($keys) !== $i && !isset($array[$key])) {
-                $array[$key] = $array[$key] = [];
-
-                continue;
-            }
-            ++$i;
-
-            $array[$key] = $value;
-        }
-
-        return $array;
+        return array_replace_recursive($array, $result);
     }
 
     /**
@@ -113,12 +88,12 @@ class Helper
     /**
      * Convert array with keys like a.b to associative array.
      */
-    public static function pathArrayToAssociative(Iterable $array): array
+    public static function pathArrayToAssociative(Iterable $array, string $separator = '.'): array
     {
         $out = [];
         foreach ($array as $key => $val) {
             $r = &$out;
-            foreach (explode('.', $key) as $key) {
+            foreach (explode($separator, $key) as $key) {
                 if (!isset($r[$key])) {
                     $r[$key] = [];
                 }

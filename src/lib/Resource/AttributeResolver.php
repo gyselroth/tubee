@@ -32,7 +32,7 @@ class AttributeResolver
         }
 
         if (0 === count($attributes)) {
-            return self::translateAttributes($resolvable, $resource);
+            return SecretFactory::reverse($resource, self::translateAttributes($resolvable, $resource));
         }
 
         return SecretFactory::reverse($resource, self::translateAttributes($resolvable, array_intersect_key($resolvable, array_flip($attributes))));
@@ -56,6 +56,7 @@ class AttributeResolver
             'created' => isset($data['created']) ? $data['created']->toDateTime()->format('c') : null,
             'changed' => isset($data['changed']) ? $data['changed']->toDateTime()->format('c') : null,
             'description' => isset($data['description']) ? $data['description'] : null,
+            'secrets' => $resource->getSecrets(),
         ];
     }
 

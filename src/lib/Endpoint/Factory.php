@@ -18,6 +18,7 @@ use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Resource\Factory as ResourceFactory;
+use Tubee\Secret\Factory as SecretFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory extends ResourceFactory
@@ -35,11 +36,19 @@ class Factory extends ResourceFactory
     protected $workflow_factory;
 
     /**
+     * Secret factory.
+     *
+     * @var SecretFactory
+     */
+    protected $secret_factory;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, WorkflowFactory $workflow_factory, LoggerInterface $logger)
+    public function __construct(Database $db, WorkflowFactory $workflow_factory, SecretFactory $secret_factory, LoggerInterface $logger)
     {
         $this->workflow_factory = $workflow_factory;
+        $this->secret_factory = $secret_factory;
         parent::__construct($db, $logger);
     }
 
@@ -158,6 +167,7 @@ class Factory extends ResourceFactory
     public function build(array $resource, DataTypeInterface $datatype)
     {
         $factory = $resource['data']['class'].'\\Factory';
+        $resource = $this->secret_factory->resolve($resource);
 
         return $this->initResource($factory::build($resource, $datatype, $this->workflow_factory, $this->logger));
     }

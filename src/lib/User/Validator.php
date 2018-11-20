@@ -19,7 +19,7 @@ class Validator extends ResourceValidator
     /**
      * Validate resource.
      */
-    public static function validate(array $resource, string $policy): array
+    public static function validatePolicy(array $resource, string $policy): array
     {
         parent::validate($resource);
 

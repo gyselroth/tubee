@@ -118,7 +118,7 @@ class Factory extends ResourceFactory
     public function update(UserInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
-        $data = Validator::validate($data, $this->password_policy);
+        $data = Validator::validatePolicy($data, $this->password_policy);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
@@ -128,13 +128,14 @@ class Factory extends ResourceFactory
      */
     public function add(array $resource): ObjectIdInterface
     {
-        Validator::validate($resource, $this->password_policy);
+        Validator::validatePolicy($resource, $this->password_policy);
 
         if ($this->has($resource['name'])) {
             throw new Exception\NotUnique('user '.$resource['name'].' does already exists');
         }
 
-        $resource['data']['password'] = password_hash($resource['data']['password'], $this->password_hash);
+        $resource['hash'] = password_hash($resource['data']['password'], $this->password_hash);
+        unset($resource['data']['password']);
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
@@ -152,8 +153,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): UserInterface
     {
-        unset($resource['data']['password']);
-
         return $this->initResource(new User($resource));
     }
 }

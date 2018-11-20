@@ -34,7 +34,7 @@ class Factory extends ResourceFactory
     /**
      * Default key.
      */
-    private const DEFAULT_KEY = '3140040033da9bd0dedd8babc8b89cda7f2132dd5009cc43c619382863d0c75e172ebf18e713e1987f35d6ea3ace43b561c50d9aefc4441a8c4418f6928a70e4655de5a9660cd323de63b4fd2fb76525470f25311c788c5e366e29bf60c438c4ac0b440e';
+    private const DEFAULT_KEY = '314004004b3cef33ba8ea540b424736408364317d9ebfbc9293b8478a8d2478e23dba1ba30ded48ab0dd059cfe3dce2daf00d10eb40af1c0bf429553a2d64802272a514cfde95ac31956baa3929ee01c7338c95805c3a619e254f7aa2966e6a7cdad4783';
 
     /**
      * Encryption key.
@@ -93,7 +93,7 @@ class Factory extends ResourceFactory
             ]);
 
             foreach ($resource['secrets'] as $secret) {
-                $blob = $this->getOne($secret['from'])->getData();
+                $blob = $this->getOne($secret['secret'])->getData();
                 $data = base64_decode(Helper::getArrayValue($blob, $secret['key']));
                 $resource = Helper::setArrayValue($resource, $secret['to'], $data);
             }
@@ -108,7 +108,7 @@ class Factory extends ResourceFactory
     public static function reverse(ResourceInterface $resource, array $result): array
     {
         foreach ($resource->getSecrets() as $secret) {
-            Helper::deleteArrayValue($result, $secret['to']);
+            $result = Helper::deleteArrayValue($result, $secret['to']);
         }
 
         return $result;
@@ -131,7 +131,7 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data = Validator::validate($data);
-        $resource = $this->crypt($resource);
+        $data = $this->crypt($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
@@ -165,7 +165,7 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): SecretInterface
     {
-        $decrypted = json_decode(Symmetric::decrypt($resource['data'], $this->key));
+        $decrypted = json_decode(Symmetric::decrypt($resource['blob'], $this->key)->getString(), true);
         $resource['data'] = $decrypted;
         unset($resource['blob']);
 

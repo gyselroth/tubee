@@ -60,6 +60,10 @@ abstract class AbstractResource implements ResourceInterface
      */
     public function getData(): array
     {
+        if (!isset($this->resource['data'])) {
+            return [];
+        }
+
         return $this->resource['data'];
     }
 
@@ -68,6 +72,10 @@ abstract class AbstractResource implements ResourceInterface
      */
     public function getSecrets(): array
     {
+        if (!isset($this->resource['secrets'])) {
+            return [];
+        }
+
         return $this->resource['secrets'];
     }
 

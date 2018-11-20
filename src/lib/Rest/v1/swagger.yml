@@ -3370,6 +3370,7 @@ definitions:
             properties:
               password:
                 description: "The users password. Gets hashed on the server and can not be retrieved after."
+                type: "string"
   access-rules:
     description: "A list of access rules."
     allOf:
