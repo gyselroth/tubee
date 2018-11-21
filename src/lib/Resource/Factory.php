@@ -151,6 +151,10 @@ class Factory
         $total = $collection->count($query);
         $offset = $this->calcOffset($total, $offset);
 
+        if (empty($sort)) {
+            $sort = ['$natural' => -1];
+        }
+
         $result = $collection->find($query, [
             'skip' => $offset,
             'limit' => $limit,
@@ -169,6 +173,7 @@ class Factory
      */
     public function watchFrom(Collection $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = [], ?Closure $build = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        //$this->logger->debug("PIPE WATCH");
         if ($build === null) {
             $build = function ($resource) {
                 return $this->build($resource);
@@ -182,6 +187,7 @@ class Factory
                 $pipeline[0]['$match']['fullDocument.'.$key] = $value;
             }
         }
+        //$this->logger->debug("PIPE".json_encode($pipeline));
 
         $stream = $collection->watch($pipeline, [
             'resumeAfter' => $after,

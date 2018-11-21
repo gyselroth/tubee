@@ -108,11 +108,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     {
         $resource = [
             'kind' => 'Workflow',
-            'data' => [
-                'ensure' => $this->ensure,
-                'condition' => $this->condition,
-                'map' => $this->attribute_map->getMap(),
-            ],
+            'data' => $this->getData(),
         ];
 
         return AttributeResolver::resolve($request, $this, $resource);
@@ -233,7 +229,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 ];
 
                 $id = $datatype->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
-                $this->importRelations($datatype->getObject(['_id' => $id]), $map, $endpoints);
+                $this->importRelations($datatype->getObject(['_id' => $id]), $map, $simulate, $endpoints);
 
                 return true;
 
@@ -248,7 +244,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 ];
 
                 $datatype->changeObject($exists, $object, $simulate, $endpoints);
-                $this->importRelations($exists, $map, $endpoints);
+                $this->importRelations($exists, $map, $simulate, $endpoints);
 
                 return true;
 
@@ -364,7 +360,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Create object relations.
      */
-    protected function importRelations(DataObjectInterface $object, array $data, array $endpoints): bool
+    protected function importRelations(DataObjectInterface $object, array $data, bool $simulate, array $endpoints): bool
     {
         foreach ($this->attribute_map->getMap() as $name => $definition) {
             if (isset($definition['map'])) {
@@ -374,7 +370,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     'data.'.$definition['map']['to'] => $data[$name],
                 ]);
 
-                $object->createOrUpdateRelation($relative, [], $endpoints);
+                $object->createOrUpdateRelation($relative, [], $simulate, $endpoints);
             }
         }
 

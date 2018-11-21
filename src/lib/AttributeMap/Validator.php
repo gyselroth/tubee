@@ -12,13 +12,14 @@ declare(strict_types=1);
 namespace Tubee\AttributeMap;
 
 use InvalidArgumentException;
+use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class Validator
 {
     /**
      * Validate resource.
      */
-    public static function validate(array $resource): array
+    public static function validate(array $resource, ExpressionLanguage $expression): array
     {
         foreach ($resource as $attribute => $definition) {
             if (!is_array($definition)) {
@@ -29,7 +30,7 @@ class Validator
                 throw new InvalidArgumentException('map attribute '.$attribute.' name must be a string');
             }
 
-            self::validateAttribute($attribute, $definition);
+            $resource[$attribute] = self::validateAttribute($attribute, $definition, $expression);
         }
 
         return $resource;
@@ -38,11 +39,27 @@ class Validator
     /**
      * Validate attribute.
      */
-    protected static function validateAttribute(string $name, array $schema): bool
+    protected static function validateAttribute(string $name, array $schema, ExpressionLanguage $expression): array
     {
+        $defaults = [
+            'ensure' => AttributeMapInterface::ENSURE_LAST,
+            'value' => null,
+            'type' => null,
+            'from' => null,
+            'script' => null,
+            'rewrite' => [],
+            'require_regex' => null,
+            'required' => false,
+            'map' => [],
+        ];
+
         foreach ($schema as $option => $definition) {
             switch ($option) {
-                case 'value':
+                case 'ensure':
+                    if (!in_array($definition, AttributeMapInterface::VALID_ENSURES)) {
+                        throw new InvalidArgumentException('map.ensure as string must be provided (one of exists,last,merge,absent)');
+                    }
+
                 break;
                 case 'type':
                     if (!in_array($definition, AttributeMapInterface::VALID_TYPES)) {
@@ -50,13 +67,14 @@ class Validator
                     }
 
                 break;
-                case 'map':
+                case 'rewrite':
                 break;
+                case 'script':
+                    $expression->evaluate($definition, []);
 
                 break;
+                case 'value':
                 case 'from':
-                case 'script':
-                case 'rewrite':
                 case 'require_regex':
                     if (!is_string($definition)) {
                         throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type string');
@@ -88,6 +106,6 @@ class Validator
             }
         }
 
-        return true;
+        return array_replace_recursive($defaults, $schema);
     }
 }

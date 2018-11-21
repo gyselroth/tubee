@@ -135,6 +135,10 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
+        $data['data'] += ['job' => $resource->getId()];
+        $this->scheduler->addJob(Sync::class, $data['data'], $data['data']['options']);
+        unset($data['data']['job']);
+
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 

@@ -14,6 +14,7 @@ namespace Tubee;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TaskScheduler\JobInterface as TaskJobInterface;
 use TaskScheduler\Process;
 use TaskScheduler\Scheduler;
 use Tubee\Async\Sync;
@@ -85,9 +86,17 @@ class Job extends AbstractResource implements JobInterface
                     ];
                 }
 
+                $process = $process->toArray();
+
                 return [
                     'status' => true,
-                    'process' => (string) $process->getId(),
+                    'last_process' => [
+                        'id' => (string) $process['_id'],
+                        'started' => $process['status'] === 0 ? null : $process['started']->toDateTime()->format('c'),
+                        'ended' => $process['status'] <= 2 ? null : $process['ended']->toDateTime()->format('c'),
+                        'result' => TaskJobInterface::STATUS_MAP[$process['status']],
+                        'code' => $process['status'],
+                    ],
                 ];
             },
         ];

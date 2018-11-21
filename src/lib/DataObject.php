@@ -104,15 +104,19 @@ class DataObject extends AbstractResource implements DataObjectInterface
      */
     public function getEndpoints(): array
     {
+        if (!isset($this->resource['endpoints'])) {
+            return [];
+        }
+
         return $this->resource['endpoints'];
     }
 
     /**
      * Add relation.
      */
-    public function createOrUpdateRelation(DataObjectInterface $object, array $context = [], ?array $endpoints = null): ObjectIdInterface
+    public function createOrUpdateRelation(DataObjectInterface $object, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
-        return $this->relation_factory->createOrUpdate($this, $object, $context, $endpoints);
+        return $this->relation_factory->createOrUpdate($this, $object, $context, $simulate, $endpoints);
     }
 
     /**

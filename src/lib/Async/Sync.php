@@ -76,11 +76,12 @@ class Sync extends AbstractJob
      */
     public function start(): bool
     {
-        $filter = !empty($this->data['mandators']) ? ['name' => ['$in' => $this->data['mandators']]] : [];
+        $filter = in_array('*', $this->data['mandators']) ? [] : ['name' => ['$in' => $this->data['mandators']]];
+
         foreach ($this->mandator_factory->getAll($filter) as $mandator) {
-            $filter = !empty($this->data['datatypes']) ? ['name' => ['$in' => $this->data['datatypes']]] : [];
+            $filter = in_array('*', $this->data['datatypes']) ? [] : ['name' => ['$in' => $this->data['datatypes']]];
             foreach ($mandator->getDataTypes($filter) as $datatype) {
-                $filter = !empty($this->data['endpoints']) ? ['name' => ['$in' => $this->data['endpoints']]] : [];
+                $filter = in_array('*', $this->data['endpoints']) ? [] : ['name' => ['$in' => $this->data['endpoints']]];
                 foreach ($datatype->getEndpoints($filter) as $endpoint) {
                     if ($this->data['loadbalance'] === true) {
                         $data = $this->data;

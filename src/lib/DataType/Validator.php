@@ -35,7 +35,7 @@ class Validator extends ResourceValidator
             throw new InvalidArgumentException('data.schema must be an array');
         }
 
-        SchemaValidator::validate($resource['data']['schema']);
+        $resource['data']['schema'] = SchemaValidator::validate($resource['data']['schema']);
 
         return $resource;
     }

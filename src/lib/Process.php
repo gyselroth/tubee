@@ -14,6 +14,7 @@ namespace Tubee;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use TaskScheduler\JobInterface;
 use Tubee\Log\Factory as LogFactory;
 use Tubee\Log\LogInterface;
 use Tubee\Process\ProcessInterface;
@@ -51,6 +52,9 @@ class Process extends AbstractResource implements ProcessInterface
             'changed' => $this->getCreated()->toDateTime()->format('c'),
             'data' => $this->getData(),
             'status' => [
+                'started' => $this->resource['status'] === 0 ? null : $this->resource['started']->toDateTime()->format('c'),
+                'ended' => $this->resource['status'] <= 2 ? null : $this->resource['ended']->toDateTime()->format('c'),
+                'result' => JobInterface::STATUS_MAP[$this->resource['status']],
                 'code' => $this->resource['status'],
             ],
         ];

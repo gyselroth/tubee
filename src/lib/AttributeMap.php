@@ -46,7 +46,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * Init attribute map.
      */
-    public function __construct(Iterable $map = [], ExpressionLanguage $expression, LoggerInterface $logger)
+    public function __construct(array $map = [], ExpressionLanguage $expression, LoggerInterface $logger)
     {
         $this->map = $map;
         $this->logger = $logger;
@@ -72,7 +72,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * {@inheritdoc}
      */
-    public function map(Iterable $data, UTCDateTimeInterface $ts): array
+    public function map(array $data, UTCDateTimeInterface $ts): array
     {
         $result = [];
         foreach ($this->map as $attr => $value) {
@@ -119,7 +119,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * {@inheritdoc}
      */
-    public function getDiff(Iterable $object, Iterable $endpoint_object): array
+    public function getDiff(array $object, array $endpoint_object): array
     {
         $diff = [];
         foreach ($this->map as $attr => $value) {
@@ -177,7 +177,7 @@ class AttributeMap implements AttributeMapInterface
     protected function requireAttribute(string $attr, array $value, $attrv)
     {
         if ($attrv === null || is_string($attrv) && strlen($attrv) === 0 || is_array($attrv) && count($attrv) === 0) {
-            if (isset($value['required']) && $value['required'] === false) {
+            if (/*isset($value['required']) && */$value['required'] === false) {
                 $this->logger->debug('found attribute ['.$attr.'] but source attribute is empty, remove attribute from mapping', [
                      'category' => get_class($this),
                 ]);

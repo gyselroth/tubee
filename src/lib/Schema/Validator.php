@@ -22,7 +22,7 @@ class Validator
                 throw new InvalidArgumentException('schema attribute '.$attribute.' definition must be an array');
             }
 
-            self::validateAttribute($attribute, $definition);
+            $resource[$attribute] = self::validateAttribute($attribute, $definition);
         }
 
         return $resource;
@@ -31,8 +31,16 @@ class Validator
     /**
      * Add attribute.
      */
-    protected static function validateAttribute(string $name, array $schema): bool
+    protected static function validateAttribute(string $name, array $schema): array
     {
+        $defaults = [
+            'description' => null,
+            'label' => null,
+            'type' => null,
+            'require_regex' => null,
+            'required' => false,
+        ];
+
         foreach ($schema as $option => $definition) {
             switch ($option) {
                 case 'description':
@@ -55,6 +63,6 @@ class Validator
             }
         }
 
-        return true;
+        return array_replace_recursive($defaults, $schema);
     }
 }

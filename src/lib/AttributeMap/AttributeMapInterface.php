@@ -30,6 +30,13 @@ interface AttributeMapInterface
     const ENSURE_ABSENT = 'absent';
     const ENSURE_MERGE = 'merge';
 
+    const VALID_ENSURES = [
+        self::ENSURE_EXISTS,
+        self::ENSURE_LAST,
+        self::ENSURE_ABSENT,
+        self::ENSURE_MERGE,
+    ];
+
     /**
      * Diff actions.
      */
@@ -86,10 +93,10 @@ interface AttributeMapInterface
     /**
      * Map attributes.
      */
-    public function map(Iterable $data, UTCDateTimeInterface $ts): array;
+    public function map(array $data, UTCDateTimeInterface $ts): array;
 
     /**
      * Create attribute diff.
      */
-    public function getDiff(Iterable $mapped, Iterable $endpoint_object): array;
+    public function getDiff(array $mapped, array $endpoint_object): array;
 }
