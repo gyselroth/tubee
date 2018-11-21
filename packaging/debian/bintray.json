@@ -3,7 +3,7 @@
         "name": "tubee",
         "repo": "tubee",
         "subject": "gyselroth",
-        "desc": "tubee cloud server",
+        "desc": "data I/O proxy and sync server",
         "website_url": "https://github.com/gyselroth/tubee",
         "issue_tracker_url": "https://github.com/gyselroth/tubee/issues",
         "vcs_url": "https://github.com/gyselroth/tubee.git",
