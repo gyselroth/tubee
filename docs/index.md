@@ -1,7 +1,7 @@
 # About tubee
 
 ## What ist tubee?
-tubee is a I/O data management engine with proxy capabilities for other services and also features I/O synchronization support for those.
+tubee is a I/O data management engine with proxy capabilities for other services and features I/O synchronization support for those.
 Create, Modify and Delete records in namespaced data collections. Import and export records from and to different technologies like databases, files, http services and more.
 Access endpoint records via the same system (proxy) and much more.
 
