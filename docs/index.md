@@ -14,3 +14,9 @@ Please continue reading in the [Contributing chapter](https://github.com/gyselro
 
 ## Changelog
 A changelog is available [here](https://github.com/gyselroth/tubee/blob/master/CHANGELOG.md).
+
+{% for page in site.pages %}
+    ({{ page.url }})
+{% endfor %}
+
+share
