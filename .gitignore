@@ -3,7 +3,11 @@ vendor
 doc
 build
 config
+log/*
 dist
+lib_dev
 data
+.phpstan.lock
+.phpunit.lock
 composer.lock
 .php_cs.cache

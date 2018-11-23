@@ -32,9 +32,6 @@ class LocalFilesystem implements StorageInterface
 
     /**
      * Init storage.
-     *
-     * @param string          $root
-     * @param LoggerInterface $logger
      */
     public function __construct(string $root, LoggerInterface $logger)
     {
@@ -49,17 +46,10 @@ class LocalFilesystem implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function getFiles(string $pattern): array
-    {
-        return glob($this->root.DIRECTORY_SEPARATOR.$pattern, GLOB_BRACE);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function openReadStreams(string $pattern): Generator
     {
         $files = $this->getFiles($pattern);
+
         if (count($files) === 0) {
             throw new Exception\NoFilesFound('no files found for '.$pattern);
         }
@@ -122,5 +112,13 @@ class LocalFilesystem implements StorageInterface
     public function SyncWriteStream($stream, string $file): bool
     {
         return true;
+    }
+
+    /**
+     * Search local filesystem for matching files.
+     */
+    protected function getFiles(string $pattern): array
+    {
+        return glob($this->root.DIRECTORY_SEPARATOR.$pattern, GLOB_BRACE);
     }
 }

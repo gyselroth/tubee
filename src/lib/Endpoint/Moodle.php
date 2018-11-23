@@ -18,78 +18,46 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Moodle\ApiClient;
 use Tubee\Endpoint\Moodle\Exception as MoodleEndpointException;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Moodle extends AbstractEndpoint
 {
     /**
-     * Moodle methods and identifier.
+     * Kind.
      */
-    const METHODS = [
-        'users' => [
-            'get' => [
-                'function' => 'core_user_get_users_by_field',
-                'identifier' => '',
-            ],
-            'create' => [
-                'function' => 'core_user_create_users',
-                'identifier' => 'users',
-            ],
-            'change' => [
-                'function' => 'core_user_update_users',
-                'identifier' => 'users',
-            ],
-            'delete' => [
-                'function' => 'core_user_delete_users',
-                'identifier' => 'userids',
-            ],
-            'get_all' => [
-                'function' => 'core_user_get_users',
-                'identifier' => '',
-            ],
-        ],
-    ];
+    public const KIND = 'MoodleEndpoint';
 
     /**
      * Moodle.
      *
-     * @var Moodle
+     * @var ApiClient
      */
     protected $moodle;
 
     /**
-     * Type.
+     * Call map.
      *
-     * @var string
+     * @var array
      */
-    protected $resource_type = 'users';
+    protected $call_map = [];
 
     /**
      * Init endpoint.
-     *
-     * @param string            $name
-     * @param string            $type
-     * @param ApiClient         $wrapper
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
      */
-    public function __construct(string $name, string $type, string $resource_type, ApiClient $wrapper, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $type, array $call_map, ApiClient $wrapper, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        if (!isset(self::METHODS[$resource_type])) {
-            throw new InvalidArgumentException('moodle resource type ['.$resource_type.'] does not exists');
-        }
-
         $this->moodle = $wrapper;
-        $this->resource_type = $resource_type;
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        $this->call_map = $call_map;
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
      * {@inheritdoc}
      */
-    /*public function getDiff(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object): array
+    /*public function getDiff(AttributeMapInterface $map, array $object, array $endpoint_object): array
     {
-        $id = $this->getId($endpoint_object);
+        $id = $this->getEndpointId($endpoint_object);
         $diff = [[]];
         $diff[0]['id'] = $id;
 
@@ -150,13 +118,13 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
-        $id = $this->getId($endpoint_object);
+        /*$id = $this->getEndpointId($endpoint_object);
         $diff = [$diff];
         $diff[0]['id'] = $id;
 
-        $this->logger->info('update moodle object ['.$id.'] on endpoint ['.$this->getIdentifier().']', [
+        $this->logger->info('update moodle object ['.$id.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -167,15 +135,15 @@ class Moodle extends AbstractEndpoint
             $this->moodle->restCall($diff, self::METHODS[$this->resource_type]['change']['function']);
         }
 
-        return null;
+        return null;*/
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
-        foreach ($object as $key => $value) {
+        /*foreach ($object as $key => $value) {
             if (is_array($value)) {
                 throw new Exception\EndpointCanNotHandleArray('endpoint can not handle arrays ["'.$key.'"], did you forget to set a decorator?');
             }
@@ -184,7 +152,7 @@ class Moodle extends AbstractEndpoint
         $identifier = isset(self::METHODS[$this->resource_type]['create']['identifier']) ? self::METHODS[$this->resource_type]['create']['identifier'] : '';
         $prepared_data = http_build_query([$identifier => [0 => $object]]);
 
-        $this->logger->info('create new moodle object on endpoint ['.$this->getIdentifier().'] with attributes [{attributes}]', [
+        $this->logger->info('create new moodle object on endpoint ['.$this->getEndpointIdentifier().'] with attributes [{attributes}]', [
             'category' => get_class($this),
             'attributes' => $object,
         ]);
@@ -193,19 +161,19 @@ class Moodle extends AbstractEndpoint
             $this->moodle->restCall($prepared_data, self::METHODS[$this->resource_type]['create']['function']);
         }
 
-        return $identifier;
+        return $identifier;*/
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $id = $this->getId($endpoint_object);
+        /*$id = $this->getEndpointId($endpoint_object);
         $diff = [[]];
         $diff[0] = $id;
 
-        $this->logger->info('delete existing moodle object ['.$id.'] on endpoint ['.$this->getIdentifier().']', [
+        $this->logger->info('delete existing moodle object ['.$id.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -216,15 +184,23 @@ class Moodle extends AbstractEndpoint
             $this->moodle->restCall($diff, self::METHODS[$this->resource_type]['delete']['function']);
         }
 
-        return true;
+        return true;*/
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter): Generator
+    public function transformQuery(?array $query = null)
     {
-        $this->logger->debug('find all moodle objects with moodle filter ['.$this->filter_all.'] on endpoint ['.$this->getIdentifier().']', [
+        return '';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(?array $query = []): Generator
+    {
+        /*$this->logger->debug('find all moodle objects with moodle filter ['.$this->filter_all.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -232,17 +208,17 @@ class Moodle extends AbstractEndpoint
 
         foreach ($result as $object) {
             yield $object;
-        }
+        }*/
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $atitributes = []): EndpointObjectInterface
     {
-        $filter = $this->getFilterOne($object);
+        /*$filter = $this->getFilterOne($object);
 
-        $this->logger->debug('find moodle object with moodle filter ['.$filter.'] on endpoint ['.$this->getIdentifier().']', [
+        $this->logger->debug('find moodle object with moodle filter ['.$filter.'] on endpoint ['.$this->getEndpointIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -255,17 +231,13 @@ class Moodle extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return (array) array_shift($result);
+        return (array) array_shift($result);*/
     }
 
     /**
      * Get moodle resource id.
-     *
-     * @param iterable $endpoint_object
-     *
-     * @return string
      */
-    protected function getId(Iterable $endpoint_object): string
+    protected function getEndpointId(array $endpoint_object): string
     {
         if (isset($endpoint_object['id'])) {
             return $endpoint_object['id'];

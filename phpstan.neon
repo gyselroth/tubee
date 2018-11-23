@@ -6,11 +6,13 @@ parameters:
     ignoreErrors:
         - '#^Class MongoDB\\BSON\\UTCDateTime constructor invoked with 0 parameters, 1 required\.#'
         - '#^Class MongoDB\\BSON\\Binary constructor invoked with 1 parameter, 2 required\.#'
-        - '#Balloon\\Testsuite\\Unit\\Mock\\Identity\:\:\_\_construct\(\) does not call parent constructor from Micro\\Auth\\Identity\.#'
-        - '#Call to an undefined method Balloon\\Filesystem\\Node\\AbstractNode#'
         - '#Function apc_exists not found#'
         - '#Function apc_store not found#'
         - '#Function apc_fetch not found#'
+        - '#Tubee\\Endpoint\\Pdo\\Wrapper\:\:__construct\(\) does not call parent constructor from PDO#'
+        - '#Call to an undefined method Tubee\\Resource\\Factory::build()#'
+        - '#Tubee\\Endpoint\\Mysql\\Wrapper\:\:__construct\(\) does not call parent constructor from mysqli#'
+        - '#Tubee\\Rest\\Helper#'
 
     reportUnmatchedIgnoredErrors: false
 includes:

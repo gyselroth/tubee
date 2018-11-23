@@ -11,15 +11,26 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint;
 
+use Generator;
 use InvalidArgumentException;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\EndpointObject;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Helper;
-use Tubee\Workflow;
+use Tubee\Resource\AbstractResource;
+use Tubee\Resource\AttributeResolver;
+use Tubee\Workflow\Factory as WorkflowFactory;
 use Tubee\Workflow\WorkflowInterface;
 
-abstract class AbstractEndpoint implements EndpointInterface
+abstract class AbstractEndpoint extends AbstractResource implements EndpointInterface
 {
+    /**
+     * Kind.
+     */
+    public const KIND = 'Endpoint';
+
     /**
      * Endpoint name.
      *
@@ -37,30 +48,23 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * Logger.
      *
-     * @var Logger
+     * @var LoggerInterface
      */
     protected $logger;
 
     /**
      * Filter All.
      *
-     * @var mixed
+     * @var string
      */
-    protected $filter_all = [];
+    protected $filter_all;
 
     /**
      * Filter One.
      *
-     * @var mixed
+     * @var string
      */
     protected $filter_one;
-
-    /**
-     * Workflow.
-     *
-     * @var iterable
-     */
-    protected $workflows = [];
 
     /**
      * Import.
@@ -91,29 +95,34 @@ abstract class AbstractEndpoint implements EndpointInterface
     protected $history = false;
 
     /**
-     * Init endpoint.
+     * Workflow factory.
      *
-     * @param string            $name
-     * @param string            $type
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * @var WorkflowFactory
      */
-    public function __construct(string $name, string $type, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
+    protected $workflow_factory;
+
+    /**
+     * Endpoint object identifiers.
+     *
+     * @var string
+     */
+    protected $identifiers = [];
+
+    /**
+     * Init endpoint.
+     */
+    public function __construct(string $name, string $type, DataTypeInterface $datatype, WorkflowFactory $workflow_factory, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
         $this->type = $type;
+        $this->resource = $resource;
         $this->datatype = $datatype;
         $this->logger = $logger;
-        $this->setOptions($config);
+        $this->workflow_factory = $workflow_factory;
 
-        if ($this->type === EndpointInterface::TYPE_SOURCE && count($this->import) === 0) {
-            throw new Exception\SourceEndpointNoImportCondition('source endpoint must include at least one import condition');
+        if (isset($resource['data']['options'])) {
+            $this->setOptions($resource['data']['options']);
         }
-
-        /*if (is_iterable($this->filter_one) && count($this->filter_one) === 0) {
-            throw new Exception\FilterOneRequired('endpoint must declare a single object filter');
-        }*/
     }
 
     /**
@@ -126,12 +135,8 @@ abstract class AbstractEndpoint implements EndpointInterface
 
     /**
      * Set options.
-     *
-     * @param iterable $config
-     *
-     * @return EndpointInterface
      */
-    public function setOptions(?Iterable $config = null): EndpointInterface
+    public function setOptions(?array $config = null): EndpointInterface
     {
         if ($config === null) {
             return $this;
@@ -140,20 +145,23 @@ abstract class AbstractEndpoint implements EndpointInterface
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'flush':
-                    $this->flush = (bool) (int) $value;
+                    $this->flush = (bool) $value;
 
                 break;
                 case 'import':
                     $this->import = (array) $value;
 
                 break;
-                case 'filter':
-                    if (isset($value['all'])) {
-                        $this->filter_all = $value['all'];
-                    }
-                    if (isset($value['one'])) {
-                        $this->filter_one = $value['one'];
-                    }
+                case 'identifiers':
+                    $this->identifiers = (array) $value;
+
+                break;
+                case 'filter_one':
+                        $this->filter_one = /*(string)*/$value;
+
+                break;
+                case 'filter_all':
+                        $this->filter_all = /*(string)*/$value;
 
                 break;
                 case 'history':
@@ -166,6 +174,52 @@ abstract class AbstractEndpoint implements EndpointInterface
         }
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function decorate(ServerRequestInterface $request): array
+    {
+        $datatype = $this->getDataType();
+        $mandator = $datatype->getMandator();
+
+        $resource = [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+                'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
+                'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+           ],
+            'kind' => static::KIND,
+            'data' => $this->getData(),
+            /*'type' => $this->type,
+            'resource' => $this->resource['resource'],
+            'data_options' => [
+                'import' => $this->import,
+                'history' => $this->history,
+                'flush' => $this->flush,
+                'filter_one' => $this->filter_one,
+                'filter_all' => $this->filter_all,
+            ],*/
+            'status' => function ($endpoint) {
+                try {
+                    $endpoint->setup();
+
+                    return [
+                        'available' => true,
+                    ];
+                } catch (\Exception $e) {
+                    return [
+                        'available' => false,
+                        'exception' => get_class($e),
+                        'error' => $e->getMessage(),
+                        'code' => $e->getCode(),
+                    ];
+                }
+            },
+        ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
@@ -203,7 +257,15 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function getImport(): Iterable
+    public function getIdentifiers(): array
+    {
+        return $this->identifiers;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getImport(): array
     {
         return $this->import;
     }
@@ -219,7 +281,7 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function exists(Iterable $object): bool
+    public function exists(array $object): bool
     {
         try {
             $this->getOne($object, []);
@@ -237,25 +299,7 @@ abstract class AbstractEndpoint implements EndpointInterface
      */
     public function hasWorkflow(string $name): bool
     {
-        return isset($this->workflows[$name]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function injectWorkflow(WorkflowInterface $workflow, string $name): EndpointInterface
-    {
-        $this->logger->debug('inject workflow ['.$name.'] of type ['.get_class($workflow).']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($this->hasWorkflow($name)) {
-            throw new Exception\WorkflowNotUnique('workflow '.$name.' is already registered');
-        }
-
-        $this->workflows[$name] = $workflow;
-
-        return $this;
+        return $this->workflow_factory->has($this, $name);
     }
 
     /**
@@ -263,30 +307,15 @@ abstract class AbstractEndpoint implements EndpointInterface
      */
     public function getWorkflow(string $name): WorkflowInterface
     {
-        if (!isset($this->workflows[$name])) {
-            throw new Exception\WorkflowNotFound('workflow '.$name.' is not registered in endpoint '.$this->name);
-        }
-
-        return $this->workflows[$name];
+        return $this->workflow_factory->getOne($this, $name);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getWorkflows(Iterable $workflows = []): array
+    public function getWorkflows(array $workflows = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        if (count($workflows) === 0) {
-            return $this->workflows;
-        }
-        $list = [];
-        foreach ($workflows as $name) {
-            if (!isset($this->workflows[$name])) {
-                throw new Exception\WorkflowNotFound('workflow '.$name.' is not registered in endpoint '.$this->name);
-            }
-            $list[$name] = $this->workflows[$name];
-        }
-
-        return $list;
+        return $this->workflow_factory->getAll($this, $workflows, $offset, $limit);
     }
 
     /**
@@ -308,25 +337,8 @@ abstract class AbstractEndpoint implements EndpointInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getFilterOne(array $object)
     {
-        return $this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFilterOne(Iterable $object)
-    {
-        if (is_iterable($this->filter_one)) {
-            $filter = [];
-            foreach ($this->filter_one as $key => $attr) {
-                $filter[$key] = $this->parseAttribute($attr, $object);
-            }
-
-            return $filter;
-        }
-
         return $this->parseAttribute($this->filter_one, $object);
     }
 
@@ -339,16 +351,19 @@ abstract class AbstractEndpoint implements EndpointInterface
     }
 
     /**
-     * Parse and replace string with attribute values.
-     *
-     * @param string   $string
-     * @param iterable $data
-     *
-     * @return string
+     * Build endpoint object.
      */
-    private function parseAttribute(string $string, Iterable $data): string
+    protected function build(array $object): EndpointObjectInterface
     {
-        return preg_replace_callback('/(\{(([^\}]*)+)\})(\}?)/', function ($match) use ($string, $data) {
+        return new EndpointObject(['data' => $object], $this);
+    }
+
+    /**
+     * Parse and replace string with attribute values.
+     */
+    private function parseAttribute(string $string, array $data): string
+    {
+        return preg_replace_callback('/(\{(([^\}\"]*)+)\})(\}?)/', function ($match) use ($string, $data) {
             if (substr($match[0], 0, 2) === '{{' && $match[4][0] === '}') {
                 return $match[2].$match[4];
             }

@@ -11,13 +11,15 @@ declare(strict_types=1);
 
 namespace Tubee\Workflow;
 
-use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Resource\ResourceInterface;
 
-interface WorkflowInterface
+interface WorkflowInterface extends ResourceInterface
 {
     /**
      * Object ensure states.
@@ -28,63 +30,49 @@ interface WorkflowInterface
     const ENSURE_ABSENT = 'absent';
 
     /**
+     * Valid ensures.
+     */
+    const VALID_ENSURES = [
+        self::ENSURE_EXISTS,
+        self::ENSURE_LAST,
+        self::ENSURE_DISABLED,
+        self::ENSURE_ABSENT,
+    ];
+
+    /**
      * Get endpoint.
-     *
-     * @return EndpointInterface
      */
     public function getEndpoint(): EndpointInterface;
 
     /**
      * Get attribute map.
-     *
-     * @return AttributeMapInterface
      */
     public function getAttributeMap(): AttributeMapInterface;
 
     /**
      * Get identifier.
-     *
-     * @return string
      */
     public function getIdentifier(): string;
 
     /**
      * Get name.
-     *
-     * @return string
      */
     public function getName(): string;
 
     /**
      * Cleanup.
-     *
-     * @param DataObjectInterface $object
-     * @param UTCDateTime         $ts
-     * @param bool                $simulate
-     *
-     * @return bool
      */
-    public function cleanup(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool;
+    public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Import from endpoint.
-     *
-     * @param iterable    $object
-     * @param UTCDateTime $ts
-     * @param bool        $simulate
-     *
-     * @return bool
      */
-    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTime $ts, bool $simulate = false): bool;
+    public function import(DataTypeInterface $datatype, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Write to endpoint.
      *
-     * @param iterable    $object
-     * @param UTCDateTime $ts
-     * @param bool        $simulate
-     *
-     * @return bool
+     * @param iterable $object
      */
-    public function export(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool;
+    public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 }

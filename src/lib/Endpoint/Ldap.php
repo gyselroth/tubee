@@ -18,9 +18,17 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Ldap\Exception as LdapEndpointException;
+use Tubee\Endpoint\Ldap\QueryTransformer;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Ldap extends AbstractEndpoint
 {
+    /**
+     * Kind.
+     */
+    public const KIND = 'LdapEndpoint';
+
     /**
      * Ldap.
      *
@@ -73,12 +81,16 @@ class Ldap extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, LdapServer $ldap, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null, ?Iterable $ldap_options = [])
+    public function __construct(string $name, string $type, LdapServer $ldap, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->filter_all = '(objectClass=*)';
         $this->ldap = $ldap;
-        $this->setLdapOptions($ldap_options);
-        parent::__construct($name, $type, $datatype, $logger, $config);
+
+        if (isset($resource['resource'])) {
+            $this->setLdapOptions($resource['resource']);
+        }
+
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
@@ -124,7 +136,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function setLdapOptions(?Iterable $config = null): EndpointInterface
+    public function setLdapOptions(?array $config = null): EndpointInterface
     {
         if ($config === null) {
             return $this;
@@ -168,7 +180,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $object = array_change_key_case($object);
         $dn = $this->getDn($object, $endpoint_object);
@@ -202,7 +214,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         $dn = $this->getDn($object, $endpoint_object);
         $this->logger->debug('delete ldap object ['.$dn.']', [
@@ -219,7 +231,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $dn = $this->getDn($object);
 
@@ -242,32 +254,42 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = null): Generator
+    public function transformQuery(?array $query = null)
     {
-        $filter = $this->filter_all;
-        $request = '';
-        if (is_iterable($filter)) {
-            $request = '';
-            foreach ($filter as $attr => $value) {
-                $request .= '('.$attr.'='.$value.')';
-            }
-            if (count($filter > 1)) {
-                $request = '&('.$filter.')';
+        $result = null;
+
+        if ($this->filter_all !== null) {
+            $result = $this->filter_all;
+        }
+
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
+                $result = QueryTransformer::transform($query);
+            } else {
+                $result = '&('.$this->filter_all.')('.QueryTransformer::transform($query).')';
             }
         }
 
-        if (!empty($request)) {
-            $filter = '(&('.$filter.')('.$request.'))';
-        }
+        return $result;
+    }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll(?array $query = null): Generator
+    {
+        $filter = $this->transformQuery($query);
         $this->logger->debug('find all ldap objects with ldap filter ['.$filter.'] on endpoint ['.$this->name.']', [
             'category' => get_class($this),
         ]);
 
+        $i = 0;
         $result = $this->ldap->ldapSearch($this->basedn, $filter);
         foreach ($result->getEntries() as $object) {
-            yield $object;
+            yield $this->build($object);
         }
+
+        return $i;
     }
 
     /**
@@ -312,7 +334,7 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, ?Iterable $attributes = []): Iterable
+    public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
         $filter = $this->getFilterOne($object);
         $this->logger->debug('find ldap object with ldap filter ['.$filter.'] in ['.$this->basedn.'] on endpoint ['.$this->getIdentifier().']', [
@@ -329,15 +351,11 @@ class Ldap extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $this->prepareRawObject($result->getEntries()[0]);
+        return $this->build($this->prepareRawObject($result->getEntries()[0]));
     }
 
     /**
      * Prepare object.
-     *
-     * @param array $result
-     *
-     * @return array
      */
     protected function prepareRawObject(array $result): array
     {
@@ -361,10 +379,6 @@ class Ldap extends AbstractEndpoint
 
     /**
      * Move ldap object.
-     *
-     * @param string $new_dn
-     * @param string $current_dn
-     * @param bool   $simulate
      */
     protected function moveLdapObject(string $new_dn, string $current_dn, bool $simulate = false): bool
     {
@@ -385,13 +399,8 @@ class Ldap extends AbstractEndpoint
 
     /**
      * Get dn.
-     *
-     * @param iterable $object
-     * @param iterable $endpoint_object
-     *
-     * @return string
      */
-    protected function getDn(Iterable $object, Iterable $endpoint_object = []): string
+    protected function getDn(array $object, array $endpoint_object = []): string
     {
         if (isset($object['entrydn'])) {
             return $object['entrydn'];

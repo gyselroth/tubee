@@ -20,6 +20,7 @@ use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception;
 use Tubee\Endpoint\Ldap;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class LdapTest extends TestCase
 {
@@ -27,7 +28,7 @@ class LdapTest extends TestCase
     {
         $client = $this->createMock(LdapClient::class);
         $client->expects($this->exactly(1))->method('connect');
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $ldap->setup();
     }
 
@@ -36,7 +37,7 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->expects($this->exactly(1))->method('connect');
         $client->expects($this->exactly(1))->method('startTls');
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $ldap->setLdapOptions([
             'tls' => true,
         ]);
@@ -48,7 +49,7 @@ class LdapTest extends TestCase
     {
         $client = $this->createMock(LdapClient::class);
         $client->expects($this->exactly(2))->method('setOption');
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $ldap->setLdapOptions([
             'options' => [
                 'LDAP_OPT_PROTOCOL_VERSION' => 3,
@@ -63,7 +64,7 @@ class LdapTest extends TestCase
     {
         $client = $this->createMock(LdapClient::class);
         $client->expects($this->exactly(1))->method('bind');
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $ldap->setLdapOptions([
             'binddn' => 'foo',
         ]);
@@ -75,7 +76,7 @@ class LdapTest extends TestCase
     {
         $client = $this->createMock(LdapClient::class);
         $client->expects($this->exactly(1))->method('close');
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $ldap->shutdown();
     }
 
@@ -93,11 +94,11 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->method('ldapSearch')->willReturn($search);
 
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class), [
-            'filter' => ['one' => '(uid={uid)'],
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
-        $result = $ldap->getOne([]);
+        $result = $ldap->getOne([])->getData();
         $this->assertSame(['uid' => 'foo'], $result);
     }
 
@@ -110,11 +111,11 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->method('ldapSearch')->willReturn($search);
 
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class), [
-            'filter' => ['one' => '(uid={uid)'],
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
-        $result = $ldap->getOne([]);
+        $result = $ldap->getOne([])->getData();
     }
 
     public function testGetOneNotFound()
@@ -126,11 +127,11 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->method('ldapSearch')->willReturn($search);
 
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class), [
-            'filter' => ['one' => '(uid={uid)'],
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
-        $result = $ldap->getOne([]);
+        $result = $ldap->getOne([])->getData();
     }
 
     public function testObjectExists()
@@ -147,8 +148,8 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->method('ldapSearch')->willReturn($search);
 
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class), [
-            'filter' => ['one' => '(uid={uid)'],
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $this->assertTrue($ldap->exists([]));
@@ -161,8 +162,8 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->method('ldapSearch')->willReturn($search);
 
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class), [
-            'filter' => ['one' => '(uid={uid)'],
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $this->assertTrue($ldap->exists([]));
@@ -175,8 +176,8 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->method('ldapSearch')->willReturn($search);
 
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class), [
-            'filter' => ['one' => '(uid={uid)'],
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '(uid={uid)']],
         ]);
 
         $this->assertFalse($ldap->exists([]));
@@ -184,14 +185,14 @@ class LdapTest extends TestCase
 
     public function testGetDiffNoChange()
     {
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $result = $ldap->getDiff($this->createMock(AttributeMapInterface::class), []);
         $this->assertSame([], $result);
     }
 
     public function testGetDiffReplaceValue()
     {
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $diff = [
             'foo' => [
                 'attribute' => 'foo',
@@ -212,7 +213,7 @@ class LdapTest extends TestCase
 
     public function testGetDiffReplaceTwoExistingValue()
     {
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $diff = [
             'foo' => [
                 'action' => AttributeMapInterface::ACTION_REPLACE,
@@ -240,7 +241,7 @@ class LdapTest extends TestCase
 
     public function testGetDiffRemoveValue()
     {
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $diff = [
             'foo' => [
                 'action' => AttributeMapInterface::ACTION_REMOVE,
@@ -258,7 +259,7 @@ class LdapTest extends TestCase
 
     public function testGetDiffAddValue()
     {
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(LoggerInterface::class));
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(DataTypeInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $diff = [
             'foo' => [
                 'action' => AttributeMapInterface::ACTION_ADD,

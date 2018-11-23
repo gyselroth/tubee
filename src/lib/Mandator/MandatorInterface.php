@@ -11,58 +11,40 @@ declare(strict_types=1);
 
 namespace Tubee\Mandator;
 
+use Generator;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\DataType\Factory as DataTypeFactory;
+use Tubee\Resource\ResourceInterface;
 
-interface MandatorInterface
+interface MandatorInterface extends ResourceInterface
 {
     /**
-     * Get name.
-     *
-     * @return string
-     */
-    public function getName(): string;
-
-    /**
      * Get identifier.
-     *
-     * @return string
      */
     public function getIdentifier(): string;
 
     /**
-     * Check if mandator has datatype.
-     *
-     * @param string $name
-     *
-     * @return bool
+     * Get datatype factory.
+     */
+    public function getDataTypeFactory(): DataTypeFactory;
+
+    /**
+     * Check if mandator owns datatype xy.
      */
     public function hasDataType(string $name): bool;
 
     /**
-     * Inject datatype.
-     *
-     * @param DataTypeInterface $datatype
-     * @param string            $name
-     *
-     * @return DataTypeInterface
-     */
-    public function injectDataType(DataTypeInterface $datatype, string $name): MandatorInterface;
-
-    /**
-     * Get datatype.
-     *
-     * @param string $name
-     *
-     * @return DataTypeInterface
+     * Get single datatype.
      */
     public function getDataType(string $name): DataTypeInterface;
 
     /**
-     * Get datatypes.
-     *
-     * @param iterable $datatypes
-     *
-     * @return array
+     * Get related datatypes.
      */
-    public function getDataTypes(Iterable $datatypes): array;
+    public function getDataTypes(array $datatypes = [], ?int $offset = null, ?int $limit = null): Generator;
+
+    /**
+     * Switch mandator.
+     */
+    public function switch(string $name): MandatorInterface;
 }

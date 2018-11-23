@@ -14,13 +14,7 @@ namespace Tubee;
 class Helper
 {
     /**
-     * Get array value via string path.
-     *
-     * @param iterable $arr
-     * @param string   $path
-     * @param string   $seperator
-     *
-     * @return mixed
+     * Get array value by string path.
      */
     public static function getArrayValue(Iterable $array, string $path, string $separator = '.')
     {
@@ -41,13 +35,39 @@ class Helper
     }
 
     /**
+     * Remove array value by string path.
+     */
+    public static function deleteArrayValue(array $array, string $path, string $separator = '.')
+    {
+        $nodes = explode($separator, $path);
+        $last = null;
+        $element = &$array;
+        $node = null;
+
+        foreach ($nodes as &$node) {
+            $last = &$element;
+            $element = &$element[$node];
+        }
+
+        if ($last !== null) {
+            unset($last[$node]);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Set array value via string path.
+     */
+    public static function setArrayValue(Iterable $array, string $path, $value, string $separator = '.')
+    {
+        $result = self::pathArrayToAssociative([$path => $value], $separator);
+
+        return array_replace_recursive($array, $result);
+    }
+
+    /**
      * Convert assoc array to single array.
-     *
-     * @param iterable $arr
-     * @param iterable $narr
-     * @param string   $nkey
-     *
-     * @return array
      */
     public static function associativeArrayToPath(Iterable $arr, Iterable $narr = [], $nkey = ''): array
     {
@@ -68,17 +88,13 @@ class Helper
 
     /**
      * Convert array with keys like a.b to associative array.
-     *
-     * @param iterable $array
-     *
-     * @return iterable
      */
-    public static function pathArrayToAssociative(Iterable $array): array
+    public static function pathArrayToAssociative(Iterable $array, string $separator = '.'): array
     {
         $out = [];
         foreach ($array as $key => $val) {
             $r = &$out;
-            foreach (explode('.', $key) as $key) {
+            foreach (explode($separator, $key) as $key) {
                 if (!isset($r[$key])) {
                     $r[$key] = [];
                 }
@@ -94,11 +110,6 @@ class Helper
 
     /**
      * Compare array.
-     *
-     * @param array $a1
-     * @param array $a2
-     *
-     * @return bool
      */
     public static function arrayEqual(array $a1, array $a2): bool
     {
@@ -107,11 +118,6 @@ class Helper
 
     /**
      * Search array element.
-     *
-     * @param mixed $values
-     * @param mixed $key
-     * @param array $array
-     * @param mixed $value
      */
     public static function searchArray($value, $key, array $array)
     {

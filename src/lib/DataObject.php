@@ -11,57 +11,17 @@ declare(strict_types=1);
 
 namespace Tubee;
 
-use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\UTCDateTime;
-use Tubee\DataObject\AttributeDecorator;
+use Generator;
+use MongoDB\BSON\ObjectIdInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\Resource\AbstractResource;
+use Tubee\Resource\AttributeResolver;
 
-class DataObject implements DataObjectInterface
+class DataObject extends AbstractResource implements DataObjectInterface
 {
-    /**
-     * Object id.
-     *
-     * @var ObjectId
-     */
-    protected $_id;
-
-    /**
-     * Created.
-     *
-     * @var UTCDateTime
-     */
-    protected $created;
-    /**
-     * Changed.
-     *
-     * @var UTCDateTime
-     */
-    protected $changed;
-    /**
-     * Disabled (Deleted).
-     *
-     * @var UTCDateTime
-     */
-    protected $deleted;
-    /**
-     * Object version.
-     *
-     * @var int
-     */
-    protected $version = 1;
-    /**
-     * Data.
-     *
-     * @var array
-     */
-    protected $data = [];
-    /**
-     * Endpoints.
-     *
-     * @var array
-     */
-    protected $endpoints = [];
     /**
      * Datatype.
      *
@@ -70,78 +30,57 @@ class DataObject implements DataObjectInterface
     protected $datatype;
 
     /**
+     * Data object relation factory.
+     *
+     * @var DataObjectRelationFactory
+     */
+    protected $relation_factory;
+
+    /**
      * Data object.
      */
-    public function __construct(array $data, DataTypeInterface $datatype)
+    public function __construct(array $resource, DataTypeInterface $datatype, DataObjectRelationFactory $relation_factory)
     {
+        $this->resource = $resource;
         $this->datatype = $datatype;
-        foreach ($data as $key => $value) {
-            $this->{$key} = $value;
-        }
+        $this->relation_factory = $relation_factory;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getId(): ObjectId
+    public function decorate(ServerRequestInterface $request): array
     {
-        return $this->_id;
-    }
+        $datatype = $this->getDataType();
+        $mandator = $datatype->getMandator();
 
-    /**
-     * {@inheritdoc}
-     */
-    public function toArray(): array
-    {
-        return [
-            '_id' => $this->_id,
-            'created' => $this->created,
-            'changed' => $this->changed,
-            'deleted' => $this->deleted,
-            'version' => $this->version,
-            'data' => $this->data,
-            'endpoints' => $this->endpoints,
+        $resource = [
+            '_links' => [
+                 'self' => ['href' => (string) $request->getUri()],
+                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
+                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+            ],
+            'kind' => 'DataObject',
+            'data' => $this->getData(),
+            'status' => function ($object) {
+                $endpoints = $object->getEndpoints();
+                foreach ($endpoints as &$endpoint) {
+                    $endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
+                }
+
+                return $endpoints;
+            },
         ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function decorate(array $attributes = []): array
+    public function getHistory(?array $query = null, ?int $offset = null, ?int $limit = null): Iterable
     {
-        return AttributeDecorator::decorate($this, $attributes);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getVersion(): int
-    {
-        return $this->version;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getChanged(): ?UTCDateTime
-    {
-        return $this->changed;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getCreated(): UTCDateTime
-    {
-        return $this->created;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDeleted(): ?UTCDateTime
-    {
-        return $this->deleted;
+        return $this->datatype->getObjectHistory($this->getId(), $query, $offset, $limit);
     }
 
     /**
@@ -149,7 +88,7 @@ class DataObject implements DataObjectInterface
      */
     public function getData(): array
     {
-        return $this->data;
+        return $this->resource['data'];
     }
 
     /**
@@ -165,6 +104,26 @@ class DataObject implements DataObjectInterface
      */
     public function getEndpoints(): array
     {
-        return $this->endpoints;
+        if (!isset($this->resource['endpoints'])) {
+            return [];
+        }
+
+        return $this->resource['endpoints'];
+    }
+
+    /**
+     * Add relation.
+     */
+    public function createOrUpdateRelation(DataObjectInterface $object, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
+    {
+        return $this->relation_factory->createOrUpdate($this, $object, $context, $simulate, $endpoints);
+    }
+
+    /**
+     * Get relatives.
+     */
+    public function getRelatives(): Generator
+    {
+        return $this->relation_factory->getAll($this);
     }
 }

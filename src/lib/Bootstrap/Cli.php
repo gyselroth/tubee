@@ -19,7 +19,8 @@ use Monolog\Logger;
 use Psr\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\Console\Jobs;
-use Tubee\Console\Objects;
+use Tubee\Console\Key;
+use Tubee\Console\Upgrade;
 
 class Cli extends AbstractBootstrap
 {
@@ -39,10 +40,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Cli.
-     *
-     * @param LoggerInterface    $logger
-     * @param Getopt             $getopt
-     * @param ContainerInterface $container
      */
     public function __construct(LoggerInterface $logger, GetOpt $getopt, ContainerInterface $container)
     {
@@ -57,8 +54,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Process.
-     *
-     * @return Cli
      */
     public function process(): Cli
     {
@@ -66,12 +61,15 @@ class Cli extends AbstractBootstrap
         $this->getopt->addOption(['h', 'help', GetOpt::NO_ARGUMENT, 'Help']);
 
         $this->getopt->addCommands([
-            \GetOpt\Command::create('objects', Objects::class)
-                ->addOptions(Objects::getOptions())
-                ->addOperands(Objects::getOperands()),
+            \GetOpt\Command::create('upgrade', Upgrade::class)
+                ->addOptions(Upgrade::getOptions())
+                ->addOperands(Upgrade::getOperands()),
             \GetOpt\Command::create('jobs', Jobs::class)
                 ->addOptions(Jobs::getOptions())
                 ->addOperands(Jobs::getOperands()),
+            \GetOpt\Command::create('key', Key::class)
+                ->addOptions(Key::getOptions())
+                ->addOperands(Key::getOperands()),
         ]);
 
         try {
@@ -97,8 +95,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Execute class action.
-     *
-     * @param object $command
      */
     protected function executeCommand($command)
     {
@@ -106,8 +102,14 @@ class Cli extends AbstractBootstrap
         if (is_callable([&$command, $action])) {
             return call_user_func_array([&$command, $action], []);
         }
+        if ($action === null && is_callable([&$command, '__invoke'])) {
+            return $command();
+        }
+        if (is_callable([&$command, 'help'])) {
+            return call_user_func_array([&$command, 'help'], []);
+        }
 
-        return call_user_func_array([&$command, 'help'], []);
+        echo $this->getopt->getHelpText();
     }
 
     /**

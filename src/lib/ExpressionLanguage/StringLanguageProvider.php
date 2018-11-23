@@ -45,8 +45,6 @@ class StringLanguageProvider implements ExpressionFunctionProviderInterface
 
     /**
      * Convert to UTF16.
-     *
-     * @return ExpressionFunction
      */
     protected function utf16(): ExpressionFunction
     {
@@ -66,8 +64,6 @@ class StringLanguageProvider implements ExpressionFunctionProviderInterface
 
     /**
      * Convert to UTF16.
-     *
-     * @return ExpressionFunction
      */
     protected function uuidv4(): ExpressionFunction
     {

@@ -13,8 +13,8 @@ namespace Tubee\Testsuite\Unit\Storage;
 
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Tubee\Endpoint\Balloon\ApiClient;
 use Tubee\Storage\Balloon;
+use Tubee\Storage\Balloon\ApiClient;
 use Tubee\Storage\Exception;
 
 class BalloonTest extends TestCase
@@ -23,26 +23,6 @@ class BalloonTest extends TestCase
     {
         file_put_contents(__DIR__.'/Mock/bar.csv', 'bar;bar');
         file_put_contents(__DIR__.'/Mock/foo.csv', 'foo;foo');
-    }
-
-    public function testGetFiles()
-    {
-        $api = $this->createMock(ApiClient::class);
-        $api->method('restCall')->willReturn([
-            'data' => [[
-                'id' => '1',
-                'name' => 'bar.csv',
-            ], [
-                'id' => '2',
-                'name' => 'foo.csv',
-            ]],
-        ]);
-
-        $storage = new Balloon($api, $this->createMock(LoggerInterface::class));
-
-        $files = $storage->getFiles('\.csv$');
-        $this->assertSame('bar.csv', $files[0]['name']);
-        $this->assertSame('bar.csv', $files[0]['name']);
     }
 
     public function testOpenReadStreams()

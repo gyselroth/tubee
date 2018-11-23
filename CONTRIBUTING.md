@@ -20,8 +20,14 @@ git clone https://github.com/gyselroth/tubee.git
 The recomended way to get started in development is to use the available docker images.
 You need (docker)[https://docs.docker.com/engine/installation/linux/docker-ce/debian/] and (docker-compose)[https://docs.docker.com/compose/install/] installed on your local machine.
 
-For starters you cann use the full stack development composing configuration `docker-compose-dev.yml`.
-Start the development stack `docker-compose -c docker-compose-dev.yml up`
+For starters you can use the full stack development composing configuration `docker-compose-dev.yml`.
+Start the development stack `docker-compose -c docker-compose-dev.yml up` and you are ready to go.
+
+>**Note:** You need the entire git base on your host to run the dev server since the base gets mounted in the dev container.
+
+Your tubee server is now available at `https://localhost:8090`.
+>**Note:** The dev server gets started with a self-signed ssl certificate.
+
 
 #### Make
 Always execute make via `docker exec` if your are developing with the tubee docker image.

@@ -12,36 +12,36 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
-use Psr\Log\LoggerInterface as Logger;
+use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Pdo\Wrapper as PdoWrapper;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Pdo extends AbstractSqlDatabase
 {
     /**
-     * Init endpoint.
-     *
-     * @param string            $name
-     * @param string            $type
-     * @param string            $table
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * Kind.
      */
-    public function __construct(string $name, string $type, string $table, PdoWrapper $pdo, DataTypeInterface $datatype, Logger $logger, ?Iterable $config = null)
+    public const KIND = 'PdoEndpoint';
+
+    /**
+     * Init endpoint.
+     */
+    public function __construct(string $name, string $type, string $table, PdoWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->resource = $pdo;
+        $this->socket = $socket;
         $this->table = $table;
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = null): Generator
+    public function getAll(?array $query = null): Generator
     {
-        $filter = $this->buildFilterAll($filter);
+        $filter = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = 'SELECT * FROM '.$this->table;
@@ -49,21 +49,25 @@ class Pdo extends AbstractSqlDatabase
             $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         }
 
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
 
+        $i = 0;
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
-            yield $row;
+            yield $this->build($row);
+            ++$i;
         }
+
+        return $i;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $filter = $this->getFilterOne($object);
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
 
         if ($result->num_rows > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
@@ -72,13 +76,13 @@ class Pdo extends AbstractSqlDatabase
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $result->fetch_assoc();
+        return $this->build($result->fetch_assoc());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $result = $this->prepareCreate($object, $simulate);
 
@@ -86,6 +90,6 @@ class Pdo extends AbstractSqlDatabase
             return null;
         }
 
-        return $this->resource->getResouce()->lastInsertId();
+        return $this->socket->lastInsertId();
     }
 }

@@ -15,10 +15,10 @@ use MongoDB\BSON\Binary;
 use MongoDB\BSON\Decimal128;
 use MongoDB\BSON\MaxKey;
 use MongoDB\BSON\MinKey;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\Regex;
 use MongoDB\BSON\Timestamp;
-use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
 
 interface AttributeMapInterface
 {
@@ -29,6 +29,13 @@ interface AttributeMapInterface
     const ENSURE_LAST = 'last';
     const ENSURE_ABSENT = 'absent';
     const ENSURE_MERGE = 'merge';
+
+    const VALID_ENSURES = [
+        self::ENSURE_EXISTS,
+        self::ENSURE_LAST,
+        self::ENSURE_ABSENT,
+        self::ENSURE_MERGE,
+    ];
 
     /**
      * Diff actions.
@@ -48,6 +55,18 @@ interface AttributeMapInterface
     const TYPE_NULL = 'null';
 
     /**
+     * Valid types.
+     */
+    const VALID_TYPES = [
+        self::TYPE_STRING,
+        self::TYPE_ARRAY,
+        self::TYPE_INT,
+        self::TYPE_FLOAT,
+        self::TYPE_BOOL,
+        self::TYPE_NULL,
+    ];
+
+    /**
      * Serializable class types.
      */
     const SERIALIZABLE_TYPES = [
@@ -55,43 +74,29 @@ interface AttributeMapInterface
         Decimal128::class,
         MaxKey::class,
         MinKey::class,
-        ObjectId::class,
+        ObjectIdInterface::class,
         Regex::class,
         Timestamp::class,
-        UTCDateTime::class,
+        UTCDateTimeInterface::class,
     ];
 
     /**
      * Get attribute map.
-     *
-     * @return iterable
      */
     public function getMap(): Iterable;
 
     /**
      * Get attributes.
-     *
-     * @return array
      */
     public function getAttributes(): array;
 
     /**
      * Map attributes.
-     *
-     * @param iterable    $data
-     * @param UTCDateTime $ts
-     *
-     * @return array
      */
-    public function map(Iterable $data, UTCDateTime $ts): array;
+    public function map(array $data, UTCDateTimeInterface $ts): array;
 
     /**
      * Create attribute diff.
-     *
-     * @param iterable $mapped
-     * @param iterable $endpoint_object
-     *
-     * @return array
      */
-    public function getDiff(Iterable $mapped, Iterable $endpoint_object): array;
+    public function getDiff(array $mapped, array $endpoint_object): array;
 }

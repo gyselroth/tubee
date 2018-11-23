@@ -14,6 +14,7 @@ namespace Tubee\Endpoint;
 use Psr\Log\LoggerInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Storage\StorageInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 abstract class AbstractFile extends AbstractEndpoint
 {
@@ -32,20 +33,20 @@ abstract class AbstractFile extends AbstractEndpoint
     protected $storage;
 
     /**
-     * Resource.
+     * Files.
      *
      * @var array
      */
-    protected $resource = [];
+    protected $files = [];
 
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, ?Iterable $resource = [])
     {
         $this->storage = $storage;
         $this->file = $file;
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**

@@ -33,12 +33,6 @@ class LocalFilesystemTest extends TestCase
         new LocalFilesystem(__DIR__.'/foo', $this->createMock(LoggerInterface::class));
     }
 
-    public function testGetFiles()
-    {
-        $files = $this->storage->getFiles('*');
-        $this->assertSame([__DIR__.'/Mock/bar.csv', __DIR__.'/Mock/foo.csv'], $files);
-    }
-
     public function testOpenReadStreams()
     {
         $streams = $this->storage->openReadStreams('*');

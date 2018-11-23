@@ -16,34 +16,24 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Mysql\Wrapper as MysqlWrapper;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Mysql extends AbstractSqlDatabase
 {
     /**
-     * Init endpoint.
-     *
-     * @param string            $name
-     * @param string            $type
-     * @param string            $table
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
+     * Kind.
      */
-    public function __construct(string $name, string $type, string $table, MysqlWrapper $mysqli, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
-    {
-        $this->resource = $mysqli;
-        $this->table = $table;
-        parent::__construct($name, $type, $datatype, $logger, $config);
-    }
+    public const KIND = 'MysqlEndpoint';
 
     /**
-     * {@inheritdoc}
+     * Init endpoint.
      */
-    public function setup(bool $simulate = false): EndpointInterface
+    public function __construct(string $name, string $type, string $table, MysqlWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->resource->connect();
-
-        return $this;
+        $this->socket = $socket;
+        $this->table = $table;
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
@@ -51,7 +41,7 @@ class Mysql extends AbstractSqlDatabase
      */
     public function shutdown(bool $simulate = false): EndpointInterface
     {
-        $this->resource->close();
+        $this->socket->close();
 
         return $this;
     }
@@ -59,9 +49,9 @@ class Mysql extends AbstractSqlDatabase
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter): Generator
+    public function getAll(?array $query = null): Generator
     {
-        $filter = $this->buildFilterAll($filter);
+        $filter = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = 'SELECT * FROM '.$this->table;
@@ -69,21 +59,25 @@ class Mysql extends AbstractSqlDatabase
             $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         }
 
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
+        $i = 0;
 
         while ($row = $result->fetch_assoc()) {
-            yield $row;
+            yield $this->build($row);
+            $i;
         }
+
+        return $i;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $filter = $this->getFilterOne($object);
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
-        $result = $this->resource->select($sql);
+        $result = $this->socket->select($sql);
 
         if ($result->num_rows > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
@@ -92,13 +86,13 @@ class Mysql extends AbstractSqlDatabase
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $result->fetch_assoc();
+        return $this->build($result->fetch_assoc());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $result = $this->prepareCreate($object, $simulate);
 

@@ -8,9 +8,7 @@ declare(strict_types=1);
  * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
-use Micro\Http\Response;
 use Tubee\Bootstrap\ContainerBuilder;
-use Tubee\Bootstrap\Http;
 
 define('TUBEE_PATH', (getenv('TUBEE_PATH') ? getenv('TUBEE_PATH') : realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..')));
 
@@ -27,20 +25,21 @@ set_include_path(implode(PATH_SEPARATOR, [
 ]));
 
 $composer = require 'vendor/autoload.php';
-$http = null;
 
-try {
-    $dic = ContainerBuilder::get($composer);
-    $http = $dic->get(Http::class);
-} catch (\Exception $e) {
-    error_log((string) $e);
+$dic = ContainerBuilder::get($composer);
+$request = Zend\Diactoros\ServerRequestFactory::fromGlobals();
+$logger = $dic->get(Psr\Log\LoggerInterface::class);
 
-    (new Response())
-        ->setCode(500)
-        ->setBody([
-            'error' => get_class($e),
-            'message' => $e->getMessage(),
-        ])->send();
-}
+        set_exception_handler(function ($e) use ($logger) {
+            $logger->emergency('uncaught exception: '.$e->getMessage(), [
+                'category' => 'Http',
+                'exception' => $e,
+            ]);
+        });
 
-$http->process();
+$dic->get(Tubee\Rest\Routes::class);
+$dispatcher = $dic->get(\mindplay\middleman\Dispatcher::class);
+$response = $dispatcher->dispatch($request);
+
+$emitter = new \Zend\Diactoros\Response\SapiEmitter();
+$emitter->emit($response);

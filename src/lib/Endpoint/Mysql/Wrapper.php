@@ -16,7 +16,7 @@ use mysqli_result;
 use mysqli_stmt;
 use Psr\Log\LoggerInterface;
 
-class Wrapper
+class Wrapper extends mysqli
 {
     /**
      * Logger.
@@ -26,6 +26,34 @@ class Wrapper
     protected $logger;
 
     /**
+     * Host.
+     *
+     * @var string
+     */
+    protected $host;
+
+    /**
+     * Username.
+     *
+     * @var string
+     */
+    protected $username;
+
+    /**
+     * Password.
+     *
+     * @var string
+     */
+    protected $password;
+
+    /**
+     * Options.
+     *
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * Charset.
      *
      * @var string
@@ -33,53 +61,31 @@ class Wrapper
     protected $charset = 'utf8';
 
     /**
-     * Mysql connection.
-     *
-     * @var mysqli
-     */
-    protected $mysqli;
-
-    /**
      * construct.
-     *
-     * @param mysqli          $mysqli
-     * @param LoggerInterface $logger
      */
-    public function __construct(mysqli $mysqli, LoggerInterface $logger)
+    public function __construct(string $host, LoggerInterface $logger, ?string $username = null, ?string $password = null, ?string $dbname = null, ?int $port = 3306, ?string $socket = null)
     {
         $this->logger = $logger;
-        $this->mysqli = $mysqli;
+        $this->host = $host;
+        $this->username = $username;
+        $this->passwd = $passwd;
+        $this->port = $port;
+        $this->dbname = $dbname;
+        $this->socket = $socket;
     }
 
     /**
-     * Forward calls.
-     *
-     * @param array $method
-     * @param array $arguments
-     *
-     * @return mixed
+     * Setup.
      */
-    public function __call(string $method, array $arguments = [])
+    public function connect(): Wrapper
     {
-        return call_user_func_array([&$this->mysqli, $method], $arguments);
-    }
+        parent::__construct($this->host, $this->username, $this->password, $this->options);
 
-    /**
-     * Get connection.
-     *
-     * @return resource
-     */
-    public function getResource(): mysqli
-    {
-        return $this->mysqli;
+        return $this;
     }
 
     /**
      * Query.
-     *
-     * @param string $query
-     *
-     * @return mysqli_result
      */
     public function select(string $query): mysqli_result
     {
@@ -87,11 +93,10 @@ class Wrapper
             'category' => get_class($this),
         ]);
 
-        $link = $this->getResource();
-        $result = $link->query($query);
+        $result = parent::query($query);
 
         if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->error.' ('.$link->errno.')');
+            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->error.' ('.$this->errno.')');
         }
 
         return $result;
@@ -99,10 +104,6 @@ class Wrapper
 
     /**
      * Select query.
-     *
-     * @param string $query
-     *
-     * @return bool
      */
     public function query(string $query): bool
     {
@@ -110,11 +111,10 @@ class Wrapper
             'category' => get_class($this),
         ]);
 
-        $link = $this->getResource();
-        $result = $link->query($query);
+        $result = parent::query($query);
 
         if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$link->error.' ('.$link->errno.')');
+            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->error.' ('.$this->errno.')');
         }
 
         return $result;
@@ -122,24 +122,18 @@ class Wrapper
 
     /**
      * Prepare query.
-     *
-     * @param string   $query
-     * @param iterable $values
-     *
-     * @return mysqli_stmt
      */
-    public function prepare(string $query, Iterable $values): mysqli_stmt
+    public function prepareValues(string $query, Iterable $values): mysqli_stmt
     {
         $this->logger->debug('prepare and execute sql query ['.$query.'] with values [{values}]', [
             'category' => get_class($this),
             'values' => $values,
         ]);
 
-        $link = $this->getResource();
-        $stmt = $link->prepare($query);
+        $stmt = $this->prepare($query);
 
         if (!($stmt instanceof mysqli_stmt)) {
-            throw new Exception\InvalidQuery('failed to prepare sql query with error '.$link->error.' ('.$link->errno.')');
+            throw new Exception\InvalidQuery('failed to prepare sql query with error '.$this->error.' ('.$this->errno.')');
         }
 
         $types = '';

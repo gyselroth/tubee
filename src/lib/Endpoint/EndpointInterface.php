@@ -13,162 +13,128 @@ namespace Tubee\Endpoint;
 
 use Generator;
 use Tubee\AttributeMap\AttributeMapInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Resource\ResourceInterface;
 use Tubee\Workflow\WorkflowInterface;
 
-interface EndpointInterface
+interface EndpointInterface extends ResourceInterface
 {
     /**
      * Types.
      */
     const TYPE_SOURCE = 'source';
     const TYPE_DESTINATION = 'destination';
+    const TYPE_BROWSE = 'browse';
+    const TYPE_BIDIRECTIONAL = 'bidirectional';
+    const VALID_TYPES = [
+        self::TYPE_SOURCE,
+        self::TYPE_DESTINATION,
+        self::TYPE_BROWSE,
+        self::TYPE_BIDIRECTIONAL,
+    ];
+
+    /**
+     * Endpoint class map.
+     */
+    const ENDPOINT_MAP = [
+        Ldap::KIND => Ldap::class,
+        Pdo::KIND => Pdo::class,
+        OdataRest::KIND => OdataRest::class,
+        Balloon::KIND => Balloon::class,
+        Csv::KIND => Csv::class,
+        Json::KIND => Json::class,
+        Xml::KIND => Xml::class,
+        Mongodb::KIND => Mongodb::class,
+        Moodle::KIND => Moodle::class,
+        Mysql::KIND => Mysql::class,
+        Image::KIND => Image::class,
+    ];
 
     /**
      * Setup endpoint.
-     *
-     * @param bool $simulate
-     *
-     * @return EndpointInterface
      */
     public function setup(bool $simulate = false): EndpointInterface;
 
     /**
      * Shutdown endpoint.
-     *
-     * @param bool $simulate
-     *
-     * @return EndpointInterface
      */
     public function shutdown(bool $simulate = false): EndpointInterface;
 
     /**
      * Get type.
-     *
-     * @return string
      */
     public function getType(): string;
 
     /**
      * Has workflow.
-     *
-     * @param string $name
-     *
-     * @return bool
      */
     public function hasWorkflow(string $name): bool;
 
     /**
-     * inject workflow.
-     *
-     * @param WorkflowInterface $map
-     * @param string            $name
-     *
-     * @return EndpointInterface
-     */
-    public function injectWorkflow(WorkflowInterface $workflow, string $name): EndpointInterface;
-
-    /**
      * Get workflow.
-     *
-     * @param string $name
-     *
-     * @return WorkflowInterface
      */
     public function getWorkflow(string $name): WorkflowInterface;
 
     /**
      * Get workflows.
-     *
-     * @param iterable $workflows
-     *
-     * @return array
      */
-    public function getWorkflows(Iterable $workflows = []): array;
+    public function getWorkflows(array $workflows = [], ?int $offset = null, ?int $limit = null): Generator;
 
     /**
      * Get object from endpoint.
-     *
-     * @param iterable $object
-     * @param iterable $attributes
-     *
-     * @return iterable
      */
-    public function getOne(Iterable $object, Iterable $attributes): Iterable;
+    public function getOne(array $object, array $attributes): EndpointObjectInterface;
 
     /**
      * Check if object does exists on endpoint.
      *
      * @param DataObjectInterface $object
-     *
-     * @return bool
      */
-    public function exists(Iterable $object): bool;
+    public function exists(array $object): bool;
 
     /**
      * Check if a flush is required.
-     *
-     * @return bool
      */
     public function flushRequired(): bool;
 
     /**
      * Flush endpoint.
-     *
-     * @return bool
      */
     public function flush(bool $simulate = false): bool;
 
     /**
      * Create object on endpoint.
      *
-     * @param AttributeMapInterface $map
-     * @param iterable              $object
-     * @param bool                  $simulate
      *
      * @return bool
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string;
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string;
 
     /**
      * Get diff for change.
-     *
-     * @param AttributeMapInterface $map
-     * @param array                 $diff
-     *
-     * @return array
      */
     public function getDiff(AttributeMapInterface $map, array $diff): array;
 
     /**
      * Change object on endpoint.
      *
-     * @param AttributeMapInterface $map
-     * @param iterable              $object
-     * @param iterable              $endpoint_object
-     * @param bool                  $simulate
      *
      * @return bool
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string;
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string;
 
     /**
      * Remove object from endpoint.
-     *
-     * @param AttributeMapInterface $map
-     * @param iterable              $object
-     * @param iterable              $endpoint_object
-     * @param bool                  $simulate
-     *
-     * @return bool
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool;
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool;
 
     /**
      * Read endpoint.
-     *
-     * @param mixed $filter
-     *
-     * @return Generator
      */
-    public function getAll($filter): Generator;
+    public function getAll(?array $query = null): Generator;
+
+    /**
+     * Transform mongodb like query into endpoints native query language.
+     */
+    public function transformQuery(?array $query = null);
 }

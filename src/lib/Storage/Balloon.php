@@ -12,9 +12,9 @@ declare(strict_types=1);
 namespace Tubee\Storage;
 
 use Generator;
-use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Log\LoggerInterface;
-use Tubee\Endpoint\Balloon\ApiClient;
+use Tubee\Storage\Balloon\ApiClient;
 
 class Balloon implements StorageInterface
 {
@@ -41,39 +41,12 @@ class Balloon implements StorageInterface
 
     /**
      * Init storage.
-     *
-     * @param NativeServer $server
      */
-    public function __construct(ApiClient $balloon, LoggerInterface $logger, ?string $collection = null)
+    public function __construct(ApiClient $balloon, LoggerInterface $logger, ?ObjectIdInterface $collection = null)
     {
         $this->balloon = $balloon;
         $this->logger = $logger;
-        $this->collection = new ObjectId($collection);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFiles(string $pattern): array
-    {
-        $query = [
-            'filter' => [
-                'directory' => false,
-                'name' => [
-                    '$regex' => $pattern,
-                ],
-            ],
-        ];
-
-        if ($this->collection === null) {
-            $url = '/api/v2/collections/children';
-        } else {
-            $url = '/api/v2/collections/'.$this->collection.'/children';
-        }
-
-        $result = $this->balloon->restCall($url, $query);
-
-        return $result['data'];
+        $this->collection = $collection;
     }
 
     /**
@@ -190,5 +163,30 @@ class Balloon implements StorageInterface
         }
 
         return true;
+    }
+
+    /**
+     * Search balloon for files matching pattern.
+     */
+    protected function getFiles(string $pattern): array
+    {
+        $query = [
+            'filter' => [
+                'directory' => false,
+                'name' => [
+                    '$regex' => $pattern,
+                ],
+            ],
+        ];
+
+        if ($this->collection === null) {
+            $url = '/api/v2/collections/children';
+        } else {
+            $url = '/api/v2/collections/'.$this->collection.'/children';
+        }
+
+        $result = $this->balloon->restCall($url, $query);
+
+        return $result['data'];
     }
 }

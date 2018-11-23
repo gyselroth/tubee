@@ -16,20 +16,27 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\Json\Exception as JsonException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Storage\StorageInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Json extends AbstractFile
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'JsonEndpoint';
+
+    /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         if ($type === EndpointInterface::TYPE_DESTINATION) {
             $this->flush = true;
         }
 
-        parent::__construct($name, $type, $file, $storage, $datatype, $logger, $config);
+        parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);
     }
 
     /**
@@ -54,7 +61,7 @@ class Json extends AbstractFile
                 throw new JsonException\ArrayExpected('json file contents must be an array');
             }
 
-            $this->resource[] = [
+            $this->files[] = [
                 'stream' => $stream,
                 'data' => $content,
                 'path' => $path,
@@ -69,7 +76,7 @@ class Json extends AbstractFile
      */
     public function shutdown(bool $simulate = false): EndpointInterface
     {
-        foreach ($this->resource as $resource) {
+        foreach ($this->files as $resource) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
                 $json = json_encode($resource['data'], JSON_PRETTY_PRINT);
 
@@ -83,9 +90,17 @@ class Json extends AbstractFile
             fclose($resource['stream']);
         }
 
-        $this->resource = [];
+        $this->files = [];
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function transformQuery(?array $query = null)
+    {
+        return '';
     }
 
     /**
@@ -103,8 +118,9 @@ class Json extends AbstractFile
         }
 
         $filter = array_merge($filtered, (array) $filter);
+        $i = 0;
 
-        foreach ($this->resource as $resource_key => $json) {
+        foreach ($this->files as $resource_key => $json) {
             foreach ($json['content'] as $object) {
                 if (!is_array($object)) {
                     throw new JsonException\ArrayExpected('json must contain an array of objects');
@@ -119,18 +135,21 @@ class Json extends AbstractFile
                     continue;
                 }
 
-                yield $object;
+                yield $this->build($object);
+                ++$i;
             }
         }
+
+        return $i;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
-        foreach ($this->resource as $resource_key => $xml) {
-            $this->resource[$resource_key]['content'][] = $object;
+        foreach ($this->files as $resource_key => $xml) {
+            $this->files[$resource_key]['content'][] = $object;
 
             $this->logger->debug('create new json object on endpoint ['.$this->name.'] with values [{values}]', [
                 'category' => get_class($this),
@@ -152,7 +171,7 @@ class Json extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support change(), use flush=true');
     }
@@ -160,7 +179,7 @@ class Json extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support delete(), use flush=true');
     }
@@ -168,12 +187,12 @@ class Json extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $elements = [];
         $filter = $this->getFilterOne($object);
 
-        foreach ($this->resource as $json) {
+        foreach ($this->files as $json) {
             if (isset($json['content'])) {
                 foreach ($json['content'] as $object) {
                     if (!is_array($object)) {
@@ -194,7 +213,7 @@ class Json extends AbstractFile
                 throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
             }
 
-            return array_shift($elements);
+            return $this->build(array_shift($elements));
         }
     }
 }

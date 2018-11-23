@@ -11,12 +11,16 @@ declare(strict_types=1);
 
 namespace Tubee;
 
-use Psr\Log\LoggerInterface as Logger;
+use Generator;
+use Psr\Http\Message\ServerRequestInterface;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\Mandator\Exception;
+use Tubee\DataType\Factory as DataTypeFactory;
+use Tubee\Mandator\Factory as MandatorFactory;
 use Tubee\Mandator\MandatorInterface;
+use Tubee\Resource\AbstractResource;
+use Tubee\Resource\AttributeResolver;
 
-class Mandator implements MandatorInterface
+class Mandator extends AbstractResource implements MandatorInterface
 {
     /**
      * Name.
@@ -26,102 +30,43 @@ class Mandator implements MandatorInterface
     protected $name;
 
     /**
-     * Id.
+     * Datatype.
      *
-     * @var int
+     * @var DataTypeFactory
      */
-    protected $id;
+    protected $datatype_factory;
 
     /**
-     * Manager.
+     * Mandator factory.
      *
-     * @var Manager
+     * @var MandatorFactory
      */
-    protected $manager;
-
-    /**
-     * Logger.
-     *
-     * @var Logger
-     */
-    protected $logger;
-
-    /**
-     * Type.
-     *
-     * @var array
-     */
-    protected $datatypes = [];
+    protected $mandator_factory;
 
     /**
      * Initialize.
-     *
-     * @param string  $name
-     * @param Manager $manager
-     * @param Logger  $logger
      */
-    public function __construct(string $name, Manager $manager, Logger $logger)
+    public function __construct(string $name, MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, array $resource = [])
     {
         $this->name = $name;
-        $this->manager = $manager;
-        $this->logger = $logger;
+        $this->resource = $resource;
+        $this->mandator_factory = $mandator_factory;
+        $this->datatype_factory = $datatype_factory;
     }
 
     /**
-     * {@inheritdoc}
+     * Decorate.
      */
-    public function hasDataType(string $name): bool
+    public function decorate(ServerRequestInterface $request): array
     {
-        return isset($this->datatypes[$name]);
-    }
+        $resource = [
+            '_links' => [
+                'self' => ['href' => (string) $request->getUri()],
+            ],
+            'kind' => 'Mandator',
+        ];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function injectDataType(DataTypeInterface $datatype, string $name): MandatorInterface
-    {
-        $this->logger->debug('inject datatype ['.$name.'] of type ['.get_class($datatype).']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($this->hasDataType($name)) {
-            throw new Exception\DataTypeNotUnique('datatype '.$name.' is already registered');
-        }
-
-        $this->datatypes[$name] = $datatype;
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataType(string $name): DataTypeInterface
-    {
-        if (!$this->hasDataType($name)) {
-            throw new Exception\DataTypeNotFound('datatype '.$name.' is not registered');
-        }
-
-        return $this->datatypes[$name];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getDataTypes(Iterable $datatypes = []): array
-    {
-        if (count($datatypes) === 0) {
-            return $this->datatypes;
-        }
-        $list = [];
-        foreach ($datatypes as $name) {
-            if (!$this->hasDataType($name)) {
-                throw new Exception\DataTypeNotFound('datatype '.$name.' is not registered');
-            }
-            $list[$name] = $this->datatypes[$name];
-        }
-
-        return $list;
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
@@ -135,8 +80,40 @@ class Mandator implements MandatorInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function getDataTypeFactory(): DataTypeFactory
     {
-        return $this->name;
+        return $this->datatype_factory;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function hasDataType(string $name): bool
+    {
+        return $this->datatype_factory->has($this, $name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataType(string $name): DataTypeInterface
+    {
+        return $this->datatype_factory->getOne($this, $name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDataTypes(array $datatypes = [], ?int $offset = null, ?int $limit = null): Generator
+    {
+        return $this->datatype_factory->getAll($this, $datatypes, $offset, $limit);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function switch(string $name): MandatorInterface
+    {
+        return $this->mandator_factory->getOne($name);
     }
 }

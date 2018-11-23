@@ -14,7 +14,7 @@ namespace Tubee;
 use InvalidArgumentException;
 use MongoDB\BSON\Binary;
 use MongoDB\BSON\Regex;
-use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
@@ -45,12 +45,8 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Init attribute map.
-     *
-     * @param ExpressionLanguage $expression
-     * @param LoggerInterface    $logger
-     * @param iterable           $map
      */
-    public function __construct(Iterable $map = [], ExpressionLanguage $expression, LoggerInterface $logger)
+    public function __construct(array $map = [], ExpressionLanguage $expression, LoggerInterface $logger)
     {
         $this->map = $map;
         $this->logger = $logger;
@@ -76,7 +72,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * {@inheritdoc}
      */
-    public function map(Iterable $data, UTCDateTime $ts): array
+    public function map(array $data, UTCDateTimeInterface $ts): array
     {
         $result = [];
         foreach ($this->map as $attr => $value) {
@@ -84,14 +80,8 @@ class AttributeMap implements AttributeMapInterface
                 unset($attrv);
             }
 
-            if (!is_array($value)) {
-                throw new InvalidArgumentException('attribute '.$attr.' definiton must be an array');
-            }
-
-            $value['type'] = $this->getAttributeType($attr, $value);
-
             if (isset($value['ensure'])) {
-                if ($value['ensure'] === AttributeMapInterface::ENSURE_MERGE && $value['type'] !== AttributeMapInterface::TYPE_ARRAY) {
+                if ($value['ensure'] === AttributeMapInterface::ENSURE_MERGE && isset($value['type']) && $value['type'] !== AttributeMapInterface::TYPE_ARRAY) {
                     throw new InvalidArgumentException('attribute '.$attr.' ensure is set to merge but type is not an array');
                 }
 
@@ -102,16 +92,24 @@ class AttributeMap implements AttributeMapInterface
 
             $attrv = $this->resolveValue($attr, $value, $data, $ts);
             $attrv = $this->transformAttribute($attr, $value, $data, $attrv);
-            $attrv = $this->serializeClass($attr, $attrv, $value['type']);
+
+            if (isset($value['type'])) {
+                $attrv = $this->serializeClass($attr, $attrv, $value['type']);
+            }
 
             if ($this->requireAttribute($attr, $value, $attrv) === null) {
                 continue;
             }
 
-            $result[$attr] = $this->convert($attrv, $attr, $value['type']);
-            $this->logger->debug('mapped attribute ['.$attr.'] to [<'.$value['type'].'> {value}]', [
+            if (isset($value['type'])) {
+                $attrv = $this->convert($attrv, $attr, $value['type']);
+            }
+
+            $result[$attr] = $attrv;
+
+            $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
                 'category' => get_class($this),
-                'value' => $result[$attr],
+                'value' => $attrv,
             ]);
         }
 
@@ -121,7 +119,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * {@inheritdoc}
      */
-    public function getDiff(Iterable $object, Iterable $endpoint_object): array
+    public function getDiff(array $object, array $endpoint_object): array
     {
         $diff = [];
         foreach ($this->map as $attr => $value) {
@@ -175,15 +173,11 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Check if attribute is required.
-     *
-     * @param string $attr
-     * @param array  $value
-     * @param mixed  $attrv
      */
     protected function requireAttribute(string $attr, array $value, $attrv)
     {
         if ($attrv === null || is_string($attrv) && strlen($attrv) === 0 || is_array($attrv) && count($attrv) === 0) {
-            if (isset($value['required']) && $value['required'] === false) {
+            if (/*isset($value['required']) && */$value['required'] === false) {
                 $this->logger->debug('found attribute ['.$attr.'] but source attribute is empty, remove attribute from mapping', [
                      'category' => get_class($this),
                 ]);
@@ -198,34 +192,7 @@ class AttributeMap implements AttributeMapInterface
     }
 
     /**
-     * Determine attribute type.
-     *
-     * @param string $attr
-     * @param array  $value
-     *
-     * @return string
-     */
-    protected function getAttributeType(string $attr, array $value): string
-    {
-        if (isset($value['type'])) {
-            return $value['type'];
-        }
-
-        $type = AttributeMapInterface::TYPE_STRING;
-        $this->logger->warning('missing type for attribute ['.$attr.'] assuming it is string', [
-             'category' => get_class($this),
-        ]);
-
-        return $type;
-    }
-
-    /**
      * Transform attribute.
-     *
-     * @param string $attr
-     * @param array  $value
-     * @param array  $data
-     * @param mixed  $attrv
      */
     protected function transformAttribute(string $attr, array $value, array $data, $attrv)
     {
@@ -233,7 +200,7 @@ class AttributeMap implements AttributeMapInterface
             return null;
         }
 
-        if ($value['type'] !== AttributeMapInterface::TYPE_ARRAY && is_array($attrv)) {
+        if (isset($value['type']) && $value['type'] !== AttributeMapInterface::TYPE_ARRAY && is_array($attrv)) {
             $attrv = $this->firstArrayElement($attrv, $attr);
         }
 
@@ -250,10 +217,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Convert to class.
-     *
-     * @param string $attr
-     * @param mixed  $attrv
-     * @param string $type
      */
     protected function serializeClass(string $attr, $attrv, string $type)
     {
@@ -280,13 +243,8 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Check if attribute is required.
-     *
-     * @param string      $attr
-     * @param array       $value
-     * @param array       $data
-     * @param UTCDateTime $ts
      */
-    protected function resolveValue(string $attr, array $value, array $data, UTCDateTime $ts)
+    protected function resolveValue(string $attr, array $value, array $data, UTCDateTimeInterface $ts)
     {
         $result = null;
 
@@ -316,17 +274,15 @@ class AttributeMap implements AttributeMapInterface
             ]);
         }
 
+        //if (isset($data[$attr])) {
+        //    return $data[$attr];
+        //}
+
         return $result;
     }
 
     /**
      * Require regex value.
-     *
-     * @param iterable|string $value
-     * @param string          $attribute
-     * @param string          $regex
-     *
-     * @return bool
      */
     protected function requireRegex($value, string $attribute, string $regex): bool
     {
@@ -347,12 +303,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Shift first array element.
-     *
-     * @param iterable $value
-     * @param string   $attribute
-     * @param bool     $required
-     *
-     * @return mixed
      */
     protected function firstArrayElement(Iterable $value, string $attribute)
     {
@@ -369,13 +319,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Rewrite attribute value.
-     *
-     * @param mixed    $value
-     * @param string   $attribute
-     * @param iterable $ruleset
-     * @param iterable $data
-     *
-     * @return mixed
      */
     protected function rewrite($value, string $attribute, Iterable $ruleset, Iterable $data)
     {
@@ -395,10 +338,6 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Process ruleset.
-     *
-     * @param mixed    $value
-     * @param iterable $ruleset
-     * @param iterable $data
      */
     protected function processRules($value, Iterable $ruleset, Iterable $data)
     {
@@ -430,33 +369,33 @@ class AttributeMap implements AttributeMapInterface
 
     /**
      * Convert value.
-     *
-     * @param mixed  $value
-     * @param string $attribute
-     * @param string $type
-     *
-     * @return mixed
      */
     protected function convert($value, string $attribute, string $type)
     {
         switch ($type) {
             case AttributeMapInterface::TYPE_ARRAY:
                 return (array) $value;
+
             break;
             case AttributeMapInterface::TYPE_STRING:
                 return (string) $value;
+
             break;
             case AttributeMapInterface::TYPE_INT:
                 return (int) $value;
+
             break;
             case AttributeMapInterface::TYPE_BOOL:
                 return (bool) $value;
+
             break;
             case AttributeMapInterface::TYPE_FLOAT:
                 return (float) $value;
+
             break;
             case AttributeMapInterface::TYPE_NULL:
                 return null;
+
             break;
             default:
                 if (is_object($value)) {

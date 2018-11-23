@@ -13,18 +13,23 @@ namespace Tubee;
 
 use InvalidArgumentException;
 use MongoDB\BSON\UTCDateTime;
+use MongoDB\BSON\UTCDateTimeInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObject\Exception as DataObjectException;
 use Tubee\DataType\DataTypeInterface;
-use Tubee\DataType\Exception as DataTypeException;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception as EndpointException;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Resource\AbstractResource;
+use Tubee\Resource\AttributeResolver;
 use Tubee\Workflow\Exception;
 use Tubee\Workflow\WorkflowInterface;
 
-class Workflow implements WorkflowInterface
+class Workflow extends AbstractResource implements WorkflowInterface
 {
     /**
      * Workflow name.
@@ -55,16 +60,14 @@ class Workflow implements WorkflowInterface
     protected $attribute_map;
 
     /**
-     * Ensure.
+     * Condition.
      *
      * @var string
      */
     protected $ensure = WorkflowInterface::ENSURE_EXISTS;
 
     /**
-     * Condition.
-     *
-     * @var string
+     *  Condiditon.
      */
     protected $condition;
 
@@ -77,21 +80,17 @@ class Workflow implements WorkflowInterface
 
     /**
      * Initialize.
-     *
-     * @param string            $name
-     * @param AttributeMap      $attribute_map
-     * @param EndpointInterface $endpoint
-     * @param LoggerInterface   $logger
-     * @param iterable          $config
      */
-    public function __construct(string $name, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(string $name, string $ensure, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
+        $this->ensure = $ensure;
         $this->expression = $expression;
         $this->attribute_map = $attribute_map;
         $this->endpoint = $endpoint;
         $this->logger = $logger;
-        $this->setOptions($config);
+        $this->resource = $resource;
+        $this->condition = $resource['data']['condition'];
     }
 
     /**
@@ -105,9 +104,14 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
+    public function decorate(ServerRequestInterface $request): array
     {
-        return $this->name;
+        $resource = [
+            'kind' => 'Workflow',
+            'data' => $this->getData(),
+        ];
+
+        return AttributeResolver::resolve($request, $this, $resource);
     }
 
     /**
@@ -116,37 +120,6 @@ class Workflow implements WorkflowInterface
     public function getEndpoint(): EndpointInterface
     {
         return $this->endpoint;
-    }
-
-    /**
-     * Set options.
-     *
-     * e@param iterable $config
-     *
-     * @return WorkflowInterface
-     */
-    public function setOptions(?Iterable $config = null): WorkflowInterface
-    {
-        if ($config === null) {
-            return $this;
-        }
-
-        foreach ($config as $option => $value) {
-            switch ($option) {
-                case 'ensure':
-                    $this->ensure = $value;
-
-                break;
-                case 'condition':
-                    $this->condition = $value;
-
-                break;
-                default:
-                    throw new InvalidArgumentException('invalid option '.$option.' given');
-            }
-        }
-
-        return $this;
     }
 
     /**
@@ -160,10 +133,10 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function cleanup(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool
+    public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
-        if ($this->checkCondition($attributes, true) === false) {
+        if ($this->checkCondition($attributes) === false) {
             return false;
         }
 
@@ -183,20 +156,20 @@ class Workflow implements WorkflowInterface
 
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                return $this->endpoint->getDataType()->delete($object->getId(), $simulate);
-            break;
-            case WorkflowInterface::ENSURE_DISABLED:
-                return $this->endpoint->getDataType()->disable($object->getId(), $simulate);
+                return $this->endpoint->getDataType()->deleteObject($object->getId(), $simulate);
+
             break;
             case WorkflowInterface::ENSURE_EXISTS:
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_LAST:
-                //$object_ts = new UTCDateTime();
+                //$object_ts = new UTCDateTimeInterface();
                 //$operation = $this->getMongoDBOperation($map, $object, $object_ts);
                 //$this->endpoint->getDataType()->change(['_id' => $object['id']], $operation, $simulate);
 
                 return true;
+
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, disabled, exists or last is allowed');
@@ -208,9 +181,10 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function import(DataTypeInterface $datatype, Iterable $object, UTCDateTime $ts, bool $simulate = false): bool
+    public function import(DataTypeInterface $datatype, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
-        if ($this->checkCondition($object, false) === false) {
+        $object = $object->getData();
+        if ($this->checkCondition($object) === false) {
             return false;
         }
 
@@ -220,43 +194,51 @@ class Workflow implements WorkflowInterface
             'map' => array_keys($map),
         ]);
 
-        $exists = $this->getImportObject($datatype, $map, $ts);
-        $object_ts = new UTCDateTime();
-
-        if ($exists === null && $this->ensure !== WorkflowInterface::ENSURE_EXISTS) {
+        $exists = $this->getImportObject($datatype, $map, $object, $ts);
+        $ensure = $this->ensure;
+        if ($exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
         }
+        if ($exists === null && $this->ensure === WorkflowInterface::ENSURE_LAST) {
+            $ensure = WorkflowInterface::ENSURE_EXISTS;
+        }
 
-        switch ($this->ensure) {
+        switch ($ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                $datatype->delete($exists->getId(), $simulate);
+                $datatype->deleteObject($exists->getId(), $simulate);
 
                 return true;
-            break;
-            case WorkflowInterface::ENSURE_DISABLED:
-                $datatype->disable($exists->getId(), $simulate);
 
-                return true;
             break;
             case WorkflowInterface::ENSURE_EXISTS:
                 $endpoints = [
                     $this->endpoint->getName() => [
-                        'last_sync' => $object_ts,
+                        'last_sync' => $ts,
+                        'garbage' => false,
                     ],
                 ];
 
-                $datatype->create(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                $id = $datatype->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                $this->importRelations($datatype->getObject(['_id' => $id]), $map, $simulate, $endpoints);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_LAST:
-                $object = $this->map($map, $exists->getData(), $object_ts);
+                $object = $this->map($map, $exists->getData(), $ts);
 
-                $endoints = [];
-                $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = $object_ts;
-                $datatype->change($exists, $object, $simulate, $endpoints);
+                $endpoints = [
+                    $this->endpoint->getName() => [
+                        'last_sync' => $ts,
+                        'garbage' => false,
+                    ],
+                ];
+
+                $datatype->changeObject($exists, $object, $simulate, $endpoints);
+                $this->importRelations($exists, $map, $simulate, $endpoints);
 
                 return true;
+
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, disabled, exists or last is allowed');
@@ -268,10 +250,10 @@ class Workflow implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function export(DataObjectInterface $object, UTCDateTime $ts, bool $simulate = false): bool
+    public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
-        if ($this->checkCondition($attributes, false) === false) {
+        if ($this->checkCondition($attributes) === false) {
             return false;
         }
 
@@ -283,43 +265,51 @@ class Workflow implements WorkflowInterface
 
         $exists = $this->getExportObject($map);
 
-        if ($exists === false && $this->ensure !== WorkflowInterface::ENSURE_EXISTS || $exists !== false && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
+        $ensure = $this->ensure;
+        if ($exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
         }
+        if ($exists === null && $this->ensure === WorkflowInterface::ENSURE_LAST) {
+            $ensure = WorkflowInterface::ENSURE_EXISTS;
+        }
 
-        switch ($this->ensure) {
+        switch ($ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                $this->logger->info('delete existing object from endpoint ['.$this->endpoint->getName().']', [
+                $this->logger->info('delete existing object from endpoint ['.$this->endpoint->getIdentifier().']', [
                     'category' => get_class($this),
                 ]);
 
                 $this->endpoint->delete($this->attribute_map, $map, $exists, $simulate);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_EXISTS:
-                $this->logger->info('create new object on endpoint ['.$this->endpoint->getName().']', [
+                $this->logger->info('create new object on endpoint ['.$this->endpoint->getIdentifier().']', [
                     'category' => get_class($this),
                 ]);
 
                 $result = $this->endpoint->create($this->attribute_map, $map, $simulate);
 
-                $endpoints = [];
-                $endpoints['endpoints.'.$this->endpoint->getName()]['last_sync'] = new UTCDateTime();
+                $endpoints = [
+                    $this->endpoint->getName() => [
+                        'last_sync' => $ts,
+                        'result' => $result,
+                        'garbage' => false,
+                    ],
+                ];
 
-                if ($result !== null) {
-                    $endpoints['endpoints.'.$this->endpoint->getName()]['id'] = $result;
-                }
-
-                $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getDataType()->changeObject($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
+
             break;
             case WorkflowInterface::ENSURE_LAST:
-                $this->logger->info('change object on endpoint ['.$this->endpoint->getName().']', [
+                $this->logger->info('change object on endpoint ['.$this->endpoint->getIdentifier().']', [
                     'category' => get_class($this),
                 ]);
 
+                $exists = $exists->toArray();
                 $diff = $this->attribute_map->getDiff($map, $exists);
                 $endpoints = [];
                 if (count($diff) > 0) {
@@ -332,18 +322,24 @@ class Workflow implements WorkflowInterface
                     $result = $this->endpoint->change($this->attribute_map, $diff, $map, $exists, $simulate);
 
                     if ($result !== null) {
-                        $endpoints['endpoints.'.$this->endpoint->getName().'.id'] = $result;
+                        $endpoints = [
+                            $this->endpoint->getName() => [
+                                'last_sync' => $ts,
+                                'garbage' => false,
+                            ],
+                        ];
                     }
                 } else {
-                    $this->logger->debug('no update required for object on endpoint ['.$this->endpoint->getIdentifier().']', [
+                    $this->logger->debug('object on endpoint ['.$this->endpoint->getIdentifier().'] is already up2date', [
                         'category' => get_class($this),
                     ]);
                 }
 
-                $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
-                $this->endpoint->getDataType()->change($object, $object->getData(), $simulate, $endpoints);
+                //$endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
+                $this->endpoint->getDataType()->changeObject($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
+
             break;
             default:
                 throw new InvalidArgumentException('invalid value for ensure in workflow given, only absent, exists or last is allowed');
@@ -353,14 +349,29 @@ class Workflow implements WorkflowInterface
     }
 
     /**
-     * check condition.
-     *
-     * @param iterable $object
-     * @param bool     $garbage
-     *
-     * @return bool
+     * Create object relations.
      */
-    protected function checkCondition(Iterable $object, bool $garbage = false): bool
+    protected function importRelations(DataObjectInterface $object, array $data, bool $simulate, array $endpoints): bool
+    {
+        foreach ($this->attribute_map->getMap() as $name => $definition) {
+            if (isset($definition['map'])) {
+                $mandator = $this->endpoint->getDataType()->getMandator();
+                $datatype = $mandator->getDataType($definition['map']['datatype']);
+                $relative = $datatype->getObject([
+                    'data.'.$definition['map']['to'] => $data[$name],
+                ]);
+
+                $object->createOrUpdateRelation($relative, [], $simulate, $endpoints);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * check condition.
+     */
+    protected function checkCondition(array $object): bool
     {
         if ($this->condition === null) {
             $this->logger->debug('no workflow condiditon set for workflow ['.$this->getIdentifier().']', [
@@ -377,7 +388,6 @@ class Workflow implements WorkflowInterface
         try {
             return (bool) $this->expression->evaluate($this->condition, [
                 'object' => $object,
-                'garbage' => $garbage,
             ]);
         } catch (\Exception $e) {
             $this->logger->warning('failed execute workflow condition ['.$this->condition.']', [
@@ -390,12 +400,8 @@ class Workflow implements WorkflowInterface
 
     /**
      * Get import object.
-     *
-     * @param DataTypeInterface $datatype
-     * @param array             $filter
-     * @param UTCDateTime       $ts
      */
-    protected function getImportObject(DataTypeInterface $datatype, array $map, UTCDateTime $ts): ?DataObjectInterface
+    protected function getImportObject(DataTypeInterface $datatype, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
         $prefixed = [];
@@ -403,60 +409,67 @@ class Workflow implements WorkflowInterface
             $prefixed['data.'.$attribute] = $value;
         }
 
-        if (count($filter) !== count($this->endpoint->getImport())) {
+        if (empty($filter) || count($filter) !== count($this->endpoint->getImport())) {
             throw new Exception\ImportConditionNotMet('import condition attributes are not available from mapping');
         }
 
         try {
-            $exists = $datatype->getOne($prefixed, false);
-        } catch (DataTypeException\ObjectMultipleFound $e) {
+            $exists = $datatype->getObject($prefixed, false);
+        } catch (DataObjectException\MultipleFound $e) {
             throw $e;
-        } catch (DataTypeException\ObjectNotFound $e) {
+        } catch (DataObjectException\NotFound $e) {
             return null;
         }
 
-        $endpoints = $exists->getEndpoints();
+        /*$endpoints = $exists->getEndpoints();
+
         if ($exists !== false && isset($endpoints[$this->endpoint->getName()])
         && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
             throw new Exception\ImportConditionNotMet('import filter matched multiple source objects');
-        }
+        }*/
 
         return $exists;
     }
 
     /**
      * Get export object.
-     *
-     * @param iterable $map
      */
-    protected function getExportObject(Iterable $map)
+    protected function getExportObject(Iterable $map): ?EndpointObjectInterface
     {
         try {
             if ($this->endpoint->flushRequired()) {
-                $exists = false;
+                $exists = null;
             } else {
                 $exists = $this->endpoint->getOne($map, $this->attribute_map->getAttributes());
             }
+
+            $this->logger->debug('found existing object on destination endpoint with provided filter_one', [
+                'category' => get_class($this),
+            ]);
+
+            return $exists;
         } catch (EndpointException\ObjectMultipleFound $e) {
             throw $e;
         } catch (EndpointException\ObjectNotFound $e) {
-            $exists = false;
+            $this->logger->debug('object does not exists yet on destination endpoint', [
+                'category' => get_class($this),
+            ]);
         }
 
-        return $exists;
+        return null;
     }
 
     /**
      * Map.
      */
-    protected function map(Iterable $object, Iterable $mongodb_object, UTCDateTime $ts): Iterable
+    protected function map(Iterable $object, Iterable $mongodb_object, UTCDateTimeInterface $ts): Iterable
     {
         $object = Helper::associativeArrayToPath($object);
         $mongodb_object = Helper::associativeArrayToPath($mongodb_object);
 
         foreach ($this->attribute_map->getMap() as $attr => $value) {
             if (!isset($value['ensure'])) {
-                continue;
+                $value['ensure'] = WorkflowInterface::ENSURE_LAST;
             }
 
             $exists = isset($mongodb_object[$attr]);

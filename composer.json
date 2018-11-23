@@ -16,31 +16,58 @@
             "Tubee\\Testsuite\\": "tests"
         }
     },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "https://github.com/raffis/php-mongomock"
+        }
+    ],
     "require": {
-        "php": ">=7.1",
-        "psr/log": "1.*",
+        "php": ">=7.2",
+        "psr/log": "^1.0.0",
         "ext-mongodb": "*",
         "ext-curl": "*",
-        "gyselroth/micro-auth": "*",
-        "gyselroth/micro-container": "^1.0.0",
-        "gyselroth/micro-http": "^0.0.6",
-        "psr/container": "*",
-        "mongodb/mongodb": "1.2.0",
+        "ext-apcu": "*",
+        "gyselroth/micro-auth": "1.0.0-alpha1",
+        "gyselroth/micro-container": "^2.0.0",
+        "psr/http-factory": "^1.0.0",
+        "psr/container": "^1.0.0",
+        "mongodb/mongodb": "^1.4.0",
         "ulrichsg/getopt-php": "^3.0",
-        "zendframework/zend-mail": "2.7.*",
-        "gyselroth/mongodb-php-task-scheduler": "^2.0.2",
-        "hassankhan/config": "*",
-        "symfony/yaml": "^4.0",
+        "zendframework/zend-mail": "2.9.*",
+        "gyselroth/mongodb-php-task-scheduler": "^3.0.0",
+        "hassankhan/config": "^2.0.0",
+        "symfony/yaml": "~3.1",
         "monolog/monolog": "^1.23",
         "bramus/monolog-colored-line-formatter": "~2.0",
         "zendframework/zend-servicemanager": "^3.3",
         "icewind/smb": "^2.0",
         "symfony/expression-language": "^4.0",
         "psr/cache": "^1.0",
-        "dreamscapes/ldap-core": "^3.1"
+        "dreamscapes/ldap-core": "^3.1",
+        "guzzlehttp/psr7": "^1.4",
+        "mindplay/middleman": "^3.0",
+        "lcobucci/content-negotiation-middleware": "^1.0",
+        "zendframework/zend-diactoros": "^1.7",
+        "psr/http-server-middleware": "*",
+        "middlewares/utils": "^1.0",
+        "middlewares/trailing-slash": "^1.0",
+        "middlewares/access-log": "^1.0",
+        "middlewares/payload": "^2.0",
+        "middlewares/negotiation": "^1.0",
+        "nikic/fast-route": "^1.3",
+        "middlewares/fast-route": "^1.0",
+        "php-jsonpatch/php-jsonpatch": "^3.0",
+        "stolt/json-merge-patch": "^1.0",
+        "psr/http-message": "^1.0",
+        "gyselroth/stream-iterator": "dev-master",
+        "guzzlehttp/guzzle": "~6.0",
+        "paragonie/halite": "^4",
+        "justinrainbow/json-schema": "^5.2"
     },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
     "suggest": {
-        "ext-pthreads": "*",
         "ext-ldap": "*",
         "ext-mysqli": "*",
         "ext-pdo": "*",
@@ -48,10 +75,9 @@
         "ext-xml": "*"
     },
     "require-dev": {
-        "guzzlehttp/guzzle": "*",
         "friendsofphp/php-cs-fixer": "*",
         "phpunit/phpunit": "^6.0.0",
-        "helmich/mongomock": "dev-master#bf141f5",
+        "helmich/mongomock": "dev-master#872cded",
         "phpstan/phpstan": "*"
     }
 }

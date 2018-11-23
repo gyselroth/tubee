@@ -1,7 +1,10 @@
-mongodb:
+mongodb3:
     image: mongo:3.6.0
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 openldap-endpoint:
     image: osixia/openldap:latest
+    environment:
+        - LDAP_ADMIN_PASSWORD=admin
 mongodb-endpoint:
     image: mongo:3.6.0
 mariadb-endpoint:
@@ -25,20 +28,21 @@ moodle-db:
 balloon-endpoint:
     image: gyselroth/balloon:latest-unstable
     links:
-        - mongodb
+        - mongodb3
     entrypoint: php-fpm
     environment:
         - BALLOON_MONGODB_URI=mongodb://mongodb:27017
         - BALLOON_URL=http://localhost:8080
 tubee-dev:
     image: gyselroth/tubee-development:latest
+    ports:
+        - "8090:443"
     volumes:
         - .:/srv/www/tubee
     links:
-        - mongodb
+        - mongodb3
         - openldap-endpoint
         - balloon-endpoint
-        - moodle-endpoint
-    entrypoint: sleep infinity
     environment:
-        - TUBEE_MONGODB_URI=mongodb://mongodb:27017
+        - TUBEE_MONGODB_URI=mongodb://mongodb3:27017
+        - TUBEE_VAULT_URI=http://vault:8200

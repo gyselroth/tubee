@@ -17,9 +17,16 @@ use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataType\DataTypeInterface;
+use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Mongodb extends AbstractEndpoint
 {
+    /**
+     * Kind.
+     */
+    public const KIND = 'MongodbEndpoint';
+
     /**
      * Collection.
      *
@@ -29,32 +36,25 @@ class Mongodb extends AbstractEndpoint
 
     /**
      * Init endpoint.
-     *
-     * @param string            $name
-     * @param string            $type
-     * @param Collection        $collection
-     * @param DataTypeInterface $datatype
-     * @param Logger            $logger
-     * @param iterable          $config
      */
-    public function __construct(string $name, string $type, Collection $collection, DataTypeInterface $datatype, LoggerInterface $logger, Iterable $config)
+    public function __construct(string $name, string $type, Collection $collection, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->collection = $collection;
-        parent::__construct($name, $type, $datatype, $logger, $config);
+        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOne(Iterable $object, Iterable $attributes = []): Iterable
+    public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        return $this->get($object, $attributes);
+        return $this->build($this->get($object, $attributes));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function exists(Iterable $object): bool
+    public function exists(array $object): bool
     {
         try {
             $this->get($object);
@@ -70,19 +70,47 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = []): Generator
+    public function transformQuery(?array $query = null)
     {
-        $filter = $this->buildFilterAll((array) $filter['$match']);
-
-        foreach ($this->collection->find($filter) as $data) {
-            yield $data;
+        $result = null;
+        if ($this->filter_all !== null) {
+            $result = json_decode(stripslashes($this->filter_all), true);
         }
+
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
+                $result = $query;
+            } else {
+                $result = [
+                    '$and' => [
+                        json_decode(stripslashes($this->filter_all), true),
+                        $query,
+                    ],
+                ];
+            }
+        }
+
+        return $result;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function create(AttributeMapInterface $map, Iterable $object, bool $simulate = false): ?string
+    public function getAll(?array $query = null): Generator
+    {
+        $i = 0;
+        foreach ($this->collection->find($this->transformQuery($query)) as $data) {
+            yield $this->build($data);
+            ++$i;
+        }
+
+        return $i;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
         $this->logger->debug('create new mongodb object on endpoint ['.$this->name.'] with values [{values}]', [
             'category' => get_class($this),
@@ -99,7 +127,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $filter = $this->getFilterOne($object);
         $this->logger->info('update mongodb object on endpoint ['.$this->getIdentifier().']', [
@@ -144,7 +172,7 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, ?Iterable $endpoint_object = null, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, ?array $endpoint_object = null, bool $simulate = false): bool
     {
         $filter = $this->getFilterOne($object);
 
@@ -161,13 +189,8 @@ class Mongodb extends AbstractEndpoint
 
     /**
      * Get existing object.
-     *
-     * @param iterable $object
-     * @param iterable $attributes
-     *
-     * @return array
      */
-    protected function get(Iterable $object, Iterable $attributes = []): array
+    protected function get(array $object, array $attributes = []): array
     {
         $result = [];
         $filter = $this->getFilterOne($object);
@@ -184,27 +207,5 @@ class Mongodb extends AbstractEndpoint
         }
 
         return (array) array_shift($result);
-    }
-
-    /**
-     * Build filter all.
-     *
-     * @param string $filter
-     *
-     * @return string
-     */
-    protected function buildFilterAll($filter): array
-    {
-        if ($filter !== null && $this->filter_all !== null) {
-            return array_merge($filter, $this->filter_all);
-        }
-        if ($filter !== null) {
-            return $filter;
-        }
-        if ($this->filter_all !== null) {
-            return $this->filter_all;
-        }
-
-        return null;
     }
 }

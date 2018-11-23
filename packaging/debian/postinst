@@ -1,0 +1,38 @@
+#!/bin/bash
+
+echo "create symlinks and log folder"
+if [ ! -d /var/log/tubee ]; then
+  mkdir /var/log/tubee
+fi
+
+if [ ! -h /usr/share/tubee/config ]; then
+    ln -s /etc/tubee /usr/share/tubee/config
+fi
+
+if [ ! -h /usr/share/tubee/log ]; then
+    ln -s /var/log/tubee /usr/share/tubee/log
+fi
+
+if [ ! -h /usr/bin/tubeecli ]; then
+    ln -s /usr/share/tubee/bin/console/tubeecli /usr/bin/tubeecli
+fi
+
+if [[ ! -f /etc/systemd/system/tubee-jobs.service && -d /etc/systemd/system ]]; then
+    cp /usr/share/tubee/scripts/tubee-jobs.service.systemd /etc/systemd/system/tubee-jobs.service
+fi
+
+if [[ ! -f /etc/init/tubee-jobs.conf && -d /etc/init ]]; then
+    cp /usr/share/tubee/scripts/tubee-jobs.service.upstart /etc/init/tubee-jobs.conf
+fi
+
+echo "create admin user"
+/usr/bin/tubeecli upgrade start -vvv -i
+chown -R www-data. /var/log/tubee
+
+echo "create systemctl service"
+systemctl enable tubee-jobs.service 2> /dev/null
+
+echo "restart tubee-jobs service"
+if service --status-all | grep -Fq 'tubee-jobs'; then
+  service tubee-jobs restart
+fi

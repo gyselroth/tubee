@@ -13,15 +13,21 @@ namespace Tubee\Endpoint;
 
 use InvalidArgumentException;
 use Tubee\AttributeMap\AttributeMapInterface;
+use Tubee\Endpoint\Pdo\QueryTransformer;
 
 abstract class AbstractSqlDatabase extends AbstractEndpoint
 {
     /**
      * Resource.
      *
-     * @var resource
+     * @var array
      */
-    protected $resource;
+    protected $resource = [];
+
+    /**
+     * Socket.
+     */
+    protected $socket;
 
     /**
      * Primary table.
@@ -29,6 +35,17 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
      * @var string
      */
     protected $table;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setup(bool $simulate = false): EndpointInterface
+    {
+        $this->socket->connect();
+        //$result = $this->socket->select('SELECT count(*) FROM '.$this->table);
+
+        return $this;
+    }
 
     /**
      * {@inheritdoc}
@@ -43,7 +60,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
             return true;
         }
 
-        $this->resource->query('TRUNCATE `'.$this->table.'`;');
+        $this->socket->query('TRUNCATE `'.$this->table.'`;');
 
         return true;
     }
@@ -82,7 +99,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         $query = 'UPDATE '.$this->table.' SET '.implode(',', $diff).' WHERE '.$filter;
 
         if ($simulate === false) {
-            $this->resource->prepare($query, $values);
+            $this->socket->prepareValues($query, $values);
         }
 
         return null;
@@ -97,17 +114,35 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         $sql = 'DELETE FROM '.$this->table.' WHERE '.$filter;
 
         if ($simulate === false) {
-            $this->resource->query($sql);
+            $this->socket->query($sql);
         }
 
         return true;
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function transformQuery(?array $query = null)
+    {
+        $result = null;
+        if ($this->filter_all !== null) {
+            $result = $this->filter_all;
+        }
+
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
+                $result = QueryTransformer::transform($query);
+            } else {
+                $result = '('.$this->filter_all.') AND ('.QueryTransformer::transform($query).')';
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Prepare.
-     *
-     * @param iterable $object
-     * @param bool     $simulate
      */
     protected function prepareCreate(Iterable $object, bool $simulate = false)
     {
@@ -128,7 +163,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         $sql = 'INSERT INTO '.$this->table.' ('.implode(',', $columns).') VALUES ('.implode(',', $repl).')';
 
         if ($simulate === false) {
-            return $this->resource->prepare($sql, $values);
+            return $this->socket->prepareValues($sql, $values);
         }
 
         return null;
@@ -136,10 +171,6 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
 
     /**
      * Build filter.
-     *
-     * @param string $filter
-     *
-     * @return string
      */
     protected function buildFilter($filter): ?string
     {
@@ -151,7 +182,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
                     if ($i !== 0) {
                         $request .= 'AND ';
                     }
-                    $request .= '`'.$attr.'`="'.$value.'"';
+                    $request .= $attr.'=\''.$value.'\'';
                     ++$i;
                 }
 
@@ -165,30 +196,5 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         }
 
         return $filter;
-    }
-
-    /**
-     * Build filter all.
-     *
-     * @param string $filter
-     *
-     * @return string
-     */
-    protected function buildFilterAll($filter): ?string
-    {
-        $filter = $this->buildFilter($filter);
-        $all = $this->buildFilter($this->filter_all);
-
-        if ($filter !== null && $all !== null) {
-            return '('.$all.') AND ('.$filter.')';
-        }
-        if ($filter !== null) {
-            return $filter;
-        }
-        if ($all !== null) {
-            return $all;
-        }
-
-        return null;
     }
 }

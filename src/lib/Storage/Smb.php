@@ -48,8 +48,6 @@ class Smb implements StorageInterface
 
     /**
      * Init storage.
-     *
-     * @param NativeServer $server
      */
     public function __construct(NativeServer $server, LoggerInterface $logger, string $share, string $root = '/')
     {
@@ -57,26 +55,6 @@ class Smb implements StorageInterface
         $this->logger = $logger;
         $this->share = $server->getShare($share);
         $this->root = $root;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getFiles(string $pattern): array
-    {
-        $result = [];
-        $base = dirname($pattern);
-        $path = $this->root.DIRECTORY_SEPARATOR.$base;
-        $content = $this->share->dir($path);
-        $pattern = basename($pattern);
-
-        foreach ($content as $node) {
-            if (preg_match('#'.$pattern.'#', $node->getName())) {
-                $result[] = $path.DIRECTORY_SEPARATOR.$node->getName();
-            }
-        }
-
-        return $result;
     }
 
     /**
@@ -148,5 +126,25 @@ class Smb implements StorageInterface
     public function SyncWriteStream($stream, string $file): bool
     {
         return true;
+    }
+
+    /**
+     * Search smb share for files matching pattern.
+     */
+    protected function getFiles(string $pattern): array
+    {
+        $result = [];
+        $base = dirname($pattern);
+        $path = $this->root.DIRECTORY_SEPARATOR.$base;
+        $content = $this->share->dir($path);
+        $pattern = basename($pattern);
+
+        foreach ($content as $node) {
+            if (preg_match('#'.$pattern.'#', $node->getName())) {
+                $result[] = $path.DIRECTORY_SEPARATOR.$node->getName();
+            }
+        }
+
+        return $result;
     }
 }
