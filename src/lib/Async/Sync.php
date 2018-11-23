@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Async;
 
 use MongoDB\BSON\UTCDateTime;
+use MongoDB\Database;
 use Monolog\Handler\MongoDBHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
@@ -61,13 +62,21 @@ class Sync extends AbstractJob
     protected $timestamp;
 
     /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
      * Sync.
      */
-    public function __construct(MandatorFactory $mandator_factory, Scheduler $scheduler, LoggerInterface $logger)
+    public function __construct(MandatorFactory $mandator_factory, Database $db, Scheduler $scheduler, LoggerInterface $logger)
     {
         $this->mandator_factory = $mandator_factory;
         $this->scheduler = $scheduler;
         $this->logger = $logger;
+        $this->db = $db;
         $this->timestamp = new UTCDateTime();
     }
 
@@ -77,6 +86,7 @@ class Sync extends AbstractJob
     public function start(): bool
     {
         $filter = in_array('*', $this->data['mandators']) ? [] : ['name' => ['$in' => $this->data['mandators']]];
+        $procs = [];
 
         foreach ($this->mandator_factory->getAll($filter) as $mandator) {
             $filter = in_array('*', $this->data['datatypes']) ? [] : ['name' => ['$in' => $this->data['datatypes']]];
@@ -91,7 +101,7 @@ class Sync extends AbstractJob
                             'loadbalance' => false,
                         ]);
 
-                        $id = $this->scheduler->addJob(self::class, $data);
+                        $procs[] = $this->scheduler->addJob(self::class, $data);
                     } else {
                         $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
                             'process' => (string) $this->getId(),
@@ -112,6 +122,10 @@ class Sync extends AbstractJob
                     }
                 }
             }
+        }
+
+        foreach ($procs as $process) {
+            $process->wait();
         }
 
         return true;
@@ -205,7 +219,7 @@ class Sync extends AbstractJob
         }
 
         if (count($endpoints) === 0) {
-            $this->logger->warning('no destination endpoint active for datatype ['.$datatype->getIdentifier().'], skip export', [
+            $this->logger->warning('no destination endpoint available for datatype ['.$datatype->getIdentifier().'], skip export', [
                 'category' => get_class($this),
             ]);
 
@@ -287,7 +301,7 @@ class Sync extends AbstractJob
         }
 
         if ($endpoints->getReturn() === 0) {
-            $this->logger->warning('no source endpoint active for datatype ['.$datatype->getIdentifier().'], skip import', [
+            $this->logger->warning('no source endpoint available for datatype ['.$datatype->getIdentifier().'], skip import', [
                 'category' => get_class($this),
             ]);
 
@@ -307,19 +321,18 @@ class Sync extends AbstractJob
         ]);
 
         $filter = [
-                '$or' => [
-                    [
-                        'endpoints.'.$endpoint->getName().'.last_sync' => [
-                            '$lte' => $this->timestamp,
-                        ],
-                    ],
-                    [
-                        'endpoints' => [
-                            '$exists' => 0,
-                        ],
+            '$or' => [
+                [
+                    'endpoints.'.$endpoint->getName().'.last_sync' => [
+                        '$lte' => $this->timestamp,
                     ],
                 ],
+            ],
         ];
+
+        $this->db->{$datatype->getCollection()}->updateMany($filter, ['$set' => [
+            'endpoints.'.$endpoint->getName().'.garbage' => true,
+        ]]);
 
         foreach ($datatype->getObjects($filter, false) as $id => $object) {
             $this->logger->debug('process garbage workflows for garbage object ['.$id.'] from data type ['.$datatype->getIdentifier().']', [
@@ -344,7 +357,7 @@ class Sync extends AbstractJob
                 $this->logger->error('failed execute garbage collector for object ['.$id.'] from datatype ['.$datatype->getIdentifier().']', [
                     'category' => get_class($this),
                     'exception' => $e,
-               ]);
+                ]);
 
                 if ($ignore === false) {
                     return false;

@@ -24,6 +24,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Image extends AbstractFile
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'ImageEndpoint';
+
+    /**
      * Format.
      *
      * @var string

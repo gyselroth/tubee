@@ -22,6 +22,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Mysql extends AbstractSqlDatabase
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'MysqlEndpoint';
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, string $table, MysqlWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])

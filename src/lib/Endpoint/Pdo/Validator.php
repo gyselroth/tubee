@@ -20,6 +20,14 @@ class Validator
      */
     public static function validate(array $resource): array
     {
+        $defaults = [
+            'resource' => [
+                'username' => null,
+                'passwd' => null,
+                'options' => [],
+            ],
+        ];
+
         if (!isset($resource['table']) || !is_string($resource['table'])) {
             throw new InvalidArgumentException('table is required and must be a string');
         }
@@ -34,21 +42,21 @@ class Validator
                 case 'username':
                 case 'passwd':
                     if (!is_string($value)) {
-                        throw new InvalidArgumentException("$key in pdo_options must be a string");
+                        throw new InvalidArgumentException("resource.$key must be a string");
                     }
 
                 break;
                 case 'options':
                     if (!is_array($value)) {
-                        throw new InvalidArgumentException("$key in pdo_options must be an array");
+                        throw new InvalidArgumentException("resource.$key must be an array");
                     }
 
                 break;
                 default:
-                    throw new InvalidArgumentException("invalid argument $key in pdo_options provided");
+                    throw new InvalidArgumentException("invalid argument resource.$key provided");
             }
         }
 
-        return $resource;
+        return array_replace_recursive($defaults, $resource);
     }
 }

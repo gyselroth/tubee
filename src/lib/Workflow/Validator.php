@@ -46,7 +46,7 @@ class Validator extends ResourceValidator
             $expression->evaluate($resource['data']['condition'], []);
         }
 
-        AttributeMapValidator::validate($resource['data']['map']);
+        AttributeMapValidator::validate($resource['data']['map'], $expression);
 
         return $resource;
     }

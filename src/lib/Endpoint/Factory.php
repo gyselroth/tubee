@@ -166,7 +166,7 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, DataTypeInterface $datatype)
     {
-        $factory = $resource['data']['class'].'\\Factory';
+        $factory = EndpointInterface::ENDPOINT_MAP[$resource['kind']].'\\Factory';
         $resource = $this->secret_factory->resolve($resource);
 
         return $this->initResource($factory::build($resource, $datatype, $this->workflow_factory, $this->logger));

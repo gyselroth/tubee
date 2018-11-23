@@ -23,6 +23,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Mongodb extends AbstractEndpoint
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'MongodbEndpoint';
+
+    /**
      * Collection.
      *
      * @var Collection

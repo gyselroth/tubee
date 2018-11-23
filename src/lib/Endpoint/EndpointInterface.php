@@ -34,6 +34,23 @@ interface EndpointInterface extends ResourceInterface
     ];
 
     /**
+     * Endpoint class map.
+     */
+    const ENDPOINT_MAP = [
+        Ldap::KIND => Ldap::class,
+        Pdo::KIND => Pdo::class,
+        OdataRest::KIND => OdataRest::class,
+        Balloon::KIND => Balloon::class,
+        Csv::KIND => Csv::class,
+        Json::KIND => Json::class,
+        Xml::KIND => Xml::class,
+        Mongodb::KIND => Mongodb::class,
+        Moodle::KIND => Moodle::class,
+        Mysql::KIND => Mysql::class,
+        Image::KIND => Image::class,
+    ];
+
+    /**
      * Setup endpoint.
      */
     public function setup(bool $simulate = false): EndpointInterface;

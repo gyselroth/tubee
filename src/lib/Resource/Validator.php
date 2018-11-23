@@ -30,8 +30,8 @@ class Validator
             throw new InvalidArgumentException('name as string must be provided');
         }
 
-        if (preg_match('/[^a-z\.\-0-9]/', $resource['name'])) {
-            throw new InvalidArgumentException('resoure name can only consists from lower case alphanumeric characters and . or -');
+        if (preg_match('/[^a-z\.\-\_0-9]/', $resource['name'])) {
+            throw new InvalidArgumentException('resoure name can only consists from lower case alphanumeric characters and . or _ or -');
         }
 
         if (isset($resource['description']) && !is_string($resource['description'])) {
@@ -50,7 +50,7 @@ class Validator
             self::validateSecrets($resource['secrets']);
         }
 
-        $resource = array_intersect_key($resource, array_flip(['name', 'data', 'description', 'secrets']));
+        $resource = array_intersect_key($resource, array_flip(['name', 'data', 'description', 'secrets', 'kind']));
 
         return $resource;
     }

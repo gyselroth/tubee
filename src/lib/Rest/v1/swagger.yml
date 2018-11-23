@@ -3672,7 +3672,7 @@ definitions:
             items:
               $ref: "#/definitions/endpoint"
   endpoint:
-    description: "An endpoint represents an external resource with objects. This may be a database, a file, a http service, ..."
+    description: "An endpoint represents an external resource to browse (proxy), import or export. This may be a database, a file, a http service, ..."
     allOf:
       - $ref: '#/definitions/resource'
       - type: object
@@ -3680,30 +3680,27 @@ definitions:
           - rootCause
         properties:
           kind:
-            description: "The resource type, always Endpoint."
+            description: "The type of endpoint."
             type: "string"
-            default: "Endpoint"
+            enum:
+              - PdoEndpoint
+              - MysqlEndpoint
+              - XmlEndpoint
+              - CsvEndpoint
+              - ImageEndpoint
+              - JsonEndpoint
+              - MongodbEndpoint
+              - MoodleEndpoint
+              - BalloonEndpoint
+              - OdataRestEndpoint
           data:
             type: "object"
             properties:
-              class:
-                description: "The implementation of the endpoint"
-                type: "string"
-                enum:
-                  - Pdo
-                  - Mysql
-                  - Xml
-                  - Csv
-                  - Image
-                  - Json
-                  - MongoDB
-                  - Moodle
-                  - Balloon
               type:
                 description: "Specify the type of the endpoint."
                 type: "string"
                 enum:
-                  - virtual
+                  - browse
                   - source
                   - destination
                   - bidirectional
@@ -3738,6 +3735,10 @@ definitions:
         required:
           - rootCause
         properties:
+          kind:
+            description: "The type of endpoint. Always PdoEndpoint."
+            type: "string"
+            default: "PdoEndpoint"
           data:
             properties:
               table:
@@ -3772,6 +3773,10 @@ definitions:
         required:
           - rootCause
         properties:
+          kind:
+            description: "The type of endpoint. Always MysqlEndpoint."
+            type: "string"
+            default: "MysqlEndpoint"
           data:
             properties:
               table:
@@ -3809,6 +3814,10 @@ definitions:
         required:
           - rootCause
         properties:
+          kind:
+            description: "The type of endpoint. Always LdapEndpoint."
+            type: "string"
+            default: "LdapEndpoint"
           data:
             properties:
               resource:
@@ -3838,14 +3847,18 @@ definitions:
                   options:
                     description: "More ldap specific settings (http://php.net/manual/en/function.ldap-set-option.php)."
                     type: object
-  rest-endpoint:
-    description: "Propper REST API endpoint"
+  odatarest-endpoint:
+    description: "OData REST API endpoint (Compatible with Microsoft graph (Office365 and more) and other OData compatible api's)"
     allOf:
       - $ref: '#/definitions/endpoint'
       - type: object
         required:
           - rootCause
         properties:
+          kind:
+            description: "The type of endpoint. Always OdataRestEndpoint."
+            type: "string"
+            default: "OdataRestEndpoint"
           data:
             properties:
               resource:
@@ -3933,19 +3946,6 @@ definitions:
   attribute-map:
     type: "object"
     properties:
-      _links:
-        $ref: "#/definitions/links"
-      kind:
-        type: "string"
-      datatype:
-        $ref: "#/definitions/datatype"
-      mandator:
-        $ref: "#/definitions/mandator"
-      workflow:
-        $ref: "#/definitions/workflow"
-      class:
-        type: "string"
-        description: "Name of implementation, usually Tubee\\AttributeMap"
       map:
         type: "object"
         description: "Attribute map"

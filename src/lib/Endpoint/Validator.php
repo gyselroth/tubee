@@ -35,6 +35,10 @@ class Validator extends ResourceValidator
             ],
         ];
 
+        if (!isset($resource['kind'], EndpointInterface::ENDPOINT_MAP)) {
+            throw new InvalidArgumentException('invalid endpoint kind provided, provide one of ['.join(',', array_flip(EndpointInterface::ENDPOINT_MAP)).']');
+        }
+
         $resource = array_replace_recursive($defaults, $resource);
         if (!in_array($resource['data']['type'], EndpointInterface::VALID_TYPES)) {
             throw new InvalidArgumentException('invalid endpoint type provided, provide one of ['.join(',', EndpointInterface::VALID_TYPES).']');
@@ -46,10 +50,6 @@ class Validator extends ResourceValidator
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_DESTINATION && (!isset($resource['data']['options']['filter_one']) || !is_string($resource['data']['options']['filter_one']))) {
             throw new InvalidArgumentException('destintation endpoint must have single object filter options.filter_one as a string');
-        }
-
-        if (!isset($resource['data']['class']) || !is_string($resource['data']['class'])) {
-            throw new InvalidArgumentException('class as string must be provided');
         }
 
         if (!isset($resource['data']['resource']) || !is_array($resource['data']['resource'])) {
@@ -64,18 +64,7 @@ class Validator extends ResourceValidator
      */
     protected static function validateEndpoint(array $resource): array
     {
-        if (strpos($resource['data']['class'], '\\') === false) {
-            $class = 'Tubee\\Endpoint\\'.$resource['data']['class'];
-        } else {
-            $class = $resource['data']['class'];
-        }
-
-        if (!class_exists($class)) { //|| !class_exists($resource['class'].'\\Validator')) {
-            throw new InvalidArgumentException("Endpoint $class does not exists");
-        }
-
-        $resource['data']['class'] = $class;
-
+        $class = EndpointInterface::ENDPOINT_MAP[$resource['kind']];
         $validator = $class.'\\Validator';
         if (class_exists($validator)) {
             $resource['data'] = $validator::validate($resource['data']);

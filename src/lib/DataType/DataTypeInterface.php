@@ -69,16 +69,6 @@ interface DataTypeInterface extends ResourceInterface
     public function createObject(array $object, bool $simulate, array $endpoints): ObjectIdInterface;
 
     /**
-     * Enable object.
-     */
-    public function enable(ObjectIdInterface $id, bool $simulate = false): bool;
-
-    /**
-     * Disable object.
-     */
-    public function disable(ObjectIdInterface $id, bool $simulate = false): bool;
-
-    /**
      * Change object.
      */
     public function changeObject(DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool;
@@ -92,9 +82,4 @@ interface DataTypeInterface extends ResourceInterface
      * Get identifier.
      */
     public function getIdentifier(): string;
-
-    /**
-     * Get name.
-     */
-    public function getName(): string;
 }

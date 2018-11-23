@@ -25,12 +25,7 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $options = array_values(array_merge([
-            'uri' => 'mongodb://127.0.0.1',
-            'uri_options' => null,
-            'driver_options' => null,
-        ], $resource['data']['resource']));
-
+        $options = $resource['data']['resource'];
         $mongodb = new Client(...$options);
 
         return new MongodbEndpoint($resource['name'], $resource['data']['type'], $mongodb->selectCollection($resource['data']['collection']), $datatype, $workflow, $logger, $resource);

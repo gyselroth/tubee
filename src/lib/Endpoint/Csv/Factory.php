@@ -25,7 +25,7 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $storage = StorageFactory::build($resource['data']['resource'], $logger);
+        $storage = StorageFactory::build($resource['data']['storage'], $logger);
 
         return new CsvEndpoint($resource['name'], $resource['data']['type'], $resource['data']['file'], $storage, $datatype, $workflow, $logger, $resource);
     }

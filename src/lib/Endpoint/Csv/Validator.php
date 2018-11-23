@@ -21,11 +21,38 @@ class Validator
      */
     public static function validate(array $resource): array
     {
+        $defaults = [
+            'storage' => [
+                'type' => 'Stream',
+            ],
+            'resource' => [
+                'delimiter' => ',',
+                'enclosure' => '"',
+                'escape' => '\\',
+            ],
+        ];
+
         if (!isset($resource['file']) || !is_string($resource['file'])) {
             throw new InvalidArgumentException('file is required and must be a string');
         }
 
-        $resource['resource'] = StorageValidator::validate($resource['resource']);
+        foreach ($resource['resource'] as $key => $value) {
+            switch ($option) {
+                case 'delimiter':
+                case 'enclosure':
+                case 'escape':
+                    if (!is_string($value)) {
+                        throw new InvalidArgumentException("resource.$key must be a string");
+                    }
+
+                    break;
+                default:
+                    throw new InvalidArgumentException('unknown option resource.'.$key.' provided');
+            }
+        }
+
+        $resource = array_replace_recursive($defaults, $resource);
+        $resource['storage'] = StorageValidator::validate($resource['storage']);
 
         return $resource;
     }

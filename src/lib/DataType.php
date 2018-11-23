@@ -13,7 +13,6 @@ namespace Tubee;
 
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
-use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\DataObject\DataObjectInterface;
@@ -253,42 +252,6 @@ class DataType extends AbstractResource implements DataTypeInterface
     public function createObject(array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         return $this->object_factory->create($this, $object, $simulate, $endpoints);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function enable(ObjectIdInterface $id, bool $simulate = false): bool
-    {
-        $this->logger->info('enable object ['.$id.'] in ['.$this->collection.']', [
-            'category' => get_class($this),
-        ]);
-
-        $query = ['$unset' => ['deleted' => true]];
-
-        if ($simulate === false) {
-            //$this->db->{$this->collection}->updateOne(['_id' => $id], $query);
-        }
-
-        return true;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function disable(ObjectIdInterface $id, bool $simulate = false): bool
-    {
-        $this->logger->info('disable object ['.$id.'] in ['.$this->collection.']', [
-            'category' => get_class($this),
-        ]);
-
-        $query = ['$set' => ['deleted' => new UTCDateTime()]];
-
-        if ($simulate === false) {
-            //$this->db->{$this->collection}->updateOne(['_id' => $id], $query);
-        }
-
-        return true;
     }
 
     /**

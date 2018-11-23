@@ -23,6 +23,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Csv extends AbstractFile
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'CsvEndpoint';
+
+    /**
      * Delimiter.
      *
      * @var string
@@ -52,8 +57,8 @@ class Csv extends AbstractFile
             $this->flush = true;
         }
 
-        if (isset($resource['csv_options'])) {
-            $this->setCsvOptions($resource['csv_options']);
+        if (isset($resource['data']['resource'])) {
+            $this->setCsvOptions($resource['data']['resource']);
         }
 
         parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);

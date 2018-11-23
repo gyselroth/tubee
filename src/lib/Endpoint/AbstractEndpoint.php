@@ -27,6 +27,11 @@ use Tubee\Workflow\WorkflowInterface;
 abstract class AbstractEndpoint extends AbstractResource implements EndpointInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Endpoint';
+
+    /**
      * Endpoint name.
      *
      * @var string
@@ -185,7 +190,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
            ],
-            'kind' => 'Endpoint',
+            'kind' => static::KIND,
             'data' => $this->getData(),
             /*'type' => $this->type,
             'resource' => $this->resource['resource'],

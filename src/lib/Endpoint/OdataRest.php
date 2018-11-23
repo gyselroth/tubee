@@ -19,6 +19,11 @@ use Tubee\EndpointObject\EndpointObjectInterface;
 class OdataRest extends AbstractRest
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'OdataRestEndpoint';
+
+    /**
      * {@inheritdoc}
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string

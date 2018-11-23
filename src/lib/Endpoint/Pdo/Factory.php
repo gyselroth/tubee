@@ -24,13 +24,7 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $options = array_merge([
-            'dsn' => null,
-            'username' => null,
-            'passwd' => null,
-            'options' => null,
-        ], $resource['data']['resource']);
-
+        $options = $resource['data']['resource'];
         $wrapper = new Wrapper($options['dsn'], $logger, $options['username'], $options['passwd'], $options['options']);
 
         return new PdoEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $wrapper, $datatype, $workflow, $logger, $resource);

@@ -22,6 +22,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Pdo extends AbstractSqlDatabase
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'PdoEndpoint';
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, string $table, PdoWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])

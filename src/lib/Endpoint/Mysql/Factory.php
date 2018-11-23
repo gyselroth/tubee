@@ -24,14 +24,8 @@ class Factory
      */
     public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $options = array_values(array_merge([
-            'host' => null,
-            'username' => null,
-            'passwd' => null,
-            'dbname' => null,
-            'port' => null,
-            'socket' => null,
-        ], $resource['data']['resource']));
+        $options = $resource['data']['resource'];
+        $wrapper = new Wrapper($options['host'], $logger, $options['username'], $options['passwd'], $options['dbname'], $options['socket']);
 
         return new MysqlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $datatype, $workflow, $logger, $resource);
     }

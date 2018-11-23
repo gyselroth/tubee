@@ -23,6 +23,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Json extends AbstractFile
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'JsonEndpoint';
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])

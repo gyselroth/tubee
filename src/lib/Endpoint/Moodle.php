@@ -24,6 +24,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Moodle extends AbstractEndpoint
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'MoodleEndpoint';
+
+    /**
      * Moodle.
      *
      * @var ApiClient

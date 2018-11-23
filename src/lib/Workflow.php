@@ -136,7 +136,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
-        if ($this->checkCondition($attributes, true) === false) {
+        if ($this->checkCondition($attributes) === false) {
             return false;
         }
 
@@ -157,10 +157,6 @@ class Workflow extends AbstractResource implements WorkflowInterface
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
                 return $this->endpoint->getDataType()->deleteObject($object->getId(), $simulate);
-
-            break;
-            case WorkflowInterface::ENSURE_DISABLED:
-                return $this->endpoint->getDataType()->disable($object->getId(), $simulate);
 
             break;
             case WorkflowInterface::ENSURE_EXISTS:
@@ -188,7 +184,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function import(DataTypeInterface $datatype, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $object = $object->getData();
-        if ($this->checkCondition($object, false) === false) {
+        if ($this->checkCondition($object) === false) {
             return false;
         }
 
@@ -214,17 +210,11 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 return true;
 
             break;
-            case WorkflowInterface::ENSURE_DISABLED:
-                $datatype->disable($exists->getId(), $simulate);
-                //$this->importRelations($exists, $map);
-
-                return true;
-
-            break;
             case WorkflowInterface::ENSURE_EXISTS:
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
+                        'garbage' => false,
                     ],
                 ];
 
@@ -240,6 +230,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
+                        'garbage' => false,
                     ],
                 ];
 
@@ -262,7 +253,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
-        if ($this->checkCondition($attributes, false) === false) {
+        if ($this->checkCondition($attributes) === false) {
             return false;
         }
 
@@ -304,6 +295,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
                         'result' => $result,
+                        'garbage' => false,
                     ],
                 ];
 
@@ -333,10 +325,9 @@ class Workflow extends AbstractResource implements WorkflowInterface
                         $endpoints = [
                             $this->endpoint->getName() => [
                                 'last_sync' => $ts,
+                                'garbage' => false,
                             ],
                         ];
-
-                        //$endpoints['endpoints.'.$this->endpoint->getName().'.id'] = $result;
                     }
                 } else {
                     $this->logger->debug('object on endpoint ['.$this->endpoint->getIdentifier().'] is already up2date', [
@@ -344,7 +335,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ]);
                 }
 
-                $endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
+                //$endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
                 $this->endpoint->getDataType()->changeObject($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
@@ -380,7 +371,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * check condition.
      */
-    protected function checkCondition(Iterable $object, bool $garbage = false): bool
+    protected function checkCondition(array $object): bool
     {
         if ($this->condition === null) {
             $this->logger->debug('no workflow condiditon set for workflow ['.$this->getIdentifier().']', [
@@ -397,7 +388,6 @@ class Workflow extends AbstractResource implements WorkflowInterface
         try {
             return (bool) $this->expression->evaluate($this->condition, [
                 'object' => $object,
-                'garbage' => $garbage,
             ]);
         } catch (\Exception $e) {
             $this->logger->warning('failed execute workflow condition ['.$this->condition.']', [

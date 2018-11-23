@@ -28,6 +28,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Xml extends AbstractFile
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'XmlEndpoint';
+
+    /**
      * new XML element.
      *
      * @var SimpleXMLElement

@@ -25,6 +25,11 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 class Ldap extends AbstractEndpoint
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'LdapEndpoint';
+
+    /**
      * Ldap.
      *
      * @var Ldap

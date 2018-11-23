@@ -187,7 +187,6 @@ class Factory
                 $pipeline[0]['$match']['fullDocument.'.$key] = $value;
             }
         }
-        //$this->logger->debug("PIPE".json_encode($pipeline));
 
         $stream = $collection->watch($pipeline, [
             'resumeAfter' => $after,
