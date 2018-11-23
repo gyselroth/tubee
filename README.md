@@ -51,6 +51,9 @@ Access endpoint records via the same system (data proxy) and much more.
     * SMB (Windows/Samba share via smb)
     * Stream (HTTP,FTP and more)
 
+## Documentation
+Visit [https://tubee.readthedocs.io](https://tubee.readthedocs.io) to get started!
+
 ## Changelog
 A changelog is available [here](https://github.com/gyselroth/tubee/CHANGELOG.md).
 

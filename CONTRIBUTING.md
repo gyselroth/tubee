@@ -54,7 +54,6 @@ Besides npm scripts like build and start you can use make to build this software
 * `phpstan` Execute phpstan
 
 ## Docs
-
 Documentation is written in /docs and generated with [mkdocs](https://www.mkdocs.org).
 
 ## Git commit 
