@@ -16,7 +16,5 @@ Please continue reading in the [Contributing chapter](https://github.com/gyselro
 A changelog is available [here](https://github.com/gyselroth/tubee/blob/master/CHANGELOG.md).
 
 {% for page in site.pages %}
-    ({{ page.url }})
+{% include_relative page.url %}
 {% endfor %}
-
-share
