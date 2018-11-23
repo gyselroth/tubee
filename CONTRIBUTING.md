@@ -53,6 +53,10 @@ Besides npm scripts like build and start you can use make to build this software
 * `phpcs` Execute phpcs check
 * `phpstan` Execute phpstan
 
+## Docs
+
+Documentation is written in /docs and generated with [mkdocs](https://www.mkdocs.org).
+
 ## Git commit 
 Please make sure that you always specify the number of your issue starting with a hastag (#) within any git commits.
 
