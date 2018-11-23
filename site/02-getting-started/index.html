@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Getting started - tubee</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Getting started";
+    var mkdocs_page_input_path = "02-getting-started.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> tubee</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">About tubee</a>
+	    </li>
+          
+            <li class="toctree-l1 current">
+		
+    <a class="current" href="./">Getting started</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#getting-started">Getting started</a></li>
+    
+
+    </ul>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../03-namespaces/">Namespaces</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../10-deploy-server/">Getting started</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">tubee</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Getting started</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="getting-started">Getting started</h1>
+<p>You need two things to get started, a server (usually you want a hosted server) and tubectl. 
+tubectl is the console client for Linux, Windows and OS X.</p>
+<p>The tubee server works with various different resource types. Each of those resources must be created manually to get a working setup.</p>
+<p>Resorce types:</p>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th align="center">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Namespace</td>
+<td align="center">Resources like collections must be part of a single namespace.</td>
+</tr>
+<tr>
+<td>Collection</td>
+<td align="center">A collection is group of similar data objects. Each collection holds data objects and is part of a namespace.</td>
+</tr>
+<tr>
+<td>Endpoint</td>
+<td align="center">An endpoint represents a remote server for proxying, import from, or export to.</td>
+</tr>
+<tr>
+<td>DataObject</td>
+<td align="center">An actual object which must be part of a collection.</td>
+</tr>
+<tr>
+<td>EndpointObject</td>
+<td align="center">Besides data objects there are also endpoint objects. The diference is that an endpoint object represents the state of an object on an endpoint.</td>
+</tr>
+<tr>
+<td>Workflow</td>
+<td align="center">A workflow defines how and what data should be synchronized between endpoints and collections. A worklfow is always attached to an endpoint.</td>
+</tr>
+<tr>
+<td>Secret</td>
+<td align="center">Holds sensible data which can be injected into other resources. Usually secrets injected into endpoint resources.</td>
+</tr>
+<tr>
+<td>User</td>
+<td align="center">A simple user with password authentication. (You may also use OpenID-connect or LDAP auth adapter instead local user resources)</td>
+</tr>
+<tr>
+<td>AccessRole</td>
+<td align="center">Defines an access role which can be used to gain access. Authenticated users are are part of an access-rule.</td>
+</tr>
+<tr>
+<td>AccessRule</td>
+<td align="center">Create access rules (RBAC) based on HTTP requests.</td>
+</tr>
+<tr>
+<td>Job</td>
+<td align="center">A jobs defines what endpoints (or whole mandators or collections) should be synchronized and at what time/interval.</td>
+</tr>
+<tr>
+<td>Process</td>
+<td align="center">A process represents a single execution of a job</td>
+</tr>
+<tr>
+<td>Log</td>
+<td align="center">Each process/job will create log resources which can be requested for each</td>
+</tr>
+</tbody>
+</table>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../03-namespaces/" class="btn btn-neutral float-right" title="Namespaces">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="About tubee"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../03-namespaces/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

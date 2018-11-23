@@ -6,6 +6,7 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/gyselroth/tubee/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/tubee/?branch=master)
 [![GitHub release](https://img.shields.io/github/release/gyselroth/tubee.svg)](https://github.com/gyselroth/tubee/releases)
 [ ![Download](https://api.bintray.com/packages/gyselroth/tubee/tubee/images/download.svg)](https://bintray.com/gyselroth/tubee/tubee/_latestVersion) 
+[![Documentation Status](https://readthedocs.org/projects/tubee/badge/?version=latest)](https://tubee.readthedocs.io/en/latest/?badge=latest)
 
 tubee is a I/O data management engine with proxy capabilities for other services and also features I/O synchronization support for those.
 Create, Modify and Delete records in namespaced data collections. Import and export records from and to different technologies like databases, files, http services and more.
@@ -49,6 +50,9 @@ Access endpoint records via the same system (data proxy) and much more.
     * balloon cloud server
     * SMB (Windows/Samba share via smb)
     * Stream (HTTP,FTP and more)
+
+## Documentation
+Visit [https://tubee.readthedocs.io](https://tubee.readthedocs.io) to get started!
 
 ## Changelog
 A changelog is available [here](https://github.com/gyselroth/tubee/CHANGELOG.md).
