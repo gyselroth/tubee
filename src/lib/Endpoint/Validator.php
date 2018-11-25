@@ -35,7 +35,7 @@ class Validator extends ResourceValidator
             ],
         ];
 
-        if (!isset($resource['kind'], EndpointInterface::ENDPOINT_MAP)) {
+        if (!isset($resource['kind']) || !isset(EndpointInterface::ENDPOINT_MAP[$resource['kind']])) {
             throw new InvalidArgumentException('invalid endpoint kind provided, provide one of ['.join(',', array_flip(EndpointInterface::ENDPOINT_MAP)).']');
         }
 

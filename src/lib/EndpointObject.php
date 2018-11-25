@@ -48,9 +48,9 @@ class EndpointObject extends AbstractResource implements EndpointObjectInterface
 
         $resource = [
             '_links' => [
-                'mandator' => ['href' => (string)$request->getUri()->withPath('/api/v1/mandators/'.$mandator))],
-                'datatype' => ['href' => (string)$request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype))],
-                'endpoint' => ['href' => (string)$request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype.'/endpoints/'.$endpoint))],
+                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator)],
+                'datatype' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype)],
+                'endpoint' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype.'/endpoints/'.$endpoint)],
             ],
             'kind' => 'EndpointObject',
             'mandator' => $mandator,

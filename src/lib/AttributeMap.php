@@ -177,7 +177,7 @@ class AttributeMap implements AttributeMapInterface
     protected function requireAttribute(string $attr, array $value, $attrv)
     {
         if ($attrv === null || is_string($attrv) && strlen($attrv) === 0 || is_array($attrv) && count($attrv) === 0) {
-            if (/*isset($value['required']) && */$value['required'] === false) {
+            if (isset($value['required']) && $value['required'] === false) {
                 $this->logger->debug('found attribute ['.$attr.'] but source attribute is empty, remove attribute from mapping', [
                      'category' => get_class($this),
                 ]);

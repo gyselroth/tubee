@@ -38,7 +38,7 @@ class Validator
         }
 
         foreach ($resource['resource'] as $key => $value) {
-            switch ($option) {
+            switch ($key) {
                 case 'data':
                 case 'row':
                     if (!is_string($value)) {

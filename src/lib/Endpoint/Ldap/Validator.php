@@ -32,7 +32,7 @@ class Validator
         ];
 
         foreach ($resource['resource'] as $key => $value) {
-            switch ($option) {
+            switch ($key) {
                 case 'options':
                     if (!is_array($value)) {
                         throw new InvalidArgumentException("resource.$key must be an array of ldap options, see http://php.net/manual/de/function.ldap-set-option.php");
