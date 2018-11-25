@@ -265,6 +265,8 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
+        $attributes['relations'] = $object->getRelatives();
+
         if ($this->checkCondition($attributes) === false) {
             return false;
         }

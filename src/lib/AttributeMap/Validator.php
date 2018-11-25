@@ -67,6 +67,8 @@ class Validator
                     }
 
                 break;
+                case 'unwind':
+                break;
                 case 'rewrite':
                 break;
                 case 'script':

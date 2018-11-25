@@ -90,7 +90,7 @@ class AttributeMap implements AttributeMapInterface
                 }
             }
 
-            $attrv = $this->resolveValue($attr, $value, $data, $ts);
+            /*$attrv = $this->resolveValue($attr, $value, $data, $ts);
             $attrv = $this->transformAttribute($attr, $value, $data, $attrv);
 
             if (isset($value['type'])) {
@@ -103,13 +103,13 @@ class AttributeMap implements AttributeMapInterface
 
             if (isset($value['type'])) {
                 $attrv = $this->convert($attrv, $attr, $value['type']);
-            }
+            }*/
 
-            $result[$attr] = $attrv;
+            $result[$attr] = $this->mapField($attr, $value, $data, $ts);
 
             $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
                 'category' => get_class($this),
-                'value' => $attrv,
+                'value' => $result[$attr],
             ]);
         }
 
@@ -169,6 +169,32 @@ class AttributeMap implements AttributeMapInterface
         }
 
         return $diff;
+    }
+
+    protected function mapField($attr, $value, $data, $ts)
+    {
+        $attrv = $this->resolveValue($attr, $value, $data, $ts);
+        $attrv = $this->transformAttribute($attr, $value, $data, $attrv);
+
+        if (isset($value['type'])) {
+            $attrv = $this->serializeClass($attr, $attrv, $value['type']);
+        }
+
+        if ($this->requireAttribute($attr, $value, $attrv) === null) {
+            return;
+        }
+
+        if (isset($value['type'])) {
+            $attrv = $this->convert($attrv, $attr, $value['type']);
+        }
+
+        if (isset($value['unwind'])) {
+            foreach ($attrv as $key => $element) {
+                $attrv[$key] = $this->mapField($attr, $value['unwind'], $element, $ts);
+            }
+        }
+
+        return $attrv;
     }
 
     /**
