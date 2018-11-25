@@ -88,13 +88,6 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     protected $flush = false;
 
     /**
-     * History.
-     *
-     * @var bool
-     */
-    protected $history = false;
-
-    /**
      * Workflow factory.
      *
      * @var WorkflowFactory
@@ -157,15 +150,11 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
 
                 break;
                 case 'filter_one':
-                        $this->filter_one = /*(string)*/$value;
+                        $this->filter_one = (string) $value;
 
                 break;
                 case 'filter_all':
-                        $this->filter_all = /*(string)*/$value;
-
-                break;
-                case 'history':
-                    $this->history = (bool) $value;
+                        $this->filter_all = (string) $value;
 
                 break;
                 default:
@@ -181,26 +170,18 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $datatype = $this->getDataType();
-        $mandator = $datatype->getMandator();
+        $datatype = $this->datatype->getName();
+        $mandator = $this->datatype->getMandator()->getName();
 
         $resource = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
-                'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
-                'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator)],
+                'datatype' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype)],
            ],
             'kind' => static::KIND,
+            'mandator' => $mandator,
+            'datatype' => $datatype,
             'data' => $this->getData(),
-            /*'type' => $this->type,
-            'resource' => $this->resource['resource'],
-            'data_options' => [
-                'import' => $this->import,
-                'history' => $this->history,
-                'flush' => $this->flush,
-                'filter_one' => $this->filter_one,
-                'filter_all' => $this->filter_all,
-            ],*/
             'status' => function ($endpoint) {
                 try {
                     $endpoint->setup();
@@ -268,14 +249,6 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     public function getImport(): array
     {
         return $this->import;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHistory(): bool
-    {
-        return $this->history;
     }
 
     /**

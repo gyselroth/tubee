@@ -29,14 +29,6 @@ class AccessRole extends AbstractResource implements AccessRoleInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
-    {
-        return $this->resource['name'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function decorate(ServerRequestInterface $request): array
     {
         $resource = [

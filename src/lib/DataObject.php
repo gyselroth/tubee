@@ -51,21 +51,24 @@ class DataObject extends AbstractResource implements DataObjectInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $datatype = $this->getDataType();
-        $mandator = $datatype->getMandator();
+        $datatype = $this->datatype->getName();
+        $mandator = $this->datatype->getMandator()->getName();
 
         $resource = [
             '_links' => [
-                 'self' => ['href' => (string) $request->getUri()],
-                 'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
-                 'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator)],
+                'datatype' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype)],
             ],
             'kind' => 'DataObject',
+            'mandator' => $mandator,
+            'datatype' => $datatype,
             'data' => $this->getData(),
             'status' => function ($object) {
                 $endpoints = $object->getEndpoints();
                 foreach ($endpoints as &$endpoint) {
                     $endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
+                    $endpoint['garbage'] = isset($endpoint['garbage']) ? $endpoint['garbage'] : false;
+                    $endpoint['auto'] = isset($endpoint['auto']) ? $endpoint['auto'] : null;
                 }
 
                 return $endpoints;

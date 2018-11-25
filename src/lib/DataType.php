@@ -136,10 +136,10 @@ class DataType extends AbstractResource implements DataTypeInterface
     {
         $resource = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
-                'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$this->getMandator()->getName()))],
+                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$this->getMandator()->getName())],
             ],
             'kind' => 'DataType',
+            'mandator' => $this->mandator->getName(),
             'data' => [
                 'schema' => $this->schema->getSchema(),
             ],
@@ -177,7 +177,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function getSourceEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        $query = ['data.type' => 'source'];
+        $query = ['data.type' => EndpointInterface::TYPE_SOURCE];
         if ($endpoints !== []) {
             $query = ['$and' => [$query, $endpoints]];
         }
@@ -190,7 +190,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function getDestinationEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        $query = ['data.type' => 'destination'];
+        $query = ['data.type' => EndpointInterface::TYPE_DESTINATION];
         if ($endpoints !== []) {
             $query = ['$and' => [$query, $endpoints]];
         }
@@ -204,14 +204,6 @@ class DataType extends AbstractResource implements DataTypeInterface
     public function getIdentifier(): string
     {
         return $this->mandator->getIdentifier().'::'.$this->name;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getName(): string
-    {
-        return $this->name;
     }
 
     /**

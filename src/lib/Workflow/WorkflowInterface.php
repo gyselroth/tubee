@@ -55,11 +55,6 @@ interface WorkflowInterface extends ResourceInterface
     public function getIdentifier(): string;
 
     /**
-     * Get name.
-     */
-    public function getName(): string;
-
-    /**
      * Cleanup.
      */
     public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;

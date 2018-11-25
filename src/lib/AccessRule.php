@@ -29,14 +29,6 @@ class AccessRule extends AbstractResource implements AccessRuleInterface
     /**
      * {@inheritdoc}
      */
-    public function getName(): string
-    {
-        return $this->resource['name'];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function decorate(ServerRequestInterface $request): array
     {
         $resource = [

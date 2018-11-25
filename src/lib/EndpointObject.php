@@ -42,13 +42,20 @@ class EndpointObject extends AbstractResource implements EndpointObjectInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
+        $endpoint = $this->endpoint->getName();
+        $datatype = $this->endpoint->getDataType()->getName();
+        $mandator = $this->endpoint->getDataType()->getMandator()->getName();
+
         $resource = [
             '_links' => [
-                 'self' => ['href' => (string) $request->getUri()],
-                 //'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
-                 //'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+                'mandator' => ['href' => (string)$request->getUri()->withPath('/api/v1/mandators/'.$mandator))],
+                'datatype' => ['href' => (string)$request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype))],
+                'endpoint' => ['href' => (string)$request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype.'/endpoints/'.$endpoint))],
             ],
             'kind' => 'EndpointObject',
+            'mandator' => $mandator,
+            'datatype' => $datatype,
+            'endpoint' => $endpoint,
             'data' => $this->getData(),
         ];
 

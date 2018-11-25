@@ -60,9 +60,6 @@ class Mandator extends AbstractResource implements MandatorInterface
     public function decorate(ServerRequestInterface $request): array
     {
         $resource = [
-            '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
-            ],
             'kind' => 'Mandator',
         ];
 

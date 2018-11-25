@@ -106,8 +106,20 @@ class Workflow extends AbstractResource implements WorkflowInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
+        $mandator = $this->endpoint->getDataType()->getMandator()->getName();
+        $datatype = $this->endpoint->getDataType()->getName();
+        $endpoint = $this->endpoint->getName();
+
         $resource = [
+            '_links' => [
+                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator)],
+                'datatype' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype)],
+                'endpoint' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype.'/endpoints/'.$endpoint)],
+           ],
             'kind' => 'Workflow',
+            'mandator' => $mandator,
+            'datatype' => $datatype,
+            'endpoint' => $endpoint,
             'data' => $this->getData(),
         ];
 

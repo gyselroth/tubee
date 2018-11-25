@@ -22,7 +22,7 @@ class AttributeResolver
      */
     public static function resolve(ServerRequestInterface $request, ResourceInterface $resource, array $resolvable): array
     {
-        $resolvable += self::addResourceMetaData($request, $resource);
+        $resolvable = array_replace_recursive(self::addResourceMetaData($request, $resource), $resolvable);
 
         $params = $request->getQueryParams();
         $attributes = [];
@@ -52,7 +52,6 @@ class AttributeResolver
             'id' => (string) $resource->getId(),
             'name' => $resource->getName(),
             'version' => isset($data['version']) ? $data['version'] : 0,
-            'class' => get_class($resource),
             'created' => isset($data['created']) ? $data['created']->toDateTime()->format('c') : null,
             'changed' => isset($data['changed']) ? $data['changed']->toDateTime()->format('c') : null,
             'description' => isset($data['description']) ? $data['description'] : null,
