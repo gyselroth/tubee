@@ -9,42 +9,42 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Mandator;
+namespace Tubee\ResourceNamespace;
 
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\Factory as DataTypeFactory;
-use Tubee\Mandator;
-use Tubee\Mandator\Validator as MandatorValidator;
+use Tubee\Collection\Factory as CollectionFactory;
 use Tubee\Resource\Factory as ResourceFactory;
+use Tubee\ResourceNamespace;
+use Tubee\ResourceNamespace\Validator as ResourceNamespaceValidator;
 
 class Factory extends ResourceFactory
 {
     /**
      * Collection name.
      */
-    public const COLLECTION_NAME = 'mandators';
+    public const COLLECTION_NAME = 'namespaces';
 
     /**
      * Datatype.
      *
-     * @var DataTypeFactory
+     * @var CollectionFactory
      */
-    protected $datatype_factory;
+    protected $collection_factory;
 
     /**
      * Initialize.
      */
-    public function __construct(Database $db, DataTypeFactory $datatype_factory, LoggerInterface $logger)
+    public function __construct(Database $db, CollectionFactory $collection_factory, LoggerInterface $logger)
     {
-        $this->datatype_factory = $datatype_factory;
+        $this->collection_factory = $collection_factory;
         parent::__construct($db, $logger);
     }
 
     /**
-     * Has mandator.
+     * Has namespace.
      */
     public function has(string $name): bool
     {
@@ -60,14 +60,14 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Get mandator.
+     * Get namespace.
      */
-    public function getOne(string $name): MandatorInterface
+    public function getOne(string $name): ResourceNamespaceInterface
     {
         $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
 
         if ($result === null) {
-            throw new Exception\NotFound('mandator '.$name.' is not registered');
+            throw new Exception\NotFound('namespace '.$name.' is not registered');
         }
 
         return $this->build($result);
@@ -84,14 +84,14 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Add mandator.
+     * Add namespace.
      */
     public function add(array $resource): ObjectIdInterface
     {
-        MandatorValidator::validate($resource);
+        ResourceNamespaceValidator::validate($resource);
 
         if ($this->has($resource['name'])) {
-            throw new Exception\NotUnique('mandator '.$resource['name'].' does already exists');
+            throw new Exception\NotUnique('namespace '.$resource['name'].' does already exists');
         }
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
@@ -108,8 +108,8 @@ class Factory extends ResourceFactory
     /**
      * Build instance.
      */
-    public function build(array $resource): MandatorInterface
+    public function build(array $resource): ResourceNamespaceInterface
     {
-        return $this->initResource(new Mandator($resource['name'], $this, $this->datatype_factory, $resource));
+        return $this->initResource(new ResourceNamespace($resource['name'], $this, $this->collection_factory, $resource));
     }
 }

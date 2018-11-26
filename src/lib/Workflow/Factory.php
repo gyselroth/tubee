@@ -45,14 +45,14 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Has mandator.
+     * Has namespace.
      */
     public function has(EndpointInterface $endpoint, string $name): bool
     {
         return $this->db->{self::COLLECTION_NAME}->count([
             'name' => $name,
-            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
-            'datatype' => $endpoint->getDataType()->getName(),
+            'namespace' => $endpoint->getCollection()->getResourceNamespace()->getName(),
+            'collection' => $endpoint->getCollection()->getName(),
             'endpoint' => $endpoint->getName(),
         ]) > 0;
     }
@@ -63,8 +63,8 @@ class Factory extends ResourceFactory
     public function getAll(EndpointInterface $endpoint, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         $filter = [
-            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
-            'datatype' => $endpoint->getDataType()->getName(),
+            'namespace' => $endpoint->getCollection()->getResourceNamespace()->getName(),
+            'collection' => $endpoint->getCollection()->getName(),
             'endpoint' => $endpoint->getName(),
         ];
 
@@ -86,8 +86,8 @@ class Factory extends ResourceFactory
     {
         $result = $this->db->{self::COLLECTION_NAME}->findOne([
             'name' => $name,
-            'mandator' => $endpoint->getDataType()->getMandator()->getName(),
-            'datatype' => $endpoint->getDataType()->getName(),
+            'namespace' => $endpoint->getCollection()->getResourceNamespace()->getName(),
+            'collection' => $endpoint->getCollection()->getName(),
             'endpoint' => $endpoint->getName(),
         ]);
 
@@ -119,8 +119,8 @@ class Factory extends ResourceFactory
             throw new Exception\NotUnique('workflow '.$resource['name'].' does already exists');
         }
 
-        $resource['mandator'] = $endpoint->getDataType()->getMandator()->getName();
-        $resource['datatype'] = $endpoint->getDataType()->getName();
+        $resource['namespace'] = $endpoint->getCollection()->getResourceNamespace()->getName();
+        $resource['collection'] = $endpoint->getCollection()->getName();
         $resource['endpoint'] = $endpoint->getName();
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);

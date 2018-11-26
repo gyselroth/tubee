@@ -14,7 +14,7 @@ namespace Tubee\Endpoint;
 use Generator;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\Pdo\Wrapper as PdoWrapper;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -29,11 +29,11 @@ class Pdo extends AbstractSqlDatabase
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $table, PdoWrapper $socket, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, string $table, PdoWrapper $socket, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->socket = $socket;
         $this->table = $table;
-        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
+        parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }
 
     /**

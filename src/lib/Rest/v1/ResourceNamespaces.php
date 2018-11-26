@@ -17,18 +17,18 @@ use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
-class Mandators
+class ResourceNamespaces
 {
     /**
-     * Mandator factory.
+     * ResourceNamespace factory.
      *
-     * @var MandatorFactory
+     * @var ResourceNamespaceFactory
      */
-    protected $mandator_factory;
+    protected $namespace_factory;
 
     /**
      * Acl.
@@ -40,9 +40,9 @@ class Mandators
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator, Acl $acl)
+    public function __construct(ResourceNamespaceFactory $namespace, Acl $acl)
     {
-        $this->mandator_factory = $mandator;
+        $this->namespace_factory = $namespace;
         $this->acl = $acl;
     }
 
@@ -56,17 +56,17 @@ class Mandators
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $mandators = $this->mandator_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+        $namespaces = $this->namespace_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
-        return Helper::getAll($request, $identity, $this->acl, $mandators);
+        return Helper::getAll($request, $identity, $this->acl, $namespaces);
     }
 
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
-        $resource = $this->mandator_factory->getOne($mandator);
+        $resource = $this->namespace_factory->getOne($namespace);
 
         return Helper::getOne($request, $identity, $resource);
     }
@@ -77,12 +77,12 @@ class Mandators
     public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
     {
         $body = (array) $request->getParsedBody();
-        $id = $this->mandator_factory->add($body);
+        $id = $this->namespace_factory->add($body);
         $query = $request->getQueryParams();
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->mandator_factory->getOne($body['name'])->decorate($request),
+            $this->namespace_factory->getOne($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -98,7 +98,7 @@ class Mandators
             'existing' => true,
         ], $request->getQueryParams());
 
-        $cursor = $this->mandator_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $cursor = $this->namespace_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

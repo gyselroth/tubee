@@ -9,16 +9,16 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Testsuite\Unit\Mandator;
+namespace Tubee\Testsuite\Unit\ResourceNamespace;
 
 use Helmich\MongoMock\MockDatabase;
 use MongoDB\BSON\ObjectId;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\Factory as DataTypeFactory;
-use Tubee\Mandator\Exception;
-use Tubee\Mandator\Factory as MandatorFactory;
-use Tubee\Mandator\MandatorInterface;
+use Tubee\Collection\Factory as CollectionFactory;
+use Tubee\ResourceNamespace\Exception;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 class FactoryTest extends TestCase
 {
@@ -34,7 +34,7 @@ class FactoryTest extends TestCase
             ],
         ]);
 
-        $this->factory = new MandatorFactory($db, $this->createMock(DataTypeFactory::class), $this->createMock(LoggerInterface::class));
+        $this->factory = new ResourceNamespaceFactory($db, $this->createMock(CollectionFactory::class), $this->createMock(LoggerInterface::class));
     }
 
     public function testAdd()
@@ -57,7 +57,7 @@ class FactoryTest extends TestCase
     {
         $this->factory->add(['name' => 'foo']);
         $result = $this->factory->getOne('foo');
-        $this->assertInstanceOf(MandatorInterface::class, $result);
+        $this->assertInstanceOf(ResourceNamespaceInterface::class, $result);
         $this->assertSame('foo', $result->getName());
     }
 

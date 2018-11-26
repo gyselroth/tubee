@@ -67,7 +67,8 @@ class Process extends AbstractResource implements ProcessInterface
      */
     public function getLogs(array $query = [], ?int $offset = null, ?int $limit = null, ?array $sort = []): Generator
     {
-        $query['context.process'] = (string) $this->getId();
+        $query['$or'][] = ['context.process' => (string) $this->getId()];
+        $query['$or'][] = ['context.parent' => (string) $this->getId()];
 
         return $this->log_factory->getAll($query, $offset, $limit, $sort);
     }

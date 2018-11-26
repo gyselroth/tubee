@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint\Xml;
 
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Xml as XmlEndpoint;
 use Tubee\Storage\Factory as StorageFactory;
@@ -23,10 +23,10 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
+    public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
         $storage = StorageFactory::build($resource['data']['storage'], $logger);
 
-        return new XmlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['file'], $storage, $datatype, $workflow, $logger, $resource);
+        return new XmlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['file'], $storage, $collection, $workflow, $logger, $resource);
     }
 }

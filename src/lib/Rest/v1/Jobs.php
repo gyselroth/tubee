@@ -20,18 +20,18 @@ use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Job;
 use Tubee\Job\Factory as JobFactory;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class Jobs
 {
     /**
-     * mandator factory.
+     * namespace factory.
      *
-     * @var MandatorFactory
+     * @var ResourceNamespaceFactory
      */
-    protected $mandator_factory;
+    protected $namespace_factory;
 
     /**
      * Job factory.
@@ -50,11 +50,11 @@ class Jobs
     /**
      * Init.
      */
-    public function __construct(JobFactory $job_factory, Acl $acl, MandatorFactory $mandator_factory)
+    public function __construct(JobFactory $job_factory, Acl $acl, ResourceNamespaceFactory $namespace_factory)
     {
         $this->job_factory = $job_factory;
         $this->acl = $acl;
-        $this->mandator_factory = $mandator_factory;
+        $this->namespace_factory = $namespace_factory;
     }
 
     /**
@@ -99,9 +99,9 @@ class Jobs
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $job = array_merge(['mandators' => []], $body);
+        $job = array_merge(['namespaces' => []], $body);
 
-        $this->mandator_factory->getAll($job['mandators']);
+        $this->namespace_factory->getAll($job['namespaces']);
         $id = $this->job_factory->create($job);
 
         return new UnformattedResponse(

@@ -19,18 +19,18 @@ use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Endpoint\Factory as EndpointFactory;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class Endpoints
 {
     /**
-     * mandator factory.
+     * namespace factory.
      *
-     * @var MandatorFactory
+     * @var ResourceNamespaceFactory
      */
-    protected $mandator_factory;
+    protected $namespace_factory;
 
     /**
      * Endpoint factory.
@@ -49,9 +49,9 @@ class Endpoints
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator_factory, EndpointFactory $endpoint_factory, Acl $acl)
+    public function __construct(ResourceNamespaceFactory $namespace_factory, EndpointFactory $endpoint_factory, Acl $acl)
     {
-        $this->mandator_factory = $mandator_factory;
+        $this->namespace_factory = $namespace_factory;
         $this->endpoint_factory = $endpoint_factory;
         $this->acl = $acl;
     }
@@ -59,15 +59,15 @@ class Endpoints
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $endpoints = $datatype->getEndpoints($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $endpoints = $collection->getEndpoints($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $endpoints);
     }
@@ -75,10 +75,10 @@ class Endpoints
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
     {
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $endpoint = $datatype->getEndpoint($endpoint);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $endpoint = $collection->getEndpoint($endpoint);
 
         return Helper::getOne($request, $identity, $endpoint);
     }
@@ -86,17 +86,17 @@ class Endpoints
     /**
      * Create.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $id = $this->endpoint_factory->add($datatype, $body);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $id = $this->endpoint_factory->add($collection, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->endpoint_factory->getOne($datatype, $body['name'])->decorate($request),
+            $this->endpoint_factory->getOne($collection, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -104,10 +104,10 @@ class Endpoints
     /**
      * Delete.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
     {
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $this->endpoint_factory->deleteOne($datatype, $endpoint);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $this->endpoint_factory->deleteOne($collection, $endpoint);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
@@ -115,13 +115,13 @@ class Endpoints
     /**
      * Patch.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $mandator = $this->mandator_factory->getOne($mandator);
-        $datatype = $mandator->getDataType($datatype);
-        $endpoint = $datatype->getEndpoint($endpoint);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $collection = $namespace->getCollection($collection);
+        $endpoint = $collection->getEndpoint($endpoint);
         $doc = ['data' => $endpoint->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
@@ -132,7 +132,7 @@ class Endpoints
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $datatype->getEndpoint($endpoint->getName())->decorate($request),
+            $collection->getEndpoint($endpoint->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -140,7 +140,7 @@ class Endpoints
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -148,8 +148,8 @@ class Endpoints
             'existing' => true,
         ], $request->getQueryParams());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $cursor = $this->endpoint_factory->watch($datatype, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $cursor = $this->endpoint_factory->watch($collection, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
@@ -157,14 +157,14 @@ class Endpoints
     /**
      * Entrypoint.
      */
-    public function getAllObjects(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function getAllObjects(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
+        $endpoint = $this->namespace_factory->getOne($namespace)->getCollection($collection)->getEndpoint($endpoint);
         $endpoint->setup();
         $objects = $endpoint->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 

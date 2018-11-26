@@ -25,14 +25,19 @@ moodle-db:
         - MYSQL_DATABASE=moodle
         - MYSQL_ROOT_PASSWORD=moodle
         - MYSQL_USER=moodle
-balloon-endpoint:
-    image: gyselroth/balloon:latest-unstable
+balloon:
+    image: gyselroth/balloon:2.1.8
     links:
         - mongodb3
     entrypoint: php-fpm
     environment:
-        - BALLOON_MONGODB_URI=mongodb://mongodb:27017
-        - BALLOON_URL=http://localhost:8080
+        - BALLOON_MONGODB_URI=mongodb://mongodb3:27017
+balloon-endpoint:
+    image: gyselroth/balloon-web:3.0.5
+    ports:
+        - "443:443"
+    links:
+        - balloon
 tubee-dev:
     image: gyselroth/tubee-development:latest
     ports:
@@ -45,4 +50,3 @@ tubee-dev:
         - balloon-endpoint
     environment:
         - TUBEE_MONGODB_URI=mongodb://mongodb3:27017
-        - TUBEE_VAULT_URI=http://vault:8200

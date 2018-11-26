@@ -15,7 +15,7 @@ use Generator;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Helper;
@@ -39,11 +39,11 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     protected $name;
 
     /**
-     * DataTypeInterface.
+     * CollectionInterface.
      *
-     * @var DataTypeInterface
+     * @var CollectionInterface
      */
-    protected $datatype;
+    protected $collection;
 
     /**
      * Logger.
@@ -88,13 +88,6 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     protected $flush = false;
 
     /**
-     * History.
-     *
-     * @var bool
-     */
-    protected $history = false;
-
-    /**
      * Workflow factory.
      *
      * @var WorkflowFactory
@@ -111,12 +104,12 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, DataTypeInterface $datatype, WorkflowFactory $workflow_factory, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, CollectionInterface $collection, WorkflowFactory $workflow_factory, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
         $this->type = $type;
         $this->resource = $resource;
-        $this->datatype = $datatype;
+        $this->collection = $collection;
         $this->logger = $logger;
         $this->workflow_factory = $workflow_factory;
 
@@ -131,6 +124,14 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     public function setup(bool $simulate = false): EndpointInterface
     {
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getKind(): string
+    {
+        return $this->resource['kind'];
     }
 
     /**
@@ -157,15 +158,11 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
 
                 break;
                 case 'filter_one':
-                        $this->filter_one = /*(string)*/$value;
+                        $this->filter_one = (string) $value;
 
                 break;
                 case 'filter_all':
-                        $this->filter_all = /*(string)*/$value;
-
-                break;
-                case 'history':
-                    $this->history = (bool) $value;
+                        $this->filter_all = (string) $value;
 
                 break;
                 default:
@@ -181,26 +178,18 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $datatype = $this->getDataType();
-        $mandator = $datatype->getMandator();
+        $collection = $this->collection->getName();
+        $namespace = $this->collection->getResourceNamespace()->getName();
 
         $resource = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
-                'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
-                'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace)],
+                'collection' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace.'/collections/'.$collection)],
            ],
             'kind' => static::KIND,
+            'namespace' => $namespace,
+            'collection' => $collection,
             'data' => $this->getData(),
-            /*'type' => $this->type,
-            'resource' => $this->resource['resource'],
-            'data_options' => [
-                'import' => $this->import,
-                'history' => $this->history,
-                'flush' => $this->flush,
-                'filter_one' => $this->filter_one,
-                'filter_all' => $this->filter_all,
-            ],*/
             'status' => function ($endpoint) {
                 try {
                     $endpoint->setup();
@@ -249,9 +238,9 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * {@inheritdoc}
      */
-    public function getDataType(): DataTypeInterface
+    public function getCollection(): CollectionInterface
     {
-        return $this->datatype;
+        return $this->collection;
     }
 
     /**
@@ -268,14 +257,6 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     public function getImport(): array
     {
         return $this->import;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getHistory(): bool
-    {
-        return $this->history;
     }
 
     /**
@@ -331,7 +312,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function getIdentifier(): string
     {
-        return $this->datatype->getIdentifier().'::'.$this->name;
+        return $this->collection->getIdentifier().'::'.$this->name;
     }
 
     /**

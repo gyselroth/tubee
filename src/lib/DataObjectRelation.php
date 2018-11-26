@@ -52,8 +52,8 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
         $resource = [
             '_links' => [
                  'self' => ['href' => (string) $request->getUri()],
-                 //'mandator' => ['href' => ($mandator = (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator->getName()))],
-                 //'datatype' => ['href' => $mandator.'/datatypes'.$datatype->getName()],
+                 //'namespace' => ['href' => ($namespace = (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace->getName()))],
+                 //'collection' => ['href' => $namespace.'/collections'.$collection->getName()],
             ],
             'kind' => 'DataObjectRelation',
             /*'data' => [

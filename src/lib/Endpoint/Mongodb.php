@@ -16,7 +16,7 @@ use InvalidArgumentException;
 use MongoDB\Collection;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -32,15 +32,15 @@ class Mongodb extends AbstractEndpoint
      *
      * @var Collection
      */
-    protected $collection;
+    protected $pool;
 
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, Collection $collection, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, Collection $pool, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->collection = $collection;
-        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
+        $this->pool = $pool;
+        parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }
 
     /**
@@ -99,7 +99,7 @@ class Mongodb extends AbstractEndpoint
     public function getAll(?array $query = null): Generator
     {
         $i = 0;
-        foreach ($this->collection->find($this->transformQuery($query)) as $data) {
+        foreach ($this->pool->find($this->transformQuery($query)) as $data) {
             yield $this->build($data);
             ++$i;
         }
@@ -118,7 +118,7 @@ class Mongodb extends AbstractEndpoint
         ]);
 
         if ($simulate === false) {
-            return (string) $this->collection->insertOne($object);
+            return (string) $this->pool->insertOne($object);
         }
 
         return null;
@@ -135,7 +135,7 @@ class Mongodb extends AbstractEndpoint
         ]);
 
         if ($simulate === false) {
-            $this->collection->updateOne($filter, $diff);
+            $this->pool->updateOne($filter, $diff);
         }
 
         return (string) $endpoint_object['_id'];
@@ -181,7 +181,7 @@ class Mongodb extends AbstractEndpoint
         ]);
 
         if ($simulate === false) {
-            $this->collection->deleteOne($filter);
+            $this->pool->deleteOne($filter);
         }
 
         return true;
@@ -195,7 +195,7 @@ class Mongodb extends AbstractEndpoint
         $result = [];
         $filter = $this->getFilterOne($object);
 
-        foreach ($this->collection->find($filter) as $data) {
+        foreach ($this->pool->find($filter) as $data) {
             $result[] = $data;
         }
 

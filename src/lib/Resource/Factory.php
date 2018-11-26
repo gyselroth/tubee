@@ -182,10 +182,7 @@ class Factory
 
         $pipeline = $query;
         if (!empty($pipeline)) {
-            $pipeline = [['$match' => []]];
-            foreach ($query as $key => $value) {
-                $pipeline[0]['$match']['fullDocument.'.$key] = $value;
-            }
+            $pipeline = [['$match' => $query]];
         }
 
         $stream = $collection->watch($pipeline, [

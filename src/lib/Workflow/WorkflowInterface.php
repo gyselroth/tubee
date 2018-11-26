@@ -13,8 +13,8 @@ namespace Tubee\Workflow;
 
 use MongoDB\BSON\UTCDateTimeInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
-use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Resource\ResourceInterface;
@@ -55,11 +55,6 @@ interface WorkflowInterface extends ResourceInterface
     public function getIdentifier(): string;
 
     /**
-     * Get name.
-     */
-    public function getName(): string;
-
-    /**
      * Cleanup.
      */
     public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
@@ -67,7 +62,7 @@ interface WorkflowInterface extends ResourceInterface
     /**
      * Import from endpoint.
      */
-    public function import(DataTypeInterface $datatype, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
+    public function import(CollectionInterface $collection, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Write to endpoint.

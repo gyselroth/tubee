@@ -28,7 +28,7 @@ class Validator
                 'dbname' => null,
                 'port' => 3306,
                 'socket' => null,
-            ]
+            ],
         ];
 
         if (!isset($resource['table']) || !is_string($resource['table'])) {
@@ -43,7 +43,7 @@ class Validator
             switch ($key) {
                 case 'host':
                 case 'dbname':
-                case 'socket'
+                case 'socket':
                 case 'username':
                 case 'passwd':
                     if (!is_string($value)) {

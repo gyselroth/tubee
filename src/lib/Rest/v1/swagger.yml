@@ -24,13 +24,13 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /watch/mandators:
+  /watch/namespaces:
     get:
       tags:
       - "data"
-      summary: "Watch mandators"
-      description: "Watch mandators in realtime"
-      operationId: "watchMandators"
+      summary: "Watch namespaces"
+      description: "Watch namespaces in realtime"
+      operationId: "watchNamespaces"
       produces:
       - "application/json;stream=watch"
       parameters:
@@ -66,13 +66,13 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /mandators:
+  /namespaces:
     get:
       tags:
-      - "mandators"
-      summary: "Get mandators"
-      description: "A mandator is a logical group of datatypes"
-      operationId: "getMandators"
+      - "namespaces"
+      summary: "Get namespaces"
+      description: "A namespace is a logical group of collections"
+      operationId: "getNamespaces"
       produces:
       - "application/json"
       parameters:
@@ -105,43 +105,43 @@ paths:
         type: "string"
       responses:
         200:
-          description: "List of mandators"
+          description: "List of namespaces"
           schema:
-            $ref: "#/definitions/mandators"
+            $ref: "#/definitions/Namespaces"
         403:
           description: "Access denied"
     post:
       tags:
-      - "mandators"
-      summary: "Add mandator"
-      operationId: "addMandator"
+      - "namespaces"
+      summary: "Add namespace"
+      operationId: "addNamespace"
       produces:
       - "application/json"
       parameters:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/mandator"
+          $ref: "#/definitions/Namespace"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/mandator"
+            $ref: "#/definitions/Namespace"
         403:
           description: "Access denied"
-  /mandators/{mandator}:
+  /namespaces/{namespace}:
     get:
       tags:
-      - "mandators"
-      summary: "Get specific mandator"
-      description: "A mandator is a logical group of datatypes"
-      operationId: "getMandator"
+      - "namespaces"
+      summary: "Get specific namespace"
+      description: "A namespace is a logical group of collections"
+      operationId: "getNamespace"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "query"
@@ -153,24 +153,24 @@ paths:
           type: "string"
       responses:
         200:
-          description: "Mandator"
+          description: "Namespace"
           schema:
-            $ref: "#/definitions/mandator"
+            $ref: "#/definitions/Namespace"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "mandators"
-      summary: "Delete specific mandator"
-      operationId: "deleteMandator"
+      - "namespaces"
+      summary: "Delete specific namespace"
+      operationId: "deleteNamespace"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       responses:
@@ -182,75 +182,75 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "mandators"
-      summary: "Create or replace mandator"
-      operationId: "replaceMandator"
+      - "namespaces"
+      summary: "Create or replace namespace"
+      operationId: "replaceNamespace"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/mandator"
+          $ref: "#/definitions/Namespace"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/mandator"
+            $ref: "#/definitions/Namespace"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/mandator"
+            $ref: "#/definitions/Namespace"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "mandators"
-      summary: "Patch mandator as rfc6902 request"
-      operationId: "updateMandator"
-      description: "Update specific attributes of a mandator"
+      - "namespaces"
+      summary: "Patch namespace as rfc6902 request"
+      operationId: "updateNamespace"
+      description: "Update specific attributes of a namespace"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: body
         name: data
-        description: "Mandator"
+        description: "Namespace"
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
-          description: "Mandator"
+          description: "Namespace"
           schema:
-            $ref: "#/definitions/mandator"
+            $ref: "#/definitions/Namespace"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/mandators/{mandator}/datatypes:
+  /watch/namespaces/{namespace}/collections:
     get:
       tags:
       - "data"
-      summary: "Watch datatypes"
-      description: "Watch datatypes in realtime"
-      operationId: "watchDatatypes"
+      summary: "Watch collections"
+      description: "Watch collections in realtime"
+      operationId: "watchCollections"
       produces:
       - "application/json;stream=watch"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "query"
@@ -285,19 +285,19 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /mandators/{mandator}/datatypes:
+  /namespaces/{namespace}/collections:
     get:
       tags:
-      - "datatypes"
-      summary: "Get datatypes"
-      description: "A datatype is collection of data objects of a specific type"
-      operationId: "getDatatypes"
+      - "collections"
+      summary: "Get collections"
+      description: "A collection is collection of data objects of a specific type"
+      operationId: "getCollections"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "query"
@@ -329,57 +329,57 @@ paths:
         type: "string"
       responses:
         200:
-          description: "List of datatypes"
+          description: "List of collections"
           schema:
-            $ref: "#/definitions/datatypes"
+            $ref: "#/definitions/Collections"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     post:
       tags:
-      - "datatypes"
-      summary: "Add datatype"
-      operationId: "addDatatype"
+      - "collections"
+      summary: "Add collection"
+      operationId: "addCollection"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: body
         name: data
         schema:
-           $ref: "#/definitions/datatype"
+           $ref: "#/definitions/Collection"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/datatype"
+            $ref: "#/definitions/Collection"
         403:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-  /mandators/{mandator}/datatypes/{datatype}:
+  /namespaces/{namespace}/collections/{collection}:
     get:
       tags:
-      - "datatypes"
-      summary: "Get specific datatype"
-      description: "A datatype is collection of dataobjects of a specific type"
-      operationId: "getDatatype"
+      - "collections"
+      summary: "Get specific collection"
+      description: "A collection is collection of dataobjects of a specific type"
+      operationId: "getCollection"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "query"
@@ -391,29 +391,29 @@ paths:
           type: "string"
       responses:
         200:
-          description: "Datatype"
+          description: "Collection"
           schema:
-            $ref: "#/definitions/datatype"
+            $ref: "#/definitions/Collection"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "datatypes"
-      summary: "Delete specific datatype"
-      operationId: "deleteDatatype"
+      - "collections"
+      summary: "Delete specific collection"
+      operationId: "deleteCollection"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       responses:
@@ -425,73 +425,73 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "datatypes"
-      summary: "Create or replace datatype"
-      operationId: "replaceDatatype"
+      - "collections"
+      summary: "Create or replace collection"
+      operationId: "replaceCollection"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/datatype"
+          $ref: "#/definitions/Collection"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/datatype"
+            $ref: "#/definitions/Collection"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/datatype"
+            $ref: "#/definitions/Collection"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "datatypes"
-      summary: "Patch datatype as rfc6902 request"
-      description: "Update specific attributes of a datatype"
-      operationId: "updateDatatype"
+      - "collections"
+      summary: "Patch collection as rfc6902 request"
+      description: "Update specific attributes of a collection"
+      operationId: "updateCollection"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: body
         name: data
-        description: "Datatype"
+        description: "Collection"
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
-          description: "Datatype"
+          description: "Collection"
           schema:
-            $ref: "#/definitions/datatype"
+            $ref: "#/definitions/Collection"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/mandators/{mandator}/datatypes/{datatype}/endpoints:
+  /watch/namespaces/{namespace}/collections/{collection}/endpoints:
     get:
       tags:
       - "data"
@@ -502,13 +502,13 @@ paths:
       - "application/json;stream=watch"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "query"
@@ -543,7 +543,7 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /mandators/{mandator}/datatypes/{datatype}/endpoints:
+  /namespaces/{namespace}/collections/{collection}/endpoints:
     get:
       tags:
       - "endpoints"
@@ -554,13 +554,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "query"
@@ -594,7 +594,7 @@ paths:
         200:
           description: "List of endpoints"
           schema:
-            $ref: "#/definitions/endpoints"
+            $ref: "#/definitions/Endpoints"
         404:
           description: "Resource does not exists"
         403:
@@ -608,13 +608,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: body
@@ -625,12 +625,12 @@ paths:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/endpoint"
+            $ref: "#/definitions/Endpoint"
         403:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}:
+  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}:
     get:
       tags:
       - "endpoints"
@@ -641,13 +641,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -666,7 +666,7 @@ paths:
         200:
           description: "Endpoint"
           schema:
-            $ref: "#/definitions/endpoint"
+            $ref: "#/definitions/Endpoint"
         404:
           description: "Resource does not exists"
         403:
@@ -680,13 +680,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -710,13 +710,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -727,35 +727,35 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/endpoint"
+          $ref: "#/definitions/Endpoint"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/endpoint"
+            $ref: "#/definitions/Endpoint"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/endpoint"
+            $ref: "#/definitions/Endpoint"
         403:
           description: "Access denied"
     patch:
       tags:
       - "endpoints"
-      summary: "Patch datatype as rfc6902 request"
+      summary: "Patch collection as rfc6902 request"
       description: "Update specific attributes of a endpoint"
       operationId: "updateEndpoint"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -765,21 +765,21 @@ paths:
         type: "string"
       - in: body
         name: data
-        description: "Datatype"
+        description: "Collection"
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "Endpoint"
           schema:
-            $ref: "#/definitions/endpoint"
+            $ref: "#/definitions/Endpoint"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
+  /watch/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
     get:
       tags:
       - "data"
@@ -790,13 +790,13 @@ paths:
       - "application/json;stream=watch"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -836,24 +836,24 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows:
+  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
     get:
       tags:
       - "workflows"
       summary: "Get endpoint workflows"
-      description: "A workflow is an action how to import/export a datatype and with what attribute map"
+      description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflows"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -892,7 +892,7 @@ paths:
         200:
           description: "List of workflows"
           schema:
-            $ref: "#/definitions/workflows"
+            $ref: "#/definitions/Workflows"
         403:
           description: "Access denied"
     post:
@@ -904,13 +904,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -921,34 +921,34 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/workflow"
+          $ref: "#/definitions/Workflow"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/workflow"
+            $ref: "#/definitions/Workflow"
         403:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/workflows/{workflow}:
+  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}:
     get:
       tags:
       - "workflows"
       summary: "Get specifc endpoint workflow"
-      description: "A workflow is an action how to import/export a datatype and with what attribute map"
+      description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflow"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -972,7 +972,7 @@ paths:
         200:
           description: "Workflow"
           schema:
-            $ref: "#/definitions/workflow"
+            $ref: "#/definitions/Workflow"
         404:
           description: "Resource does not exists"
         403:
@@ -986,13 +986,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1021,13 +1021,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1043,16 +1043,16 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/workflow"
+          $ref: "#/definitions/Workflow"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/workflow"
+            $ref: "#/definitions/Workflow"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/workflow"
+            $ref: "#/definitions/Workflow"
         403:
           description: "Access denied"
     patch:
@@ -1065,13 +1065,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1090,34 +1090,34 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "Workflow"
           schema:
-            $ref: "#/definitions/workflow"
+            $ref: "#/definitions/Workflow"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /mandators/{mandator}/datatypes/{datatype}/objects/{object}:
+  /namespaces/{namespace}/collections/{collection}/objects/{object}:
     get:
       tags:
       - "data"
       summary: "Get specific object"
-      description: "Get an object of a specific datatype"
+      description: "Get an object of a specific collection"
       operationId: "getObject"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1151,13 +1151,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1171,16 +1171,16 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/data-object"
+            $ref: "#/definitions/DataObject"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/job"
+            $ref: "#/definitions/Job"
         404:
           description: "Resource does not exists"
         403:
@@ -1197,13 +1197,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1219,20 +1219,20 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/data-object"
+          $ref: "#/definitions/DataObject"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/data-object"
+            $ref: "#/definitions/DataObject"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/data-object"
+            $ref: "#/definitions/DataObject"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/job"
+            $ref: "#/definitions/Job"
         404:
           description: "Resource does not exists"
         403:
@@ -1249,13 +1249,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1267,14 +1267,14 @@ paths:
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/job"
+            $ref: "#/definitions/Job"
         204:
           description: "If successful the server will respond with 204 No Content"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives:
+  /watch/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives:
     get:
       tags:
       - "data"
@@ -1285,13 +1285,13 @@ paths:
       - "application/json;stream=watch"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1331,7 +1331,7 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives:
+  /namespaces/{namespace}/collections/{collection}/objects/{object}/relatives:
     get:
       tags:
       - "data"
@@ -1342,13 +1342,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1387,7 +1387,7 @@ paths:
         200:
           description: "Object relatives"
           schema:
-            $ref: "#/definitions/object-relatives"
+            $ref: "#/definitions/ObjectRelatives"
         403:
           description: "Access denied"
         404:
@@ -1401,13 +1401,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1418,17 +1418,17 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/object-relative"
+          $ref: "#/definitions/ObjectRelative"
       responses:
         200:
           description: "Object relative"
           schema:
-            $ref: "#/definitions/object-relative"
+            $ref: "#/definitions/ObjectRelative"
         403:
           description: "Access denied"
         404:
           description: "Resource not found"
-  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/relatives/{relative}:
+  /namespaces/{namespace}/collections/{collection}/objects/{object}/relatives/{relative}:
     get:
       tags:
       - "data"
@@ -1438,13 +1438,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1461,7 +1461,7 @@ paths:
         200:
           description: "Object relative"
           schema:
-            $ref: "#/definitions/object-relative"
+            $ref: "#/definitions/ObjectRelative"
         403:
           description: "Access denied"
         404:
@@ -1475,13 +1475,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1497,12 +1497,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/object-relative"
+          $ref: "#/definitions/ObjectRelative"
       responses:
         200:
           description: "Object relative"
           schema:
-            $ref: "#/definitions/object-relative"
+            $ref: "#/definitions/ObjectRelative"
         403:
           description: "Access denied"
         404:
@@ -1516,13 +1516,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1542,7 +1542,7 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-  /mandators/{mandator}/datatypes/{datatype}/endpoints/{endpoint}/objects:
+  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects:
     get:
       tags:
       - "data"
@@ -1553,13 +1553,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1598,12 +1598,12 @@ paths:
         200:
           description: "List of objects"
           schema:
-            $ref: "#/definitions/endpoint-objects"
+            $ref: "#/definitions/EndpointObjects"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /mandators/{mandator}/datatypes/{datatype}/objects/{object}/history:
+  /namespaces/{namespace}/collections/{collection}/objects/{object}/history:
     get:
       tags:
       - "data"
@@ -1614,13 +1614,13 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "path"
@@ -1659,12 +1659,12 @@ paths:
         200:
           description: "Object history"
           schema:
-            $ref: "#/definitions/data-objects"
+            $ref: "#/definitions/DataObjects"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/mandators/{mandator}/datatypes/{datatype}/objects:
+  /watch/namespaces/{namespace}/collections/{collection}/objects:
     get:
       tags:
       - "data"
@@ -1675,13 +1675,13 @@ paths:
       - "application/json;stream=watch"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "query"
@@ -1716,24 +1716,24 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /mandators/{mandator}/datatypes/{datatype}/objects:
+  /namespaces/{namespace}/collections/{collection}/objects:
     get:
       tags:
       - "data"
-      summary: "Get objects of a specific datatype"
-      description: "A object is a data object from a specifc datatype"
+      summary: "Get objects of a specific collection"
+      description: "A object is a data object from a specifc collection"
       operationId: "getObjects"
       produces:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: "query"
@@ -1767,7 +1767,7 @@ paths:
         200:
           description: "List of objects"
           schema:
-            $ref: "#/definitions/data-objects"
+            $ref: "#/definitions/DataObjects"
         404:
           description: "Resource does not exists"
         403:
@@ -1775,7 +1775,7 @@ paths:
     post:
       tags:
       - "data"
-      summary: "Add a new object of a specifc datatype"
+      summary: "Add a new object of a specifc collection"
       operationId: "addObject"
       consumes:
       - "application/json"
@@ -1783,28 +1783,28 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
-        name: "mandator"
-        description: "Mandator name"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "datatype"
-        description: "Datatype"
+        name: "collection"
+        description: "Collection"
         required: true
         type: "string"
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/data-object"
+          $ref: "#/definitions/DataObject"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/data-object"
+            $ref: "#/definitions/DataObject"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/job"
+            $ref: "#/definitions/Job"
         404:
           description: "Resource does not exists"
         403:
@@ -1892,7 +1892,7 @@ paths:
         200:
           description: "List of secrets"
           schema:
-            $ref: "#/definitions/secrets"
+            $ref: "#/definitions/Secrets"
         403:
           description: "Access denied"
     post:
@@ -1906,12 +1906,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/secret"
+          $ref: "#/definitions/Secret"
       responses:
         201:
           description: "The created secret"
           schema:
-            $ref: "#/definitions/secret"
+            $ref: "#/definitions/Secret"
         403:
           description: "Access denied"
   /secrets/{secret}:
@@ -1932,7 +1932,7 @@ paths:
         200:
           description: "secret"
           schema:
-            $ref: "#/definitions/secret"
+            $ref: "#/definitions/Secret"
         404:
           description: "secret does not exists"
         403:
@@ -1958,12 +1958,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "The updated secret"
           schema:
-            $ref: "#/definitions/secret"
+            $ref: "#/definitions/Secret"
         403:
           description: "Access denied"
     put:
@@ -1982,12 +1982,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/secret"
+          $ref: "#/definitions/Secret"
       responses:
         201:
           description: "The created secret"
           schema:
-            $ref: "#/definitions/secret"
+            $ref: "#/definitions/Secret"
         403:
           description: "Access denied"
     delete:
@@ -2093,7 +2093,7 @@ paths:
         200:
           description: "List of users"
           schema:
-            $ref: "#/definitions/users"
+            $ref: "#/definitions/Users"
         403:
           description: "Access denied"
     post:
@@ -2107,12 +2107,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/user"
+          $ref: "#/definitions/User"
       responses:
         201:
           description: "The created User"
           schema:
-            $ref: "#/definitions/user"
+            $ref: "#/definitions/User"
         403:
           description: "Access denied"
   /users/{User}:
@@ -2133,7 +2133,7 @@ paths:
         200:
           description: "User"
           schema:
-            $ref: "#/definitions/user"
+            $ref: "#/definitions/User"
         404:
           description: "User does not exists"
         403:
@@ -2159,12 +2159,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "The updated User"
           schema:
-            $ref: "#/definitions/user"
+            $ref: "#/definitions/User"
         403:
           description: "Access denied"
     put:
@@ -2183,12 +2183,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/user"
+          $ref: "#/definitions/User"
       responses:
         201:
           description: "The created User"
           schema:
-            $ref: "#/definitions/user"
+            $ref: "#/definitions/User"
         403:
           description: "Access denied"
     delete:
@@ -2294,7 +2294,7 @@ paths:
         200:
           description: "List of access rules"
           schema:
-            $ref: "#/definitions/access-rules"
+            $ref: "#/definitions/AccessRules"
         403:
           description: "Access denied"
     post:
@@ -2308,12 +2308,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/access-rule"
+          $ref: "#/definitions/AccessRule"
       responses:
         201:
           description: "The created access rule"
           schema:
-            $ref: "#/definitions/access-rule"
+            $ref: "#/definitions/AccessRule"
         403:
           description: "Access denied"
   /access-rules/{access-rule}:
@@ -2334,7 +2334,7 @@ paths:
         200:
           description: "Acccess rule"
           schema:
-            $ref: "#/definitions/access-rule"
+            $ref: "#/definitions/AccessRule"
         404:
           description: "access rule does not exists"
         403:
@@ -2360,12 +2360,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "The updated access rule"
           schema:
-            $ref: "#/definitions/access-rule"
+            $ref: "#/definitions/AccessRule"
         403:
           description: "Access denied"
     put:
@@ -2384,12 +2384,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/access-rule"
+          $ref: "#/definitions/AccessRule"
       responses:
         201:
           description: "The created access rule"
           schema:
-            $ref: "#/definitions/access-rule"
+            $ref: "#/definitions/AccessRule"
         403:
           description: "Access denied"
     delete:
@@ -2495,7 +2495,7 @@ paths:
         200:
           description: "List of access roles"
           schema:
-            $ref: "#/definitions/access-roles"
+            $ref: "#/definitions/AccessRoles"
         403:
           description: "Access denied"
     post:
@@ -2509,12 +2509,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/access-role"
+          $ref: "#/definitions/AccessRole"
       responses:
         201:
           description: "The created access role"
           schema:
-            $ref: "#/definitions/access-role"
+            $ref: "#/definitions/AccessRole"
         403:
           description: "Access denied"
   /access-roles/{access-role}:
@@ -2535,7 +2535,7 @@ paths:
         200:
           description: "Acccess role"
           schema:
-            $ref: "#/definitions/access-role"
+            $ref: "#/definitions/AccessRole"
         404:
           description: "access role does not exists"
         403:
@@ -2561,12 +2561,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "The updated access role"
           schema:
-            $ref: "#/definitions/access-role"
+            $ref: "#/definitions/AccessRole"
         403:
           description: "Access denied"
     put:
@@ -2587,16 +2587,16 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/access-role"
+          $ref: "#/definitions/AccessRole"
       responses:
         200:
           description: "The updated access role"
           schema:
-            $ref: "#/definitions/access-role"
+            $ref: "#/definitions/AccessRole"
         201:
           description: "The created access role if it did not exists yet"
           schema:
-            $ref: "#/definitions/access-role"
+            $ref: "#/definitions/AccessRole"
         403:
           description: "Access denied"
     delete:
@@ -2702,7 +2702,7 @@ paths:
         200:
           description: "List of active jobs"
           schema:
-            $ref: "#/definitions/jobs"
+            $ref: "#/definitions/Jobs"
         403:
           description: "Access denied"
     post:
@@ -2716,12 +2716,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/job"
+          $ref: "#/definitions/Job"
       responses:
         202:
           description: "The created job"
           schema:
-            $ref: "#/definitions/job"
+            $ref: "#/definitions/Job"
         404:
           description: "Resource does not exists"
         403:
@@ -2744,7 +2744,7 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/job"
+            $ref: "#/definitions/Job"
         404:
           description: "Job does not exists"
         403:
@@ -2791,12 +2791,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/json-patch"
+            $ref: "#/definitions/JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/job"
+            $ref: "#/definitions/Job"
         404:
           description: "Resource does not exists"
         403:
@@ -2841,7 +2841,7 @@ paths:
         200:
           description: "Process"
           schema:
-            $ref: "#/definitions/processes"
+            $ref: "#/definitions/Processes"
         404:
           description: "Job does not exists"
         403:
@@ -2857,12 +2857,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/process"
+          $ref: "#/definitions/Process"
       responses:
         202:
           description: "Returns a 202 if successful"
           schema:
-            $ref: "#/definitions/process"
+            $ref: "#/definitions/Process"
         404:
           description: "Job does not exists"
         403:
@@ -2928,7 +2928,7 @@ paths:
         200:
           description: "Process"
           schema:
-            $ref: "#/definitions/process"
+            $ref: "#/definitions/Process"
         404:
           description: "Process does not exists"
         403:
@@ -2998,7 +2998,7 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/log"
+            $ref: "#/definitions/Log"
         404:
           description: "Job does not exists"
         403:
@@ -3026,7 +3026,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/log"
+            $ref: "#/definitions/Log"
         404:
           description: "Job does not exists"
         403:
@@ -3124,7 +3124,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/log"
+            $ref: "#/definitions/Log"
         404:
           description: "Process does not exists"
         403:
@@ -3152,7 +3152,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/log"
+            $ref: "#/definitions/Log"
         404:
           description: "Log does not exists"
         403:
@@ -3206,7 +3206,7 @@ paths:
         403:
           description: "Access denied"
 definitions:
-  json-patch:
+  JsonPatch:
     description: "A JSON Patch according rfc6902."
     type: "object"
     properties:
@@ -3216,32 +3216,32 @@ definitions:
         type: "string"
       value:
         type: "string"
-  links:
+  Links:
     description: "Contains resource links (URL) to other resources."
     type: "object"
     properties:
       self:
-        $ref: "#/definitions/link"
-  list-links:
+        $ref: "#/definitions/Link"
+  ListLinks:
     type: "object"
     properties:
       self:
-        $ref: "#/definitions/link"
+        $ref: "#/definitions/Link"
       prev:
-        $ref: "#/definitions/link"
+        $ref: "#/definitions/Link"
       next:
-        $ref: "#/definitions/link"
-  link:
+        $ref: "#/definitions/Link"
+  Link:
     type: "object"
     properties:
       href:
         type: "string"
-  list:
+  List:
     type: "object"
     properties:
       _links:
         description: "Holds a list of links rfc1738 to other resources."
-        $ref: "#/definitions/list-links"
+        $ref: "#/definitions/ListLinks"
       kind:
         description: "The resource type, always List."
         type: "string"
@@ -3252,11 +3252,11 @@ definitions:
       total:
         description: "Holds the number of total available items on the server. Note that a List resource is always paged. You need to traverse with offset and limit to request further resources in the list."
         type: "number"
-  resource:
+  Resource:
     type: "object"
     properties:
       _links:
-        $ref: "#/definitions/links"
+        $ref: "#/definitions/Links"
       name:
         description: "Resource identifier. Note that the name is immutable once created on the server and must be unique in its own resource context."
         type: "string"
@@ -3276,8 +3276,8 @@ definitions:
         description: "Injected secrets in this resource."
         type: "array"
         items:
-          $ref: "#/definitions/secret-mount"
-  secret-mount:
+          $ref: "#/definitions/SecretMount"
+  SecretMount:
     type: "object"
     properties:
       secret:
@@ -3289,10 +3289,10 @@ definitions:
       to:
         description: "The resource path where the secret value should be injected (You may use a recursive path by delimiting keys with '.', for example: data.resource.password)."
         type: "string"
-  mandators:
-    description: "A list of mandators."
+  Namespaces:
+    description: "A list of namespaces."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3300,23 +3300,23 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/mandator"
-  mandator:
-    description: "A mandator is a namespace to separate resources."
+              $ref: "#/definitions/Namespace"
+  Namespace:
+    description: "A namespace is a namespace to separate resources."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
         properties:
           kind:
-            description: "The resource type, always Mandator."
+            description: "The resource type, always Namespace."
             type: "string"
-            default: "Mandator"
-  secrets:
+            default: "Namespace"
+  Secrets:
     description: "A list of secrets."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3324,11 +3324,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/secret"
-  secret:
+              $ref: "#/definitions/Secret"
+  Secret:
     description: "A secret is sensitive information which can be injected into another resource. A secret gets specially encrypted on the server and is always base64 encoded."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3340,10 +3340,10 @@ definitions:
           data:
             description: "The secrets data. You may specify multiple keys. Important: You need to base64 encode the values!"
             type: "object"
-  users:
+  Users:
     description: "A list of users."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3351,11 +3351,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/user"
-  user:
+              $ref: "#/definitions/User"
+  User:
     description: "A local tubee user."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3371,10 +3371,10 @@ definitions:
               password:
                 description: "The users password. Gets hashed on the server and can not be retrieved after."
                 type: "string"
-  access-rules:
+  AccessRules:
     description: "A list of access rules."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3382,11 +3382,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/access-rule"
-  access-rule:
+              $ref: "#/definitions/AccessRule"
+  AccessRule:
     description: "An access rule allows to specify what access roles can access which resources."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3417,7 +3417,7 @@ definitions:
                     - DELETE
                     - HEAD
               selectors:
-                description: "A list of selectors to match resources, for example mandator, datatype, endpoint, ..."
+                description: "A list of selectors to match resources, for example namespace, collection, endpoint, ..."
                 type: "array"
                 items:
                   type: "string"
@@ -3426,10 +3426,10 @@ definitions:
                 type: "array"
                 items:
                   type: "string"
-  access-roles:
+  AccessRoles:
     description: "A list of access roles."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3437,11 +3437,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/access-role"
-  access-role:
+              $ref: "#/definitions/AccessRole"
+  AccessRole:
     description: "An access role is defined list which matches authenticated user identifiers."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3458,10 +3458,10 @@ definitions:
                 type: "array"
                 items:
                   type: "string"
-  processes:
+  Processes:
     description: "A list of processes."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3469,11 +3469,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/process"
-  process:
+              $ref: "#/definitions/Process"
+  Process:
     description: "A process is a sub resource of a job. Each process represents one job execution."
     allOf:
-      - $ref: '#/definitions/job'
+      - $ref: '#/definitions/Job'
       - type: object
         required:
           - rootCause
@@ -3489,10 +3489,10 @@ definitions:
               code:
                 description: "The result code of the process."
                 type: "number"
-  jobs:
+  Jobs:
     description: "A list of jobs."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3500,11 +3500,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/job"
-  job:
-    description: "A job is a synchronization job which declares when and what datatypes should be synchronized."
+              $ref: "#/definitions/Job"
+  Job:
+    description: "A job is a synchronization job which declares when and what collections should be synchronized."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3528,14 +3528,14 @@ definitions:
                     type: array
                     items:
                       type: string
-              mandators:
-                description: "A list of mandators (name) the job should match. You may use a wildcard to specify all mandators."
+              namespaces:
+                description: "A list of namespaces (name) the job should match. You may use a wildcard to specify all namespaces."
                 type: array
                 items:
                   type: string
                 default: ["*"]
-              datatypes:
-                description: "A list of datatypes (name) the job should match. You may use a wildcard to specify all datatypes."
+              collections:
+                description: "A list of collections (name) the job should match. You may use a wildcard to specify all collections."
                 type: array
                 items:
                   type: string
@@ -3589,10 +3589,10 @@ definitions:
                     description: "The number of secconds beween failed job retries. The default is 300 (5min)."
                     type: "integer"
                     default: 0
-  logs:
+  Logs:
     description: "A list of logs."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3600,11 +3600,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/log"
-  log:
+              $ref: "#/definitions/Log"
+  Log:
     description: "A log messagage from a process."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3629,10 +3629,10 @@ definitions:
               exception:
                 description: "Holds an exception object if the log message holds an exception reference."
                 type: "object"
-  datatypes:
-    description: "A list of datatypes."
+  Collections:
+    description: "A list of collections."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3640,29 +3640,29 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/datatypes"
-  datatype:
-    description: "A datatype is a collection of data objects, meaning a collection of similar objects."
+              $ref: "#/definitions/Collections"
+  Collection:
+    description: "A collection is a collection of data objects, meaning a collection of similar objects."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
         properties:
           kind:
-            description: "The resource type, always DataType."
+            description: "The resource type, always Collection."
             type: "string"
-            default: "DataType"
+            default: "Collection"
           data:
             type: "object"
             properties:
               schema:
                 type: "object"
                 default: {}
-  endpoints:
+  Endpoints:
     description: "A list of endpoints."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3670,11 +3670,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/endpoint"
-  endpoint:
+              $ref: "#/definitions/Endpoint"
+  Endpoint:
     description: "An endpoint represents an external resource to browse (proxy), import or export. This may be a database, a file, a http service, ..."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3718,7 +3718,7 @@ definitions:
                     items:
                       type: string
                   flush:
-                    description: "If true and the endpoint is of type source, the endpoint gets flushed before export. If the type is destination, the endpoints datatype gets flushed before import. Pay attention with flush as it may result in data loss!"
+                    description: "If true and the endpoint is of type source, the endpoint gets flushed before export. If the type is destination, the endpoints collection gets flushed before import. Pay attention with flush as it may result in data loss!"
                     type: "boolean"
                     default: false
                   filter_one:
@@ -3727,10 +3727,10 @@ definitions:
                   filter_all:
                     description: "Specify a filter which always gets applied to the endpoint if objects are retrieved."
                     type: "string"
-  pdo-endpoint:
+  PdoEndpoint:
     description: "Pdo endpoint"
     allOf:
-      - $ref: '#/definitions/endpoint'
+      - $ref: '#/definitions/Endpoint'
       - type: object
         required:
           - rootCause
@@ -3765,10 +3765,10 @@ definitions:
                     description: "Driver specific connection options."
                     type: object
                     default: {}
-  mysql-endpoint:
+  MysqlEndpoint:
     description: "MySQL/MariaDB (and other MySQL forks) endpoint"
     allOf:
-      - $ref: '#/definitions/endpoint'
+      - $ref: '#/definitions/Endpoint'
       - type: object
         required:
           - rootCause
@@ -3806,10 +3806,10 @@ definitions:
                   socket:
                     description: "Specifies the socket or named pipe that should be used."
                     type: string
-  ldap-endpoint:
+  LdapEndpoint:
     description: "LDAP (OpenLDAP, Microsoft AD and other LDAP compatible Server) endpoint"
     allOf:
-      - $ref: '#/definitions/endpoint'
+      - $ref: '#/definitions/Endpoint'
       - type: object
         required:
           - rootCause
@@ -3847,10 +3847,10 @@ definitions:
                   options:
                     description: "More ldap specific settings (http://php.net/manual/en/function.ldap-set-option.php)."
                     type: object
-  odatarest-endpoint:
+  OdataRestEndpoint:
     description: "OData REST API endpoint (Compatible with Microsoft graph (Office365 and more) and other OData compatible api's)"
     allOf:
-      - $ref: '#/definitions/endpoint'
+      - $ref: '#/definitions/Endpoint'
       - type: object
         required:
           - rootCause
@@ -3866,8 +3866,11 @@ definitions:
                 type: "object"
                 properties:
                   base_uri:
-                    description: "Base uri to resourses (Like https://rest.api/v1/resources)."
+                    description: "Base uri to resources (Like https://rest.api/v1/resources)."
                     type: string
+                  options:
+                    description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
+                    type: object
                   auth:
                     description: "Authentication adapter, either of none, http basic authentication or oauth2 using client_credentials flow."
                     type: string
@@ -3901,10 +3904,206 @@ definitions:
                       client_secret:
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
                         type: string
-  workflows:
+  MongodbEndpoint:
+    description: "MongoDB endpoint"
+    allOf:
+      - $ref: '#/definitions/Endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The type of endpoint. Always MongodbEndpoint."
+            type: "string"
+            default: "MongodbEndpoint"
+          data:
+            properties:
+              collection:
+                description: "The name of the MongoDB collection where the data is located at."
+                type: string
+              resource:
+                description: "Holds the relevant options of how to connect to the endpoint."
+                type: "object"
+                properties:
+                  uri:
+                    description: "MongoDB connection uri"
+                    type: string
+                    default: "mongodb://127.0.0.1"
+                  uri_options:
+                    description: "Advanced URI options"
+                    type: object
+                    default: {}
+                  driver_options:
+                    description: "Advanced Driver options"
+                    type: object
+                    default: {}
+  BalloonEndpoint:
+    description: "Balloon cloud server endpoint"
+    allOf:
+      - $ref: '#/definitions/Endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The type of endpoint. Always BalloonEndpoint."
+            type: "string"
+            default: "BalloonEndpoint"
+          data:
+            properties:
+              resource:
+                description: "Holds the relevant options of how to connect to the endpoint."
+                type: "object"
+                properties:
+                  base_uri:
+                    description: "Base uri to resources (Like https://rest.api/v2/users)."
+                    type: string
+                  options:
+                    description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
+                    type: object
+                  auth:
+                    description: "Authentication adapter, either of none, http basic authentication or oauth2 using client_credentials flow."
+                    type: string
+                    enum:
+                      - basic
+                      - oauth2
+                  basic:
+                    description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
+                    type: object
+                    properties:
+                      username:
+                        description: "Basic authentication username."
+                        type: string
+                      password:
+                        description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                        type: string
+                      has_password:
+                        description: "Is true if a password has been set."
+                        type: boolean
+                        default: false
+                  oauth2:
+                    description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
+                    type: object
+                    properties:
+                      token_uri:
+                        description: "URI to token endpoint."
+                        type: string
+                      client_id:
+                        description: "OAuth2 client_id."
+                        type: string
+                      client_secret:
+                        description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
+                        type: string
+  CsvEndpoint:
+    description: "CSV data format endpoint"
+    allOf:
+      - $ref: '#/definitions/Endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The type of endpoint. Always CsvEndpoint."
+            type: "string"
+            default: "CsvEndpoint"
+          data:
+            properties:
+              storage:
+                $ref: '#/definitions/Storage'
+              file:
+                description: "File uri or pattern, depends what storage you have choosen."
+                type: string
+              resource:
+                description: "CSV parse options."
+                type: object
+                properties:
+                  delimiter:
+                    description: "Field delimiter."
+                    type: string
+                    default: ","
+                  enclosure:
+                    description: "Field enclosure."
+                    type: string
+                    default: '"'
+                  escape:
+                    description: "Escape character."
+                    type: string
+                    default: "\\"
+  XmlEndpoint:
+    description: "XML data format endpoint"
+    allOf:
+      - $ref: '#/definitions/Endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The type of endpoint. Always XmlEndpoint."
+            type: "string"
+            default: "XmlEndpoint"
+          data:
+            properties:
+              storage:
+                $ref: '#/definitions/Storage'
+              file:
+                description: "File uri or pattern, depends what storage you have choosen."
+                type: string
+              resource:
+                description: "CSV parse options."
+                type: object
+                properties:
+                  root_name:
+                    description: "The name of the root element."
+                    type: string
+                    default: "data"
+                  node_name:
+                    description: "The name of the sub node of the root element. For example: <root><row><a>0</a></row><a>1</a><row></row</root>"
+                    type: string
+                    default: "row"
+                  pretty:
+                    description: "Prettify xml output, note this is only useful if the XmlEndpoint is a destination endpoint."
+                    type: boolean
+                    default: true
+                  preserve_whitespace:
+                    description: "Preserve whitespace, note this is only useful if the XmlEndpoint is a destination endpoint."
+                    type: boolean
+                    default: false
+  JsonEndpoint:
+    description: "JSON data format endpoint"
+    allOf:
+      - $ref: '#/definitions/Endpoint'
+      - type: object
+        required:
+          - rootCause
+        properties:
+          kind:
+            description: "The type of endpoint. Always JsonEndpoint."
+            type: "string"
+            default: "JsonEndpoint"
+          data:
+            properties:
+              storage:
+                $ref: '#/definitions/Storage'
+              file:
+                description: "File uri or pattern, depends what storage you have choosen."
+                type: string
+  Storage:
+    description: "The storage defines where data can be fetched."
+    type: object
+    properties:
+      kind:
+        description: "The kind of storage where data shall be fetched."
+        type: string
+        default: "Stream"
+        enum:
+          - Stream
+          - LocalFilesystem
+          - Smb
+          - Balloon
+  Workflows:
     description: "A list of workflows."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3912,11 +4111,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/workflow"
-  workflow:
+              $ref: "#/definitions/Workflow"
+  Workflow:
     description: "A workflow gets used if an endpoint gets imported or exported. A workflow defines if and what object and also if and what attributes of an object should be written to or from an endpoint."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3940,19 +4139,19 @@ definitions:
                 description: "Holds a scripted condition if a given workflow gets matched and executed."
                 type: string
               map:
-                description: "Map attributes from the endpoint to the datatype schema (if the endpoint is of type source) or map attributes from the datatype to the endpoint if the endpoint is of type destination."
+                description: "Map attributes from the endpoint to the collection schema (if the endpoint is of type source) or map attributes from the collection to the endpoint if the endpoint is of type destination."
                 type: object
                 default: {}
-  attribute-map:
+  AttributeMap:
     type: "object"
     properties:
       map:
         type: "object"
         description: "Attribute map"
-  endpoint-objects:
+  EndpointObjects:
     description: "A list of endpoint objects."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3964,11 +4163,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/endpoint-object"
-  endpoint-object:
+              $ref: "#/definitions/EndpointObject"
+  EndpointObject:
     description: "An endpoint object is the actual object on an endpoint itself."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -3976,10 +4175,10 @@ definitions:
           data:
             description: "Attributes"
             type: "object"
-  data-objects:
+  DataObjects:
     description: "List of data objects."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -3987,11 +4186,11 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/data-object"
-  data-object:
-    description: "A data object represents a single object in a datatype (data collection)."
+              $ref: "#/definitions/DataObject"
+  DataObject:
+    description: "A data object represents a single object in a collection (data collection)."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
@@ -4003,10 +4202,10 @@ definitions:
           data:
             description: "Attributes"
             type: "object"
-  object-relatives:
+  ObjectRelatives:
     description: "A list of related objects."
     allOf:
-      - $ref: '#/definitions/list'
+      - $ref: '#/definitions/List'
       - type: object
         required:
           - rootCause
@@ -4014,19 +4213,19 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/object-relative"
-  object-relative:
-    description: "An object relation represents a releationship between two data objects. A relationship may apply to objects of different datatypes and/or mandators."
+              $ref: "#/definitions/ObjectRelative"
+  ObjectRelative:
+    description: "An object relation represents a releationship between two data objects. A relationship may apply to objects of different collections and/or namespaces."
     allOf:
-      - $ref: '#/definitions/resource'
+      - $ref: '#/definitions/Resource'
       - type: object
         required:
           - rootCause
         properties:
           kind:
-            description: "The resource type, always Mandator."
+            description: "The resource type, always Namespace."
             type: "string"
-            default: "Mandator"
+            default: "Namespace"
           data:
             type: object
             properties:
@@ -4035,4 +4234,4 @@ definitions:
                 type: "object"
                 default: {}
               object:
-                $ref: "#/definitions/data-object"
+                $ref: "#/definitions/DataObject"

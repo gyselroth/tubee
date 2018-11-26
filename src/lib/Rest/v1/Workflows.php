@@ -18,7 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
 use Tubee\Acl;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Tubee\Workflow\Factory as WorkflowFactory;
 use Zend\Diactoros\Response;
@@ -26,11 +26,11 @@ use Zend\Diactoros\Response;
 class Workflows
 {
     /**
-     * Mandator factory.
+     * ResourceNamespace factory.
      *
-     * @var MandatorFactory
+     * @var ResourceNamespaceFactory
      */
-    protected $mandator_factory;
+    protected $namespace_factory;
 
     /**
      * Workflow factory.
@@ -49,9 +49,9 @@ class Workflows
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator_factory, WorkflowFactory $workflow_factory, Acl $acl)
+    public function __construct(ResourceNamespaceFactory $namespace_factory, WorkflowFactory $workflow_factory, Acl $acl)
     {
-        $this->mandator_factory = $mandator_factory;
+        $this->namespace_factory = $namespace_factory;
         $this->workflow_factory = $workflow_factory;
         $this->acl = $acl;
     }
@@ -59,15 +59,15 @@ class Workflows
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $mandator = $this->mandator_factory->getOne($mandator);
-        $workflows = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $workflows = $namespace->getCollection($collection)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $workflows);
     }
@@ -75,10 +75,10 @@ class Workflows
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint, string $workflow): ResponseInterface
     {
-        $mandator = $this->mandator_factory->getOne($mandator);
-        $workflow = $mandator->getDataType($datatype)->getEndpoint($endpoint)->getWorkflow($workflow);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $workflow = $namespace->getCollection($collection)->getEndpoint($endpoint)->getWorkflow($workflow);
 
         return Helper::getOne($request, $identity, $workflow);
     }
@@ -86,13 +86,13 @@ class Workflows
     /**
      * Create.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
 
-        $mandator = $this->mandator_factory->getOne($mandator);
-        $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $endpoint = $namespace->getCollection($collection)->getEndpoint($endpoint);
         $this->workflow_factory->add($endpoint, $body);
 
         return new UnformattedResponse(
@@ -105,10 +105,10 @@ class Workflows
     /**
      * Delete.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint, string $workflow): ResponseInterface
     {
-        $mandator = $this->mandator_factory->getOne($mandator);
-        $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $endpoint = $namespace->getCollection($collection)->getEndpoint($endpoint);
         $this->workflow_factory->deleteOne($endpoint, $workflow);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
@@ -117,12 +117,12 @@ class Workflows
     /**
      * Patch.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint, string $workflow): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint, string $workflow): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $mandator = $this->mandator_factory->getOne($mandator);
-        $endpoint = $mandator->getDataType($datatype)->getEndpoint($endpoint);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $endpoint = $namespace->getCollection($collection)->getEndpoint($endpoint);
         $workflow = $endpoint->getWorkflow($workflow);
         $doc = ['data' => $workflow->getData()];
 
@@ -143,7 +143,7 @@ class Workflows
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, string $endpoint): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -151,7 +151,7 @@ class Workflows
             'existing' => true,
         ], $request->getQueryParams());
 
-        $endpoint = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getEndpoint($endpoint);
+        $endpoint = $this->namespace_factory->getOne($namespace)->getCollection($collection)->getEndpoint($endpoint);
         $cursor = $this->workflow_factory->watch($endpoint, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);

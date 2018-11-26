@@ -26,7 +26,7 @@ if [[ ! -f /etc/init/tubee-jobs.conf && -d /etc/init ]]; then
 fi
 
 echo "create admin user"
-/usr/bin/tubeecli upgrade start -vvv -i
+/usr/bin/tubeecli upgrade -vvv
 chown -R www-data. /var/log/tubee
 
 echo "create systemctl service"
@@ -36,3 +36,25 @@ echo "restart tubee-jobs service"
 if service --status-all | grep -Fq 'tubee-jobs'; then
   service tubee-jobs restart
 fi
+
+if [ ! -d /etc/ssl/tubee ]; then
+  mkdir /etc/ssl/tubee
+fi
+
+if [[ ! -f /etc/ssl/tubee/key.pem && ! -f /etc/ssl/tubee/chain.pem ]]; then
+  openssl genrsa -des3 -passout pass:tubee -out server.pass.key 2048
+  openssl rsa -passin pass:tubee -in server.pass.key -out key.pem
+  rm server.pass.key
+  openssl req -new -key key.pem -out server.csr -subj "/C=CH/L=Zurich/O=Tubee/CN=tubee.local"
+  openssl x509 -req -days 365 -in server.csr -signkey key.pem -out chain.pem
+  rm server.csr
+  mv key.pem /etc/ssl/tubee
+  mv chain.pem /etc/ssl/tubee
+fi
+
+if [ ! -f /etc/nginx/conf.d/tubee.conf ]; then
+  cp /usr/share/tubee/nginx/nginx.conf /etc/nginx/conf.d/tubee.conf
+fi
+
+service nginx restart
+

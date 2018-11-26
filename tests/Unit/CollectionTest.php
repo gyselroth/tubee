@@ -18,21 +18,21 @@ use PHPUnit\Framework\TestCase;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\UriInterface;
 use Psr\Log\LoggerInterface;
+use Tubee\Collection;
 use Tubee\DataObject\Exception as ObjectException;
 use Tubee\DataObject\Factory as DataObjectFactory;
-use Tubee\DataType;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Factory as EndpointFactory;
-use Tubee\Mandator\MandatorInterface;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Schema\SchemaInterface;
 
-class DataTypeTest extends TestCase
+class CollectionTest extends TestCase
 {
     protected $datatype;
 
     public function setUp()
     {
-        $mandator = $this->createMock(MandatorInterface::class);
+        $mandator = $this->createMock(ResourceNamespaceInterface::class);
         $mandator->method('getIdentifier')->willReturn('foo');
         $mandator->method('getName')->willReturn('foo');
 
@@ -48,7 +48,7 @@ class DataTypeTest extends TestCase
             ],
         ]);
 
-        $this->datatype = new DataType('foo', $mandator, $endpoint_factory, $object_factory, $schema, $this->createMock(LoggerInterface::class), [
+        $this->datatype = new Collection('foo', $mandator, $endpoint_factory, $object_factory, $schema, $this->createMock(LoggerInterface::class), [
             '_id' => new ObjectId(),
             'version' => 1,
             'name' => 'foo',
@@ -104,6 +104,6 @@ class DataTypeTest extends TestCase
 
         $result = $this->datatype->decorate($request);
         $this->assertSame('foo', $result['name']);
-        $this->assertSame('DataType', $result['kind']);
+        $this->assertSame('Collection', $result['kind']);
     }
 }

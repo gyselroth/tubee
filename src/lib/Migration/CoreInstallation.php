@@ -72,10 +72,10 @@ class CoreInstallation implements DeltaInterface
         $this->db->secrets->createIndex(['name' => 1], ['unique' => true]);
         $this->db->users->createIndex(['name' => 1], ['unique' => true]);
         $this->db->jobs->createIndex(['name' => 1], ['unique' => true]);
-        $this->db->mandators->createIndex(['name' => 1], ['unique' => true]);
-        $this->db->datatypes->createIndex(['name' => 1, 'mandator' => 1], ['unique' => true]);
-        $this->db->endpoints->createIndex(['name' => 1, 'datatype' => 1, 'mandator' => 1], ['unique' => true]);
-        $this->db->workflows->createIndex(['name' => 1, 'datatype' => 1, 'endpoint' => 1, 'mandator' => 1], ['unique' => true]);
+        $this->db->namespaces->createIndex(['name' => 1], ['unique' => true]);
+        $this->db->collections->createIndex(['name' => 1, 'namespace' => 1], ['unique' => true]);
+        $this->db->endpoints->createIndex(['name' => 1, 'collection' => 1, 'namespace' => 1], ['unique' => true]);
+        $this->db->workflows->createIndex(['name' => 1, 'collection' => 1, 'endpoint' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->relations->createIndex(['object_1' => 1, 'object_2' => 1], ['unique' => true]);
 
         if (!$this->user_factory->has('admin')) {
@@ -116,6 +116,10 @@ class CoreInstallation implements DeltaInterface
                 'size' => 100000000, ]
             );
         }
+
+        $this->db->logs->createIndex(['context.process' => 1]);
+        $this->db->logs->createIndex(['context.parent' => 1]);
+        $this->db->logs->createIndex(['context.job' => 1]);
 
         return true;
     }

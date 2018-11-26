@@ -17,6 +17,11 @@ use MongoDB\BSON\UTCDateTimeInterface;
 abstract class AbstractResource implements ResourceInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Resource';
+
+    /**
      * Data.
      *
      * @var array
@@ -29,6 +34,14 @@ abstract class AbstractResource implements ResourceInterface
     public function getId(): ObjectIdInterface
     {
         return $this->resource['_id'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getKind(): string
+    {
+        return static::KIND;
     }
 
     /**

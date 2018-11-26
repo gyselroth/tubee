@@ -9,7 +9,7 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\Balloon;
+namespace Tubee\Endpoint\OdataRest;
 
 use InvalidArgumentException;
 
@@ -50,8 +50,10 @@ class Validator
                 break;
                 case 'container':
                 break;
+                case 'options':
                 case 'oauth':
                 case 'basic':
+                case 'base_uri':
                 break;
                 default:
                     throw new InvalidArgumentException("unknown option resource.$key provided");

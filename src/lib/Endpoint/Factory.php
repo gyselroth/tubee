@@ -16,7 +16,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Secret\Factory as SecretFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -55,23 +55,23 @@ class Factory extends ResourceFactory
     /**
      * Has endpoint.
      */
-    public function has(DataTypeInterface $datatype, string $name): bool
+    public function has(CollectionInterface $collection, string $name): bool
     {
         return $this->db->{self::COLLECTION_NAME}->count([
             'name' => $name,
-            'mandator' => $datatype->getMandator()->getName(),
-            'datatype' => $datatype->getName(),
+            'namespace' => $collection->getResourceNamespace()->getName(),
+            'collection' => $collection->getName(),
         ]) > 0;
     }
 
     /**
      * Get all.
      */
-    public function getAll(DataTypeInterface $datatype, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAll(CollectionInterface $collection, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         $filter = [
-            'mandator' => $datatype->getMandator()->getName(),
-            'datatype' => $datatype->getName(),
+            'namespace' => $collection->getResourceNamespace()->getName(),
+            'collection' => $collection->getName(),
         ];
 
         if (!empty($query)) {
@@ -80,35 +80,35 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($datatype) {
-            return $this->build($resource, $datatype);
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($collection) {
+            return $this->build($resource, $collection);
         });
     }
 
     /**
      * Get one.
      */
-    public function getOne(DataTypeInterface $datatype, string $name): EndpointInterface
+    public function getOne(CollectionInterface $collection, string $name): EndpointInterface
     {
         $result = $this->db->{self::COLLECTION_NAME}->findOne([
             'name' => $name,
-            'mandator' => $datatype->getMandator()->getName(),
-            'datatype' => $datatype->getName(),
+            'namespace' => $collection->getResourceNamespace()->getName(),
+            'collection' => $collection->getName(),
         ]);
 
         if ($result === null) {
             throw new Exception\NotFound('endpoint '.$name.' is not registered');
         }
 
-        return $this->build($result, $datatype);
+        return $this->build($result, $collection);
     }
 
     /**
      * Delete by name.
      */
-    public function deleteOne(DataTypeInterface $datatype, string $name): bool
+    public function deleteOne(CollectionInterface $collection, string $name): bool
     {
-        $resource = $this->getOne($datatype, $name);
+        $resource = $this->getOne($collection, $name);
 
         return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
@@ -116,26 +116,26 @@ class Factory extends ResourceFactory
     /**
      * Add.
      */
-    public function add(DataTypeInterface $datatype, array $resource): ObjectIdInterface
+    public function add(CollectionInterface $collection, array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
-        if ($this->has($datatype, $resource['name'])) {
+        if ($this->has($collection, $resource['name'])) {
             throw new Exception\NotUnique('endpoint '.$resource['name'].' does already exists');
         }
 
         $resource['_id'] = new ObjectId();
-        $endpoint = $this->build($resource, $datatype);
+        $endpoint = $this->build($resource, $collection);
         $endpoint->setup();
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE) {
-            $this->ensureIndex($datatype, $resource['data']['options']['import']);
+            $this->ensureIndex($collection, $resource['data']['options']['import']);
         } elseif (!empty($resource['data']['options']['filter_all'])) {
-            $this->ensureIndex($datatype, array_keys($resource['data']['options']['filter_all']));
+            $this->ensureIndex($collection, array_keys($resource['data']['options']['filter_all']));
         }
 
-        $resource['mandator'] = $datatype->getMandator()->getName();
-        $resource['datatype'] = $datatype->getName();
+        $resource['namespace'] = $collection->getResourceNamespace()->getName();
+        $resource['collection'] = $collection->getName();
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
@@ -146,6 +146,7 @@ class Factory extends ResourceFactory
     public function update(EndpointInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
         $data = Validator::validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
@@ -154,30 +155,30 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(DataTypeInterface $datatype, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function watch(CollectionInterface $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($datatype) {
-            return $this->build($resource, $datatype);
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($collection) {
+            return $this->build($resource, $collection);
         }, $offset, $limit, $sort);
     }
 
     /**
      * Build instance.
      */
-    public function build(array $resource, DataTypeInterface $datatype)
+    public function build(array $resource, CollectionInterface $collection)
     {
         $factory = EndpointInterface::ENDPOINT_MAP[$resource['kind']].'\\Factory';
         $resource = $this->secret_factory->resolve($resource);
 
-        return $this->initResource($factory::build($resource, $datatype, $this->workflow_factory, $this->logger));
+        return $this->initResource($factory::build($resource, $collection, $this->workflow_factory, $this->logger));
     }
 
     /**
      * Ensure indexes.
      */
-    protected function ensureIndex(DataTypeInterface $datatype, array $fields): string
+    protected function ensureIndex(CollectionInterface $collection, array $fields): string
     {
-        $list = iterator_to_array($this->db->{$datatype->getCollection()}->listIndexes());
+        $list = iterator_to_array($this->db->{$collection->getCollection()}->listIndexes());
         $keys = array_fill_keys($fields, 1);
 
         $this->logger->debug('verify if mongodb index exists for import attributes [{import}]', [
@@ -200,6 +201,6 @@ class Factory extends ResourceFactory
             'category' => get_class($this),
         ]);
 
-        return $this->db->{$datatype->getCollection()}->createIndex($keys);
+        return $this->db->{$collection->getCollection()}->createIndex($keys);
     }
 }

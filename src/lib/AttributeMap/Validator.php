@@ -67,6 +67,8 @@ class Validator
                     }
 
                 break;
+                case 'unwind':
+                break;
                 case 'rewrite':
                 break;
                 case 'script':
@@ -74,6 +76,7 @@ class Validator
 
                 break;
                 case 'value':
+                break;
                 case 'from':
                 case 'require_regex':
                     if (!is_string($definition)) {
@@ -92,8 +95,8 @@ class Validator
                         throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type array');
                     }
 
-                    if (!isset($definition['datatype'])) {
-                        throw new InvalidArgumentException('mapping for attribute '.$name.' requires map.datatype');
+                    if (!isset($definition['collection'])) {
+                        throw new InvalidArgumentException('mapping for attribute '.$name.' requires map.collection');
                     }
 
                     if (!isset($definition['to'])) {

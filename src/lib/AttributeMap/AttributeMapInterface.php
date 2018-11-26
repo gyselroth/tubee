@@ -11,15 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\AttributeMap;
 
-use MongoDB\BSON\Binary;
-use MongoDB\BSON\Decimal128;
-use MongoDB\BSON\MaxKey;
-use MongoDB\BSON\MinKey;
-use MongoDB\BSON\ObjectIdInterface;
-use MongoDB\BSON\Regex;
-use MongoDB\BSON\Timestamp;
-use MongoDB\BSON\UTCDateTimeInterface;
-
 interface AttributeMapInterface
 {
     /**
@@ -53,6 +44,7 @@ interface AttributeMapInterface
     const TYPE_FLOAT = 'float';
     const TYPE_BOOL = 'bool';
     const TYPE_NULL = 'null';
+    const TYPE_BINARY = 'binary';
 
     /**
      * Valid types.
@@ -64,20 +56,7 @@ interface AttributeMapInterface
         self::TYPE_FLOAT,
         self::TYPE_BOOL,
         self::TYPE_NULL,
-    ];
-
-    /**
-     * Serializable class types.
-     */
-    const SERIALIZABLE_TYPES = [
-        Binary::class,
-        Decimal128::class,
-        MaxKey::class,
-        MinKey::class,
-        ObjectIdInterface::class,
-        Regex::class,
-        Timestamp::class,
-        UTCDateTimeInterface::class,
+        self::TYPE_BINARY,
     ];
 
     /**
@@ -93,7 +72,7 @@ interface AttributeMapInterface
     /**
      * Map attributes.
      */
-    public function map(array $data, UTCDateTimeInterface $ts): array;
+    public function map(array $data): array;
 
     /**
      * Create attribute diff.

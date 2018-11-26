@@ -9,29 +9,21 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\DataType;
+namespace Tubee\Collection;
 
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Mandator;
-use Tubee\Mandator\MandatorInterface;
 use Tubee\Resource\ResourceInterface;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
-interface DataTypeInterface extends ResourceInterface
+interface CollectionInterface extends ResourceInterface
 {
     /**
-     * Get dataset.
-     *
-     * @return iterable
+     * Get namespace.
      */
-    public function getDataset(): array;
-
-    /**
-     * Get mandator.
-     */
-    public function getMandator(): MandatorInterface;
+    public function getResourceNamespace(): ResourceNamespaceInterface;
 
     /**
      * Has endpoint.

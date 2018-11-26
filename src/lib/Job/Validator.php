@@ -43,8 +43,8 @@ class Validator extends ResourceValidator
                     'enabled' => false,
                     'receiver' => [],
                 ],
-                'mandators' => [],
-                'datatypes' => [],
+                'namespaces' => [],
+                'collections' => [],
                 'endpoints' => [],
                 'filter' => [],
                 'loadbalance' => true,
@@ -66,8 +66,8 @@ class Validator extends ResourceValidator
 
         foreach ($resource['data'] as $option => $value) {
             switch ($option) {
-                case 'mandators':
-                case 'datatypes':
+                case 'namespaces':
+                case 'collections':
                 case 'endpoints':
                     if (!is_array($value) || count(array_filter($value, 'is_string')) !== count($value)) {
                         throw new InvalidArgumentException('option '.$option.' must be an array of resource names');

@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\DataObject;
 
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Resource\ResourceInterface;
 
 interface DataObjectInterface extends ResourceInterface
@@ -19,7 +19,7 @@ interface DataObjectInterface extends ResourceInterface
     /**
      * Get data type.
      */
-    public function getDataType(): DataTypeInterface;
+    public function getCollection(): CollectionInterface;
 
     /**
      * Get endpoints.

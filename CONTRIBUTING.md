@@ -74,12 +74,18 @@ and do not contribute software parts which are not compatible with GPL-3.0.
 ## Editor config
 This repository gets shipped with an .editorconfig configuration. For more information on how to configure your editor please visit [editorconfig](https://github.com/editorconfig).
 
-## Code policy
-Add the following script to your git pre-commit hook file, otherwise your build will fail if you do not following code style:
+## Git pre commit hook
+Add the following lines to your git pre-commit hook file, otherwise your build will fail if you do not following code style:
+Note that you will need to install swagger-markdown on your host to compile the OpenAPI spec into markdown doc.
 
 ```
+swagger-markdown -i src/lib/Rest/v1/swagger.yml -o docs/11-api.md
 ./vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v
 ```
 
 This automatically converts your code into the code style guidelines of this project otherwise your build will fail!
 
+Install swagger-markdown:
+```
+npm install -g swagger-markdown
+```

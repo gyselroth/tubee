@@ -37,7 +37,7 @@ class Validator
         }
 
         foreach ($resource['resource'] as $key => $value) {
-            switch ($option) {
+            switch ($key) {
                 case 'delimiter':
                 case 'enclosure':
                 case 'escape':

@@ -18,9 +18,9 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Exception as DataObjectException;
-use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception as EndpointException;
 use Tubee\EndpointObject\EndpointObjectInterface;
@@ -106,8 +106,20 @@ class Workflow extends AbstractResource implements WorkflowInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
+        $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
+        $collection = $this->endpoint->getCollection()->getName();
+        $endpoint = $this->endpoint->getName();
+
         $resource = [
+            '_links' => [
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace)],
+                'collection' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace.'/collections/'.$collection)],
+                'endpoint' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace.'/collections/'.$collection.'/endpoints/'.$endpoint)],
+           ],
             'kind' => 'Workflow',
+            'namespace' => $namespace,
+            'collection' => $collection,
+            'endpoint' => $endpoint,
             'data' => $this->getData(),
         ];
 
@@ -156,7 +168,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
         switch ($this->ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                return $this->endpoint->getDataType()->deleteObject($object->getId(), $simulate);
+                return $this->endpoint->getCollection()->deleteObject($object->getId(), $simulate);
 
             break;
             case WorkflowInterface::ENSURE_EXISTS:
@@ -166,7 +178,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
             case WorkflowInterface::ENSURE_LAST:
                 //$object_ts = new UTCDateTimeInterface();
                 //$operation = $this->getMongoDBOperation($map, $object, $object_ts);
-                //$this->endpoint->getDataType()->change(['_id' => $object['id']], $operation, $simulate);
+                //$this->endpoint->getCollection()->change(['_id' => $object['id']], $operation, $simulate);
 
                 return true;
 
@@ -181,7 +193,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * {@inheritdoc}
      */
-    public function import(DataTypeInterface $datatype, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
+    public function import(CollectionInterface $collection, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $object = $object->getData();
         if ($this->checkCondition($object) === false) {
@@ -194,7 +206,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
             'map' => array_keys($map),
         ]);
 
-        $exists = $this->getImportObject($datatype, $map, $object, $ts);
+        $exists = $this->getImportObject($collection, $map, $object, $ts);
         $ensure = $this->ensure;
         if ($exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
@@ -205,7 +217,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
 
         switch ($ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                $datatype->deleteObject($exists->getId(), $simulate);
+                $collection->deleteObject($exists->getId(), $simulate);
 
                 return true;
 
@@ -218,8 +230,8 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ],
                 ];
 
-                $id = $datatype->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
-                $this->importRelations($datatype->getObject(['_id' => $id]), $map, $simulate, $endpoints);
+                $id = $collection->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                $this->importRelations($collection->getObject(['_id' => $id]), $map, $simulate, $endpoints);
 
                 return true;
 
@@ -234,7 +246,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ],
                 ];
 
-                $datatype->changeObject($exists, $object, $simulate, $endpoints);
+                $collection->changeObject($exists, $object, $simulate, $endpoints);
                 $this->importRelations($exists, $map, $simulate, $endpoints);
 
                 return true;
@@ -253,6 +265,8 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
+        $attributes['relations'] = $object->getRelatives();
+
         if ($this->checkCondition($attributes) === false) {
             return false;
         }
@@ -299,7 +313,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ],
                 ];
 
-                $this->endpoint->getDataType()->changeObject($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getCollection()->changeObject($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
 
@@ -336,7 +350,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 }
 
                 //$endpoints['endpoints.'.$this->endpoint->getName().'.last_sync'] = new UTCDateTime();
-                $this->endpoint->getDataType()->changeObject($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getCollection()->changeObject($object, $object->getData(), $simulate, $endpoints);
 
                 return true;
 
@@ -355,9 +369,9 @@ class Workflow extends AbstractResource implements WorkflowInterface
     {
         foreach ($this->attribute_map->getMap() as $name => $definition) {
             if (isset($definition['map'])) {
-                $mandator = $this->endpoint->getDataType()->getMandator();
-                $datatype = $mandator->getDataType($definition['map']['datatype']);
-                $relative = $datatype->getObject([
+                $namespace = $this->endpoint->getCollection()->getResourceNamespace();
+                $collection = $namespace->getCollection($definition['map']['collection']);
+                $relative = $collection->getObject([
                     'data.'.$definition['map']['to'] => $data[$name],
                 ]);
 
@@ -401,7 +415,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Get import object.
      */
-    protected function getImportObject(DataTypeInterface $datatype, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
+    protected function getImportObject(CollectionInterface $collection, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
         $prefixed = [];
@@ -414,7 +428,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         try {
-            $exists = $datatype->getObject($prefixed, false);
+            $exists = $collection->getObject($prefixed, false);
         } catch (DataObjectException\MultipleFound $e) {
             throw $e;
         } catch (DataObjectException\NotFound $e) {
@@ -453,6 +467,12 @@ class Workflow extends AbstractResource implements WorkflowInterface
         } catch (EndpointException\ObjectNotFound $e) {
             $this->logger->debug('object does not exists yet on destination endpoint', [
                 'category' => get_class($this),
+                'exception' => $e,
+            ]);
+        } catch (EndpointException\AttributeNotResolvable $e) {
+            $this->logger->debug('object filter can not be resolved, leading to non existing object', [
+                'category' => get_class($this),
+                'exception' => $e,
             ]);
         }
 
