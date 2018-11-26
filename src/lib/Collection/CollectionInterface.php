@@ -21,13 +21,6 @@ use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 interface CollectionInterface extends ResourceInterface
 {
     /**
-     * Get dataset.
-     *
-     * @return iterable
-     */
-    public function getDataset(): array;
-
-    /**
      * Get namespace.
      */
     public function getResourceNamespace(): ResourceNamespaceInterface;

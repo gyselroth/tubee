@@ -218,14 +218,6 @@ class Collection extends AbstractResource implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataset(): array
-    {
-        return $this->dataset;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getObjects(array $query = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
     {
         return $this->object_factory->getAll($this, $query, $include_dataset, $offset, $limit);

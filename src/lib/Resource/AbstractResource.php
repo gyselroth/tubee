@@ -17,6 +17,11 @@ use MongoDB\BSON\UTCDateTimeInterface;
 abstract class AbstractResource implements ResourceInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Resource';
+
+    /**
      * Data.
      *
      * @var array
