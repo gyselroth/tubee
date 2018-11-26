@@ -86,42 +86,27 @@ Create a file named `tubee-stable.yaml` with this content:
 ```yaml
 mongodb:
     image: mongo:3.6.0
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
 postfix:
     image: webuni/postfix
 tubee:
     image: gyselroth/tubee:latest
     links:
-        - clamav
         - mongodb
-        - elasticsearch
         - postfix
-        - browserless
-    entrypoint: php-fpm
+    entrypoint: service nginx start && php-fpm
     environment:
-        - BALLOON_MONGODB_URI=mongodb://mongodb:27017
-        - BALLOON_CLAMAV_URI=tcp://clamav:3310
-        - BALLOON_ELASTICSEARCH_URI=http://elasticsearch:9200
-        - BALLOON_WOPI_URL=https://tubee
-        - BALLOON_SMTP_HOST=postfix
-        - BALLOON_URL=http://localhost:8080
-        - BALLOON_BURL_BROWSERLESS_URL=http://browserless:3000
+        - TUBEE_MONGODB_URI=mongodb://mongodb:27017
+        - TUBEE_SMTP_HOST=postfix
 tubee-jobs:
     image: gyselroth/tubee:latest
     links:
-        - clamav
         - mongodb
-        - elasticsearch
         - postfix
-        - browserless
     entrypoint: tubeecli jobs
     environment:
-        - BALLOON_MONGODB_URI=mongodb://mongodb:27017
-        - BALLOON_CLAMAV_URI=tcp://clamav:3310
-        - BALLOON_ELASTICSEARCH_URI=http://elasticsearch:9200
-        - BALLOON_WOPI_URL=https://tubee
-        - BALLOON_SMTP_HOST=postfix
-        - BALLOON_URL=http://localhost:8080
-        - BALLOON_BURL_BROWSERLESS_URL=http://browserless:3000
+        - TUBEE_MONGODB_URI=mongodb://mongodb:27017
+        - TUBEE_SMTP_HOST=postfix
 ```
 
 The tubee server can now be started using:
