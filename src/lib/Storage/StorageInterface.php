@@ -16,6 +16,16 @@ use Generator;
 interface StorageInterface
 {
     /**
+     * StorageMap.
+     */
+    const STORAGE_MAP = [
+        'Stream' => Stream::class,
+        'LocalFilesystem' => LocalFilesystem::class,
+        'Balloon' => Balloon::class,
+        'Smb' => Smb::class,
+    ];
+
+    /**
      * Open write stream.
      */
     public function openWriteStream(string $file);

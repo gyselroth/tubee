@@ -19,18 +19,18 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class ObjectRelatives
 {
     /**
-     * mandator factory.
+     * namespace factory.
      *
-     * @var MandatorFactory
+     * @var ResourceNamespaceFactory
      */
-    protected $mandator_factory;
+    protected $namespace_factory;
 
     /**
      * Dataobject relation factory.
@@ -49,9 +49,9 @@ class ObjectRelatives
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator_factory, DataObjectRelationFactory $relation_factory, Acl $acl)
+    public function __construct(ResourceNamespaceFactory $namespace_factory, DataObjectRelationFactory $relation_factory, Acl $acl)
     {
-        $this->mandator_factory = $mandator_factory;
+        $this->namespace_factory = $namespace_factory;
         $this->relation_factory = $relation_factory;
         $this->acl = $acl;
     }
@@ -59,15 +59,15 @@ class ObjectRelatives
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $object = $datatype->getObject(['_id' => $object]);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $object = $collection->getObject(['_id' => $object]);
         $relatives = $object->getRelatives($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $relatives);
@@ -76,10 +76,10 @@ class ObjectRelatives
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object, ObjectId $relative): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object, ObjectId $relative): ResponseInterface
     {
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $object = $datatype->getObject(['_id' => $object], false);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $object = $collection->getObject(['_id' => $object], false);
         $relative = $object->getRelative($relative);
 
         return Helper::getOne($request, $identity, $relative);
@@ -88,7 +88,7 @@ class ObjectRelatives
     /**
      * Create object.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
     {
         $query = array_merge([
             'write' => false,
@@ -99,8 +99,8 @@ class ObjectRelatives
             'endpoints' => null,
         ], $request->getParsedBody());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $id = $datatype->createObject($body['data'], false, $body['endpoints']);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $id = $collection->createObject($body['data'], false, $body['endpoints']);
 
         if ($query['write'] === true) {
             //add job
@@ -108,7 +108,7 @@ class ObjectRelatives
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $datatype->getOne(['_id' => $id], false)->decorate($request),
+            $collection->getOne(['_id' => $id], false)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -116,7 +116,7 @@ class ObjectRelatives
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $id): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $id): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -124,7 +124,7 @@ class ObjectRelatives
             'existing' => true,
         ], $request->getQueryParams());
 
-        $object = $this->mandator_factory->getOne($mandator)->getDataType($datatype)->getObject($id);
+        $object = $this->namespace_factory->getOne($namespace)->getCollection($collection)->getObject($id);
         $cursor = $this->relation_factory->watch($object, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);

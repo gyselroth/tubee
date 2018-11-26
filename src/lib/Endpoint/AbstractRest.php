@@ -15,7 +15,7 @@ use GuzzleHttp\Client;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\Rest\Exception as RestException;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -66,7 +66,7 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, Client $client, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->client = $client;
 
@@ -74,7 +74,7 @@ abstract class AbstractRest extends AbstractEndpoint
             $this->setRestOptions($resource['data']['resource']['rest_options']);
         }
 
-        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
+        parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }
 
     /**

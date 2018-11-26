@@ -9,17 +9,17 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\DataType;
+namespace Tubee\Collection;
 
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
+use Tubee\Collection;
 use Tubee\DataObject\Factory as DataObjectFactory;
-use Tubee\DataType;
 use Tubee\Endpoint\Factory as EndpointFactory;
-use Tubee\Mandator\MandatorInterface;
 use Tubee\Resource\Factory as ResourceFactory;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Schema;
 
 class Factory extends ResourceFactory
@@ -27,7 +27,7 @@ class Factory extends ResourceFactory
     /**
      * Collection name.
      */
-    public const COLLECTION_NAME = 'datatypes';
+    public const COLLECTION_NAME = 'collections';
 
     /**
      * Object factory.
@@ -54,23 +54,23 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Has mandator.
+     * Has namespace.
      */
-    public function has(MandatorInterface $mandator, string $name): bool
+    public function has(ResourceNamespaceInterface $namespace, string $name): bool
     {
         return $this->db->{self::COLLECTION_NAME}->count([
             'name' => $name,
-            'mandator' => $mandator->getName(),
+            'namespace' => $namespace->getName(),
         ]) > 0;
     }
 
     /**
      * Get all.
      */
-    public function getAll(MandatorInterface $mandator, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         $filter = [
-            'mandator' => $mandator->getName(),
+            'namespace' => $namespace->getName(),
         ];
 
         if (!empty($query)) {
@@ -79,50 +79,50 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($mandator) {
-            return $this->build($resource, $mandator);
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace) {
+            return $this->build($resource, $namespace);
         });
     }
 
     /**
      * Get one.
      */
-    public function getOne(MandatorInterface $mandator, string $name): DataTypeInterface
+    public function getOne(ResourceNamespaceInterface $namespace, string $name): CollectionInterface
     {
         $result = $this->db->{self::COLLECTION_NAME}->findOne([
             'name' => $name,
-            'mandator' => $mandator->getName(),
+            'namespace' => $namespace->getName(),
         ]);
 
         if ($result === null) {
-            throw new Exception\NotFound('datatype '.$name.' is not registered');
+            throw new Exception\NotFound('collection '.$name.' is not registered');
         }
 
-        return $this->build($result, $mandator);
+        return $this->build($result, $namespace);
     }
 
     /**
      * Delete by name.
      */
-    public function deleteOne(MandatorInterface $mandator, string $name): bool
+    public function deleteOne(ResourceNamespaceInterface $namespace, string $name): bool
     {
-        $resource = $this->getOne($mandator, $name);
+        $resource = $this->getOne($namespace, $name);
 
         return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
-     * Add mandator.
+     * Add namespace.
      */
-    public function add(MandatorInterface $mandator, array $resource): ObjectIdInterface
+    public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
-        if ($this->has($mandator, $resource['name'])) {
-            throw new Exception\NotUnique('datatype '.$resource['name'].' does already exists');
+        if ($this->has($namespace, $resource['name'])) {
+            throw new Exception\NotUnique('collection '.$resource['name'].' does already exists');
         }
 
-        $resource['mandator'] = $mandator->getName();
+        $resource['namespace'] = $namespace->getName();
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
@@ -130,7 +130,7 @@ class Factory extends ResourceFactory
     /**
      * Update.
      */
-    public function update(DataTypeInterface $resource, array $data): bool
+    public function update(CollectionInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
         $data = Validator::validate($data);
@@ -141,20 +141,20 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(MandatorInterface $mandator, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($mandator) {
-            return $this->build($resource, $mandator);
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace) {
+            return $this->build($resource, $namespace);
         }, $offset, $limit, $sort);
     }
 
     /**
      * Build instance.
      */
-    public function build(array $resource, MandatorInterface $mandator): DataTypeInterface
+    public function build(array $resource, ResourceNamespaceInterface $namespace): CollectionInterface
     {
         $schema = new Schema($resource['data']['schema'], $this->logger);
 
-        return $this->initResource(new DataType($resource['name'], $mandator, $this->endpoint_factory, $this->object_factory, $schema, $this->logger, $resource));
+        return $this->initResource(new Collection($resource['name'], $namespace, $this->endpoint_factory, $this->object_factory, $schema, $this->logger, $resource));
     }
 }

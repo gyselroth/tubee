@@ -12,7 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint\Mysql;
 
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Mysql as MysqlEndpoint;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -22,11 +22,11 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
+    public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
         $options = $resource['data']['resource'];
         $wrapper = new Wrapper($options['host'], $logger, $options['username'], $options['passwd'], $options['dbname'], $options['socket']);
 
-        return new MysqlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $datatype, $workflow, $logger, $resource);
+        return new MysqlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $collection, $workflow, $logger, $resource);
     }
 }

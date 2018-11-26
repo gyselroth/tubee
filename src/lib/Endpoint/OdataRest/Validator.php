@@ -50,8 +50,10 @@ class Validator
                 break;
                 case 'container':
                 break;
+                case 'options':
                 case 'oauth':
                 case 'basic':
+                case 'base_uri':
                 break;
                 default:
                     throw new InvalidArgumentException("unknown option resource.$key provided");

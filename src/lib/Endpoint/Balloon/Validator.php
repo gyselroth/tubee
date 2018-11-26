@@ -47,6 +47,8 @@ class Validator
                     }
 
                 break;
+                case 'options':
+                case 'base_uri':
                 case 'oauth':
                 case 'basic':
                 break;

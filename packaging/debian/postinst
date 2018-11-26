@@ -26,7 +26,7 @@ if [[ ! -f /etc/init/tubee-jobs.conf && -d /etc/init ]]; then
 fi
 
 echo "create admin user"
-/usr/bin/tubeecli upgrade start -vvv -i
+/usr/bin/tubeecli upgrade -vvv
 chown -R www-data. /var/log/tubee
 
 echo "create systemctl service"

@@ -15,7 +15,7 @@ use Generator;
 use InvalidArgumentException;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Helper;
@@ -39,11 +39,11 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     protected $name;
 
     /**
-     * DataTypeInterface.
+     * CollectionInterface.
      *
-     * @var DataTypeInterface
+     * @var CollectionInterface
      */
-    protected $datatype;
+    protected $collection;
 
     /**
      * Logger.
@@ -104,12 +104,12 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, DataTypeInterface $datatype, WorkflowFactory $workflow_factory, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, CollectionInterface $collection, WorkflowFactory $workflow_factory, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
         $this->type = $type;
         $this->resource = $resource;
-        $this->datatype = $datatype;
+        $this->collection = $collection;
         $this->logger = $logger;
         $this->workflow_factory = $workflow_factory;
 
@@ -124,6 +124,14 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     public function setup(bool $simulate = false): EndpointInterface
     {
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getKind(): string
+    {
+        return $this->resource['kind'];
     }
 
     /**
@@ -170,17 +178,17 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $datatype = $this->datatype->getName();
-        $mandator = $this->datatype->getMandator()->getName();
+        $collection = $this->collection->getName();
+        $namespace = $this->collection->getResourceNamespace()->getName();
 
         $resource = [
             '_links' => [
-                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator)],
-                'datatype' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype)],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace)],
+                'collection' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace.'/collections/'.$collection)],
            ],
             'kind' => static::KIND,
-            'mandator' => $mandator,
-            'datatype' => $datatype,
+            'namespace' => $namespace,
+            'collection' => $collection,
             'data' => $this->getData(),
             'status' => function ($endpoint) {
                 try {
@@ -230,9 +238,9 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * {@inheritdoc}
      */
-    public function getDataType(): DataTypeInterface
+    public function getCollection(): CollectionInterface
     {
-        return $this->datatype;
+        return $this->collection;
     }
 
     /**
@@ -304,7 +312,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function getIdentifier(): string
     {
-        return $this->datatype->getIdentifier().'::'.$this->name;
+        return $this->collection->getIdentifier().'::'.$this->name;
     }
 
     /**

@@ -70,13 +70,13 @@ class Factory extends ResourceFactory
         $filter = [
             '$or' => [
                 [
-                    'mandator_1' => $object->getDataType()->getMandator()->getName(),
-                    'datatype_1' => $object->getDataType()->getName(),
+                    'namespace_1' => $object->getCollection()->getResourceNamespace()->getName(),
+                    'collection_1' => $object->getCollection()->getName(),
                     'object_1' => $object->getId(),
                 ],
                 [
-                    'mandator_2' => $object->getDataType()->getMandator()->getName(),
-                    'datatype_2' => $object->getDataType()->getName(),
+                    'namespace_2' => $object->getCollection()->getResourceNamespace()->getName(),
+                    'collection_2' => $object->getCollection()->getName(),
                     'object_2' => $object->getId(),
                 ],
             ],
@@ -90,9 +90,9 @@ class Factory extends ResourceFactory
 
         return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object) {
             if ($resource['object_1'] == $object->getId()) {
-                $related = $object->getDataType()->getMandator()->switch($resource['mandator_2'])->getDataType($resource['datatype_2'])->getObject(['_id' => $resource['object_2']]);
+                $related = $object->getCollection()->getResourceNamespace()->switch($resource['namespace_2'])->getCollection($resource['collection_2'])->getObject(['_id' => $resource['object_2']]);
             } else {
-                $related = $object->getDataType()->getMandator()->switch($resource['mandator_1'])->getDataType($resource['datatype_1'])->getObject(['_id' => $resource['object_1']]);
+                $related = $object->getCollection()->getResourceNamespace()->switch($resource['namespace_1'])->getCollection($resource['collection_1'])->getObject(['_id' => $resource['object_1']]);
             }
 
             return $this->build($resource, $object, $related);
@@ -105,11 +105,11 @@ class Factory extends ResourceFactory
     public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $resource = [
-            'datatype_1' => $object_1->getDataType()->getName(),
-            'mandator_1' => $object_1->getDataType()->getMandator()->getName(),
+            'collection_1' => $object_1->getCollection()->getName(),
+            'namespace_1' => $object_1->getCollection()->getResourceNamespace()->getName(),
             'object_1' => $object_1->getId(),
-            'datatype_2' => $object_2->getDataType()->getName(),
-            'mandator_2' => $object_2->getDataType()->getMandator()->getName(),
+            'collection_2' => $object_2->getCollection()->getName(),
+            'namespace_2' => $object_2->getCollection()->getResourceNamespace()->getName(),
             'object_2' => $object_2->getId(),
             'data' => $context,
          ];

@@ -34,6 +34,14 @@ abstract class AbstractResource implements ResourceInterface
     /**
      * {@inheritdoc}
      */
+    public function getKind(): string
+    {
+        return static::KIND;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName(): string
     {
         if (isset($this->resource['name'])) {

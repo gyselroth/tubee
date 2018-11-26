@@ -15,9 +15,9 @@ use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
-use Tubee\DataType\DataTypeInterface;
 use Tubee\Resource\Factory as ResourceFactory;
 
 class Factory extends ResourceFactory
@@ -39,20 +39,20 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Has mandator.
+     * Has namespace.
      */
-    public function has(DataTypeInterface $mandator, string $name): bool
+    public function has(CollectionInterface $namespace, string $name): bool
     {
-        return $this->db->datatypes->count([
+        return $this->db->collections->count([
             'name' => $name,
-            'mandator' => $mandator->getName(),
+            'namespace' => $namespace->getName(),
         ]) > 0;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getObjectHistory(DataTypeInterface $datatype, ObjectIdInterface $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
+    public function getObjectHistory(CollectionInterface $collection, ObjectIdInterface $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [
             ['$match' => ['_id' => $id]],
@@ -73,52 +73,52 @@ class Factory extends ResourceFactory
             $pipeline[] = ['$limit' => $limit];
         }
 
-        $current = $this->getOne($datatype, ['_id' => $id]);
+        $current = $this->getOne($collection, ['_id' => $id]);
         yield $current;
 
-        foreach ($this->db->{$datatype->getCollection()}->aggregate($pipeline) as $version) {
-            yield $version['version'] => $this->build(array_merge($current->toArray(), $version['history']), $datatype);
+        foreach ($this->db->{$collection->getCollection()}->aggregate($pipeline) as $version) {
+            yield $version['version'] => $this->build(array_merge($current->toArray(), $version['history']), $collection);
         }
 
         $count[] = ['$count' => 'count'];
-        //return $this->db->{$datatype->getCollection()}->aggregate($count)['count'];
+        //return $this->db->{$collection->getCollection()}->aggregate($count)['count'];
         return 1;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getOne(DataTypeInterface $datatype, array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
+    public function getOne(CollectionInterface $collection, array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
         //$pipeline = $this->preparePipeline($filter, $include_dataset, $version);
 
-        $this->logger->debug('find one object with pipeline [{pipeline}] from ['.$datatype->getCollection().']', [
+        $this->logger->debug('find one object with pipeline [{pipeline}] from ['.$collection->getCollection().']', [
             'category' => get_class($this),
             //'pipeline' => $pipeline,
         ]);
 
-        $cursor = $this->db->{$datatype->getCollection()}->aggregate([['$match' => $filter]], [
+        $cursor = $this->db->{$collection->getCollection()}->aggregate([['$match' => $filter]], [
             'allowDiskUse' => true,
         ]);
         $objects = iterator_to_array($cursor);
 
         if (count($objects) === 0) {
-            throw new Exception\NotFound('data object '.json_encode($filter).' not found in collection '.$datatype->getCollection());
+            throw new Exception\NotFound('data object '.json_encode($filter).' not found in collection '.$collection->getCollection());
         }
         if (count($objects) > 1) {
-            throw new Exception\MultipleFound('multiple data objects found with filter '.json_encode($filter).' in collection '.$datatype->getCollection());
+            throw new Exception\MultipleFound('multiple data objects found with filter '.json_encode($filter).' in collection '.$collection->getCollection());
         }
 
-        return $this->build(array_shift($objects), $datatype);
+        return $this->build(array_shift($objects), $collection);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAll(DataTypeInterface $datatype, ?array $query = null, bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAll(CollectionInterface $collection, ?array $query = null, bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($this->db->{$datatype->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($datatype) {
-            return $this->build($resource, $datatype);
+        return $this->getAllFrom($this->db->{$collection->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($collection) {
+            return $this->build($resource, $collection);
         });
 
         /*$total = $collection->count($query);
@@ -135,27 +135,27 @@ class Factory extends ResourceFactory
         }
 
         $pipeline  = array_merge($pipeline, $this->preparePipeline());
-        $this->logger->debug('aggregate pipeline [{pipeline}] on collection ['.$datatype->getCollection().']', [
+        $this->logger->debug('aggregate pipeline [{pipeline}] on collection ['.$collection->getCollection().']', [
             'category' => get_class($this),
             'pipeline' => $pipeline
         ]);
 
-        $cursor = $this->db->{$datatype->getCollection()}->aggregate($pipeline, [
+        $cursor = $this->db->{$collection->getCollection()}->aggregate($pipeline, [
             'allowDiskUse' => true,
         ]);
 
         foreach ($cursor as $object) {
             ++$found;
-            yield (string) $object['_id'] => $this->build($object, $datatype);
+            yield (string) $object['_id'] => $this->build($object, $collection);
         }
 
         if ($found === 0) {
-            $this->logger->warning('found no data objects in collection ['.$datatype->getCollection().'] with aggregation pipeline [{pipeline}]', [
+            $this->logger->warning('found no data objects in collection ['.$collection->getCollection().'] with aggregation pipeline [{pipeline}]', [
                 'category' => get_class($this),
                 'pipeline' => $pipeline
             ]);
         } else {
-            $this->logger->info('found ['.$found.'] data objects in collection ['.$datatype->getCollection().'] with aggregation pipeline [{pipeline}]', [
+            $this->logger->info('found ['.$found.'] data objects in collection ['.$collection->getCollection().'] with aggregation pipeline [{pipeline}]', [
                 'category' => get_class($this),
                 'pipeline' => $pipeline
             ]);
@@ -167,48 +167,49 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function create(DataTypeInterface $datatype, array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
+    public function create(CollectionInterface $collection, array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
-        $datatype->getSchema()->validate($object);
+        $collection->getSchema()->validate($object);
 
         $object = [
             'data' => $object,
             'endpoints' => $endpoints,
         ];
 
-        return $this->addTo($this->db->{$datatype->getCollection()}, $object, $simulate);
+        return $this->addTo($this->db->{$collection->getCollection()}, $object, $simulate);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function update(DataTypeInterface $datatype, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
+    public function update(CollectionInterface $collection, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
     {
-        $datatype->getSchema()->validate($data);
+        $collection->getSchema()->validate($data);
 
         $data = ['data' => $data];
 
         if ($endpoints !== null) {
-            $data['endpoints'] = $endpoints;
+            $existing = $object->getEndpoints();
+            $data['endpoints'] = array_replace_recursive($existing, $endpoints);
         }
 
-        return $this->updateIn($this->db->{$datatype->getCollection()}, $object, $data, $simulate);
+        return $this->updateIn($this->db->{$collection->getCollection()}, $object, $data, $simulate);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteOne(DataTypeInterface $datatype, ObjectIdInterface $id, bool $simulate = false): bool
+    public function deleteOne(CollectionInterface $collection, ObjectIdInterface $id, bool $simulate = false): bool
     {
-        return $this->deleteFrom($this->db->{$datatype->getCollection()}, $id, $simulate);
+        return $this->deleteFrom($this->db->{$collection->getCollection()}, $id, $simulate);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function deleteAll(DataTypeInterface $datatype, ObjectIdInterface $id, bool $simulate = false): bool
+    public function deleteAll(CollectionInterface $collection, ObjectIdInterface $id, bool $simulate = false): bool
     {
-        $this->logger->info('delete object ['.$id.'] from ['.$datatype->getCollection().']', [
+        $this->logger->info('delete object ['.$id.'] from ['.$collection->getCollection().']', [
             'category' => get_class($this),
         ]);
     }
@@ -216,19 +217,19 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(DataTypeInterface $datatype, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function watch(CollectionInterface $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{$datatype->getCollection()}, $after, $existing, $query, function (array $resource) use ($datatype) {
-            return $this->build($datatype, $resource);
+        return $this->watchFrom($this->db->{$collection->getCollection()}, $after, $existing, $query, function (array $resource) use ($collection) {
+            return $this->build($collection, $resource);
         }, $offset, $limit, $sort);
     }
 
     /**
      * Build.
      */
-    public function build(array $resource, DataTypeInterface $datatype): DataObjectInterface
+    public function build(array $resource, CollectionInterface $collection): DataObjectInterface
     {
-        return $this->initResource(new DataObject($resource, $datatype, $this->relation_factory));
+        return $this->initResource(new DataObject($resource, $collection, $this->relation_factory));
     }
 
     /**

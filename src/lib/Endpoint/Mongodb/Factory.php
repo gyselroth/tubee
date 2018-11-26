@@ -13,7 +13,7 @@ namespace Tubee\Endpoint\Mongodb;
 
 use MongoDB\Client;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Mongodb as MongodbEndpoint;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -23,11 +23,11 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
+    public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
         $options = $resource['data']['resource'];
         $mongodb = new Client(...$options);
 
-        return new MongodbEndpoint($resource['name'], $resource['data']['type'], $mongodb->selectCollection($resource['data']['collection']), $datatype, $workflow, $logger, $resource);
+        return new MongodbEndpoint($resource['name'], $resource['data']['type'], $mongodb->selectCollection($resource['data']['collection']), $collection, $workflow, $logger, $resource);
     }
 }

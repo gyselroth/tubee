@@ -16,7 +16,7 @@ use Imagick;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Storage\StorageInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -52,13 +52,13 @@ class Image extends AbstractFile
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $file, StorageInterface $storage, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         if (isset($resource['image_options'])) {
             $this->setImageOptions($resource['image_options']);
         }
 
-        parent::__construct($name, $type, $file, $storage, $datatype, $workflow, $logger, $resource);
+        parent::__construct($name, $type, $file, $storage, $collection, $workflow, $logger, $resource);
     }
 
     /**

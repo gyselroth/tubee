@@ -13,7 +13,7 @@ namespace Tubee\Endpoint\Balloon;
 
 use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\Balloon;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -23,7 +23,7 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow_factory, LoggerInterface $logger): EndpointInterface
+    public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow_factory, LoggerInterface $logger): EndpointInterface
     {
         $options = [
             'base_uri' => $resource['data']['resource']['base_uri'],
@@ -41,8 +41,9 @@ class Factory
             }
         }
 
+        $options = array_merge($resource['data']['resource']['options'], $options);
         $client = new Client($options);
 
-        return new Balloon($resource['name'], $resource['data']['type'], $client, $datatype, $workflow_factory, $logger, $resource);
+        return new Balloon($resource['name'], $resource['data']['type'], $client, $collection, $workflow_factory, $logger, $resource);
     }
 }

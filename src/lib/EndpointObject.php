@@ -43,18 +43,18 @@ class EndpointObject extends AbstractResource implements EndpointObjectInterface
     public function decorate(ServerRequestInterface $request): array
     {
         $endpoint = $this->endpoint->getName();
-        $datatype = $this->endpoint->getDataType()->getName();
-        $mandator = $this->endpoint->getDataType()->getMandator()->getName();
+        $collection = $this->endpoint->getCollection()->getName();
+        $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
 
         $resource = [
             '_links' => [
-                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator)],
-                'datatype' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype)],
-                'endpoint' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype.'/endpoints/'.$endpoint)],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace)],
+                'collection' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace.'/collections/'.$collection)],
+                'endpoint' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace.'/collections/'.$collection.'/endpoints/'.$endpoint)],
             ],
             'kind' => 'EndpointObject',
-            'mandator' => $mandator,
-            'datatype' => $datatype,
+            'namespace' => $namespace,
+            'collection' => $collection,
             'endpoint' => $endpoint,
             'data' => $this->getData(),
         ];

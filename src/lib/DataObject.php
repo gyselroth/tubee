@@ -14,9 +14,9 @@ namespace Tubee;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
-use Tubee\DataType\DataTypeInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
 
@@ -25,9 +25,9 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * Datatype.
      *
-     * @var DataTypeInterface
+     * @var CollectionInterface
      */
-    protected $datatype;
+    protected $collection;
 
     /**
      * Data object relation factory.
@@ -39,10 +39,10 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * Data object.
      */
-    public function __construct(array $resource, DataTypeInterface $datatype, DataObjectRelationFactory $relation_factory)
+    public function __construct(array $resource, CollectionInterface $collection, DataObjectRelationFactory $relation_factory)
     {
         $this->resource = $resource;
-        $this->datatype = $datatype;
+        $this->collection = $collection;
         $this->relation_factory = $relation_factory;
     }
 
@@ -51,17 +51,17 @@ class DataObject extends AbstractResource implements DataObjectInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $datatype = $this->datatype->getName();
-        $mandator = $this->datatype->getMandator()->getName();
+        $collection = $this->collection->getName();
+        $namespace = $this->collection->getResourceNamespace()->getName();
 
         $resource = [
             '_links' => [
-                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator)],
-                'datatype' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$mandator.'/datatypes/'.$datatype)],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace)],
+                'collection' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace.'/collections/'.$collection)],
             ],
             'kind' => 'DataObject',
-            'mandator' => $mandator,
-            'datatype' => $datatype,
+            'namespace' => $namespace,
+            'collection' => $collection,
             'data' => $this->getData(),
             'status' => function ($object) {
                 $endpoints = $object->getEndpoints();
@@ -83,7 +83,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
      */
     public function getHistory(?array $query = null, ?int $offset = null, ?int $limit = null): Iterable
     {
-        return $this->datatype->getObjectHistory($this->getId(), $query, $offset, $limit);
+        return $this->collection->getObjectHistory($this->getId(), $query, $offset, $limit);
     }
 
     /**
@@ -97,9 +97,9 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function getDataType(): DataTypeInterface
+    public function getCollection(): CollectionInterface
     {
-        return $this->datatype;
+        return $this->collection;
     }
 
     /**

@@ -18,20 +18,20 @@ use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Job\Validator as JobValidator;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Zend\Mail\Message;
 
 class Sync extends AbstractJob
 {
     /**
-     * Mandator factory.
+     * ResourceNamespace factory.
      *
-     * @var MandatorFactory
+     * @var ResourceNamespaceFactory
      */
-    protected $mandator_factory;
+    protected $namespace_factory;
 
     /**
      * Scheduler.
@@ -71,9 +71,9 @@ class Sync extends AbstractJob
     /**
      * Sync.
      */
-    public function __construct(MandatorFactory $mandator_factory, Database $db, Scheduler $scheduler, LoggerInterface $logger)
+    public function __construct(ResourceNamespaceFactory $namespace_factory, Database $db, Scheduler $scheduler, LoggerInterface $logger)
     {
-        $this->mandator_factory = $mandator_factory;
+        $this->namespace_factory = $namespace_factory;
         $this->scheduler = $scheduler;
         $this->logger = $logger;
         $this->db = $db;
@@ -85,19 +85,20 @@ class Sync extends AbstractJob
      */
     public function start(): bool
     {
-        $filter = in_array('*', $this->data['mandators']) ? [] : ['name' => ['$in' => $this->data['mandators']]];
+        $filter = in_array('*', $this->data['namespaces']) ? [] : ['name' => ['$in' => $this->data['namespaces']]];
         $procs = [];
 
-        foreach ($this->mandator_factory->getAll($filter) as $mandator) {
-            $filter = in_array('*', $this->data['datatypes']) ? [] : ['name' => ['$in' => $this->data['datatypes']]];
-            foreach ($mandator->getDataTypes($filter) as $datatype) {
+        foreach ($this->namespace_factory->getAll($filter) as $namespace) {
+            $filter = in_array('*', $this->data['collections']) ? [] : ['name' => ['$in' => $this->data['collections']]];
+            foreach ($namespace->getCollections($filter) as $collection) {
                 $filter = in_array('*', $this->data['endpoints']) ? [] : ['name' => ['$in' => $this->data['endpoints']]];
-                foreach ($datatype->getEndpoints($filter) as $endpoint) {
+                foreach ($collection->getEndpoints($filter) as $endpoint) {
                     if ($this->data['loadbalance'] === true) {
                         $data = $this->data;
                         $data = array_merge($data, [
-                            'mandators' => [$mandator->getName()],
+                            'namespaces' => [$namespace->getName()],
                             'endpoints' => [$endpoint->getName()],
+                            'parent' => $this->getId(),
                             'loadbalance' => false,
                         ]);
 
@@ -105,16 +106,17 @@ class Sync extends AbstractJob
                     } else {
                         $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
                             'process' => (string) $this->getId(),
+                            'parent' => isset($this->data['parent']) ? (string) $this->data['parent'] : null,
                             'start' => $this->timestamp,
-                            'mandator' => $mandator->getName(),
-                            'datatype' => $datatype->getName(),
+                            'namespace' => $namespace->getName(),
+                            'collection' => $collection->getName(),
                             'endpoint' => $endpoint->getName(),
                         ]);
 
                         if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
-                            $this->import($datatype, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+                            $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
                         } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-                            $this->export($datatype, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+                            $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
                         }
 
                         $this->logger->popProcessor();
@@ -158,13 +160,13 @@ class Sync extends AbstractJob
     /**
      * {@inheritdoc}
      */
-    protected function export(DataTypeInterface $datatype, array $filter = [], array $endpoints = [], bool $simulate = false, bool $ignore = false): bool
+    protected function export(CollectionInterface $collection, array $filter = [], array $endpoints = [], bool $simulate = false, bool $ignore = false): bool
     {
-        $this->logger->info('start export to destination endpoints from data type ['.$datatype->getIdentifier().']', [
+        $this->logger->info('start export to destination endpoints from data type ['.$collection->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
-        $endpoints = iterator_to_array($datatype->getDestinationEndpoints($endpoints));
+        $endpoints = iterator_to_array($collection->getDestinationEndpoints($endpoints));
 
         foreach ($endpoints as $ep) {
             if ($ep->flushRequired()) {
@@ -174,8 +176,8 @@ class Sync extends AbstractJob
             $ep->setup($simulate);
         }
 
-        foreach ($datatype->getObjects($filter) as $id => $object) {
-            $this->logger->debug('process write for object ['.(string) $id.'] from data type ['.$datatype->getIdentifier().']', [
+        foreach ($collection->getObjects($filter) as $id => $object) {
+            $this->logger->debug('process write for object ['.(string) $id.'] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
@@ -219,7 +221,7 @@ class Sync extends AbstractJob
         }
 
         if (count($endpoints) === 0) {
-            $this->logger->warning('no destination endpoint available for datatype ['.$datatype->getIdentifier().'], skip export', [
+            $this->logger->warning('no destination endpoint available for collection ['.$collection->getIdentifier().'], skip export', [
                 'category' => get_class($this),
             ]);
 
@@ -236,13 +238,13 @@ class Sync extends AbstractJob
     /**
      * {@inheritdoc}
      */
-    protected function import(DataTypeInterface $datatype, array $filter = [], array $endpoints = [], bool $simulate = false, bool $ignore = false): bool
+    protected function import(CollectionInterface $collection, array $filter = [], array $endpoints = [], bool $simulate = false, bool $ignore = false): bool
     {
-        $this->logger->info('start import from source endpoints into data type ['.$datatype->getIdentifier().']', [
+        $this->logger->info('start import from source endpoints into data type ['.$collection->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
-        $endpoints = $datatype->getSourceEndpoints($endpoints);
+        $endpoints = $collection->getSourceEndpoints($endpoints);
 
         foreach ($endpoints as $ep) {
             $this->logger->info('start import from source endpoint ['.$ep->getIdentifier().']', [
@@ -250,13 +252,13 @@ class Sync extends AbstractJob
             ]);
 
             if ($ep->flushRequired()) {
-                $datatype->flush($simulate);
+                $collection->flush($simulate);
             }
 
             $ep->setup($simulate);
 
             foreach ($ep->getAll($filter) as $id => $object) {
-                $this->logger->debug('process import for object ['.$id.'] into data type ['.$datatype->getIdentifier().']', [
+                $this->logger->debug('process import for object ['.$id.'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
                     'attributes' => $object,
                 ]);
@@ -267,7 +269,7 @@ class Sync extends AbstractJob
                             'category' => get_class($this),
                         ]);
 
-                        if ($workflow->import($datatype, $object, $this->timestamp, $simulate) === true) {
+                        if ($workflow->import($collection, $object, $this->timestamp, $simulate) === true) {
                             $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the current object, skip any further workflows for the current data object', [
                                 'category' => get_class($this),
                             ]);
@@ -284,8 +286,8 @@ class Sync extends AbstractJob
 
                     $this->logger->error('failed import data object from source endpoint ['.$ep->getIdentifier().']', [
                         'category' => get_class($this),
-                        'mandator' => $datatype->getMandator()->getName(),
-                        'datatype' => $datatype->getName(),
+                        'namespace' => $collection->getResourceNamespace()->getName(),
+                        'collection' => $collection->getName(),
                         'endpoint' => $ep->getName(),
                         'exception' => $e,
                     ]);
@@ -296,12 +298,12 @@ class Sync extends AbstractJob
                 }
             }
 
-            $this->garbageCollector($datatype, $ep, $simulate, $ignore);
+            $this->garbageCollector($collection, $ep, $simulate, $ignore);
             $ep->shutdown($simulate);
         }
 
         if ($endpoints->getReturn() === 0) {
-            $this->logger->warning('no source endpoint available for datatype ['.$datatype->getIdentifier().'], skip import', [
+            $this->logger->warning('no source endpoint available for collection ['.$collection->getIdentifier().'], skip import', [
                 'category' => get_class($this),
             ]);
 
@@ -314,9 +316,9 @@ class Sync extends AbstractJob
     /**
      * Garbage.
      */
-    protected function garbageCollector(DataTypeInterface $datatype, EndpointInterface $endpoint, bool $simulate = false, bool $ignore = false): bool
+    protected function garbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, bool $simulate = false, bool $ignore = false): bool
     {
-        $this->logger->info('start garbage collector workflows from data type ['.$datatype->getIdentifier().']', [
+        $this->logger->info('start garbage collector workflows from data type ['.$collection->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -330,12 +332,12 @@ class Sync extends AbstractJob
             ],
         ];
 
-        $this->db->{$datatype->getCollection()}->updateMany($filter, ['$set' => [
+        $this->db->{$collection->getCollection()}->updateMany($filter, ['$set' => [
             'endpoints.'.$endpoint->getName().'.garbage' => true,
         ]]);
 
-        foreach ($datatype->getObjects($filter, false) as $id => $object) {
-            $this->logger->debug('process garbage workflows for garbage object ['.$id.'] from data type ['.$datatype->getIdentifier().']', [
+        foreach ($collection->getObjects($filter, false) as $id => $object) {
+            $this->logger->debug('process garbage workflows for garbage object ['.$id.'] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
@@ -354,7 +356,7 @@ class Sync extends AbstractJob
                     }
                 }
             } catch (\Exception $e) {
-                $this->logger->error('failed execute garbage collector for object ['.$id.'] from datatype ['.$datatype->getIdentifier().']', [
+                $this->logger->error('failed execute garbage collector for object ['.$id.'] from collection ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
                     'exception' => $e,
                 ]);

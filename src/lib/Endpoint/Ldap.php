@@ -16,7 +16,7 @@ use Generator;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\Ldap\Exception as LdapEndpointException;
 use Tubee\Endpoint\Ldap\QueryTransformer;
 use Tubee\EndpointObject\EndpointObjectInterface;
@@ -81,7 +81,7 @@ class Ldap extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, LdapServer $ldap, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, LdapServer $ldap, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->filter_all = '(objectClass=*)';
         $this->ldap = $ldap;
@@ -90,7 +90,7 @@ class Ldap extends AbstractEndpoint
             $this->setLdapOptions($resource['resource']);
         }
 
-        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
+        parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }
 
     /**

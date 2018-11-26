@@ -13,7 +13,7 @@ namespace Tubee\Endpoint\Ldap;
 
 use Dreamscapes\Ldap\Core\Ldap as LdapServer;
 use Psr\Log\LoggerInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Ldap as LdapEndpoint;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -23,10 +23,10 @@ class Factory
     /**
      * Build instance.
      */
-    public static function build(array $resource, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
+    public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
         $ldap = new LdapServer();
 
-        return new LdapEndpoint($resource['name'], $resource['data']['type'], $ldap, $datatype, $workflow, $logger, $resource);
+        return new LdapEndpoint($resource['name'], $resource['data']['type'], $ldap, $collection, $workflow, $logger, $resource);
     }
 }

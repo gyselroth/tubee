@@ -15,7 +15,7 @@ use Generator;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
-use Tubee\DataType\DataTypeInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\Moodle\ApiClient;
 use Tubee\Endpoint\Moodle\Exception as MoodleEndpointException;
 use Tubee\EndpointObject\EndpointObjectInterface;
@@ -45,11 +45,11 @@ class Moodle extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, array $call_map, ApiClient $wrapper, DataTypeInterface $datatype, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, array $call_map, ApiClient $wrapper, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->moodle = $wrapper;
         $this->call_map = $call_map;
-        parent::__construct($name, $type, $datatype, $workflow, $logger, $resource);
+        parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }
 
     /**

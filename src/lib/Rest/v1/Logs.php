@@ -110,10 +110,11 @@ class Logs
 
         if ($process !== null) {
             $process = $this->process_factory->getOne($process);
-            $query['query']['context.process'] = (string) $process->getId();
+            $query['query']['$or'][] = ['fullDocument.context.process' => (string) $process->getId()];
+            $query['query']['$or'][] = ['fullDocument.context.parent' => (string) $process->getId()];
         } else {
             $job = $this->job_factory->getOne($job);
-            $query['query']['context.job'] = (string) $job->getId();
+            $query['query']['fullDocument.context.job'] = (string) $job->getId();
         }
 
         $cursor = $this->log_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);

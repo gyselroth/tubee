@@ -19,9 +19,9 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
 use Tubee\Acl;
+use Tubee\Collection\Factory as CollectionFactory;
 use Tubee\DataObject\Factory as DataObjectFactory;
-use Tubee\DataType\Factory as DataTypeFactory;
-use Tubee\Mandator\Factory as MandatorFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Tubee\Rest\Pager;
 use Zend\Diactoros\Response;
@@ -29,18 +29,18 @@ use Zend\Diactoros\Response;
 class Objects
 {
     /**
-     * mandator factory.
+     * namespace factory.
      *
-     * @var MandatorFactory
+     * @var ResourceNamespaceFactory
      */
-    protected $mandator_factory;
+    protected $namespace_factory;
 
     /**
-     * datatype factory.
+     * collection factory.
      *
-     * @var DataTypeFactory
+     * @var CollectionFactory
      */
-    protected $datatype_factory;
+    protected $collection_factory;
 
     /**
      * Object factory.
@@ -59,10 +59,10 @@ class Objects
     /**
      * Init.
      */
-    public function __construct(MandatorFactory $mandator_factory, DataTypeFactory $datatype_factory, DataObjectFactory $object_factory, Acl $acl)
+    public function __construct(ResourceNamespaceFactory $namespace_factory, CollectionFactory $collection_factory, DataObjectFactory $object_factory, Acl $acl)
     {
-        $this->mandator_factory = $mandator_factory;
-        $this->datatype_factory = $datatype_factory;
+        $this->namespace_factory = $namespace_factory;
+        $this->collection_factory = $collection_factory;
         $this->acl = $acl;
         $this->object_factory = $object_factory;
     }
@@ -70,15 +70,15 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $objects = $datatype->getObjects($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $objects = $collection->getObjects($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $objects);
     }
@@ -86,10 +86,10 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
     {
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $object = $datatype->getObject(['_id' => $object], false);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $object = $collection->getObject(['_id' => $object], false);
 
         return Helper::getOne($request, $identity, $object);
     }
@@ -97,7 +97,7 @@ class Objects
     /**
      * Create object.
      */
-    public function post(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
         $query = array_merge([
             'write' => false,
@@ -108,12 +108,12 @@ class Objects
             'endpoints' => null,
         ], $request->getParsedBody());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $id = $datatype->createObject($body['data'], false, $body['endpoints']);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $id = $collection->createObject($body['data'], false, $body['endpoints']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $datatype->getObject(['_id' => $id], false)->decorate($request),
+            $collection->getObject(['_id' => $id], false)->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -121,7 +121,7 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getHistory(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function getHistory(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -129,8 +129,8 @@ class Objects
             'query' => [],
         ], $request->getQueryParams());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $object = $datatype->getObject(['_id' => $object], false);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $object = $collection->getObject(['_id' => $object], false);
         $history = $object->getHistory();
         $body = Pager::fromRequest($history, $request);
 
@@ -144,23 +144,23 @@ class Objects
     /**
      * Patch.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype, ObjectId $object): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $mandator = $this->mandator_factory->getOne($mandator);
-        $datatype = $mandator->getDataType($datatype);
-        $object = $datatype->getObject(['_id' => $object]);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $collection = $namespace->getCollection($collection);
+        $object = $collection->getObject(['_id' => $object]);
         $doc = ['data' => $object->getData()];
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();
         $update = json_decode($patched, true);
 
-        $this->object_factory->update($datatype, $object, $update);
+        $this->object_factory->update($collection, $object, $update);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $datatype->getObject(['_id' => $object->getId()])->decorate($request),
+            $collection->getObject(['_id' => $object->getId()])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -168,7 +168,7 @@ class Objects
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $mandator, string $datatype): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -176,8 +176,8 @@ class Objects
             'existing' => true,
         ], $request->getQueryParams());
 
-        $datatype = $this->mandator_factory->getOne($mandator)->getDataType($datatype);
-        $cursor = $this->object_factory->watch($datatype, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $cursor = $this->object_factory->watch($collection, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

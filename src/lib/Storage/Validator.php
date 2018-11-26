@@ -20,20 +20,14 @@ class Validator
      */
     public static function validate(array $resource): array
     {
-        if (!isset($resource['class']) || !is_string($resource['class'])) {
-            throw new InvalidArgumentException('resource.class is required and must be a string');
+        $defaults = ['kind' => 'Stream'];
+        $resource = array_replace_recursive($defaults, $resource);
+
+        if (!isset(StorageInterface::STORAGE_MAP[$resource['kind']])) {
+            throw new InvalidArgumentException('invalid storage kind provided, provide one of ['.join(',', array_flip(StorageInterface::STORAGE_MAP)).']');
         }
 
-        if (strpos($resource['class'], '\\') === false) {
-            $class = 'Tubee\\Storage\\'.$resource['class'];
-        } else {
-            $class = $resource['class'];
-        }
-
-        if (!class_exists($class)) {
-            throw new InvalidArgumentException("storage $class does not exists");
-        }
-
+        $class = StorageInterface::STORAGE_MAP[$resource['kind']];
         $validator = $class.'\\Validator';
         $resource['class'] = $class;
         $resource = $validator::validate($resource);

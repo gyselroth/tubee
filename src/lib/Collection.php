@@ -15,31 +15,31 @@ use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Factory as DataObjectFactory;
-use Tubee\DataType\DataTypeInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Factory as EndpointFactory;
-use Tubee\Mandator\MandatorInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Schema\SchemaInterface;
 
-class DataType extends AbstractResource implements DataTypeInterface
+class Collection extends AbstractResource implements CollectionInterface
 {
     /**
-     * DataType name.
+     * Collection name.
      *
      * @var string
      */
     protected $name;
 
     /**
-     * Mandator.
+     * ResourceNamespace.
      *
-     * @var MandatorInterface
+     * @var ResourceNamespaceInterface
      */
-    protected $mandator;
+    protected $namespace;
 
     /**
      * Schema.
@@ -54,13 +54,6 @@ class DataType extends AbstractResource implements DataTypeInterface
      * @var LoggerInterface
      */
     protected $logger;
-
-    /**
-     * MongoDB aggregation pipeline.
-     *
-     * @var iterable
-     */
-    protected $dataset = [];
 
     /**
      * Endpoints.
@@ -93,12 +86,12 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * Initialize.
      */
-    public function __construct(string $name, MandatorInterface $mandator, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, SchemaInterface $schema, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, ResourceNamespaceInterface $namespace, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, SchemaInterface $schema, LoggerInterface $logger, array $resource = [])
     {
         $this->resource = $resource;
         $this->name = $name;
-        $this->collection = 'objects'.'.'.$mandator->getName().'.'.$name;
-        $this->mandator = $mandator;
+        $this->collection = 'objects'.'.'.$namespace->getName().'.'.$name;
+        $this->namespace = $namespace;
         $this->schema = $schema;
         $this->endpoint_factory = $endpoint_factory;
         $this->logger = $logger;
@@ -124,9 +117,9 @@ class DataType extends AbstractResource implements DataTypeInterface
     /**
      * {@inheritdoc}
      */
-    public function getMandator(): MandatorInterface
+    public function getResourceNamespace(): ResourceNamespaceInterface
     {
-        return $this->mandator;
+        return $this->namespace;
     }
 
     /**
@@ -136,10 +129,10 @@ class DataType extends AbstractResource implements DataTypeInterface
     {
         $resource = [
             '_links' => [
-                'mandator' => ['href' => (string) $request->getUri()->withPath('/api/v1/mandators/'.$this->getMandator()->getName())],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$this->getResourceNamespace()->getName())],
             ],
-            'kind' => 'DataType',
-            'mandator' => $this->mandator->getName(),
+            'kind' => 'Collection',
+            'namespace' => $this->namespace->getName(),
             'data' => [
                 'schema' => $this->schema->getSchema(),
             ],
@@ -203,7 +196,7 @@ class DataType extends AbstractResource implements DataTypeInterface
      */
     public function getIdentifier(): string
     {
-        return $this->mandator->getIdentifier().'::'.$this->name;
+        return $this->namespace->getIdentifier().'::'.$this->name;
     }
 
     /**
