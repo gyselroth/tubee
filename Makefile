@@ -94,6 +94,7 @@ deb: $(DIST_DIR)/tubee-$(VERSION).deb
 
 $(DIST_DIR)/tubee-$(VERSION).deb: $(CHANGELOG_TARGET) $(BUILD_TARGET)
 	$(COMPOSER_BIN) update --no-dev
+	@rm $(BUILD_DIR)/coverage.xml
 	@mkdir -p $(BUILD_DIR)/DEBIAN
 	@cp $(BASE_DIR)/packaging/debian/control $(BUILD_DIR)/DEBIAN/control
 	@cp $(BASE_DIR)/packaging/debian/postinst $(BUILD_DIR)/DEBIAN/postinst
@@ -105,6 +106,8 @@ $(DIST_DIR)/tubee-$(VERSION).deb: $(CHANGELOG_TARGET) $(BUILD_TARGET)
 	@rsync -a --exclude='.git' $(VENDOR_DIR) $(BUILD_DIR)/usr/share/tubee
 	@cp  $(BASE_DIR)/packaging/tubee-jobs.service.systemd $(BUILD_DIR)/usr/share/tubee/scripts
 	@cp  $(BASE_DIR)/packaging/tubee-jobs.service.upstart $(BUILD_DIR)/usr/share/tubee/scripts
+	@mkdir $(BUILD_DIR)/usr/share/tubee/nginx
+	@cp -Rp $(BASE_DIR)/packaging/nginx.conf $(BUILD_DIR)/usr/share/tubee/nginx
 	@cp -Rp $(SRC_DIR)/cgi-bin/cli.php $(BUILD_DIR)/usr/share/tubee/bin/console/tubeecli
 	@cp -Rp $(SRC_DIR)/httpdocs $(BUILD_DIR)/usr/share/tubee/bin
 	@cp -Rp $(SRC_DIR)/lib $(BUILD_DIR)/usr/share/tubee/src
@@ -119,6 +122,7 @@ tar: $(TAR)
 
 $(TAR): $(BUILD_TARGET)
 	$(COMPOSER_BIN) update --no-dev
+	@rm $(BUILD_DIR)/coverage.xml
 	@-test ! -f $(TAR) || rm -fv $(TAR)
 	@-test -d $(DIST_DIR) || mkdir $(DIST_DIR)
 	@-test ! -d $(BUILD_DIR) || rm -rfv $(BUILD_DIR)
