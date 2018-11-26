@@ -1,0 +1,23 @@
+mongodb:
+    image: mongo:3.6.0
+    entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
+postfix:
+    image: webuni/postfix
+tubee:
+    image: gyselroth/tubee:latest-unstable
+    links:
+        - mongodb
+        - postfix
+    entrypoint: service nginx start && php-fpm
+    environment:
+        - TUBEE_MONGODB_URI=mongodb://mongodb:27017
+        - TUBEE_SMTP_HOST=postfix
+tubee-jobs:
+    image: gyselroth/tubee:latest-unstable
+    links:
+        - mongodb
+        - postfix
+    entrypoint: tubeecli jobs
+    environment:
+        - TUBEE_MONGODB_URI=mongodb://mongodb:27017
+        - TUBEE_SMTP_HOST=postfix

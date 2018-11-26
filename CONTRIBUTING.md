@@ -79,7 +79,7 @@ Add the following lines to your git pre-commit hook file, otherwise your build w
 Note that you will need to install swagger-markdown on your host to compile the OpenAPI spec into markdown doc.
 
 ```
-swagger-markdown -i src/lib/Rest/v1/swagger.yml -o docs/11-api.md
+swagger-markdown -i src/lib/Rest/v1/swagger.yml -o docs/development/api.md
 ./vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v
 ```
 
