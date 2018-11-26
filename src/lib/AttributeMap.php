@@ -12,13 +12,11 @@ declare(strict_types=1);
 namespace Tubee;
 
 use InvalidArgumentException;
-use MongoDB\BSON\Binary;
-use MongoDB\BSON\Regex;
-use MongoDB\BSON\UTCDateTimeInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\AttributeMap\Exception;
+use Tubee\AttributeMap\Transform;
 
 class AttributeMap implements AttributeMapInterface
 {
@@ -72,7 +70,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * {@inheritdoc}
      */
-    public function map(array $data, UTCDateTimeInterface $ts): array
+    public function map(array $data): array
     {
         $result = [];
         foreach ($this->map as $attr => $value) {
@@ -90,27 +88,16 @@ class AttributeMap implements AttributeMapInterface
                 }
             }
 
-            /*$attrv = $this->resolveValue($attr, $value, $data, $ts);
-            $attrv = $this->transformAttribute($attr, $value, $data, $attrv);
+            $mapped = $this->mapField($attr, $value, $data);
 
-            if (isset($value['type'])) {
-                $attrv = $this->serializeClass($attr, $attrv, $value['type']);
+            if ($mapped !== null) {
+                $result[$attr] = $mapped;
+
+                $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
+                    'category' => get_class($this),
+                    'value' => $result[$attr],
+                ]);
             }
-
-            if ($this->requireAttribute($attr, $value, $attrv) === null) {
-                continue;
-            }
-
-            if (isset($value['type'])) {
-                $attrv = $this->convert($attrv, $attr, $value['type']);
-            }*/
-
-            $result[$attr] = $this->mapField($attr, $value, $data, $ts);
-
-            $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
-                'category' => get_class($this),
-                'value' => $result[$attr],
-            ]);
         }
 
         return $result;
@@ -171,27 +158,35 @@ class AttributeMap implements AttributeMapInterface
         return $diff;
     }
 
-    protected function mapField($attr, $value, $data, $ts)
+    /**
+     * Map field.
+     */
+    protected function mapField($attr, $value, $data)
     {
-        $attrv = $this->resolveValue($attr, $value, $data, $ts);
-        $attrv = $this->transformAttribute($attr, $value, $data, $attrv);
-
-        if (isset($value['type'])) {
-            $attrv = $this->serializeClass($attr, $attrv, $value['type']);
-        }
+        $attrv = $this->resolveValue($attr, $value, $data);
+        $attrv = $this->transformAttribute($attr, $value, $attrv);
 
         if ($this->requireAttribute($attr, $value, $attrv) === null) {
             return;
         }
 
         if (isset($value['type'])) {
-            $attrv = $this->convert($attrv, $attr, $value['type']);
+            $attrv = Transform::convertType($attrv, $attr, $value['type']);
         }
 
         if (isset($value['unwind'])) {
+            $unwind = [];
             foreach ($attrv as $key => $element) {
-                $attrv[$key] = $this->mapField($attr, $value['unwind'], $element, $ts);
+                $result = $this->mapField($attr, $value['unwind'], [
+                    'root' => $element,
+                ]);
+
+                if ($result !== null) {
+                    $unwind[$key] = $result;
+                }
             }
+
+            $attrv = $unwind;
         }
 
         return $attrv;
@@ -220,7 +215,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * Transform attribute.
      */
-    protected function transformAttribute(string $attr, array $value, array $data, $attrv)
+    protected function transformAttribute(string $attr, array $value, $attrv)
     {
         if ($attrv === null) {
             return null;
@@ -231,46 +226,22 @@ class AttributeMap implements AttributeMapInterface
         }
 
         if (isset($value['rewrite'])) {
-            $attrv = $this->rewrite($attrv, $attr, $value['rewrite'], $data);
+            $attrv = $this->rewrite($attrv, $value['rewrite']);
         }
 
         if (isset($value['require_regex'])) {
-            $this->requireRegex($attrv, $attr, $value['require_regex']);
+            if (!preg_match($value['require_regex'], $attrv)) {
+                throw new Exception\AttributeRegexNotMatch('resolve attribute '.$attr.' value does not match require_regex');
+            }
         }
 
         return $attrv;
     }
 
     /**
-     * Convert to class.
-     */
-    protected function serializeClass(string $attr, $attrv, string $type)
-    {
-        if ($attrv === null || !in_array($type, AttributeMapInterface::SERIALIZABLE_TYPES)) {
-            return $attrv;
-        }
-
-        $args = [];
-
-        if ($attrv !== null) {
-            if ($attrv instanceof $type) {
-                return $attrv;
-            }
-
-            $args[] = $attrv;
-        }
-
-        if ($type === Binary::class) {
-            $args[] = Binary::TYPE_GENERIC;
-        }
-
-        return new $type(...$args);
-    }
-
-    /**
      * Check if attribute is required.
      */
-    protected function resolveValue(string $attr, array $value, array $data, UTCDateTimeInterface $ts)
+    protected function resolveValue(string $attr, array $value, array $data)
     {
         $result = null;
 
@@ -308,26 +279,6 @@ class AttributeMap implements AttributeMapInterface
     }
 
     /**
-     * Require regex value.
-     */
-    protected function requireRegex($value, string $attribute, string $regex): bool
-    {
-        if (is_iterable($value)) {
-            foreach ($value as $value_child) {
-                if (!preg_match($regex, $value_child)) {
-                    throw new Exception\AttributeRegexNotMatch('resolve attribute '.$attribute.' value does not match require_regex');
-                }
-            }
-        } else {
-            if (!preg_match($regex, $value)) {
-                throw new Exception\AttributeRegexNotMatch('resolve attribute '.$attribute.' value does not match require_regex');
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Shift first array element.
      */
     protected function firstArrayElement(Iterable $value, string $attribute)
@@ -344,28 +295,9 @@ class AttributeMap implements AttributeMapInterface
     }
 
     /**
-     * Rewrite attribute value.
-     */
-    protected function rewrite($value, string $attribute, Iterable $ruleset, Iterable $data)
-    {
-        if (is_iterable($value)) {
-            foreach ($value as &$value_child) {
-                $new = $this->processRules($value_child, $ruleset, $data);
-                if ($new !== null) {
-                    $value_child = $new;
-                }
-            }
-
-            return $value;
-        }
-
-        return $this->processRules($value, $ruleset, $data);
-    }
-
-    /**
      * Process ruleset.
      */
-    protected function processRules($value, Iterable $ruleset, Iterable $data)
+    protected function rewrite($value, array $ruleset)
     {
         foreach ($ruleset as $rule) {
             if (!isset($rule['match'])) {
@@ -390,45 +322,6 @@ class AttributeMap implements AttributeMapInterface
             }
         }
 
-        return null;
-    }
-
-    /**
-     * Convert value.
-     */
-    protected function convert($value, string $attribute, string $type)
-    {
-        switch ($type) {
-            case AttributeMapInterface::TYPE_ARRAY:
-                return (array) $value;
-
-            break;
-            case AttributeMapInterface::TYPE_STRING:
-                return (string) $value;
-
-            break;
-            case AttributeMapInterface::TYPE_INT:
-                return (int) $value;
-
-            break;
-            case AttributeMapInterface::TYPE_BOOL:
-                return (bool) $value;
-
-            break;
-            case AttributeMapInterface::TYPE_FLOAT:
-                return (float) $value;
-
-            break;
-            case AttributeMapInterface::TYPE_NULL:
-                return null;
-
-            break;
-            default:
-                if (is_object($value)) {
-                    return $value;
-                }
-
-                throw new InvalidArgumentException('invalid type set for attribute '.$attribute);
-        }
+        return $value;
     }
 }
