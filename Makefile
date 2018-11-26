@@ -94,7 +94,7 @@ deb: $(DIST_DIR)/tubee-$(VERSION).deb
 
 $(DIST_DIR)/tubee-$(VERSION).deb: $(CHANGELOG_TARGET) $(BUILD_TARGET)
 	$(COMPOSER_BIN) update --no-dev
-	@rm $(BUILD_DIR)/coverage.xml
+	@-test ! -f $(BUILD_DIR)/coverage.xml || rm $(BUILD_DIR)/coverage.xml
 	@mkdir -p $(BUILD_DIR)/DEBIAN
 	@cp $(BASE_DIR)/packaging/debian/control $(BUILD_DIR)/DEBIAN/control
 	@cp $(BASE_DIR)/packaging/debian/postinst $(BUILD_DIR)/DEBIAN/postinst
@@ -122,7 +122,7 @@ tar: $(TAR)
 
 $(TAR): $(BUILD_TARGET)
 	$(COMPOSER_BIN) update --no-dev
-	@rm $(BUILD_DIR)/coverage.xml
+	@-test ! -f $(BUILD_DIR)/coverage.xml || rm $(BUILD_DIR)/coverage.xml
 	@-test ! -f $(TAR) || rm -fv $(TAR)
 	@-test -d $(DIST_DIR) || mkdir $(DIST_DIR)
 	@-test ! -d $(BUILD_DIR) || rm -rfv $(BUILD_DIR)
