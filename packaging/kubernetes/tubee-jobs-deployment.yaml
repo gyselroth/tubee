@@ -1,0 +1,57 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: tubee-jobs
+  name: tubee-jobs
+  namespace: tubee
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: tubee-jobs
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: tubee-jobs
+    spec:
+      containers:
+      - command:
+        - tubeecli
+        - jobs
+        - -vvvv
+        env:
+        - name: TUBEE_MONGODB_URI
+          value: mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017
+        - name: TUBEE_SMTP_HOST
+          value: localhost
+        image: gyselroth/tubee:1.0.0-alpha7
+        imagePullPolicy: IfNotPresent
+        name: tubee-jobs
+        resources:
+          limits:
+            cpu: 600m
+            memory: 800Mi
+          requests:
+            cpu: 215m
+            memory: 10Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        #volumeMounts:
+        #- mountPath: /usr/share/tubee/config
+        #  name: config-volume
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      #volumes:
+      #- configMap:
+      #    defaultMode: 420
+      #    name: tubee-config
+      #  name: config-volume
