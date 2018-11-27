@@ -1,4 +1,4 @@
-# Getting started
+# Deploy Server
 
 This is a step-by-step tutorial how to correctly deploy the tubee server.
 

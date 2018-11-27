@@ -35,7 +35,7 @@ balloon:
 balloon-endpoint:
     image: gyselroth/balloon-web:3.0.5
     ports:
-        - "443:443"
+        - "8091:443"
     links:
         - balloon
 tubee-dev:
