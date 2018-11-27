@@ -1,4 +1,4 @@
-# Getting started
+# Quick start
 
 You need two things to get started, a server (usually you want a hosted server) and tubectl. 
 tubectl is the tubee console client for Linux, Windows and OS X.
