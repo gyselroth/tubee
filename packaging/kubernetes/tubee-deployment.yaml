@@ -1,0 +1,58 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    k8s-app: tubee
+  name: tubee
+  namespace: tubee
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: tubee
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: tubee
+    spec:
+      containers:
+      - command:
+        - php-fpm
+        env:
+        - name: TUBEE_MONGODB_URI
+          value: mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017
+        - name: TUBEE_SMTP_HOST
+          value: localhost
+        image: gyselroth/tubee:1.0.0-alpha7
+        imagePullPolicy: IfNotPresent
+        name: tubee
+        ports:
+        - containerPort: 9000
+          protocol: TCP
+        resources:
+          limits:
+            cpu: 1500m
+            memory: 500Mi
+          requests:
+            cpu: 100m
+            memory: 50Mi
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        #volumeMounts:
+        #- mountPath: /usr/share/tubee/config
+        #  name: config-volume
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      #volumes:
+      #- configMap:
+      #    defaultMode: 420
+      #    name: tubee-config
+      #  name: config-volume

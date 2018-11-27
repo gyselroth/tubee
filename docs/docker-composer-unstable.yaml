@@ -4,18 +4,18 @@ mongodb:
 postfix:
     image: webuni/postfix
 tubee:
-    image: gyselroth/tubee:latest-unstable
+    image: gyselroth/tubee:1.0.0-alpha7
     links:
         - mongodb
         - postfix
-    entrypoint: php-fpm
+    entrypoint: bash -c "service nginx start && php-fpm"
     environment:
         - TUBEE_MONGODB_URI=mongodb://mongodb:27017
         - TUBEE_SMTP_HOST=postfix
     ports:
       - "8090:443"
 tubee-jobs:
-    image: gyselroth/tubee:latest-unstable
+    image: gyselroth/tubee:1.0.0-alpha7
     links:
         - mongodb
         - postfix
