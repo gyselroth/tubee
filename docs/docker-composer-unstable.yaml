@@ -8,10 +8,12 @@ tubee:
     links:
         - mongodb
         - postfix
-    entrypoint: service nginx start && php-fpm
+    entrypoint: php-fpm
     environment:
         - TUBEE_MONGODB_URI=mongodb://mongodb:27017
         - TUBEE_SMTP_HOST=postfix
+    ports:
+      - "8090:443"
 tubee-jobs:
     image: gyselroth/tubee:latest-unstable
     links:
