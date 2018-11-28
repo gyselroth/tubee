@@ -91,9 +91,9 @@ class Validator
 
                 break;
                 case 'map':
-                    if (!is_array($definition['map'])) {
+                    /*if (!is_array($definition['map'])) {
                         throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type array');
-                    }
+                    }*/
 
                     if (!isset($definition['collection'])) {
                         throw new InvalidArgumentException('mapping for attribute '.$name.' requires map.collection');

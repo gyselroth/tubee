@@ -16,6 +16,9 @@ spec:
     spec:
       terminationGracePeriodSeconds: 10
       serviceAccount: mongo
+      nodeSelector:
+        kubernetes.io/hostname: kubernetes-worker005
+        #gyselroth.net/physicalNode: "true"
       containers:
         - name: mongo
           image: mongo:3.6
@@ -45,7 +48,7 @@ spec:
   - metadata:
       name: mongo-persistent-storage
       annotations:
-        volume.beta.kubernetes.io/storage-class: "fast"
+        volume.beta.kubernetes.io/storage-class: "generic-nimble"
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:

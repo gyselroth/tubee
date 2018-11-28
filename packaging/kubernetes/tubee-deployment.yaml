@@ -28,7 +28,7 @@ spec:
           value: mongodb://mongo-0.mongo,mongo-1.mongo,mongo-2.mongo:27017
         - name: TUBEE_SMTP_HOST
           value: localhost
-        image: gyselroth/tubee:1.0.0-alpha7
+        image: gyselroth/tubee:1.0.0-alpha8
         imagePullPolicy: IfNotPresent
         name: tubee
         ports:
@@ -43,16 +43,16 @@ spec:
             memory: 50Mi
         terminationMessagePath: /dev/termination-log
         terminationMessagePolicy: File
-        #volumeMounts:
-        #- mountPath: /usr/share/tubee/config
-        #  name: config-volume
+        volumeMounts:
+        - mountPath: /usr/share/tubee/config
+          name: config-volume
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
       securityContext: {}
       terminationGracePeriodSeconds: 30
-      #volumes:
-      #- configMap:
-      #    defaultMode: 420
-      #    name: tubee-config
-      #  name: config-volume
+      volumes:
+      - configMap:
+          defaultMode: 420
+          name: tubee-config
+        name: config-volume
