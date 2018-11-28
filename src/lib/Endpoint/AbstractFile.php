@@ -62,7 +62,7 @@ abstract class AbstractFile extends AbstractEndpoint
             return true;
         }
 
-        foreach ($this->resource as $stream) {
+        foreach ($this->files as $stream) {
             if (ftruncate($stream['stream'], 0) === false) {
                 throw new Exception\WriteOperationFailed('failed flush file '.$this->file);
             }

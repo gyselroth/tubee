@@ -8,7 +8,7 @@ data:
     ^(.+)$ /index.php$1 last;\n        break;\n    }\n\n    location ~ ^/index.php
     {\n        root /usr/share/tubee/bin/httpdocs;\n        fastcgi_pass tubee:9000;\n
     \       fastcgi_param SCRIPT_FILENAME /usr/share/tubee/bin/httpdocs$fastcgi_script_name;\n
-    \       fastcgi_param PATH_INFO $fastcgi_script_name;\n        include /etc/nginx/fastcgi_params;\n
+    \       fastcgi_param PATH_INFO $fastcgi_script_name;\n        include /etc/nginx/fastcgi_params; \n fastcgi_read_timeout 300;\n
     \   }\n\n    location / {\n        root /usr/share/tubee/bin/httpdocs;\n        index
     index.html;\n        break;\n    }\n}\n\n"
   nginx.conf: " user  nginx; worker_processes  1;\nerror_log  /var/log/nginx/error.log

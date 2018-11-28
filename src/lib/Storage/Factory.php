@@ -25,24 +25,24 @@ class Factory
     public static function build(array $resource, LoggerInterface $logger): StorageInterface
     {
         switch ($resource['kind']) {
-            case 'Smb':
+            case 'SmbStorage':
                 $server = new NativeServer($resource['host'], $resource['username'], $resource['password']);
 
                 return new Smb($server, $logger, $resource['share'], $resource['root']);
 
             break;
-            case 'LocalFilesystem':
+            case 'LocalFilesystemStorage':
                 return new LocalFilesystem($resource['root'], $logger);
 
             break;
-            case 'Balloon':
+            case 'BalloonStorage':
                 $server = new ApiClient(['host' => $resource['host']], $logger);
                 $collection = isset($resource['collection']) ? new ObjectId($resource['collection']) : null;
 
                 return new Balloon($server, $logger, $collection);
 
             break;
-            case 'Stream':
+            case 'StreamStorage':
                 return new Stream($logger);
 
             break;

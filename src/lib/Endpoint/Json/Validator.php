@@ -23,7 +23,7 @@ class Validator
     {
         $defaults = [
             'storage' => [
-                'type' => 'Stream',
+                'kind' => 'StreamStorage',
             ],
         ];
 

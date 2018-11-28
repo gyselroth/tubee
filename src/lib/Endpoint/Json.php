@@ -51,19 +51,22 @@ class Json extends AbstractFile
         }
 
         foreach ($streams as $path => $stream) {
-            $content = json_decode(stream_get_contents($stream), true);
+            $content = [];
+            if ($this->type === EndpointInterface::TYPE_SOURCE) {
+                $content = json_decode(stream_get_contents($stream), true);
 
-            if ($err = json_last_error() !== JSON_ERROR_NONE) {
-                throw new JsonException\InvalidJson('failed decode json '.$this->file.', json error '.$err);
-            }
+                if ($err = json_last_error() !== JSON_ERROR_NONE) {
+                    throw new JsonException\InvalidJson('failed decode json '.$this->file.', json error '.$err);
+                }
 
-            if (!is_array($content)) {
-                throw new JsonException\ArrayExpected('json file contents must be an array');
+                if (!is_array($content)) {
+                    throw new JsonException\ArrayExpected('json file contents must be an array');
+                }
             }
 
             $this->files[] = [
                 'stream' => $stream,
-                'data' => $content,
+                'content' => $content,
                 'path' => $path,
             ];
         }
@@ -78,7 +81,7 @@ class Json extends AbstractFile
     {
         foreach ($this->files as $resource) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
-                $json = json_encode($resource['data'], JSON_PRETTY_PRINT);
+                $json = json_encode($resource['content'], JSON_PRETTY_PRINT);
 
                 if (fwrite($resource['stream'], $json) === false) {
                     throw new Exception\WriteOperationFailed('failed create json file '.$resource['path']);

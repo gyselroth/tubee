@@ -20,7 +20,7 @@ class Validator
      */
     public static function validate(array $resource): array
     {
-        $defaults = ['kind' => 'Stream'];
+        $defaults = ['kind' => 'StreamStorage'];
         $resource = array_replace_recursive($defaults, $resource);
 
         if (!isset(StorageInterface::STORAGE_MAP[$resource['kind']])) {

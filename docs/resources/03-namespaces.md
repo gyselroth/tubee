@@ -5,8 +5,8 @@ it easy to deploy RBAC rules.
 
 ## Create a new namespace
 
-spec.yaml:
 ```yaml 
+#spec.yaml
 kind: Namespace
 name: foobar
 ```

@@ -16,6 +16,7 @@ use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
@@ -69,6 +70,38 @@ class ResourceNamespaces
         $resource = $this->namespace_factory->getOne($namespace);
 
         return Helper::getOne($request, $identity, $resource);
+    }
+
+    /**
+     * Delete.
+     */
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
+    {
+        $this->namespace_factory->deleteOne($namespace);
+
+        return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+    }
+
+    /**
+     * Patch.
+     */
+    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
+    {
+        $body = $request->getParsedBody();
+        $query = $request->getQueryParams();
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $doc = ['data' => $namespace->getData()];
+
+        $patch = new Patch(json_encode($doc), json_encode($body));
+        $patched = $patch->apply();
+        $update = json_decode($patched, true);
+        $this->namespace_factory->update($namespace, $update);
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $this->namespace_factory->getOne($namespace->getName())->decorate($request),
+            ['pretty' => isset($query['pretty'])]
+        );
     }
 
     /**

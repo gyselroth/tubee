@@ -199,7 +199,7 @@ class Xml extends AbstractFile
      */
     public function getAll($filter = []): Generator
     {
-        $filtered = [];
+        /*$filtered = [];
         foreach ($this->filter_all as $attr => $value) {
             if (is_iterable($value)) {
                 $filtered[$attr] = array_values($value->children());
@@ -208,7 +208,7 @@ class Xml extends AbstractFile
             }
         }
 
-        $filter = array_merge($filtered, (array) $filter);
+        $filter = array_merge($filtered, (array) $filter);*/
         $i = 0;
 
         foreach ($this->files as $xml) {
@@ -222,7 +222,7 @@ class Xml extends AbstractFile
             }
 
             foreach ($data as $node_data) {
-                foreach ($filter as $attribute => $value) {
+                /*foreach ($filter as $attribute => $value) {
                     if (!array_key_exists($attribute, $node_data) || is_array($value) && !in_array($node_data[$attribute], $value) || !is_array($value) && $value !== $node_data[$attribute]) {
                         $this->logger->debug('data does not match filter [{filter}], skip it', [
                             'category' => get_class($this),
@@ -231,7 +231,7 @@ class Xml extends AbstractFile
 
                         continue 2;
                     }
-                }
+                }*/
 
                 yield $this->build($node_data);
                 ++$i;
