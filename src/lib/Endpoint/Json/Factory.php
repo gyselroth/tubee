@@ -25,7 +25,7 @@ class Factory
      */
     public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
-        $storage = StorageFactory::build($resource['data']['resource'], $logger);
+        $storage = StorageFactory::build($resource['data']['storage'], $logger);
 
         return new JsonEndpoint($resource['name'], $resource['data']['type'], $resource['data']['file'], $storage, $collection, $workflow, $logger, $resource);
     }

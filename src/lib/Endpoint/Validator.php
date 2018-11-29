@@ -32,6 +32,7 @@ class Validator extends ResourceValidator
                     'filter_one' => null,
                     'filter_all' => null,
                 ],
+                'resource' => [],
             ],
         ];
 
@@ -52,7 +53,7 @@ class Validator extends ResourceValidator
             throw new InvalidArgumentException('destintation endpoint must have single object filter options.filter_one as a string');
         }
 
-        if (!isset($resource['data']['resource']) || !is_array($resource['data']['resource'])) {
+        if (!is_array($resource['data']['resource'])) {
             throw new InvalidArgumentException('resource as array must be provided');
         }
 

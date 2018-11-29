@@ -19,10 +19,10 @@ interface StorageInterface
      * StorageMap.
      */
     const STORAGE_MAP = [
-        'Stream' => Stream::class,
-        'LocalFilesystem' => LocalFilesystem::class,
-        'Balloon' => Balloon::class,
-        'Smb' => Smb::class,
+        'StreamStorage' => Stream::class,
+        'LocalFilesystemStorage' => LocalFilesystem::class,
+        'BalloonStorage' => Balloon::class,
+        'SmbStorage' => Smb::class,
     ];
 
     /**

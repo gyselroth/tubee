@@ -1,0 +1,147 @@
+apiVersion: v1
+data:
+  config.yaml: |- 
+    MongoDB\Client:
+      arguments:
+        uri: "{ENV(TUBEE_MONGODB_URI,mongodb://localhost:27017)}"
+    MongoDB\Database:
+      use: '{MongoDB\Client}'
+      selects:
+        - method: selectDatabase
+          arguments:
+            databaseName: 'tubee'
+    Tubee\Async\Mail:
+      arguments:
+        config:
+          sender_address: "no-reply@localhost"
+          sender_name: "tubee"
+    TaskScheduler\Scheduler:
+      arguments:
+        config:
+          job_queue_size: 1000000
+          event_queue_size: 5000000
+    TaskScheduler\Queue:
+      arguments:
+        config:
+          pm: dynamic
+          max_children: 4
+          min_children: 2
+    Zend\Mail\Transport\SmtpOptions:
+      arguments:
+        options:
+          host: '{ENV(TUBEE_SMTP_HOST,127.0.0.1)}'
+          port: 25
+    Zend\Mail\Transport\TransportInterface:
+      use: "Zend\\Mail\\Transport\\Smtp"
+    ParagonIE\Halite\Symmetric\EncryptionKey:
+      services:
+        ParagonIE\Halite\HiddenString:
+          arguments:
+            value: "{ENV(ENTUBEE_ENCRYPTION_KEY,314004004b3cef33ba8ea540b424736408364317d9ebfbc9293b8478a8d2478e23dba1ba30ded48ab0dd059cfe3dce2daf00d10eb40af1c0bf429553a2d64802272a514cfde95ac31956baa3929ee01c7338c95805c3a619e254f7aa2966e6a7cdad4783)}"
+    Psr\Log\LoggerInterface:
+      use: "Monolog\\Logger"
+      arguments:
+        name: default
+      calls:
+        file:
+          method: pushHandler
+          arguments:
+            handler: '{file}'
+        stderr:
+          method: pushHandler
+          arguments:
+            handler: '{stderr}'
+        stdout:
+          method: pushHandler
+          arguments:
+            handler: '{stdout}'
+      services:
+        Monolog\Formatter\FormatterInterface:
+          use: Monolog\Formatter\LineFormatter
+          arguments:
+            dateFormat: "Y-d-m H:i:s"
+            format: "%datetime% [%context.category%,%level_name%]: %message% %context.params% %context.exception%\n"
+          calls:
+            - method: includeStacktraces
+        file:
+          use: Monolog\Handler\StreamHandler
+          arguments:
+            stream: '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log'
+            level: 100
+          calls:
+            formatter:
+              method: setFormatter
+        stderr:
+          use: Monolog\Handler\StreamHandler
+          arguments:
+            stream: 'php://stderr'
+            level: 600
+          calls:
+            formatter:
+              method: setFormatter
+        stdout:
+          use: Monolog\Handler\FilterHandler
+          arguments:
+            handler: '{output}'
+            minLevelOrList: 100
+            maxLevel: 550
+          services:
+            output:
+              use: Monolog\Handler\StreamHandler
+              arguments:
+                stream: 'php://stdout'
+                level: 100
+              calls:
+                formatter:
+                  method: setFormatter
+    Micro\Auth\Auth:
+      calls:
+        basic_db:
+          method: injectAdapter
+          arguments:
+            adapter: '{basic_db}'
+      services:
+        basic_db:
+          use: "Tubee\\User\\AuthAdapter"
+        oidc:
+          use: "Micro\\Auth\\Adapter\\Oidc"
+          arguments:
+            config:
+              provider_url: "https://openidconnect.example.net"
+        ldap:
+          use: "Micro\\Auth\\Adapter\\Basic\\Ldap"
+          services:
+            Micro\Auth\Ldap:
+              arguments:
+                config:
+                  uri: "ldap://localhost:389"
+                  basedn: "dc=example,dc=org"
+                  binddn: "cn=admin,dc=example,dc=org"
+                  bindpw: 1234
+                  tls: true
+                  options:
+                    LDAP_OPT_PROTOCOL_VERSION: 3
+          arguments:
+            config:
+              account_filter: "(uid=%s)"
+              attr_sync_cache: 3600
+              map:
+                namespace:
+                  type: "string"
+                  attr: "o"
+                avatar:
+                  type: "binary"
+                  attr: "jpegphoto"
+                hard_quota:
+                  type: "int"
+                  attr: "customhardquota"
+                soft_quota:
+                  type: "int"
+                  attr: "customsoftquota"
+                mail:
+                  type: "string"
+                  attr: "mail"
+kind: ConfigMap
+metadata:
+  name: tubee-config
+  namespace: tubee

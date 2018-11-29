@@ -27,7 +27,7 @@ paths:
   /watch/namespaces:
     get:
       tags:
-      - "data"
+      - "namespaces"
       summary: "Watch namespaces"
       description: "Watch namespaces in realtime"
       operationId: "watchNamespaces"
@@ -241,7 +241,7 @@ paths:
   /watch/namespaces/{namespace}/collections:
     get:
       tags:
-      - "data"
+      - "collections"
       summary: "Watch collections"
       description: "Watch collections in realtime"
       operationId: "watchCollections"
@@ -494,7 +494,7 @@ paths:
   /watch/namespaces/{namespace}/collections/{collection}/endpoints:
     get:
       tags:
-      - "data"
+      - "endpoints"
       summary: "Watch endpoints"
       description: "Watch updates in realtime"
       operationId: "watchEndpoints"
@@ -782,7 +782,7 @@ paths:
   /watch/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
     get:
       tags:
-      - "data"
+      - "workflows"
       summary: "Watch workflows"
       description: "Watch updates in realtime"
       operationId: "watchWorkflows"
