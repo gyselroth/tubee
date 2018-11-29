@@ -3,7 +3,7 @@ scripts
 vendor
 doc
 build
-config
+config/config.yaml
 log/*
 dist
 lib_dev
