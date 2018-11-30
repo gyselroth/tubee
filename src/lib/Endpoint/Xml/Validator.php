@@ -39,8 +39,8 @@ class Validator
 
         foreach ($resource['resource'] as $key => $value) {
             switch ($key) {
-                case 'data':
-                case 'row':
+                case 'root_name':
+                case 'node_name':
                     if (!is_string($value)) {
                         throw new InvalidArgumentException("resource.$key must be a string");
                     }
@@ -51,7 +51,8 @@ class Validator
                     if (!is_bool($value)) {
                         throw new InvalidArgumentException("resource.$key must be a boolean");
                     }
-                    // no break
+
+                    break;
                 default:
                     throw new InvalidArgumentException('unknown option resource.'.$key.' provided');
             }

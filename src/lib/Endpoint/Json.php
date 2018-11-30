@@ -52,17 +52,17 @@ class Json extends AbstractFile
 
         foreach ($streams as $path => $stream) {
             $content = [];
-            if ($this->type === EndpointInterface::TYPE_SOURCE) {
-                $content = json_decode(stream_get_contents($stream), true);
+            // if ($this->type === EndpointInterface::TYPE_SOURCE) {
+            $content = json_decode(stream_get_contents($stream), true);
 
-                if ($err = json_last_error() !== JSON_ERROR_NONE) {
-                    throw new JsonException\InvalidJson('failed decode json '.$this->file.', json error '.$err);
-                }
-
-                if (!is_array($content)) {
-                    throw new JsonException\ArrayExpected('json file contents must be an array');
-                }
+            if ($err = json_last_error() !== JSON_ERROR_NONE) {
+                throw new JsonException\InvalidJson('failed decode json '.$this->file.', json error '.$err);
             }
+
+            if (!is_array($content)) {
+                throw new JsonException\ArrayExpected('json file contents must be an array');
+            }
+            // }
 
             $this->files[] = [
                 'stream' => $stream,
@@ -103,24 +103,28 @@ class Json extends AbstractFile
      */
     public function transformQuery(?array $query = null)
     {
-        return '';
+        $result = null;
+        if ($this->filter_all !== null) {
+            $result = json_decode(stripslashes($this->filter_all), true);
+        }
+
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
+                $result = json_decode($query, true);
+            } else {
+                $result = array_merge($result, $query);
+            }
+        }
+
+        return $result;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = []): Generator
+    public function getAll(?array $query = null): Generator
     {
-        $filtered = [];
-        foreach ($this->filter_all as $attr => $value) {
-            if (is_iterable($value)) {
-                $filtered[$attr] = array_values($value->children());
-            } else {
-                $filtered[$attr] = $value;
-            }
-        }
-
-        $filter = array_merge($filtered, (array) $filter);
+        $filter = $this->transformQuery($query);
         $i = 0;
 
         foreach ($this->files as $resource_key => $json) {
@@ -193,7 +197,7 @@ class Json extends AbstractFile
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $elements = [];
-        $filter = $this->getFilterOne($object);
+        $filter = json_decode($this->getFilterOne($object), true);
 
         foreach ($this->files as $json) {
             if (isset($json['content'])) {

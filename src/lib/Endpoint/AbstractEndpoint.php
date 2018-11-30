@@ -146,23 +146,11 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'flush':
-                    $this->flush = (bool) $value;
-
-                break;
                 case 'import':
-                    $this->import = (array) $value;
-
-                break;
                 case 'identifiers':
-                    $this->identifiers = (array) $value;
-
-                break;
                 case 'filter_one':
-                        $this->filter_one = (string) $value;
-
-                break;
                 case 'filter_all':
-                        $this->filter_all = (string) $value;
+                    $this->{$option} = $value;
 
                 break;
                 default:

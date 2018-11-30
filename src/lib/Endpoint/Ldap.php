@@ -86,8 +86,8 @@ class Ldap extends AbstractEndpoint
         $this->filter_all = '(objectClass=*)';
         $this->ldap = $ldap;
 
-        if (isset($resource['resource'])) {
-            $this->setLdapOptions($resource['resource']);
+        if (isset($resource['data']['resource'])) {
+            $this->setLdapOptions($resource['data']['resource']);
         }
 
         parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
