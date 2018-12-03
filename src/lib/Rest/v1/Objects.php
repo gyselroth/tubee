@@ -156,7 +156,7 @@ class Objects
         $patched = $patch->apply();
         $update = json_decode($patched, true);
 
-        $this->object_factory->update($collection, $object, $update);
+        $this->object_factory->update($collection, $object, $update['data']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

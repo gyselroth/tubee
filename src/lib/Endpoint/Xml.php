@@ -32,13 +32,6 @@ class Xml extends AbstractFile
     public const KIND = 'XmlEndpoint';
 
     /**
-     * new XML element.
-     *
-     * @var SimpleXMLElement
-     */
-    protected $new_xml;
-
-    /**
      * XML root name.
      *
      * @var string

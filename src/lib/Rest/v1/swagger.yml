@@ -1103,7 +1103,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/objects/{object}:
     get:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Get specific object"
       description: "Get an object of a specific collection"
       operationId: "getObject"
@@ -1141,7 +1141,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Patch object as rfc6902 request"
       description: "Update specific attributes of an object"
       operationId: "updateObject"
@@ -1187,7 +1187,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Replace or create object"
       description: "Replace all data attributes of an object (Or create one if not exists)"
       operationId: "replaceObject"
@@ -1239,7 +1239,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Delete object"
       description: "Delete a specific object"
       operationId: "deleteObject"
@@ -1277,7 +1277,7 @@ paths:
   /watch/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives:
     get:
       tags:
-      - "data"
+      - "dataObjectRelations"
       summary: "Watch object relatives"
       description: "Watch updates in realtime"
       operationId: "watchObjectRelatives"
@@ -1334,7 +1334,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/objects/{object}/relatives:
     get:
       tags:
-      - "data"
+      - "dataObjectRelations"
       summary: "Get relative objects of an object"
       description: "Get all objects the object is related to"
       operationId: "getObjectRelatives"
@@ -1394,7 +1394,7 @@ paths:
           description: "Resource not found"
     post:
       tags:
-      - "data"
+      - "dataObjectRelations"
       summary: "Add new object relation to an object"
       operationId: "addObjectRelative"
       produces:
@@ -1431,7 +1431,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/objects/{object}/relatives/{relative}:
     get:
       tags:
-      - "data"
+      - "dataObjectRelations"
       summary: "Get single relative object of an object"
       operationId: "getObjectRelative"
       produces:
@@ -1468,7 +1468,7 @@ paths:
           description: "Resource not found"
     put:
       tags:
-      - "data"
+      - "dataObjectRelations"
       summary: "Update object relation"
       operationId: "updateObjectRelative"
       produces:
@@ -1509,7 +1509,7 @@ paths:
           description: "Resource not found"
     delete:
       tags:
-      - "data"
+      - "dataObjectRelations"
       summary: "Delete object relation"
       operationId: "deleteObjectRelative"
       produces:
@@ -1545,7 +1545,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects:
     get:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Get objects from endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpointObjects"
@@ -1606,7 +1606,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/objects/{object}/history:
     get:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Get object history"
       description: "Get the history of all modifications from a specific object"
       operationId: "getObjectHistory"
@@ -1667,7 +1667,7 @@ paths:
   /watch/namespaces/{namespace}/collections/{collection}/objects:
     get:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Watch objects"
       description: "Watch updates in realtime"
       operationId: "watchObjects"
@@ -1719,7 +1719,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/objects:
     get:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Get objects of a specific collection"
       description: "A object is a data object from a specifc collection"
       operationId: "getObjects"
@@ -1774,7 +1774,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "data"
+      - "dataObjects"
       summary: "Add a new object of a specifc collection"
       operationId: "addObject"
       consumes:
@@ -2214,7 +2214,7 @@ paths:
   /watch/access-rules:
     get:
       tags:
-      - "access-rules"
+      - "accessRules"
       summary: "Watch access rules"
       description: "Watch updates in realtime"
       operationId: "watchAccessRules"
@@ -2256,7 +2256,7 @@ paths:
   /access-rules:
     get:
       tags:
-      - "access-rules"
+      - "accessRules"
       summary: "Get access rules"
       description: "An access rule defines what role is granted access to what resource"
       operationId: "getAccessRules"
@@ -2299,7 +2299,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "access-rules"
+      - "accessRules"
       summary: "Create a new access rule"
       operationId: "addAccessRule"
       produces:
@@ -2319,7 +2319,7 @@ paths:
   /access-rules/{access-rule}:
     get:
       tags:
-      - "access-rules"
+      - "accessRules"
       summary: "Get access rule by name"
       operationId: "getAccessRule"
       produces:
@@ -2341,7 +2341,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "access-rules"
+      - "accessRules"
       summary: "Patch access rule as rfc6902 request"
       operationId: "updateAccessRule"
       consumes:
@@ -2370,7 +2370,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "access-rules"
+      - "accessRules"
       summary: "Create or replace an access rule"
       operationId: "replaceAccessRule"
       produces:
@@ -2394,7 +2394,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "access-rules"
+      - "accessRules"
       summary: "Delete access-rule by name"
       operationId: "deleteAccessRule"
       produces:
@@ -2415,7 +2415,7 @@ paths:
   /watch/access-roles:
     get:
       tags:
-      - "access-roles"
+      - "accessRoles"
       summary: "Watch access roles"
       description: "Watch updates in realtime"
       operationId: "watchAccessRoles"
@@ -2457,7 +2457,7 @@ paths:
   /access-roles:
     get:
       tags:
-      - "access-roles"
+      - "accessRoles"
       summary: "Get access roles"
       description: "An access role defines what role is granted access to what resource"
       operationId: "getAccessRoles"
@@ -2500,7 +2500,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "access-roles"
+      - "accessRoles"
       summary: "Create a new access role"
       operationId: "addAccessRole"
       produces:
@@ -2520,7 +2520,7 @@ paths:
   /access-roles/{access-role}:
     get:
       tags:
-      - "access-roles"
+      - "accessRoles"
       summary: "Get access role by name"
       operationId: "getAccessRole"
       produces:
@@ -2542,7 +2542,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "access-roles"
+      - "accessRoles"
       summary: "Patch access role as rfc6902 request"
       operationId: "updateAccessRole"
       consumes:
@@ -2571,7 +2571,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "access-roles"
+      - "accessRoles"
       summary: "Create or replace an access role"
       operationId: "replaceAccessRole"
       consumes:
@@ -2601,7 +2601,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "access-roles"
+      - "accessRoles"
       summary: "Delete access-role by name"
       operationId: "deleteAccessRole"
       produces:
@@ -4055,7 +4055,7 @@ definitions:
                   root_name:
                     description: "The name of the root element."
                     type: string
-                    default: "data"
+                    default: "dataObjects"
                   node_name:
                     description: "The name of the sub node of the root element. For example: <root><row><a>0</a></row><a>1</a><row></row</root>"
                     type: string
@@ -4198,7 +4198,7 @@ definitions:
           kind:
             description: "The resource type, always DataObject."
             type: "string"
-            default: "DataObject"
+            default: "dataObjects"
           data:
             description: "Attributes"
             type: "object"
