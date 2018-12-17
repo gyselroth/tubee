@@ -19,6 +19,15 @@ wget -qO - https://bintray.com/user/downloadSubjectPublicKey?username=gyselroth 
 sudo apt-get update && apt-get install tubectl
 ```
 
+### OSX
+
+As OSX user you may install tubectl using brew:
+
+```sh
+brew tap gyselroth/core
+brew install tubectl
+```
+
 ## tubectl first steps
 
 At first you have tell tubectl what tubee server you want to communicate to and you must provide your authentication credentials:
@@ -27,7 +36,7 @@ At first you have tell tubectl what tubee server you want to communicate to and 
 tubectl login -u raffis -P -s https://tubee.example
 ```
 
->**Note**: tubectl login stores your password in your operating systems credentials vault. You may be asked to unlock it.
+>**Note** tubectl login stores your password in your operating systems credentials vault. You may be asked to unlock it.
 
 As of tubectl v1.0.0 it is only possible to authenticate using http basic credentials eventough the tubee server also offers OpenID-connect.
 By default self signed ssl certificated are not accepted by tubectl, however you may change this behaviour by setting the option -a or --allow-self-signed accordingly.
@@ -62,7 +71,7 @@ tubectl
     sync                       Sync resources
 ```
 
->**Note**: tubecl loads its config (.yml) from the users home directory (~/.tubee/config) and only holds configuration data like the tubee server. You may specify a custom configuration by specifying `-c path/to/config`.
+>**Note** tubecl loads its config (.yml) from the users home directory (~/.tubee/config) and only holds configuration data like the tubee server. You may specify a custom configuration by specifying `-c path/to/config`.
 
 ## Help & explain resources
 

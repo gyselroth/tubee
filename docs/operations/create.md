@@ -15,7 +15,7 @@ EDITOR=vi tubectl create ns
 After exiting the editor, tubectl tries to create the specified resource, if this fails for whatever reason the error message gets prepended on the top
 and you may correct the error. If you do not change anything and quit a seccond time the editor gets closed.
 
->**Note**: Your changes are not lost, tubectl creates a temporary file in your temp directory which still exists after you quit. This may just get reapplied using the `-f` or `--file` option.
+>**Note** Your changes are not lost, tubectl creates a temporary file in your temp directory which still exists after you quit. This may just get reapplied using the `-f` or `--file` option.
 
 ## Set resource name before open editor
 

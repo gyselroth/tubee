@@ -25,7 +25,7 @@ tubeectl get ns foo
 Most resource types know an alias to help you to type as fast as possible. `ns` in this case is the same as `namespaces`.
 `tubectl help get` lists all possible resources to query from and also their related alias.
 
->**Note**: Not all resource types have an alias. Usually only resource with a name >6 characters.
+>**Note** Not all resource types have an alias. Usually only resource with a name >6 characters.
 
 
 ## Sort output
@@ -60,7 +60,7 @@ The output format can be changed by using `-o` or `--output` accordingly.
 
 Besides the default there is also yaml or json output.
 
->**Note**: Some resources such as Log may also have even more possibilities.
+>**Note** Some resources such as Log may also have even more possibilities.
 
 ```
 tubectl get ns -o yaml
@@ -95,7 +95,7 @@ Like the sort operation a query works in the format key=value and may be delimit
 ```
 tubectl get ns -q name=bar
 ```
->**Note**: To find a resource by name just specify the name after the resource type since this is the shorthand method to the above example.
+>**Note** To find a resource by name just specify the name after the resource type since this is the shorthand method to the above example.
 
 or a more complex example:
 
@@ -123,7 +123,7 @@ tubectl get ns foo -H
 tubectl features also diff mechanism whereas you might find differences between resource version much more easily.
 By specifying `-d` or `--diff` accordingly one can compare the resource differences in the difftool of your choice.
 
->**Note**: You need to set an env variable DIFFTOOL on your host system for that case or start tubectl with such.
+>**Note** You need to set an env variable DIFFTOOL on your host system for that case or start tubectl with such.
 On linux, `vimdiff` is highly recommended. 
 
 This will compare the namespace foo (current version) with the version 1 of itself.

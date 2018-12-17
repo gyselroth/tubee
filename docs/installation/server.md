@@ -36,9 +36,9 @@ wget -qO - https://bintray.com/user/downloadSubjectPublicKey?username=gyselroth 
 sudo apt-get update
 ```
 
->**Note**: If you want to install beta and alpha versions replace `stable` with `unstable`. Pre-releases are only ment for testing purposes and are in **no** way recommended in production environements!
+>**Note** If you want to install beta and alpha versions replace `stable` with `unstable`. Pre-releases are only ment for testing purposes and are in **no** way recommended in production environements!
 
->**Note**: This repository also includes the shell client `tubectl`.
+>**Note** This repository also includes the shell client `tubectl`.
 
 #### PHP
 The tubee server requires PHP 7.2. If your current distribution does not provide 7.2 out of their stable archives (which is most certainly the case) please add the PPA ppa:ondrej/php which will provide the latest PHP 7.2 releases.
@@ -53,7 +53,7 @@ sudo apt-get update
 #### MongoDB
 tubee uses MongoDB as its main database. At least MongoDB 3.4 is required. If your current distribution does not ship at least this release you will need to add the official MongoDB repository.
 
->**Note**: MongoDB recommends to use the official MongoDB repository anyway since the releases in the debian and or ubuntu repositories are not maintained by them and lack newer minor releases.
+>**Note** MongoDB recommends to use the official MongoDB repository anyway since the releases in the debian and or ubuntu repositories are not maintained by them and lack newer minor releases.
 
 ```sh
 sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 2930ADAE8CAF5059EE73BB4B58712A2291FA4AD5
@@ -61,7 +61,7 @@ echo "deb http://repo.mongodb.org/apt/debian jessie/mongodb-org/3.6 main" | sudo
 sudo apt-get update
 ``` 
 
->**Note**: This will add the repository for debian jessie, if you need another repository please refer to the [MongoDB installation](https://docs.mongodb.com/manual/administration/install-on-linux/) docs.
+>**Note** This will add the repository for debian jessie, if you need another repository please refer to the [MongoDB installation](https://docs.mongodb.com/manual/administration/install-on-linux/) docs.
 
 ### Install tubee
 Now tubee and its components can be installed.
@@ -119,10 +119,10 @@ You need to initialize tubee once (You do not need to execute this everytime you
 docker exec tubee-stable-tubee_1 tubeecli upgrade -i -vvv
 ```
 
->**Note**: All tubee containers provide a version tag besides `latest`. It is best practice to use an exact version of a service instead the latest tag in production environment.
+>**Note** All tubee containers provide a version tag besides `latest`. It is best practice to use an exact version of a service instead the latest tag in production environment.
 The containers provide a `latest-unstable` tag for the tubee-jobs, tubee and tubee-web container. It is in no way reccomened to use pre-releases in production environments! 
 
->**Note**: If you want to install beta and alpha versions replace `latest` with `latest-unstable` or specify an exact version tag. Pre-releases are only ment for testing purposes and are in **no** way recommended in production environements!
+>**Note** If you want to install beta and alpha versions replace `latest` with `latest-unstable` or specify an exact version tag. Pre-releases are only ment for testing purposes and are in **no** way recommended in production environements!
 
 ## Deploy on kubernetes
 
@@ -167,4 +167,4 @@ cd tubee
 make install
 ```
 
->**Note**: You can also create .deb or .tar packages using make. Just execute either `make deb` or `make tar` or `make dist` for both.
+>**Note** You can also create .deb or .tar packages using make. Just execute either `make deb` or `make tar` or `make dist` for both.

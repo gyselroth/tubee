@@ -22,4 +22,4 @@ tubectl get ns foobar -o yaml
 ```
 
 The namespace `foobar` is now ready.
->**Note**: Namespace is the simplest resource type of all, it only requires a name.
+>**Note** Namespace is the simplest resource type of all, it only requires a name.
