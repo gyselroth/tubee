@@ -3699,6 +3699,7 @@ definitions:
               type:
                 description: "Specify the type of the endpoint."
                 type: "string"
+                default: "browse"
                 enum:
                   - browse
                   - source
@@ -3755,12 +3756,8 @@ definitions:
                     description: "Username if required."
                     type: string
                   passwd:
-                    description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                    description: "Password if required."
                     type: string
-                  has_password:
-                    description: "Is true if a password has been set."
-                    type: boolean
-                    default: false
                   options:
                     description: "Driver specific connection options."
                     type: object
@@ -3793,12 +3790,8 @@ definitions:
                     description: "Username."
                     type: string
                   passwd:
-                    description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                    description: "Password if required."
                     type: string
-                  has_password:
-                    description: "Is true if a password has been set."
-                    type: boolean
-                    default: false
                   port:
                     description: "Specifies the port number to attempt to connect to the MySQL server."
                     type: integer
@@ -3831,12 +3824,8 @@ definitions:
                     description: "Bind DN if required."
                     type: string
                   bindpw:
-                    description: "Bind password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                    description: "Bind password if required."
                     type: string
-                  has_password:
-                    description: "Is true if a password has been set."
-                    type: boolean
-                    default: false
                   basedn:
                     description: "Specifies the base dn (Like dc=example,dc=net)."
                     type: string
@@ -3885,12 +3874,8 @@ definitions:
                         description: "Basic authentication username."
                         type: string
                       password:
-                        description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                        description: "Password if required."
                         type: string
-                      has_password:
-                        description: "Is true if a password has been set."
-                        type: boolean
-                        default: false
                   oauth2:
                     description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
                     type: object
@@ -3975,12 +3960,8 @@ definitions:
                         description: "Basic authentication username."
                         type: string
                       password:
-                        description: "Password if required. Note the password gets encrypted on the server an can't be retrieved after it. If a password was set, has_password will be true."
+                        description: "Password if required."
                         type: string
-                      has_password:
-                        description: "Is true if a password has been set."
-                        type: boolean
-                        default: false
                   oauth2:
                     description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
                     type: object

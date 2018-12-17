@@ -1,2 +1,20 @@
 site_name: tubee
 theme: readthedocs
+extra_css:
+ - css/extra.css
+nav:
+ - Home: index.md
+ - Overwiew: overview.md
+ - Quick Start: quick-start.md
+ - Operations:
+    - Request & Query resources: operations/get.md
+    - Create resources: operations/create.md
+    - Modify resources: operations/edit.md
+ - Resources:
+    - Namespace: resources/namespace.md
+ - Installation:
+    - Server: installation/server.md
+ - Development:
+    - Overview: development/overview.md
+    - Api reference: development/api.md
+
