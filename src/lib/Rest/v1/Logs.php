@@ -89,7 +89,7 @@ class Logs
             $resource = $this->job_factory->getOne($namespace, $job);
         }
 
-        $logs = $resource->getLogs($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $logs = $resource->getLogs($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $logs);
     }

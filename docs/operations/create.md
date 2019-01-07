@@ -43,6 +43,8 @@ By default tubectl opens a temporary file where you create the new resource. You
 tubectl create -f resources.yaml
 ```
 
+>**Note** The more advanced command [tubectl apply](apply) will also update resources if they may already exist. 
+
 ## Read from stdin
 
 You may as well read from stdin instead creating a file manually. This is done by specifying `-s` or `--stdin` accordingly.

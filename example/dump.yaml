@@ -26,6 +26,29 @@ data:
     filter_all: null
   file: 'http://feeds.bbci.co.uk/news/rss.xml'
 ---
+name: hourly-import
+kind: Job
+namespace: default
+data:
+  notification:
+    enabled: false
+    receiver: []
+  collections:
+    - 'news'
+  endpoints:
+    - 'bbc'
+  filter: []
+  loadbalance: true
+  simulate: false
+  log_level: error
+  ignore: false
+  options:
+    at: 0
+    interval: 3600
+    retry: 0
+    retry_interval: 0
+    timeout: 0
+---
 name: create
 kind: Workflow
 namespace: default
@@ -92,6 +115,7 @@ kind: Collection
 kind: DataObject
 namespace: default
 collection: accounts
+name: user1
 data:
   username: user1
   mail: user1@example.org
@@ -99,6 +123,7 @@ data:
 kind: DataObject
 namespace: default
 collection: accounts
+name: user2
 data:
   username: user2
   mail: user2@example.org
@@ -126,6 +151,23 @@ data:
       - id
     filter_one: '{\"_id\": \"{endpoints.balloon.result}\"}'
     filter_all: null
+---
+name: one-time-export
+kind: Process
+namespace: default
+data:
+  notification:
+    enabled: false
+    receiver: []
+  collections:
+    - 'accounts'
+  endpoints:
+    - '*'
+  filter: []
+  loadbalance: true
+  simulate: false
+  log_level: info
+  ignore: true
 ---
 name: create-update
 kind: Workflow

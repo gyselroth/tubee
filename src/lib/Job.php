@@ -120,7 +120,7 @@ class Job extends AbstractResource implements JobInterface
     {
         $query['context.job'] = (string) $this->getId();
 
-        return $this->log_factory->getAll($this->namespace, $query, $offset, $limit, $sort);
+        return $this->log_factory->getAll($query, $offset, $limit, $sort);
     }
 
     /**
@@ -128,7 +128,7 @@ class Job extends AbstractResource implements JobInterface
      */
     public function getLog(ObjectIdInterface $id): LogInterface
     {
-        return $this->log_factory->getOne($this->namespace, $id);
+        return $this->log_factory->getOne($id);
     }
 
     /**

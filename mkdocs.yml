@@ -10,6 +10,7 @@ nav:
     - Request & Query resources: operations/get.md
     - Create resources: operations/create.md
     - Modify resources: operations/edit.md
+    - Apply from file: operations/apply.md
  - Resources:
     - Namespace: resources/namespace.md
  - Installation:

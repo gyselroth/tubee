@@ -57,7 +57,7 @@ class Factory extends ResourceFactory
     {
         $filter = [
             'status' => ['$exists' => true],
-            'namespace' => $namespace->getName(),
+            'data.namespace' => $namespace->getName(),
         ];
 
         if (!empty($query)) {
@@ -77,7 +77,7 @@ class Factory extends ResourceFactory
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
-        $resource['namespace'] = $namespace->getName();
+        $resource['data']['namespace'] = $namespace->getName();
 
         $process = $this->scheduler->addJob(Sync::class, $resource['data']);
 

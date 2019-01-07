@@ -80,7 +80,7 @@ class Process extends AbstractResource implements ProcessInterface
         $query['$or'][] = ['context.process' => (string) $this->getId()];
         $query['$or'][] = ['context.parent' => (string) $this->getId()];
 
-        return $this->log_factory->getAll($this->namespace, $query, $offset, $limit, $sort);
+        return $this->log_factory->getAll($query, $offset, $limit, $sort);
     }
 
     /**
@@ -88,6 +88,6 @@ class Process extends AbstractResource implements ProcessInterface
      */
     public function getLog(ObjectIdInterface $id): LogInterface
     {
-        return $this->log_factory->getOne($this->namespace, $id);
+        return $this->log_factory->getOne($id);
     }
 }
