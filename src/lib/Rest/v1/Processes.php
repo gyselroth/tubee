@@ -19,11 +19,19 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
 use Tubee\Process\Factory as ProcessFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
 
 class Processes
 {
+    /**
+     * Namespace factory.
+     *
+     * @var ResourceNamespaceFactory
+     */
+    protected $namespace_factory;
+
     /**
      * Process factory.
      *
@@ -41,23 +49,25 @@ class Processes
     /**
      * Init.
      */
-    public function __construct(Acl $acl, ProcessFactory $process_factory)
+    public function __construct(Acl $acl, ProcessFactory $process_factory, ResourceNamespaceFactory $namespace_factory)
     {
         $this->acl = $acl;
         $this->process_factory = $process_factory;
+        $this->namespace_factory = $namespace_factory;
     }
 
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $processes = $this->process_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $processes = $this->process_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $processes);
     }
@@ -65,9 +75,10 @@ class Processes
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, ObjectId $process): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, ObjectId $process): ResponseInterface
     {
-        $resource = $this->process_factory->getOne($process);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $resource = $this->process_factory->getOne($namespace, $process);
 
         return Helper::getOne($request, $identity, $resource);
     }
@@ -75,11 +86,13 @@ class Processes
     /**
      * Force trigger process.
      */
-    public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $id = $this->process_factory->create($body);
+
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $id = $this->process_factory->create($namespace, $body);
         $process = $this->process_factory->getOne($id);
 
         return new UnformattedResponse(
@@ -92,9 +105,10 @@ class Processes
     /**
      * Stop process.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, ObjectId $process): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, ObjectId $process): ResponseInterface
     {
-        $this->process_factory->getOne($process)->deleteOne($process);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $this->process_factory->getOne($process)->deleteOne($namespace, $process);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
@@ -102,7 +116,7 @@ class Processes
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -110,7 +124,8 @@ class Processes
             'existing' => true,
         ], $request->getQueryParams());
 
-        $cursor = $this->process_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $cursor = $this->process_factory->watch($namespace, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

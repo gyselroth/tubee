@@ -43,7 +43,6 @@ class Validator extends ResourceValidator
                     'enabled' => false,
                     'receiver' => [],
                 ],
-                'namespaces' => [],
                 'collections' => [],
                 'endpoints' => [],
                 'filter' => [],
@@ -66,7 +65,6 @@ class Validator extends ResourceValidator
 
         foreach ($resource['data'] as $option => $value) {
             switch ($option) {
-                case 'namespaces':
                 case 'collections':
                 case 'endpoints':
                     if (!is_array($value) || count(array_filter($value, 'is_string')) !== count($value)) {

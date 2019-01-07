@@ -2619,7 +2619,7 @@ paths:
           description: "Access role does not exists"
         403:
           description: "Access denied"
-  /watch/jobs:
+  /watch/namespaces/{namespace}/jobs:
     get:
       tags:
       - "jobs"
@@ -2629,6 +2629,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2661,7 +2666,7 @@ paths:
           description: "List of active jobs"
         403:
           description: "Access denied"
-  /jobs:
+  /namespaces/{namespace}/jobs:
     get:
       tags:
       - "jobs"
@@ -2671,6 +2676,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2713,6 +2723,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: body
         name: data
         schema:
@@ -2726,7 +2741,7 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /jobs/{job}:
+  /namespaces/{namespace}/jobs/{job}:
     get:
       tags:
       - "jobs"
@@ -2735,6 +2750,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -2757,6 +2777,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -2781,6 +2806,11 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
         name: "job"
         description: "Job ID"
         required: true
@@ -2801,7 +2831,7 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /processes:
+  /namespaces/{namespace}/processes:
     get:
       tags:
       - "jobs"
@@ -2810,6 +2840,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2854,6 +2889,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: body
         name: data
         schema:
@@ -2867,7 +2907,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /watch/processes:
+  /watch/namespaces/{namespace}/processes:
     get:
       tags:
       - "jobs"
@@ -2876,6 +2916,11 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2910,7 +2955,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /processes/{process}:
+  /namespaces/{namespace}/processes/{process}:
     get:
       tags:
       - "jobs"
@@ -2919,6 +2964,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -2942,6 +2992,11 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
         name: "process"
         description: "Process ID"
         required: true
@@ -2953,7 +3008,7 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-  /jobs/{job}/logs:
+  /namespaces/{namespace}/jobs/{job}/logs:
     get:
       tags:
       - "jobs"
@@ -2962,6 +3017,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -3003,7 +3063,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /jobs/{job}/logs/{log}:
+  /namespaces/{namespace}/jobs/{job}/logs/{log}:
     get:
       tags:
       - "jobs"
@@ -3012,6 +3072,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -3031,7 +3096,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /watch/jobs/{job}/logs:
+  /watch/namespaces/{namespace}/jobs/{job}/logs:
     get:
       tags:
       - "jobs"
@@ -3040,6 +3105,11 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -3079,7 +3149,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /processes/{process}/logs:
+  /namespaces/{namespace}/processes/{process}/logs:
     get:
       tags:
       - "jobs"
@@ -3088,6 +3158,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3129,7 +3204,7 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-  /process/{process}/logs/{log}:
+  /namespaces/{namespace}/process/{process}/logs/{log}:
     get:
       tags:
       - "jobs"
@@ -3138,6 +3213,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3157,7 +3237,7 @@ paths:
           description: "Log does not exists"
         403:
           description: "Access denied"
-  /watch/processes/{process}/logs:
+  /watch/namespaces/{namespace}/processes/{process}/logs:
     get:
       tags:
       - "jobs"
@@ -3166,6 +3246,11 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3294,8 +3379,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3306,8 +3389,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Namespace."
@@ -3318,8 +3399,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3330,8 +3409,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Secret."
@@ -3345,8 +3422,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3357,8 +3432,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always User."
@@ -3376,8 +3449,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3388,8 +3459,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always AccessRule."
@@ -3431,8 +3500,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3443,8 +3510,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always AccessRole."
@@ -3463,8 +3528,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3475,8 +3538,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Job'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Process."
@@ -3494,8 +3555,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3506,8 +3565,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Job."
@@ -3528,12 +3585,7 @@ definitions:
                     type: array
                     items:
                       type: string
-              namespaces:
-                description: "A list of namespaces (name) the job should match. You may use a wildcard to specify all namespaces."
-                type: array
-                items:
-                  type: string
-                default: ["*"]
+                    default: []
               collections:
                 description: "A list of collections (name) the job should match. You may use a wildcard to specify all collections."
                 type: array
@@ -3594,8 +3646,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3606,8 +3656,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Log."
@@ -3634,8 +3682,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3646,8 +3692,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Collection."
@@ -3657,15 +3701,13 @@ definitions:
             type: "object"
             properties:
               schema:
-                type: "object"
+                type: object
                 default: {}
   Endpoints:
     description: "A list of endpoints."
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3676,8 +3718,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint."
@@ -3733,8 +3773,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always PdoEndpoint."
@@ -3767,8 +3805,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always MysqlEndpoint."
@@ -3804,8 +3840,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always LdapEndpoint."
@@ -3841,8 +3875,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always OdataRestEndpoint."
@@ -3894,8 +3926,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always MongodbEndpoint."
@@ -3927,8 +3957,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always BalloonEndpoint."
@@ -3980,8 +4008,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always CsvEndpoint."
@@ -4015,8 +4041,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always XmlEndpoint."
@@ -4054,8 +4078,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always JsonEndpoint."
@@ -4086,8 +4108,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -4098,8 +4118,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Workflow."
@@ -4134,8 +4152,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always EndpointObject."
@@ -4150,8 +4166,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             description: "Attributes"
@@ -4161,8 +4175,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -4173,8 +4185,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always DataObject."
@@ -4188,8 +4198,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -4200,8 +4208,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Namespace."

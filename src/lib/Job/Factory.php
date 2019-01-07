@@ -21,6 +21,7 @@ use Tubee\Job;
 use Tubee\Log\Factory as LogFactory;
 use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Resource\Factory as ResourceFactory;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 class Factory extends ResourceFactory
 {
@@ -64,19 +65,36 @@ class Factory extends ResourceFactory
     /**
      * Get all.
      */
-    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
+        $filter = [
+            'namespace' => $namespace->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace) {
+            return $this->build($resource, $namespace);
+        });
     }
 
     /**
      * Delete by name.
      */
-    public function deleteOne(string $name): bool
+    public function deleteOne(ResourceNamespaceInterface $namespace, string $name): bool
     {
-        $job = $this->getOne($name);
+        $job = $this->getOne($namespace, $name);
 
-        foreach ($this->scheduler->getJobs(['data.job' => $name]) as $task) {
+        $tasks = $this->scheduler->getJobs([
+            'data.namespace' => $namespace->getName(),
+            'data.job' => $name,
+        ]);
+
+        foreach ($tasks as $task) {
             try {
                 $this->scheduler->cancelJob($task['_id']);
             } catch (\Exception $e) {
@@ -89,31 +107,40 @@ class Factory extends ResourceFactory
     /**
      * Get job.
      */
-    public function getOne(string $name): JobInterface
+    public function getOne(ResourceNamespaceInterface $namespace, string $name): JobInterface
     {
-        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
+            'namespace' => $namespace->getName(),
+            'name' => $name,
+        ]);
 
         if ($result === null) {
             throw new Exception\NotFound('job not found');
         }
 
-        return $this->build($result);
+        return $this->build($result, $namespace);
     }
 
     /**
      * Create resource.
      */
-    public function create(array $resource): ObjectIdInterface
+    public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource = Validator::validate($resource);
 
-        if ($this->has($resource['name'])) {
+        if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('job '.$resource['name'].' does already exists');
         }
 
+        $resource['namespace'] = $namespace->getName();
+
         $result = $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
 
-        $resource['data'] += ['job' => $result];
+        $resource['data'] += [
+            'namespace' => $namespace->getName(),
+            'job' => $result,
+        ];
+
         $this->scheduler->addJob(Sync::class, $resource['data'], $resource['data']['options']);
 
         return $result;
@@ -122,9 +149,12 @@ class Factory extends ResourceFactory
     /**
      * Has.
      */
-    public function has(string $name): bool
+    public function has(ResourceNamespaceInterface $namespace, string $name): bool
     {
-        return $this->db->{self::COLLECTION_NAME}->count(['name' => $name]) > 0;
+        return $this->db->{self::COLLECTION_NAME}->count([
+            'namespace' => $namespace->getName(),
+            'name' => $name,
+        ]) > 0;
     }
 
     /**
@@ -145,16 +175,18 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
+        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace) {
+            return $this->build($resource, $namespace);
+        }, $offset, $limit, $sort);
     }
 
     /**
      * Build instance.
      */
-    public function build(array $resource): JobInterface
+    public function build(array $resource, ResourceNamespaceInterface $namespace): JobInterface
     {
-        return $this->initResource(new Job($resource, $this->scheduler, $this->process_factory, $this->log_factory));
+        return $this->initResource(new Job($resource, $namespace, $this->scheduler, $this->process_factory, $this->log_factory));
     }
 }

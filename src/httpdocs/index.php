@@ -8,6 +8,7 @@ declare(strict_types=1);
  * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
+
 use Tubee\Bootstrap\ContainerBuilder;
 
 define('TUBEE_PATH', (getenv('TUBEE_PATH') ? getenv('TUBEE_PATH') : realpath(__DIR__.DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR.'..')));

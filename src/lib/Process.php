@@ -20,9 +20,17 @@ use Tubee\Log\LogInterface;
 use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 class Process extends AbstractResource implements ProcessInterface
 {
+    /**
+     * Namespace.
+     *
+     * @var ResourceNamespace
+     */
+    protected $namespace;
+
     /**
      * Log factory.
      *
@@ -33,9 +41,10 @@ class Process extends AbstractResource implements ProcessInterface
     /**
      * Process.
      */
-    public function __construct(array $resource, LogFactory $log_factory)
+    public function __construct(array $resource, ResourceNamespaceInterface $namespace, LogFactory $log_factory)
     {
         $this->resource = $resource;
+        $this->namespace = $namespace;
         $this->log_factory = $log_factory;
     }
 
@@ -49,6 +58,7 @@ class Process extends AbstractResource implements ProcessInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Process',
+            'namespace' => $this->namespace->getName(),
             'changed' => $this->getCreated()->toDateTime()->format('c'),
             'data' => $this->getData(),
             'status' => [
@@ -70,7 +80,7 @@ class Process extends AbstractResource implements ProcessInterface
         $query['$or'][] = ['context.process' => (string) $this->getId()];
         $query['$or'][] = ['context.parent' => (string) $this->getId()];
 
-        return $this->log_factory->getAll($query, $offset, $limit, $sort);
+        return $this->log_factory->getAll($this->namespace, $query, $offset, $limit, $sort);
     }
 
     /**
@@ -78,6 +88,6 @@ class Process extends AbstractResource implements ProcessInterface
      */
     public function getLog(ObjectIdInterface $id): LogInterface
     {
-        return $this->log_factory->getOne($id);
+        return $this->log_factory->getOne($this->namespace, $id);
     }
 }

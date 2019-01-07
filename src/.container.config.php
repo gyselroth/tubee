@@ -37,7 +37,7 @@ use TaskScheduler\WorkerFactoryInterface;
 use TaskScheduler\WorkerManager;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 use ParagonIE\Halite\KeyFactory;
-use ParagonIE\Halite\HiddenString;
+use ParagonIE\HiddenString\HiddenString;
 
 return [
     Dispatcher::class => [
