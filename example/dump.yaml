@@ -1,0 +1,174 @@
+name: default
+kind: Namespace
+---
+name: news
+namespace: default
+kind: Collection
+---
+name: bbc
+kind: XmlEndpoint
+namespace: default
+collection: news
+data:
+  storage:
+    kind: StreamStorage
+  resource:
+    root_name: data
+    node_name: item
+    pretty: true
+    preserve_whitespace: false
+  type: source
+  options:
+    flush: false
+    import:
+      - guid
+    filter_one: null
+    filter_all: null
+  file: 'http://feeds.bbci.co.uk/news/rss.xml'
+---
+name: create
+kind: Workflow
+namespace: default
+collection: news
+endpoint: bbc
+data:
+  ensure: exists
+  map:
+    title:
+      from: title
+      required: true
+    description:
+      from: description
+    date:
+      from: pubDate
+    guid:
+      from: guid._value
+  condition: null
+---
+name: xml-export
+kind: XmlEndpoint
+namespace: default
+collection: news
+data:
+  storage:
+    kind: StreamStorage
+  resource:
+    root_name: data
+    node_name: article
+    pretty: true
+    preserve_whitespace: false
+  type: destination
+  options:
+    flush: false
+    import:
+      - guid
+    filter_one: 'guid="{guid}"'
+    filter_all: null
+  file: /tmp/news.xml
+---
+name: create-update
+kind: Workflow
+namespace: default
+collection: news
+endpoint: xml-export
+data:
+  ensure: exists
+  map:
+    title:
+      from: data.title
+      required: true
+    description:
+      from: data.description
+    date:
+      from: data.date
+    guid:
+      from: data.guid
+  condition: null
+---
+name: accounts
+namespace: default
+kind: Collection
+---
+kind: DataObject
+namespace: default
+collection: accounts
+data:
+  username: user1
+  mail: user1@example.org
+---
+kind: DataObject
+namespace: default
+collection: accounts
+data:
+  username: user2
+  mail: user2@example.org
+---
+name: balloon
+kind: BalloonEndpoint
+namespace: default
+collection: accounts
+data:
+  resource:
+    options:
+      verify: false
+    auth: basic
+    oauth:
+      client_id: null
+      client_pw: null
+    basic:
+      username: admin
+      password: admin
+    base_uri: 'https://balloon-endpoint/api/v2/users'
+  type: destination
+  options:
+    flush: false
+    import:
+      - id
+    filter_one: '{\"_id\": \"{endpoints.balloon.result}\"}'
+    filter_all: null
+---
+name: create-update
+kind: Workflow
+namespace: default
+collection: accounts
+endpoint: balloon
+data:
+  ensure: last
+  map:
+    hard_quota:
+      value: 4999999999999999
+    username:
+      from: data.username
+      required: true
+  condition: null
+---
+name: json-export
+kind: JsonEndpoint
+namespace: default
+collection: accounts
+data:
+  storage:
+    kind: StreamStorage
+  type: destination
+  options:
+    flush: ss
+    import: []
+    filter_one: test
+    filter_all: null
+  resource: []
+  file: /tmp/accounts.json
+---
+name: create-update
+kind: Workflow
+namespace: default
+collection: accounts
+endpoint: json-export
+data:
+  ensure: last
+  map:
+    hard_quota:
+      value: 10
+    username:
+      from: data.username
+      required: true
+  condition: null
