@@ -54,22 +54,6 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function exists(array $object): bool
-    {
-        try {
-            $this->get($object);
-
-            return true;
-        } catch (Exception\ObjectMultipleFound $e) {
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function transformQuery(?array $query = null)
     {
         $result = null;

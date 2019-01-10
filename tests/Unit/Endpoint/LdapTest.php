@@ -134,55 +134,6 @@ class LdapTest extends TestCase
         $result = $ldap->getOne([])->getData();
     }
 
-    public function testObjectExists()
-    {
-        $search = $this->createMock(LdapResult::class);
-        $search->method('countEntries')->willReturn(1);
-        $search->method('getEntries')->willReturn([
-            ['uid' => [
-                'count' => 1,
-                0 => 'foo',
-            ]],
-        ]);
-
-        $client = $this->createMock(LdapClient::class);
-        $client->method('ldapSearch')->willReturn($search);
-
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => '(uid={uid)']],
-        ]);
-
-        $this->assertTrue($ldap->exists([]));
-    }
-
-    public function testObjectExistsIfMultipleFound()
-    {
-        $search = $this->createMock(LdapResult::class);
-        $search->method('countEntries')->willReturn(2);
-        $client = $this->createMock(LdapClient::class);
-        $client->method('ldapSearch')->willReturn($search);
-
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => '(uid={uid)']],
-        ]);
-
-        $this->assertTrue($ldap->exists([]));
-    }
-
-    public function testObjectNotExistsIfNotFound()
-    {
-        $search = $this->createMock(LdapResult::class);
-        $search->method('countEntries')->willReturn(0);
-        $client = $this->createMock(LdapClient::class);
-        $client->method('ldapSearch')->willReturn($search);
-
-        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => '(uid={uid)']],
-        ]);
-
-        $this->assertFalse($ldap->exists([]));
-    }
-
     public function testGetDiffNoChange()
     {
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
