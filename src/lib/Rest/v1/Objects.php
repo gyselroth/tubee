@@ -98,9 +98,7 @@ class Objects
      */
     public function post(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
-        $query = array_merge([
-            'write' => false,
-        ], $request->getQueryParams());
+        $query = $request->getQueryParams());
 
         $body = array_merge([
             'data' => [],

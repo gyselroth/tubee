@@ -68,7 +68,7 @@ class ObjectRelations
 
         if ($object !== null) {
             $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
-            $object = $collection->getObject(['_id' => $object]);
+            $object = $collection->getObject(['name' => $object]);
             $relatives = $object->getRelations($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::getAll($request, $identity, $this->acl, $relatives);
@@ -87,7 +87,7 @@ class ObjectRelations
     {
         if ($object != null) {
             $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
-            $object = $collection->getObject(['_id' => $object], false);
+            $object = $collection->getObject(['name' => $object], false);
             $relative = $object->getRelation($relation);
 
             return Helper::getOne($request, $identity, $relative);
