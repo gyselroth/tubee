@@ -21,8 +21,11 @@ class Validator
     public static function validate(array $resource): array
     {
         $defaults = [
+            'options' => [
+                'identifier' => 'id',
+            ],
             'resource' => [
-                'options' => [],
+                'request_options' => [],
                 'auth' => null,
                 'oauth' => [
                     'client_id' => null,

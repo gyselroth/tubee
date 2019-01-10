@@ -99,7 +99,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      *
      * @var string
      */
-    protected $identifiers = [];
+    protected $identifier;
 
     /**
      * Init endpoint.
@@ -147,7 +147,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
             switch ($option) {
                 case 'flush':
                 case 'import':
-                case 'identifiers':
+                case 'identifier':
                 case 'filter_one':
                 case 'filter_all':
                     $this->{$option} = $value;
@@ -234,9 +234,9 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * {@inheritdoc}
      */
-    public function getIdentifiers(): array
+    public function getResourceIdentifier(): array
     {
-        return $this->identifiers;
+        return $this->identifier;
     }
 
     /**
@@ -284,7 +284,9 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     public function getWorkflows(array $workflows = [], ?int $offset = null, ?int $limit = null): Generator
     {
-        return $this->workflow_factory->getAll($this, $workflows, $offset, $limit);
+        return $this->workflow_factory->getAll($this, $workflows, $offset, $limit, [
+            'priority' => 1,
+        ]);
     }
 
     /**

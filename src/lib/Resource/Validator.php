@@ -61,20 +61,12 @@ class Validator
     protected static function validateSecrets(array $secrets): array
     {
         foreach ($secrets as $key => $value) {
-            if (!isset($value['secret']) || !is_string($value['secret'])) {
-                throw new InvalidArgumentException('secrets.secret [string] is required');
+            if (['secret', 'key', 'to'] != array_keys($value)) {
+                throw new InvalidArgumentException('secret in secrets must contain secret, key and to as strings');
             }
 
-            if (!isset($value['key']) || !is_string($value['key'])) {
-                throw new InvalidArgumentException('secrets.key [string] is required');
-            }
-
-            if (!isset($value['to']) || !is_string($value['to'])) {
-                throw new InvalidArgumentException('secrets.to [string] is required');
-            }
-
-            if (!in_array($key, ['secret', 'key', 'to'])) {
-                throw new InvalidArgumentException('secrets.'.$key.' is an unknown option');
+            if (array_filter($value, 'is_string') != $value) {
+                throw new InvalidArgumentException('secret in secrets must contain secret, key and to as strings');
             }
         }
 

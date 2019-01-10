@@ -12,12 +12,12 @@ declare(strict_types=1);
 namespace Tubee\DataObjectRelation;
 
 use Generator;
-use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\ObjectId;
-use Tubee\ResourceNamespace\ResourceNamespaceInterface;
+use MongoDB\BSON\ObjectIdInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObjectRelation;
 use Tubee\Resource\Factory as ResourceFactory;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 class Factory extends ResourceFactory
 {
@@ -38,7 +38,7 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Get one
+     * Get one.
      */
     public function getOne(ResourceNamespaceInterface $namespace, string $name): DataObjectRelationInterface
     {
@@ -55,7 +55,7 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Get one from object
+     * Get one from object.
      */
     public function getOneFromObject(DataObjectInterface $object, string $name): DataObjectRelationInterface
     {
@@ -80,9 +80,9 @@ class Factory extends ResourceFactory
 
         $object_1 = array_shift($resource['data']['relation']);
         $object_2 = array_shift($resource['data']['relation']);
-        $related  = $object_1;
+        $related = $object_1;
 
-        if($object_1 == $relation) {
+        if ($object_1 == $relation) {
             $related = $object_2;
         }
 
@@ -92,7 +92,7 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Get all from object
+     * Get all from object.
      */
     public function getAllFromObject(DataObjectInterface $object, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
@@ -117,13 +117,14 @@ class Factory extends ResourceFactory
         return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation) {
             $object_1 = $resource['data']['relation'][0];
             $object_2 = $resource['data']['relation'][1];
-            $related  = $object_1;
+            $related = $object_1;
 
-            if($object_1 == $relation) {
+            if ($object_1 == $relation) {
                 $related = $object_2;
             }
 
             $related = $object->getCollection()->getResourceNamespace()->switch($related['namespace'])->getCollection($related['collection'])->getObject(['name' => $related['object']]);
+
             return $this->build($resource, $related);
         });
     }
@@ -134,7 +135,7 @@ class Factory extends ResourceFactory
     public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         $filter = [
-            'namespace' => $namespace->getName()
+            'namespace' => $namespace->getName(),
         ];
 
         if (!empty($query)) {
@@ -162,14 +163,14 @@ class Factory extends ResourceFactory
                 'data.relation.namespace' => $object_2->getCollection()->getResourceNamespace()->getName(),
                 'data.relation.collection' => $object_2->getCollection()->getName(),
                 'data.relation.object' => $object_2->getName(),
-            ]
+            ],
         ];
 
         $resource = $relations;
         $resource['data.context'] = $context;
 
         $exists = $this->db->{self::COLLECTION_NAME}->findOne([
-            '$and' => $relations
+            '$and' => $relations,
         ]);
 
         if ($endpoints !== null) {
@@ -179,6 +180,7 @@ class Factory extends ResourceFactory
         if ($exists !== null) {
             $exists = $this->build($exists);
             $this->update($exists, ['context' => $context]);
+
             return $exists->getId();
         }
 
@@ -193,8 +195,8 @@ class Factory extends ResourceFactory
         $resource = Validator::validate($resource);
 
         $object['_id'] = new ObjectId();
-        if(!isset($object['name'])) {
-            $object['name'] = (string)$object['_id'];
+        if (!isset($object['name'])) {
+            $object['name'] = (string) $object['_id'];
         }
 
         if ($this->has($namespace, $resource['name'])) {
@@ -202,6 +204,7 @@ class Factory extends ResourceFactory
         }
 
         $resource['namespace'] = $namespace->getName();
+
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
@@ -243,7 +246,7 @@ class Factory extends ResourceFactory
     /**
      * Build.
      */
-    public function build(array $resource, ?DataObjectInterface $object=null): DataObjectRelationInterface
+    public function build(array $resource, ?DataObjectInterface $object = null): DataObjectRelationInterface
     {
         return $this->initResource(new DataObjectRelation($resource, $object));
     }

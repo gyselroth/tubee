@@ -122,7 +122,7 @@ class Endpoints
         $namespace = $this->namespace_factory->getOne($namespace);
         $collection = $namespace->getCollection($collection);
         $endpoint = $collection->getEndpoint($endpoint);
-        $doc = ['data' => $endpoint->getData()];
+        $doc = ['data' => $endpoint->getData(), 'secrets' => $endpoint->getSecrets()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();

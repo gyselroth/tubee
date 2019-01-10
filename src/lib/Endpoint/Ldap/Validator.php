@@ -21,6 +21,10 @@ class Validator
     public static function validate(array $resource): array
     {
         $defaults = [
+            'options' => [
+                'identifier' => 'entrydn',
+                'filter_all' => '(objectClass=*)',
+            ],
             'resource' => [
                 'uri' => 'ldap://127.0.0.1:389',
                 'binddn' => null,

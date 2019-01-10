@@ -29,7 +29,6 @@ class Validator
 
         $class = StorageInterface::STORAGE_MAP[$resource['kind']];
         $validator = $class.'\\Validator';
-        $resource['class'] = $class;
         $resource = $validator::validate($resource);
 
         return $resource;

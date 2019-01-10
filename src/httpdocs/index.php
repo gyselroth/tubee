@@ -31,12 +31,13 @@ $dic = ContainerBuilder::get($composer);
 $request = Zend\Diactoros\ServerRequestFactory::fromGlobals();
 $logger = $dic->get(Psr\Log\LoggerInterface::class);
 
-        set_exception_handler(function ($e) use ($logger) {
-            $logger->emergency('uncaught exception: '.$e->getMessage(), [
-                'category' => 'Http',
-                'exception' => $e,
-            ]);
-        });
+set_exception_handler(function ($e) use ($logger) {
+    http_response_code(500);
+    $logger->emergency('uncaught exception: '.$e->getMessage(), [
+        'category' => 'Http',
+        'exception' => $e,
+    ]);
+});
 
 $dic->get(Tubee\Rest\Routes::class);
 $dispatcher = $dic->get(\mindplay\middleman\Dispatcher::class);

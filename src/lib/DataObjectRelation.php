@@ -29,7 +29,7 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
     /**
      * Data object.
      */
-    public function __construct(array $resource, ?DataObjectInterface $object=null)
+    public function __construct(array $resource, ?DataObjectInterface $object = null)
     {
         $this->resource = $resource;
         $this->object = $object;
@@ -51,7 +51,7 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
 
         $object = $this->object;
 
-        if($object !== null) {
+        if ($object !== null) {
             $resource['status']['object'] = function () use ($object, $request) {
                 return $object->decorate($request);
             };

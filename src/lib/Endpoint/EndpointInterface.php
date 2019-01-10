@@ -48,6 +48,7 @@ interface EndpointInterface extends ResourceInterface
         Moodle::KIND => Moodle::class,
         Mysql::KIND => Mysql::class,
         Image::KIND => Image::class,
+        Ucs::KIND => Ucs::class,
     ];
 
     /**

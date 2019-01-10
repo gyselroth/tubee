@@ -236,7 +236,7 @@ abstract class AbstractRest extends AbstractEndpoint
         }
 
         if (!is_array($data)) {
-            throw new RestException\NotIterable('response is not iterable');
+            throw new Exception\NotIterable('response is not iterable');
         }
 
         return $data;

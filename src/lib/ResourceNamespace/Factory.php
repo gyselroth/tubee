@@ -18,7 +18,6 @@ use Psr\Log\LoggerInterface;
 use Tubee\Collection\Factory as CollectionFactory;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace;
-use Tubee\ResourceNamespace\Validator as ResourceNamespaceValidator;
 
 class Factory extends ResourceFactory
 {
@@ -74,6 +73,18 @@ class Factory extends ResourceFactory
     }
 
     /**
+     * Update.
+     */
+    public function update(ResourceNamespaceInterface $resource, array $data): bool
+    {
+        $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
+        $data = Validator::validate($data);
+
+        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+    }
+
+    /**
      * Delete by name.
      */
     public function deleteOne(string $name): bool
@@ -88,7 +99,7 @@ class Factory extends ResourceFactory
      */
     public function add(array $resource): ObjectIdInterface
     {
-        ResourceNamespaceValidator::validate($resource);
+        Validator::validate($resource);
 
         if ($this->has($resource['name'])) {
             throw new Exception\NotUnique('namespace '.$resource['name'].' does already exists');

@@ -133,7 +133,7 @@ class Jobs
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->job_factory->getOne($job->getName())->decorate($request),
+            $this->job_factory->getOne($namespace, $job->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

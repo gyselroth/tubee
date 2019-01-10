@@ -21,6 +21,9 @@ class Validator
     public static function validate(array $resource): array
     {
         $defaults = [
+            'options' => [
+                'identifier' => '_id',
+            ],
             'resource' => [
                 'uri' => 'mongodb://127.0.0.1',
                 'uri_options' => [],

@@ -37,7 +37,7 @@ class StringLanguageProvider implements ExpressionFunctionProviderInterface
             ExpressionFunction::fromPhp('str_replace'),
             ExpressionFunction::fromPhp('substr'),
             ExpressionFunction::fromPhp('pack'),
-            ExpressionFunction::fromPhp('time'),
+            ExpressionFunction::fromPhp('time', 'now'),
             $this->utf16(),
             $this->uuidv4(),
         ];

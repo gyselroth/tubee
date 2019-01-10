@@ -12,14 +12,13 @@ declare(strict_types=1);
 namespace Tubee\AttributeMap;
 
 use InvalidArgumentException;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 
 class Validator
 {
     /**
      * Validate resource.
      */
-    public static function validate(array $resource, ExpressionLanguage $expression): array
+    public static function validate(array $resource): array
     {
         foreach ($resource as $attribute => $definition) {
             if (!is_array($definition)) {
@@ -30,7 +29,7 @@ class Validator
                 throw new InvalidArgumentException('map attribute '.$attribute.' name must be a string');
             }
 
-            $resource[$attribute] = self::validateAttribute($attribute, $definition, $expression);
+            $resource[$attribute] = self::validateAttribute($attribute, $definition);
         }
 
         return $resource;
@@ -39,14 +38,16 @@ class Validator
     /**
      * Validate attribute.
      */
-    protected static function validateAttribute(string $name, array $schema, ExpressionLanguage $expression): array
+    protected static function validateAttribute(string $name, array $schema): array
     {
         $defaults = [
             'ensure' => AttributeMapInterface::ENSURE_LAST,
             'value' => null,
             'type' => null,
+            'name' => null,
             'from' => null,
             'script' => null,
+            'unwind' => null,
             'rewrite' => [],
             'require_regex' => null,
             'required' => false,
@@ -72,11 +73,10 @@ class Validator
                 case 'rewrite':
                 break;
                 case 'script':
-                    $expression->evaluate($definition, []);
-
                 break;
                 case 'value':
                 break;
+                case 'name':
                 case 'from':
                 case 'require_regex':
                     if (!is_string($definition)) {

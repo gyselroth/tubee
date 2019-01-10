@@ -22,7 +22,7 @@ class Validator
     {
         $defaults = [
             'resource' => [
-                'options' => [],
+                'request_options' => [],
                 'container' => 'data',
                 'auth' => null,
                 'oauth' => [

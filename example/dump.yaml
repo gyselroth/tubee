@@ -1,13 +1,13 @@
-name: default
+name: playground
 kind: Namespace
 ---
 name: news
-namespace: default
+namespace: playground
 kind: Collection
 ---
 name: bbc
 kind: XmlEndpoint
-namespace: default
+namespace: playground
 collection: news
 data:
   storage:
@@ -28,7 +28,7 @@ data:
 ---
 name: hourly-import
 kind: Job
-namespace: default
+namespace: playground
 data:
   notification:
     enabled: false
@@ -41,7 +41,7 @@ data:
   loadbalance: true
   simulate: false
   log_level: error
-  ignore: false
+  ignore: true
   options:
     at: 0
     interval: 3600
@@ -51,7 +51,7 @@ data:
 ---
 name: create
 kind: Workflow
-namespace: default
+namespace: playground
 collection: news
 endpoint: bbc
 data:
@@ -70,7 +70,7 @@ data:
 ---
 name: xml-export
 kind: XmlEndpoint
-namespace: default
+namespace: playground
 collection: news
 data:
   storage:
@@ -91,7 +91,7 @@ data:
 ---
 name: create-update
 kind: Workflow
-namespace: default
+namespace: playground
 collection: news
 endpoint: xml-export
 data:
@@ -109,28 +109,96 @@ data:
   condition: null
 ---
 name: accounts
-namespace: default
+namespace: playground
 kind: Collection
 ---
 kind: DataObject
-namespace: default
+namespace: playground
 collection: accounts
 name: user1
 data:
   username: user1
   mail: user1@example.org
+  firstname: user1
+  lastname: foo
+  disabled: 1547036962
 ---
 kind: DataObject
-namespace: default
+namespace: playground
 collection: accounts
 name: user2
 data:
   username: user2
   mail: user2@example.org
+  firstname: user2
+  lastname: bar
+  disabled: null
+---
+name: groups
+namespace: playground
+kind: Collection
+---
+kind: DataObject
+namespace: playground
+collection: groups
+name: group1
+data:
+  name: group1
+  disabled: null
+---
+kind: DataObject
+namespace: playground
+collection: groups
+name: group2
+data:
+  name: group2
+  disabled: null
+---
+kind: DataObjectRelation
+namespace: playground
+name: user1-group2
+data:
+  relation:
+  - namespace: playground
+    collection: accounts
+    object: user1
+  - namespace: playground
+    collection: groups
+    object: group1
+  context:
+    foo: bar
+---
+kind: DataObjectRelation
+namespace: playground
+name: user2-group2
+data:
+  relation:
+  - namespace: playground
+    collection: accounts
+    object: user2
+  - namespace: playground
+    collection: groups
+    object: group2
+  context:
+    foo: foo
+---
+kind: DataObjectRelation
+namespace: playground
+name: user1-group1
+data:
+  relation:
+  - namespace: playground
+    collection: accounts
+    object: user1
+  - namespace: playground
+    collection: groups
+    object: group1
+  context:
+    foo: foofoo
 ---
 name: balloon
 kind: BalloonEndpoint
-namespace: default
+namespace: playground
 collection: accounts
 data:
   resource:
@@ -154,7 +222,7 @@ data:
 ---
 name: one-time-export
 kind: Process
-namespace: default
+namespace: playground
 data:
   notification:
     enabled: false
@@ -162,7 +230,7 @@ data:
   collections:
     - 'accounts'
   endpoints:
-    - '*'
+    - 'json-export'
   filter: []
   loadbalance: true
   simulate: false
@@ -171,7 +239,7 @@ data:
 ---
 name: create-update
 kind: Workflow
-namespace: default
+namespace: playground
 collection: accounts
 endpoint: balloon
 data:
@@ -186,14 +254,14 @@ data:
 ---
 name: json-export
 kind: JsonEndpoint
-namespace: default
+namespace: playground
 collection: accounts
 data:
   storage:
     kind: StreamStorage
   type: destination
   options:
-    flush: ss
+    flush: true
     import: []
     filter_one: test
     filter_all: null
@@ -202,7 +270,7 @@ data:
 ---
 name: create-update
 kind: Workflow
-namespace: default
+namespace: playground
 collection: accounts
 endpoint: json-export
 data:
@@ -214,3 +282,201 @@ data:
       from: data.username
       required: true
   condition: null
+---
+name: ucs
+kind: UcsEndpoint
+namespace: playground
+collection: accounts
+data:
+  resource:
+    request_options:
+      verify: false
+    base_uri: 'http://ucs-endpoint/univention'
+    flavor: users/user
+  type: destination
+  options:
+    flush: false
+    filter_one: '{\"objectProperty\": \"name\", \"objectPropertyValue\": \"{username}\"}'
+    filter_all: null
+secrets:
+- secret: ucs
+  key: username
+  to: 'data.resource.auth.username'
+- secret: ucs
+  key: password
+  to: 'data.resource.auth.password'
+---
+name: create
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 1
+  ensure: exists
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+      required: true
+    username:
+      from: data.username
+      required: true
+    lastname:
+      from: data.firstname
+      required: true
+    description:
+      value: "bar bar"
+    password:
+      value: admin1234
+  condition: "object['data']['disabled'] === null"
+---
+name: update
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 2
+  ensure: last
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+      required: true
+    username:
+      from: data.username
+      required: true
+    lastname:
+      from: data.firstname
+      required: true
+    description:
+      value: "foo foo"
+  condition: "object['data']['disabled'] === null"
+---
+name: disable
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 4
+  ensure: last
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+      required: true
+    username:
+      from: data.username
+      required: true
+    lastname:
+      from: data.firstname
+      required: true
+    description:
+      value: "This user is disabled"
+  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 1800"
+---
+name: remove
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 3
+  ensure: absent
+  map:
+    username:
+      from: data.username
+      required: true
+  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 3600"
+---
+name: hourly-account-export
+kind: Job
+namespace: playground
+data:
+  notification:
+    enabled: false
+    receiver: []
+  collections:
+    - 'accounts'
+  endpoints:
+    - 'ucs'
+  filter: []
+  loadbalance: true
+  simulate: false
+  log_level: debug
+  ignore: true
+  options:
+    at: 0
+    interval: 3600
+    retry: 0
+    retry_interval: 0
+    timeout: 0
+---
+name: ucs
+kind: UcsEndpoint
+namespace: playground
+collection: groups
+data:
+  resource:
+    request_options:
+      verify: false
+    base_uri: 'http://ucs-endpoint/univention'
+    flavor: groups/group
+  type: destination
+  options:
+    flush: false
+    filter_one: '{\"objectProperty\": \"name\", \"objectPropertyValue\": \"{name}\"}'
+    filter_all: null
+secrets:
+- secret: ucs
+  key: username
+  to: 'data.resource.auth.username'
+- secret: ucs
+  key: password
+  to: 'data.resource.auth.password'
+---
+kind: Secret
+name: ucs
+data:
+  username: QWRtaW5pc3RyYXRvcg==
+  password: YWRtaW4xMjM0
+---
+name: create-update
+kind: Workflow
+namespace: playground
+collection: groups
+endpoint: ucs
+data:
+  priority: 3
+  ensure: last
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'cn='~data['name']~',cn=groups,dc=foobar,dc=intranet'"
+      required: true
+    name:
+      from: data.name
+      required: true
+    users:
+      from: relations
+      unwind:
+        from: root.object.endpoints.ucs.result
+    description:
+      value: "foobar"
+  condition: null
+---
+name: remove
+kind: Workflow
+namespace: playground
+collection: groups
+endpoint: ucs
+data:
+  priority: 1
+  ensure: absent
+  map:
+    name:
+      from: data.name
+      required: true
+  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 3600"

@@ -95,7 +95,6 @@ class Sync extends AbstractJob
                 if ($this->data['loadbalance'] === true) {
                     $data = $this->data;
                     $data = array_merge($data, [
-                        'namespaces' => [$namespace->getName()],
                         'endpoints' => [$endpoint->getName()],
                         'parent' => $this->getId(),
                         'loadbalance' => false,

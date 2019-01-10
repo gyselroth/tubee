@@ -1,52 +1,72 @@
-mongodb3:
+version: '3'
+services:
+  mongodb3:
     image: mongo:3.6.0
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
-openldap-endpoint:
+  openldap-endpoint:
     image: osixia/openldap:latest
     environment:
-        - LDAP_ADMIN_PASSWORD=admin
-mongodb-endpoint:
+      - LDAP_ADMIN_PASSWORD=admin
+  mongodb-endpoint:
     image: mongo:3.6.0
-mariadb-endpoint:
+  mariadb-endpoint:
     image: mariadb
     environment:
-        - MYSQL_DATABASE=admin
-        - MYSQL_ROOT_PASSWORD=admin
-        - MYSQL_USER=admin
-moodle-endpoint:
+      - MYSQL_DATABASE=admin
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_USER=admin
+  moodle-endpoint:
     image: jhardison/moodle:latest
     links:
-        - moodle-db
+      - moodle-db
     environment:
-        - MOODLE_URL=http://localhost:8080
-moodle-db:
+      - MOODLE_URL=http://localhost:8080
+  moodle-db:
     image: mysql:latest
     environment:
-        - MYSQL_DATABASE=moodle
-        - MYSQL_ROOT_PASSWORD=moodle
-        - MYSQL_USER=moodle
-balloon:
+      - MYSQL_DATABASE=moodle
+      - MYSQL_ROOT_PASSWORD=moodle
+      - MYSQL_USER=moodle
+  balloon:
     image: gyselroth/balloon:2.1.8
     links:
-        - mongodb3
+      - mongodb3
     entrypoint: php-fpm
     environment:
-        - BALLOON_MONGODB_URI=mongodb://mongodb3:27017
-balloon-endpoint:
+      - BALLOON_MONGODB_URI=mongodb://mongodb3:27017
+  ucs-endpoint:
+    image: univention/ucs-master-amd64:4.2-2
+    hostname: master
+    tmpfs:
+      - /run
+      - /run/lock
+    environment:
+      - HOSTNAME=master
+      - domainname=testdomain.intranet
+      - rootpwd=admin1234
+      - container=docker
+    cap_add:
+      - SYS_ADMIN
+    volumes:
+      -  /sys/fs/cgroup:/sys/fs/cgroup:ro
+    ports:
+      - "8011:80"
+  balloon-endpoint:
     image: gyselroth/balloon-web:3.0.5
     ports:
-        - "8091:443"
+      - "8091:443"
     links:
-        - balloon
-tubee-dev:
+      - balloon
+  tubee-dev:
     image: gyselroth/tubee-development:latest
     ports:
-        - "8090:443"
+      - "8090:443"
     volumes:
-        - .:/srv/www/tubee
+      - .:/srv/www/tubee
     links:
-        - mongodb3
-        - openldap-endpoint
-        - balloon-endpoint
+      - mongodb3
+      - openldap-endpoint
+      - balloon-endpoint
+      - ucs-endpoint
     environment:
-        - TUBEE_MONGODB_URI=mongodb://mongodb3:27017
+      - TUBEE_MONGODB_URI=mongodb://mongodb3:27017

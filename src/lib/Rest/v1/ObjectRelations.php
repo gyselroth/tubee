@@ -14,15 +14,14 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
-use MongoDB\BSON\ObjectId;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
-use Rs\Json\Patch;
 
 class ObjectRelations
 {
@@ -60,14 +59,14 @@ class ObjectRelations
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace, ?string $collection=null, ?string $object=null): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace, ?string $collection = null, ?string $object = null): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        if($object !== null) {
+        if ($object !== null) {
             $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
             $object = $collection->getObject(['_id' => $object]);
             $relatives = $object->getRelations($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
@@ -77,23 +76,26 @@ class ObjectRelations
 
         $namespace = $this->namespace_factory->getOne($namespace);
         $result = $this->relation_factory->getAll($namespace, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
         return Helper::getAll($request, $identity, $this->acl, $result);
     }
 
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, ?string $collection=null, ?string $object=null, ?string $relation=null): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, ?string $collection = null, ?string $object = null, ?string $relation = null): ResponseInterface
     {
-        if($object != null) {
+        if ($object != null) {
             $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
             $object = $collection->getObject(['_id' => $object], false);
             $relative = $object->getRelation($relation);
+
             return Helper::getOne($request, $identity, $relative);
         }
 
         $namespace = $this->namespace_factory->getOne($namespace);
         $relative = $this->relation_factory->getOne($namespace, $relation);
+
         return Helper::getOne($request, $identity, $relative);
     }
 

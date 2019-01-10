@@ -93,7 +93,7 @@ class Processes
 
         $namespace = $this->namespace_factory->getOne($namespace);
         $id = $this->process_factory->create($namespace, $body);
-        $process = $this->process_factory->getOne($id);
+        $process = $this->process_factory->getOne($namespace, $id);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),

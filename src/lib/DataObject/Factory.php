@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Tubee\DataObject;
 
 use Generator;
-use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\ObjectId;
+use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
@@ -131,8 +131,8 @@ class Factory extends ResourceFactory
 
         $object['_id'] = new ObjectId();
 
-        if(!isset($object['name'])) {
-            $object['name'] = (string)$object['_id'];
+        if (!isset($object['name'])) {
+            $object['name'] = (string) $object['_id'];
         }
 
         if ($this->has($collection, $object['name'])) {
@@ -172,6 +172,7 @@ class Factory extends ResourceFactory
     public function deleteOne(CollectionInterface $collection, string $name, bool $simulate = false): bool
     {
         $resource = $this->getOne($collection, ['name' => $name]);
+
         return $this->deleteFrom($this->db->{$collection->getCollection()}, $resource->getId(), $simulate);
     }
 
