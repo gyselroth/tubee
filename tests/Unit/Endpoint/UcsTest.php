@@ -255,6 +255,66 @@ class UcsTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testGetDiffReplaceTwoExistingValue()
+    {
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $diff = [
+            'foo' => [
+                'attribute' => 'foo',
+                'action' => AttributeMapInterface::ACTION_REPLACE,
+                'value' => 'bar',
+            ],
+            'bar' => [
+                'attribute' => 'foo',
+                'action' => AttributeMapInterface::ACTION_REPLACE,
+                'value' => 'foo',
+            ],
+        ];
+
+        $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), $diff);
+        $expected = [
+            'foo' => 'bar',
+            'bar' => 'foo',
+        ];
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetDiffRemoveValue()
+    {
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $diff = [
+            'foo' => [
+                'action' => AttributeMapInterface::ACTION_REMOVE,
+            ],
+        ];
+
+        $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), $diff);
+        $expected = [
+            'foo' => '',
+        ];
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetDiffAddValue()
+    {
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $diff = [
+            'foo' => [
+                'action' => AttributeMapInterface::ACTION_ADD,
+                'value' => 'bar',
+            ],
+        ];
+
+        $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), $diff);
+        $expected = [
+            'foo' => 'bar',
+        ];
+
+        $this->assertSame($expected, $result);
+    }
+
     protected function getMockClient($response = [])
     {
         $body = $this->createMock(StreamInterface::class);
@@ -273,71 +333,4 @@ class UcsTest extends TestCase
 
         return $client;
     }
-
-    /*
-        public function testGetDiffReplaceTwoExistingValue()
-        {
-            $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
-            $diff = [
-                'foo' => [
-                    'action' => AttributeMapInterface::ACTION_REPLACE,
-                    'value' => 'bar',
-                ],
-                'bar' => [
-                    'action' => AttributeMapInterface::ACTION_REPLACE,
-                    'value' => 'foo',
-                ],
-            ];
-    
-            $result = $ldap->getDiff($this->createMock(AttributeMapInterface::class), $diff);
-            $expected = [[
-                'attrib' => 'foo',
-                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-                'values' => ['bar'],
-            ], [
-                'attrib' => 'bar',
-                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-                'values' => ['foo'],
-            ]];
-    
-            $this->assertSame($expected, $result);
-        }
-    
-        public function testGetDiffRemoveValue()
-        {
-            $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
-            $diff = [
-                'foo' => [
-                    'action' => AttributeMapInterface::ACTION_REMOVE,
-                ],
-            ];
-    
-            $result = $ldap->getDiff($this->createMock(AttributeMapInterface::class), $diff);
-            $expected = [[
-                'attrib' => 'foo',
-                'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
-            ]];
-    
-            $this->assertSame($expected, $result);
-        }
-    
-        public function testGetDiffAddValue()
-        {
-            $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
-            $diff = [
-                'foo' => [
-                    'action' => AttributeMapInterface::ACTION_ADD,
-                    'value' => 'bar',
-                ],
-            ];
-    
-            $result = $ldap->getDiff($this->createMock(AttributeMapInterface::class), $diff);
-            $expected = [[
-                'attrib' => 'foo',
-                'modtype' => LDAP_MODIFY_BATCH_ADD,
-                'values' => ['bar'],
-            ]];
-    
-            $this->assertSame($expected, $result);
-        }*/
 }
