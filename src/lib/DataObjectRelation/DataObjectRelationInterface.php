@@ -24,5 +24,5 @@ interface DataObjectRelationInterface extends ResourceInterface
     /**
      * Get data object.
      */
-    public function getDataObject(): DataObjectInterface;
+    public function getDataObject(): ?DataObjectInterface;
 }

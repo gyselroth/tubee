@@ -27,20 +27,12 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
     protected $object;
 
     /**
-     * Related object.
-     *
-     * @var DataObjectInterface
-     */
-    protected $related_object;
-
-    /**
      * Data object.
      */
-    public function __construct(array $resource, DataObjectInterface $object, DataObjectInterface $related_object)
+    public function __construct(array $resource, ?DataObjectInterface $object=null)
     {
         $this->resource = $resource;
         $this->object = $object;
-        $this->related_object = $related_object;
     }
 
     /**
@@ -48,21 +40,22 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $related = $this->related_object;
         $resource = [
             '_links' => [
                  'self' => ['href' => (string) $request->getUri()],
-                 //'namespace' => ['href' => ($namespace = (string) $request->getUri()->withPath('/api/v1/namespaces/'.$namespace->getName()))],
-                 //'collection' => ['href' => $namespace.'/collections'.$collection->getName()],
             ],
             'kind' => 'DataObjectRelation',
-            /*'data' => [
-                'context' => $this->resource['context'],
-            ]*/
-            'object' => function () use ($related, $request) {
-                return $related->decorate($request);
-            },
+            'namespace' => $this->resource['namespace'],
+            'data' => $this->getData(),
         ];
+
+        $object = $this->object;
+
+        if($object !== null) {
+            $resource['status']['object'] = function () use ($object, $request) {
+                return $object->decorate($request);
+            };
+        }
 
         return AttributeResolver::resolve($request, $this, $resource);
     }
@@ -72,13 +65,13 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
      */
     public function getContext(): array
     {
-        return $this->resource['context'];
+        return $this->resource['data']['context'];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getDataObject(): DataObjectInterface
+    public function getDataObject(): ?DataObjectInterface
     {
         return $this->object;
     }

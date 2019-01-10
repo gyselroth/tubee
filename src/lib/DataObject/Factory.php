@@ -13,6 +13,7 @@ namespace Tubee\DataObject;
 
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
+use MongoDB\BSON\ObjectId;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
@@ -39,13 +40,12 @@ class Factory extends ResourceFactory
     }
 
     /**
-     * Has namespace.
+     * Has object.
      */
-    public function has(CollectionInterface $namespace, string $name): bool
+    public function has(CollectionInterface $collection, string $name): bool
     {
-        return $this->db->collections->count([
+        return $this->db->{$collection->getCollection()}->count([
             'name' => $name,
-            'namespace' => $namespace->getName(),
         ]) > 0;
     }
 
@@ -120,48 +120,6 @@ class Factory extends ResourceFactory
         return $this->getAllFrom($this->db->{$collection->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($collection) {
             return $this->build($resource, $collection);
         });
-
-        /*$total = $collection->count($query);
-        $pipeline[] = ['$match' => $filter];
-        $found = 0;
-        $offset = $this->calcOffset($total, $offset);
-
-        if ($offset !== null) {
-            array_unshift($pipeline, ['$skip' => $offset]);
-        }
-
-        if ($limit !== null) {
-            $pipeline[] = ['$limit' => $limit];
-        }
-
-        $pipeline  = array_merge($pipeline, $this->preparePipeline());
-        $this->logger->debug('aggregate pipeline [{pipeline}] on collection ['.$collection->getCollection().']', [
-            'category' => get_class($this),
-            'pipeline' => $pipeline
-        ]);
-
-        $cursor = $this->db->{$collection->getCollection()}->aggregate($pipeline, [
-            'allowDiskUse' => true,
-        ]);
-
-        foreach ($cursor as $object) {
-            ++$found;
-            yield (string) $object['_id'] => $this->build($object, $collection);
-        }
-
-        if ($found === 0) {
-            $this->logger->warning('found no data objects in collection ['.$collection->getCollection().'] with aggregation pipeline [{pipeline}]', [
-                'category' => get_class($this),
-                'pipeline' => $pipeline
-            ]);
-        } else {
-            $this->logger->info('found ['.$found.'] data objects in collection ['.$collection->getCollection().'] with aggregation pipeline [{pipeline}]', [
-                'category' => get_class($this),
-                'pipeline' => $pipeline
-            ]);
-        }
-
-        return $total;*/
     }
 
     /**
@@ -171,8 +129,20 @@ class Factory extends ResourceFactory
     {
         $collection->getSchema()->validate($object);
 
+        $object['_id'] = new ObjectId();
+
+        if(!isset($object['name'])) {
+            $object['name'] = (string)$object['_id'];
+        }
+
+        if ($this->has($collection, $object['name'])) {
+            throw new Exception\NotUnique('data object '.$object['name'].' does already exists');
+        }
+
         $object = [
-            'data' => $object,
+            '_id' => $object['_id'],
+            'name' => $object['name'],
+            'data' => $object['data'],
             'endpoints' => $endpoints,
         ];
 
@@ -199,9 +169,10 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function deleteOne(CollectionInterface $collection, ObjectIdInterface $id, bool $simulate = false): bool
+    public function deleteOne(CollectionInterface $collection, string $name, bool $simulate = false): bool
     {
-        return $this->deleteFrom($this->db->{$collection->getCollection()}, $id, $simulate);
+        $resource = $this->getOne($collection, ['name' => $name]);
+        return $this->deleteFrom($this->db->{$collection->getCollection()}, $resource->getId(), $simulate);
     }
 
     /**
@@ -209,9 +180,9 @@ class Factory extends ResourceFactory
      */
     public function deleteAll(CollectionInterface $collection, ObjectIdInterface $id, bool $simulate = false): bool
     {
-        $this->logger->info('delete object ['.$id.'] from ['.$collection->getCollection().']', [
+        /*$this->logger->info('delete object ['.$id.'] from ['.$collection->getCollection().']', [
             'category' => get_class($this),
-        ]);
+        ]);*/
     }
 
     /**
@@ -231,30 +202,4 @@ class Factory extends ResourceFactory
     {
         return $this->initResource(new DataObject($resource, $collection, $this->relation_factory));
     }
-
-    /**
-     * Prepare pipeline.
-     */
-    /*protected function preparePipeline(): array
-    {
-        $pipeline = [];
-        $pipeline[] = [
-            '$lookup' => [
-                'from': 'relations',
-                'localField': '_id',
-                'foreignField': 'object_1',
-                'as': 'relations_1',
-            ];
-        ];
-        $pipeline[] = [
-            '$lookup' => [
-                'from': 'relations',
-                'localField': '_id',
-                'foreignField': 'object_2',
-                'as': 'relations_2',
-            ];
-        ]
-
-        return $pipeline;
-    }*/
 }

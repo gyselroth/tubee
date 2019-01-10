@@ -125,8 +125,16 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * Get relatives.
      */
-    public function getRelatives(): Generator
+    public function getRelations(): Generator
     {
-        return $this->relation_factory->getAll($this);
+        return $this->relation_factory->getAllFromObject($this);
+    }
+
+    /**
+     * Get relative.
+     */
+    public function getRelation(string $name): Generator
+    {
+        return $this->relation_factory->getOneFromObject($this, $name);
     }
 }

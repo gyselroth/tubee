@@ -86,10 +86,10 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $object): ResponseInterface
     {
         $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
-        $object = $collection->getObject(['_id' => $object], false);
+        $object = $collection->getObject(['name' => $object], false);
 
         return Helper::getOne($request, $identity, $object);
     }
@@ -109,7 +109,7 @@ class Objects
         ], $request->getParsedBody());
 
         $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
-        $id = $collection->createObject($body['data'], false, $body['endpoints']);
+        $id = $collection->createObject($body, false, $body['endpoints']);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -121,7 +121,7 @@ class Objects
     /**
      * Entrypoint.
      */
-    public function getHistory(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
+    public function getHistory(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $object): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
@@ -130,7 +130,7 @@ class Objects
         ], $request->getQueryParams());
 
         $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
-        $object = $collection->getObject(['_id' => $object], false);
+        $object = $collection->getObject(['name' => $object], false);
         $history = $object->getHistory();
         $body = Pager::fromRequest($history, $request);
 
@@ -144,13 +144,13 @@ class Objects
     /**
      * Patch.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectId $object): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $object): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
         $namespace = $this->namespace_factory->getOne($namespace);
         $collection = $namespace->getCollection($collection);
-        $object = $collection->getObject(['_id' => $object]);
+        $object = $collection->getObject(['name' => $object]);
         $doc = ['data' => $object->getData()];
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();
@@ -163,6 +163,17 @@ class Objects
             $collection->getObject(['_id' => $object->getId()])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
+    }
+
+    /**
+     * Delete.
+     */
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $object): ResponseInterface
+    {
+        $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+        $this->object_factory->deleteOne($collection, $object);
+
+        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
 
     /**
