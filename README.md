@@ -45,6 +45,7 @@ Access endpoint records via the same system (data proxy) and much more.
     * CSV (via different storage backends, see Storage drivers)
     * JSON (via different storage backends, see Storage drivers)
     * Images (via different storage backends, see Storage drivers)
+    * Ucs (Univention Corporate Server)
 * Storage drivers for data formats:
     * LocalFilesystem
     * balloon cloud server
