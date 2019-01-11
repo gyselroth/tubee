@@ -12,7 +12,10 @@ nav:
     - Modify resources: operations/edit.md
     - Apply from file: operations/apply.md
  - Resources:
-    - Namespace: resources/namespace.md
+    - Namespaces: resources/namespaces.md
+    - Collections: resources/collections.md
+    - DataObjects: resources/data-objects.md
+    - Endpoints: resources/endpoints.md
  - Installation:
     - Server: installation/server.md
  - Development:

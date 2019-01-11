@@ -3,7 +3,7 @@
 You need two things to get started, a server (usually you want a hosted server) and tubectl. 
 tubectl is the tubee console client for Linux, Windows and OS X.
 
-## Get tubeectl
+## Get tubectl
 
 All releases and executeable binaries are available tubee [@github](https://github.com/gyselroth/tubee-client-cli/releases).
 Besides installing the binary manually, you may also install it from a package repository.
@@ -86,4 +86,13 @@ For example you might want to know what PdoEndpoint is and what can be configure
 
 ```
 tubectl explain PdoEndpoint
+```
+
+## Playground
+How does it all work and looks like? Want to play around with? You may want to import a playground with defines various resources and possibilities.
+
+This will create a namespace `playground` with example data. This may also be useful for new developers to test resources.
+
+```
+tubectl apply -f https://raw.githubusercontent.com/gyselroth/tubee/dev/example/dump.yaml
 ```

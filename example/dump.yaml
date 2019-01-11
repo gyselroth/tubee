@@ -111,6 +111,25 @@ data:
 name: accounts
 namespace: playground
 kind: Collection
+data:
+  schema:
+    username:
+      label: Username
+      type: string
+      require_regex: '#[a-zA-Z0-1]+#'
+    firstname:
+      label: Firstname
+      type: string
+    lastname:
+      label: Surname
+      type: string
+    disabled:
+      label: Surname
+      type: int
+    mail:
+      label: Mail adress
+      type: string
+      require_regex: '#[a-zA-z0-9.-]+\@[a-zA-z0-9.-]+.[a-zA-Z]+#'
 ---
 kind: DataObject
 namespace: playground

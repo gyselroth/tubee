@@ -16,33 +16,98 @@ class QueryTransformer
     /**
      * Convert mongodb like query to ldap query.
      */
-    public static function transform(array $query): string
+    public static function transform($query): string
     {
-        $result = '&';
+        $result = '';
 
+        if (!is_array($query)) {
+            return $query;
+        }
+
+        $simple = '';
         foreach ($query as $key => $value) {
+            if (is_array($value) && isset($value['$and']) || isset($value['$or'])) {
+                $result .= self::transform($value);
+
+                continue;
+            }
+
+            $key = (string) $key;
             switch ($key) {
                 case '$and':
-                    $result .= '&';
+                    $part = '(&';
                     foreach ($value as $sub) {
-                        $result .= '('.self::transform($sub).')';
+                        $part .= self::transform($sub);
                     }
+
+                    $result .= $part.')';
 
                 break;
                 case '$or':
-                    $result .= '|';
+                    $part = '(|';
                     foreach ($value as $sub) {
-                        $result .= '('.self::transform($sub).')';
+                        $part .= self::transform($sub);
                     }
+
+                    $result .= $part.')';
 
                 break;
                 default:
-                    $result .= '('.$key.'='.$value.')';
+                    $part = '';
+
+                    if (is_array($value)) {
+                        foreach ($value as $t => $a) {
+                            if (!is_array($a) && $t[0] !== '$') {
+                                $part .= '('.$t.'='.$a.')';
+                            }
+
+                            switch ($t) {
+                                case '$gt':
+                                    $part .= '('.$key.'>'.$a.')';
+
+                                break;
+                                case '$lt':
+                                    $part .= '('.$key.'<'.$a.')';
+
+                                break;
+                                case '$lte':
+                                    $part .= '('.$key.'<='.$a.')';
+
+                                break;
+                                case '$gte':
+                                    $part .= '('.$key.'>='.$a.')';
+
+                                break;
+                            }
+                        }
+
+                        if (count($value) > 1) {
+                            $result .= '(&'.$part.')';
+                        } else {
+                            $result .= $part;
+                        }
+                    } else {
+                        $simple .= '('.$key.'='.$value.')';
+                    }
 
                 break;
             }
         }
 
+        if (!empty($simple)) {
+            if (count($query) > 1) {
+                $simple = '(&'.$simple.')';
+                $result .= $simple;
+            } else {
+                $result .= $simple;
+            }
+        }
+
         return $result;
+    }
+
+    protected static function transformOperator($value)
+    {
+        return $value;
     }
 }

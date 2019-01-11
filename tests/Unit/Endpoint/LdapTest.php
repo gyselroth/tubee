@@ -20,6 +20,7 @@ use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception;
 use Tubee\Endpoint\Ldap;
+use Tubee\Endpoint\Ldap\Exception as LdapException;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class LdapTest extends TestCase
@@ -225,6 +226,165 @@ class LdapTest extends TestCase
             'values' => ['bar'],
         ]];
 
+        $this->assertSame($expected, $result);
+    }
+
+    public function testCreateObject()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->once())->method('add');
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ldap->create($this->createMock(AttributeMapInterface::class), $object);
+        $this->assertSame($object['entrydn'], $result);
+    }
+
+    public function testCreateObjectSimulate()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->never())->method('add');
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ldap->create($this->createMock(AttributeMapInterface::class), $object, true);
+        $this->assertSame($object['entrydn'], $result);
+    }
+
+    public function testCreateObjectNoDN()
+    {
+        $this->expectException(LdapException\NoEntryDn::class);
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'foo' => 'bar',
+        ];
+
+        $ldap->create($this->createMock(AttributeMapInterface::class), $object);
+    }
+
+    public function testTransformSingleAttributeQuery()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            'foo' => 'bar',
+        ];
+
+        $expected = '(foo=bar)';
+        $result = $ldap->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformSimpleQuery()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            'foo' => 'bar',
+            'bar' => 'foo',
+        ];
+
+        $expected = '(&(foo=bar)(bar=foo))';
+        $result = $ldap->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformAndQuery()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            '$and' => [
+                ['foo' => 'bar', 'foobar' => 'foobar'],
+                ['bar' => 'foo', 'barf' => 'barf'],
+            ],
+        ];
+
+        $expected = '(&(&(foo=bar)(foobar=foobar))(&(bar=foo)(barf=barf)))';
+        $result = $ldap->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformOrQuery()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            '$or' => [
+                ['foo' => 'bar'],
+                ['bar' => 'foo'],
+            ],
+        ];
+
+        $expected = '(|(foo=bar)(bar=foo))';
+        $result = $ldap->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformOrAndQuery()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            '$or' => [
+                [
+                    '$and' => [
+                        ['foo' => 'bar'],
+                        ['bar' => 'foo'],
+                    ],
+                ],
+                [
+                    'foobar' => 'bar',
+                ],
+            ],
+        ];
+
+        $expected = '(|(&(foo=bar)(bar=foo))(foobar=bar))';
+        $result = $ldap->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformCompareOperatorsQuery()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            'foo' => [
+                '$gt' => 1,
+                '$lte' => 2,
+                '$gte' => 3,
+                '$lt' => 4,
+             ],
+        ];
+
+        $expected = '(&(foo>1)(foo<=2)(foo>=3)(foo<4))';
+        $result = $ldap->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformOrCompareQuery()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            '$or' => [
+                [
+                    'foo' => ['$gt' => 1],
+                ],
+                [
+                    'bar' => ['$lt' => 2],
+                ],
+            ],
+        ];
+
+        $expected = '(|(foo>1)(bar<2))';
+        $result = $ldap->transformQuery($query);
         $this->assertSame($expected, $result);
     }
 }
