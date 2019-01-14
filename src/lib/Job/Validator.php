@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -43,7 +43,6 @@ class Validator extends ResourceValidator
                     'enabled' => false,
                     'receiver' => [],
                 ],
-                'namespaces' => [],
                 'collections' => [],
                 'endpoints' => [],
                 'filter' => [],
@@ -66,7 +65,6 @@ class Validator extends ResourceValidator
 
         foreach ($resource['data'] as $option => $value) {
             switch ($option) {
-                case 'namespaces':
                 case 'collections':
                 case 'endpoints':
                     if (!is_array($value) || count(array_filter($value, 'is_string')) !== count($value)) {

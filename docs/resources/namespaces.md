@@ -6,9 +6,8 @@ it easy to deploy RBAC rules.
 ## Create a new namespace
 
 ```yaml 
-#spec.yaml
 kind: Namespace
-name: foobar
+name: playground
 ```
 
 ```sh

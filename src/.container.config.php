@@ -37,20 +37,20 @@ use TaskScheduler\WorkerFactoryInterface;
 use TaskScheduler\WorkerManager;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 use ParagonIE\Halite\KeyFactory;
-use ParagonIE\Halite\HiddenString;
+use ParagonIE\HiddenString\HiddenString;
 
 return [
     Dispatcher::class => [
         'arguments' => [
             'stack' => [
                 '{'.ContentTypeMiddleware::class.'}',
+                '{'.AccessLog::class.'}',
                 '{'.ExceptionHandler::class.'}',
                 '{'.JsonPayload::class.'}',
                 '{'.QueryDecoder::class.'}',
                 '{'.AuthMiddleware::class.'}',
                 '{'.AclMiddleware::class.'}',
                 '{'.TrailingSlash::class.'}',
-                '{'.AccessLog::class.'}',
                 '{'.FastRoute::class.'}',
                 '{'.RequestHandler::class.'}',
             ],
@@ -179,7 +179,7 @@ return [
             'mongodb' => [
                 'use' => Monolog\Handler\MongoDBHandler::class,
                 'arguments' => [
-                    'mongo' => '{'.Client::class.'}',
+                    'mongodb' => '{'.Client::class.'}',
                     'database' => 'tubee',
                     'collection' => 'logs',
                     'level' => 1000,

@@ -55,7 +55,7 @@ tubectl get ns --json-sort '{"name":0,"changed":1}'
 ```
 
 ## Change the output format
-By default tubectl will try to pretty print the requested resources in table to your shell. By design this output may not hold the information you require.
+By default tubectl will try to pretty print the requested resources in a table on your shell. By design this output may not hold the information you require.
 The output format can be changed by using `-o` or `--output` accordingly.
 
 Besides the default there is also yaml or json output.
@@ -88,9 +88,26 @@ data:
     secrets: []
 ```
 
+You may also draw a custom table by using `cc` and specify comma separated label:value. The follwing example will print all endpoints within the playground namespace and list the name and the endpoint type.
+```
+tubectl get ep playground foo -o cc="Name:name,Endpoint Type:data.type"
+
++---------------------------+---------------------------+
+| Name                      | Endpoint Type             |
+|---------------------------|---------------------------|
+| foo                       | destination               |
+|---------------------------|---------------------------|
+| bar                       | destination               |
+|---------------------------|---------------------------|
+| foobar                    | source                    |
++---------------------------+---------------------------+
+```
+
 ## Query & search resources
 Usually the latest 100 resources are not enaugh to work with. By using the option `-q` or `--field-selector` you may find the needed resource.
-Like the sort operation a query works in the format key=value and may be delimited by `,`. Keep in mind that deliming will work as and queries. However it is possible to specify `-s` or `--field-selector` multiple times which will result in or queries.
+Like the sort operation a query works in the format key=value and may be delimited by `,`. Keep in mind that delimiting will work as `AND` queries. However it is possible to specify `-q` or `--field-selector` multiple times which will result in `OR` queries.
+
+>**Note** There may be endpoints which do not accept such complex queries (Like the Ucs endpoint).
 
 ```
 tubectl get ns -q name=bar
@@ -113,8 +130,8 @@ tubectl get ns --json-query '{"$or":["changed":{"$gt":"2018-10-25"},{"name":"bar
 By default the server returns the latest 100 resources ordered by created date/time. Meaning the first record is the newest one and the last the oldest (If not more than 100 resources of the requested type are available). By using `-t` or `--tail` accordingly the output is reversed. Meaning the last record is the newest and the first the oldest (Again, if there are not more than 100 resources available of that type.)
 
 ### Resource history & diff
-Each modification on a resource will result in an incrision of the resource version and the old version gets stored safely. You can find the resource version in the default output on most resource types or by specifying a custom output such as yaml. The resources history can be requested if `-H` or `--history` accordingly is specified. Note that if this option is requested a resource name must be specified. You can not request the history on a List response (Multiple resources).
-`-H` will list all older version of the requested resource.
+Each modification on a resource will result in an incrision of the resource version and the old version gets stored safely. You can find the resource version in the default output on most resource types or by specifying a custom output such as yaml. The resources history can be requested if `-v` or `--history` accordingly is specified. Note that if this option is requested a resource name must be specified. You can not request the history on a List response (Multiple resources).
+`-H` will list all older versions of the requested resource.
 
 ```
 tubectl get ns foo -H

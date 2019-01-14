@@ -32,7 +32,7 @@ Zend\Mail\Transport\TransportInterface:
   use: "Zend\\Mail\\Transport\\Smtp"
 ParagonIE\Halite\Symmetric\EncryptionKey:
   services:
-    ParagonIE\Halite\HiddenString:
+    ParagonIE\HiddenString\HiddenString:
       arguments:
         value: "{ENV(ENTUBEE_ENCRYPTION_KEY,314004004b3cef33ba8ea540b424736408364317d9ebfbc9293b8478a8d2478e23dba1ba30ded48ab0dd059cfe3dce2daf00d10eb40af1c0bf429553a2d64802272a514cfde95ac31956baa3929ee01c7338c95805c3a619e254f7aa2966e6a7cdad4783)}"
 Psr\Log\LoggerInterface:

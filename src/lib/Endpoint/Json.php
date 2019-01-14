@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -52,17 +52,17 @@ class Json extends AbstractFile
 
         foreach ($streams as $path => $stream) {
             $content = [];
-            // if ($this->type === EndpointInterface::TYPE_SOURCE) {
-            $content = json_decode(stream_get_contents($stream), true);
+            if ($this->type === EndpointInterface::TYPE_SOURCE) {
+                $content = json_decode(stream_get_contents($stream), true);
 
-            if ($err = json_last_error() !== JSON_ERROR_NONE) {
-                throw new JsonException\InvalidJson('failed decode json '.$this->file.', json error '.$err);
-            }
+                if ($err = json_last_error() !== JSON_ERROR_NONE) {
+                    throw new JsonException\InvalidJson('failed decode json '.$this->file.', json error '.$err);
+                }
 
-            if (!is_array($content)) {
-                throw new JsonException\ArrayExpected('json file contents must be an array');
+                if (!is_array($content)) {
+                    throw new JsonException\ArrayExpected('json file contents must be an array');
+                }
             }
-            // }
 
             $this->files[] = [
                 'stream' => $stream,

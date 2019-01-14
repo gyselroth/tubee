@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -14,10 +14,10 @@ namespace Tubee\Secret;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
-use ParagonIE\Halite\HiddenString;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\Halite\Symmetric\Crypto as Symmetric;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
+use ParagonIE\HiddenString\HiddenString;
 use Psr\Log\LoggerInterface;
 use Tubee\Helper;
 use Tubee\Resource\Factory as ResourceFactory;

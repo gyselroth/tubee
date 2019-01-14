@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -68,7 +68,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
                 foreach ($endpoints as &$endpoint) {
                     $endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
                     $endpoint['garbage'] = isset($endpoint['garbage']) ? $endpoint['garbage'] : false;
-                    $endpoint['result'] = isset($endpoint['auto']) ? $endpoint['auto'] : null;
+                    $endpoint['result'] = isset($endpoint['result']) ? $endpoint['result'] : null;
                 }
 
                 return ['endpoints' => $endpoints];
@@ -125,8 +125,16 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * Get relatives.
      */
-    public function getRelatives(): Generator
+    public function getRelations(): Generator
     {
-        return $this->relation_factory->getAll($this);
+        return $this->relation_factory->getAllFromObject($this);
+    }
+
+    /**
+     * Get relative.
+     */
+    public function getRelation(string $name): Generator
+    {
+        return $this->relation_factory->getOneFromObject($this, $name);
     }
 }

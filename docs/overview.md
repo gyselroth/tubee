@@ -52,6 +52,7 @@ tubee acts as a central data manager and proxy layer between various services.
     * CSV (via different storage backends, see Storage drivers)
     * JSON (via different storage backends, see Storage drivers)
     * Images (via different storage backends, see Storage drivers)
+    * Ucs (Univetion Corporate Server)
 * Storage drivers for data formats:
     * LocalFilesystem
     * balloon cloud server
@@ -68,6 +69,7 @@ The tubee server works with various different resource types.
 | Collection | A collection is group of similar data objects. Each collection holds data objects and is part of a namespace.|
 | Endpoint | An endpoint represents a remote server for proxying, import from, or export to. |
 | DataObject  | An actual object which must be part of a collection. |
+| DataObjectRelation  | Represents a relationship between data objects. |
 | EndpointObject  | Besides data objects there are also endpoint objects. The diference is that an endpoint object represents the state of an object on an endpoint. |
 | Workflow   | A workflow defines how and what data should be synchronized between endpoints and collections. A worklfow is always attached to an endpoint.|
 | Secret  | Holds sensible data which can be injected into other resources. Usually secrets injected into endpoint resources. |

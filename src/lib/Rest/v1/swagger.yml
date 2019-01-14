@@ -1274,70 +1274,13 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives:
+  /namespaces/{namespace}/collections/{collection}/objects/{object}/relations:
     get:
       tags:
-      - "dataObjectRelations"
-      summary: "Watch object relatives"
-      description: "Watch updates in realtime"
-      operationId: "watchObjectRelatives"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of objects"
-        403:
-          description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}/relatives:
-    get:
-      tags:
-      - "dataObjectRelations"
+      - "dataObjects"
       summary: "Get relative objects of an object"
       description: "Get all objects the object is related to"
-      operationId: "getObjectRelatives"
+      operationId: "getObjectRelations"
       produces:
       - "application/json"
       parameters:
@@ -1353,7 +1296,7 @@ paths:
         type: "string"
       - in: "path"
         name: "object"
-        description: "Object ID"
+        description: "Object name"
         required: true
         type: "string"
       - in: "query"
@@ -1387,7 +1330,145 @@ paths:
         200:
           description: "Object relatives"
           schema:
-            $ref: "#/definitions/ObjectRelatives"
+            $ref: "#/definitions/ObjectRelations"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
+  /namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}:
+    get:
+      tags:
+      - "dataObjects"
+      summary: "Get single relative object of an object"
+      operationId: "getObjectRelation"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "collection"
+        description: "Collection"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "relation"
+        description: "Relation name"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Object relation"
+          schema:
+            $ref: "#/definitions/ObjectRelation"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
+  /watch/namespaces/{namespace}/relations:
+    get:
+      tags:
+      - "dataObjectRelations"
+      summary: "Watch data object relations in realtime"
+      description: "Watch data object relations in realtime"
+      operationId: "watchRelations"
+      produces:
+      - "application/json;stream=watch"
+      parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Object relations"
+        403:
+          description: "Access denied"
+        404:
+          description: "Resource not found"
+  /namespaces/{namespace}/relations:
+    get:
+      tags:
+      - "dataObjectRelations"
+      summary: "Get data object relations"
+      description: "Get data object relations"
+      operationId: "getRelations"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "query"
+        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+        required: false
+        type: "string"
+      - in: "query"
+        name: "attributes"
+        description: "Filter attributes"
+        required: false
+        type: "array"
+        items:
+          type: "string"
+      - in: "query"
+        name: "offset"
+        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+        required: false
+        type: "number"
+      - in: "query"
+        name: "limit"
+        description: "Objects limit, per default 20 objects will get returned"
+        required: false
+        type: "number"
+      - in: "query"
+        name: "sort"
+        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Object relatives"
+          schema:
+            $ref: "#/definitions/ObjectRelations"
         403:
           description: "Access denied"
         404:
@@ -1395,8 +1476,8 @@ paths:
     post:
       tags:
       - "dataObjectRelations"
-      summary: "Add new object relation to an object"
-      operationId: "addObjectRelative"
+      summary: "Add new object relation"
+      operationId: "addRelation"
       produces:
       - "application/json"
       parameters:
@@ -1405,35 +1486,25 @@ paths:
         description: "Namespace name"
         required: true
         type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/ObjectRelative"
+          $ref: "#/definitions/ObjectRelation"
       responses:
         200:
-          description: "Object relative"
+          description: "Object relation"
           schema:
-            $ref: "#/definitions/ObjectRelative"
+            $ref: "#/definitions/ObjectRelation"
         403:
           description: "Access denied"
         404:
           description: "Resource not found"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}/relatives/{relative}:
+  /namespaces/{namespace}/relations/{relation}:
     get:
       tags:
       - "dataObjectRelations"
-      summary: "Get single relative object of an object"
-      operationId: "getObjectRelative"
+      summary: "Get single relation"
+      operationId: "getRelation"
       produces:
       - "application/json"
       parameters:
@@ -1443,34 +1514,27 @@ paths:
         required: true
         type: "string"
       - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relative"
-        description: "Object ID"
+        name: "relation"
+        description: "Relation"
         required: true
         type: "string"
       responses:
         200:
-          description: "Object relative"
+          description: "Object relation"
           schema:
-            $ref: "#/definitions/ObjectRelative"
+            $ref: "#/definitions/ObjectRelation"
         403:
           description: "Access denied"
         404:
           description: "Resource not found"
-    put:
+    patch:
       tags:
       - "dataObjectRelations"
-      summary: "Update object relation"
-      operationId: "updateObjectRelative"
+      summary: "Patch relation as rfc6902 request"
+      description: "Update specific attributes of a relation"
+      operationId: "updateRelation"
+      consumes:
+      - "application/json-patch+json"
       produces:
       - "application/json"
       parameters:
@@ -1480,29 +1544,53 @@ paths:
         required: true
         type: "string"
       - in: "path"
-        name: "collection"
-        description: "Collection"
+        name: "relation"
+        description: "Relation"
+        required: true
+        type: "string"
+      - in: body
+        name: data
+        description: "Object"
+        schema:
+          type: array
+          items:
+            $ref: "#/definitions/JsonPatch"
+      responses:
+        200:
+          description: "If successful the server will respond with 200 OK"
+          schema:
+            $ref: "#/definitions/ObjectRelation"
+        404:
+          description: "Resource does not exists"
+        403:
+          description: "Access denied"
+    put:
+      tags:
+      - "dataObjectRelations"
+      summary: "Replace object relation"
+      operationId: "replaceRelation"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
         required: true
         type: "string"
       - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relative"
-        description: "Object ID"
+        name: "relation"
+        description: "Relation"
         required: true
         type: "string"
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/ObjectRelative"
+          $ref: "#/definitions/ObjectRelation"
       responses:
         200:
-          description: "Object relative"
+          description: "Object relation"
           schema:
-            $ref: "#/definitions/ObjectRelative"
+            $ref: "#/definitions/ObjectRelation"
         403:
           description: "Access denied"
         404:
@@ -1511,7 +1599,7 @@ paths:
       tags:
       - "dataObjectRelations"
       summary: "Delete object relation"
-      operationId: "deleteObjectRelative"
+      operationId: "deleteObjectRelation"
       produces:
       - "application/json"
       parameters:
@@ -1521,18 +1609,8 @@ paths:
         required: true
         type: "string"
       - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relative"
-        description: "Object ID"
+        name: "relation"
+        description: "Relation"
         required: true
         type: "string"
       responses:
@@ -1545,7 +1623,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects:
     get:
       tags:
-      - "dataObjects"
+      - "endpointObjects"
       summary: "Get objects from endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpointObjects"
@@ -2619,7 +2697,7 @@ paths:
           description: "Access role does not exists"
         403:
           description: "Access denied"
-  /watch/jobs:
+  /watch/namespaces/{namespace}/jobs:
     get:
       tags:
       - "jobs"
@@ -2629,6 +2707,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2661,7 +2744,7 @@ paths:
           description: "List of active jobs"
         403:
           description: "Access denied"
-  /jobs:
+  /namespaces/{namespace}/jobs:
     get:
       tags:
       - "jobs"
@@ -2671,6 +2754,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2713,6 +2801,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: body
         name: data
         schema:
@@ -2726,7 +2819,7 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /jobs/{job}:
+  /namespaces/{namespace}/jobs/{job}:
     get:
       tags:
       - "jobs"
@@ -2735,6 +2828,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -2757,6 +2855,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -2781,6 +2884,11 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
         name: "job"
         description: "Job ID"
         required: true
@@ -2801,7 +2909,7 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /processes:
+  /namespaces/{namespace}/processes:
     get:
       tags:
       - "jobs"
@@ -2810,6 +2918,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2854,6 +2967,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: body
         name: data
         schema:
@@ -2867,7 +2985,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /watch/processes:
+  /watch/namespaces/{namespace}/processes:
     get:
       tags:
       - "jobs"
@@ -2876,6 +2994,11 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -2910,7 +3033,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /processes/{process}:
+  /namespaces/{namespace}/processes/{process}:
     get:
       tags:
       - "jobs"
@@ -2919,6 +3042,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -2942,6 +3070,11 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
         name: "process"
         description: "Process ID"
         required: true
@@ -2953,7 +3086,7 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-  /jobs/{job}/logs:
+  /namespaces/{namespace}/jobs/{job}/logs:
     get:
       tags:
       - "jobs"
@@ -2962,6 +3095,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -3003,7 +3141,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /jobs/{job}/logs/{log}:
+  /namespaces/{namespace}/jobs/{job}/logs/{log}:
     get:
       tags:
       - "jobs"
@@ -3012,6 +3150,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -3031,7 +3174,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /watch/jobs/{job}/logs:
+  /watch/namespaces/{namespace}/jobs/{job}/logs:
     get:
       tags:
       - "jobs"
@@ -3040,6 +3183,11 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "job"
         description: "Job ID"
@@ -3079,7 +3227,7 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /processes/{process}/logs:
+  /namespaces/{namespace}/processes/{process}/logs:
     get:
       tags:
       - "jobs"
@@ -3088,6 +3236,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3129,7 +3282,7 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-  /process/{process}/logs/{log}:
+  /namespaces/{namespace}/process/{process}/logs/{log}:
     get:
       tags:
       - "jobs"
@@ -3138,6 +3291,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3157,7 +3315,7 @@ paths:
           description: "Log does not exists"
         403:
           description: "Access denied"
-  /watch/processes/{process}/logs:
+  /watch/namespaces/{namespace}/processes/{process}/logs:
     get:
       tags:
       - "jobs"
@@ -3166,6 +3324,11 @@ paths:
       produces:
       - "application/json+stream"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "process"
         description: "Process ID"
@@ -3294,8 +3457,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3306,8 +3467,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Namespace."
@@ -3318,8 +3477,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3330,8 +3487,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Secret."
@@ -3339,14 +3494,24 @@ definitions:
             default: "Secret"
           data:
             description: "The secrets data. You may specify multiple keys. Important: You need to base64 encode the values!"
-            type: "object"
+            type: "array"
+            items:
+              type: "object"
+              properties:
+                secret:
+                  description: "The name of the secret."
+                  type: "string"
+                key:
+                  description: "The key name from the secret."
+                  type: "string"
+                to:
+                  description: "The injection destination within this resource. You may delimit by using '. For example: data.resource.password"
+                  type: "string"  
   Users:
     description: "A list of users."
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3357,8 +3522,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always User."
@@ -3376,8 +3539,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3388,8 +3549,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always AccessRule."
@@ -3431,8 +3590,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3443,8 +3600,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always AccessRole."
@@ -3463,8 +3618,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3475,13 +3628,14 @@ definitions:
     allOf:
       - $ref: '#/definitions/Job'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Process."
             type: "string"
             default: "Process"
+          namespace: 
+            description: "The resource namespace"
+            type: "string"
           status:
             description: "Holds the status of this resource. Note that status is immutable."
             type: "object"
@@ -3494,8 +3648,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3506,13 +3658,14 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Job."
             type: "string"
             default: "Job"
+          namespace: 
+            description: "The resource namespace"
+            type: "string"
           data:
             type: "object"
             properties:
@@ -3528,12 +3681,7 @@ definitions:
                     type: array
                     items:
                       type: string
-              namespaces:
-                description: "A list of namespaces (name) the job should match. You may use a wildcard to specify all namespaces."
-                type: array
-                items:
-                  type: string
-                default: ["*"]
+                    default: []
               collections:
                 description: "A list of collections (name) the job should match. You may use a wildcard to specify all collections."
                 type: array
@@ -3594,8 +3742,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3606,8 +3752,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Log."
@@ -3634,8 +3778,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3646,26 +3788,25 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Collection."
             type: "string"
             default: "Collection"
+          namespace: 
+            description: "The resource namespace"
+            type: "string"
           data:
             type: "object"
             properties:
               schema:
-                type: "object"
+                type: object
                 default: {}
   Endpoints:
     description: "A list of endpoints."
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -3676,8 +3817,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint."
@@ -3693,6 +3832,7 @@ definitions:
               - MoodleEndpoint
               - BalloonEndpoint
               - OdataRestEndpoint
+              - UcsEndpoint
           data:
             type: "object"
             properties:
@@ -3709,10 +3849,8 @@ definitions:
                 type: "object"
                 properties:
                   identifier:
-                    description: "A list of attributes which gets used to uniquely identify an object on the endpoint."
-                    type: "array"
-                    items:
-                      type: string
+                    description: "Endpoint resource identifier."
+                    type: "string"
                   import:
                     description: "A list of attributes which gets used to uniquely identify an object on the endpoint."
                     type: "array"
@@ -3733,8 +3871,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always PdoEndpoint."
@@ -3767,8 +3903,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always MysqlEndpoint."
@@ -3804,8 +3938,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always LdapEndpoint."
@@ -3841,8 +3973,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always OdataRestEndpoint."
@@ -3857,7 +3987,7 @@ definitions:
                   base_uri:
                     description: "Base uri to resources (Like https://rest.api/v1/resources)."
                     type: string
-                  options:
+                  request_options:
                     description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
                     type: object
                   auth:
@@ -3889,13 +4019,46 @@ definitions:
                       client_secret:
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
                         type: string
+  UcsEndpoint:
+    description: "UCS endpoint (Univention Corporate Server, https://www.univention.com/products/ucs)"
+    allOf:
+      - $ref: '#/definitions/Endpoint'
+      - type: object
+        properties:
+          kind:
+            description: "The type of endpoint. Always UcsEndpoint."
+            type: "string"
+            default: "UcsEndpoint"
+          data:
+            properties:
+              resource:
+                description: "Holds the relevant options of how to connect to the endpoint."
+                type: "object"
+                properties:
+                  base_uri:
+                    description: "Base uri to univention server (usually including /univention) (Like https://master/univention)."
+                    type: string
+                  flavor:
+                    description: "Object type flavor (For example users/user or groups/group)."
+                    type: string
+                  request_options:
+                    description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
+                    type: object
+                  auth:
+                    description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
+                    type: object
+                    properties:
+                      username:
+                        description: "Basic authentication username."
+                        type: string
+                      password:
+                        description: "Password if required."
+                        type: string
   MongodbEndpoint:
     description: "MongoDB endpoint"
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always MongodbEndpoint."
@@ -3927,8 +4090,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always BalloonEndpoint."
@@ -3943,7 +4104,7 @@ definitions:
                   base_uri:
                     description: "Base uri to resources (Like https://rest.api/v2/users)."
                     type: string
-                  options:
+                  request_options:
                     description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
                     type: object
                   auth:
@@ -3980,8 +4141,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always CsvEndpoint."
@@ -4015,8 +4174,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always XmlEndpoint."
@@ -4054,8 +4211,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The type of endpoint. Always JsonEndpoint."
@@ -4086,8 +4241,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -4098,8 +4251,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always Workflow."
@@ -4108,6 +4259,10 @@ definitions:
           data:
             type: "object"
             properties:
+              priority:
+                description: "The priority defines in what order multiple workflows get executed. 0 (Default) is the highest priority."
+                type: integer
+                default: 0
               ensure:
                 type: string
                 enum:
@@ -4134,8 +4289,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always EndpointObject."
@@ -4150,8 +4303,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             description: "Attributes"
@@ -4161,8 +4312,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
@@ -4173,8 +4322,6 @@ definitions:
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
             description: "The resource type, always DataObject."
@@ -4183,30 +4330,26 @@ definitions:
           data:
             description: "Attributes"
             type: "object"
-  ObjectRelatives:
-    description: "A list of related objects."
+  ObjectRelations:
+    description: "A list of relations."
     allOf:
       - $ref: '#/definitions/List'
       - type: object
-        required:
-          - rootCause
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/ObjectRelative"
-  ObjectRelative:
+              $ref: "#/definitions/ObjectRelation"
+  ObjectRelation:
     description: "An object relation represents a releationship between two data objects. A relationship may apply to objects of different collections and/or namespaces."
     allOf:
       - $ref: '#/definitions/Resource'
       - type: object
-        required:
-          - rootCause
         properties:
           kind:
-            description: "The resource type, always Namespace."
+            description: "The resource type, always DataObjectRelation."
             type: "string"
-            default: "Namespace"
+            default: "DataObjectRelation"
           data:
             type: object
             properties:
@@ -4214,5 +4357,18 @@ definitions:
                 description: "Optional context context data which describes the relationship."
                 type: "object"
                 default: {}
-              object:
-                $ref: "#/definitions/DataObject"
+              relation:
+                description: "Holds the relationship between two objects. You may create cross collection and cross namespace object relationships."
+                type: "array"
+                items:
+                  type: object
+                  properties:
+                    namespace:
+                      description: "Name of the objects namespace"
+                      type: "string"                 
+                    collection:
+                      description: "Name of the objects collection"
+                      type: "string"                 
+                    object:
+                      description: "Name of the object"
+                      type: "string"                 

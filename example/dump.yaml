@@ -1,0 +1,500 @@
+name: playground
+kind: Namespace
+---
+name: news
+namespace: playground
+kind: Collection
+---
+name: bbc
+kind: XmlEndpoint
+namespace: playground
+collection: news
+data:
+  storage:
+    kind: StreamStorage
+  resource:
+    root_name: data
+    node_name: item
+    pretty: true
+    preserve_whitespace: false
+  type: source
+  options:
+    flush: false
+    import:
+      - guid
+    filter_one: null
+    filter_all: null
+  file: 'http://feeds.bbci.co.uk/news/rss.xml'
+---
+name: hourly-import
+kind: Job
+namespace: playground
+data:
+  notification:
+    enabled: false
+    receiver: []
+  collections:
+    - 'news'
+  endpoints:
+    - 'bbc'
+  filter: []
+  loadbalance: true
+  simulate: false
+  log_level: error
+  ignore: true
+  options:
+    at: 0
+    interval: 3600
+    retry: 0
+    retry_interval: 0
+    timeout: 0
+---
+name: create
+kind: Workflow
+namespace: playground
+collection: news
+endpoint: bbc
+data:
+  ensure: exists
+  map:
+    title:
+      from: title
+      required: true
+    description:
+      from: description
+    date:
+      from: pubDate
+    guid:
+      from: guid._value
+  condition: null
+---
+name: xml-export
+kind: XmlEndpoint
+namespace: playground
+collection: news
+data:
+  storage:
+    kind: StreamStorage
+  resource:
+    root_name: data
+    node_name: article
+    pretty: true
+    preserve_whitespace: false
+  type: destination
+  options:
+    flush: false
+    import:
+      - guid
+    filter_one: 'guid="{guid}"'
+    filter_all: null
+  file: /tmp/news.xml
+---
+name: create-update
+kind: Workflow
+namespace: playground
+collection: news
+endpoint: xml-export
+data:
+  ensure: exists
+  map:
+    title:
+      from: data.title
+      required: true
+    description:
+      from: data.description
+    date:
+      from: data.date
+    guid:
+      from: data.guid
+  condition: null
+---
+name: accounts
+namespace: playground
+kind: Collection
+data:
+  schema:
+    username:
+      label: Username
+      type: string
+      require_regex: '#[a-zA-Z0-1]+#'
+    firstname:
+      label: Firstname
+      type: string
+    lastname:
+      label: Surname
+      type: string
+    disabled:
+      label: Surname
+      type: int
+    mail:
+      label: Mail adress
+      type: string
+      require_regex: '#[a-zA-z0-9.-]+\@[a-zA-z0-9.-]+.[a-zA-Z]+#'
+---
+kind: DataObject
+namespace: playground
+collection: accounts
+name: user1
+data:
+  username: user1
+  mail: user1@example.org
+  firstname: user1
+  lastname: foo
+  disabled: 1547036962
+---
+kind: DataObject
+namespace: playground
+collection: accounts
+name: user2
+data:
+  username: user2
+  mail: user2@example.org
+  firstname: user2
+  lastname: bar
+---
+name: groups
+namespace: playground
+kind: Collection
+---
+kind: DataObject
+namespace: playground
+collection: groups
+name: group1
+data:
+  name: group1
+  disabled: null
+---
+kind: DataObject
+namespace: playground
+collection: groups
+name: group2
+data:
+  name: group2
+  disabled: null
+---
+kind: DataObjectRelation
+namespace: playground
+name: user1-group2
+data:
+  relation:
+  - namespace: playground
+    collection: accounts
+    object: user1
+  - namespace: playground
+    collection: groups
+    object: group1
+  context:
+    foo: bar
+---
+kind: DataObjectRelation
+namespace: playground
+name: user2-group2
+data:
+  relation:
+  - namespace: playground
+    collection: accounts
+    object: user2
+  - namespace: playground
+    collection: groups
+    object: group2
+  context:
+    foo: foo
+---
+kind: DataObjectRelation
+namespace: playground
+name: user1-group1
+data:
+  relation:
+  - namespace: playground
+    collection: accounts
+    object: user1
+  - namespace: playground
+    collection: groups
+    object: group1
+  context:
+    foo: foofoo
+---
+name: balloon
+kind: BalloonEndpoint
+namespace: playground
+collection: accounts
+data:
+  resource:
+    options:
+      verify: false
+    auth: basic
+    oauth:
+      client_id: null
+      client_pw: null
+    basic:
+      username: admin
+      password: admin
+    base_uri: 'https://balloon-endpoint/api/v2/users'
+  type: destination
+  options:
+    flush: false
+    import:
+      - id
+    filter_one: '{\"_id\": \"{endpoints.balloon.result}\"}'
+    filter_all: null
+---
+name: one-time-export
+kind: Process
+namespace: playground
+data:
+  notification:
+    enabled: false
+    receiver: []
+  collections:
+    - 'accounts'
+  endpoints:
+    - 'json-export'
+  filter: []
+  loadbalance: true
+  simulate: false
+  log_level: info
+  ignore: true
+---
+name: create-update
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: balloon
+data:
+  ensure: last
+  map:
+    hard_quota:
+      value: 4999999999999999
+    username:
+      from: data.username
+      required: true
+  condition: null
+---
+name: json-export
+kind: JsonEndpoint
+namespace: playground
+collection: accounts
+data:
+  storage:
+    kind: StreamStorage
+  type: destination
+  options:
+    flush: true
+    import: []
+    filter_one: test
+    filter_all: null
+  resource: []
+  file: /tmp/accounts.json
+---
+name: create-update
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: json-export
+data:
+  ensure: last
+  map:
+    hard_quota:
+      value: 10
+    username:
+      from: data.username
+      required: true
+  condition: null
+---
+name: ucs
+kind: UcsEndpoint
+namespace: playground
+collection: accounts
+data:
+  resource:
+    request_options:
+      verify: false
+    base_uri: 'http://ucs-endpoint/univention'
+    flavor: users/user
+  type: destination
+  options:
+    flush: false
+    filter_one: '{\"objectProperty\": \"name\", \"objectPropertyValue\": \"{username}\"}'
+    filter_all: null
+secrets:
+- secret: ucs
+  key: username
+  to: 'data.resource.auth.username'
+- secret: ucs
+  key: password
+  to: 'data.resource.auth.password'
+---
+name: create
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 1
+  ensure: exists
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+      required: true
+    username:
+      from: data.username
+      required: true
+    lastname:
+      from: data.firstname
+      required: true
+    description:
+      value: "bar bar"
+    password:
+      value: admin1234
+  condition: "object['data']['disabled'] === null"
+---
+name: update
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 2
+  ensure: last
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+      required: true
+    username:
+      from: data.username
+      required: true
+    lastname:
+      from: data.firstname
+      required: true
+    description:
+      value: "foo foo"
+  condition: "object['data']['disabled'] === null"
+---
+name: disable
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 4
+  ensure: last
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+      required: true
+    username:
+      from: data.username
+      required: true
+    lastname:
+      from: data.firstname
+      required: true
+    description:
+      value: "This user is disabled"
+  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 1800"
+---
+name: remove
+kind: Workflow
+namespace: playground
+collection: accounts
+endpoint: ucs
+data:
+  priority: 3
+  ensure: absent
+  map:
+    username:
+      from: data.username
+      required: true
+  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 3600"
+---
+name: hourly-account-export
+kind: Job
+namespace: playground
+data:
+  notification:
+    enabled: false
+    receiver: []
+  collections:
+    - 'accounts'
+  endpoints:
+    - 'ucs'
+  filter: []
+  loadbalance: true
+  simulate: false
+  log_level: debug
+  ignore: true
+  options:
+    at: 0
+    interval: 3600
+    retry: 0
+    retry_interval: 0
+    timeout: 0
+---
+name: ucs
+kind: UcsEndpoint
+namespace: playground
+collection: groups
+data:
+  resource:
+    request_options:
+      verify: false
+    base_uri: 'http://ucs-endpoint/univention'
+    flavor: groups/group
+  type: destination
+  options:
+    flush: false
+    filter_one: '{\"objectProperty\": \"name\", \"objectPropertyValue\": \"{name}\"}'
+    filter_all: null
+secrets:
+- secret: ucs
+  key: username
+  to: 'data.resource.auth.username'
+- secret: ucs
+  key: password
+  to: 'data.resource.auth.password'
+---
+kind: Secret
+name: ucs
+data:
+  username: QWRtaW5pc3RyYXRvcg==
+  password: YWRtaW4xMjM0
+---
+name: create-update
+kind: Workflow
+namespace: playground
+collection: groups
+endpoint: ucs
+data:
+  priority: 3
+  ensure: last
+  map:
+    entryDn:
+      name: "$dn$"
+      script: "'cn='~data['name']~',cn=groups,dc=foobar,dc=intranet'"
+      required: true
+    name:
+      from: data.name
+      required: true
+    users:
+      from: relations
+      unwind:
+        from: root.object.endpoints.ucs.result
+    description:
+      value: "foobar"
+  condition: null
+---
+name: remove
+kind: Workflow
+namespace: playground
+collection: groups
+endpoint: ucs
+data:
+  priority: 1
+  ensure: absent
+  map:
+    name:
+      from: data.name
+      required: true
+  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 3600"

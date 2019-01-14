@@ -5,14 +5,13 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
 namespace Tubee\Workflow;
 
 use InvalidArgumentException;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\Validator as AttributeMapValidator;
 use Tubee\Resource\Validator as ResourceValidator;
 
@@ -21,12 +20,13 @@ class Validator extends ResourceValidator
     /**
      * Validate resource.
      */
-    public static function validateWorkflow(array $resource, ExpressionLanguage $expression): array
+    public static function validateWorkflow(array $resource): array
     {
         $resource = parent::validate($resource);
         $defaults = [
             'data' => [
                 'ensure' => WorkflowInterface::ENSURE_LAST,
+                'priority' => 0,
                 'map' => [],
                 'condition' => null,
             ],
@@ -42,11 +42,13 @@ class Validator extends ResourceValidator
             if (!is_string($resource['data']['condition'])) {
                 throw new InvalidArgumentException('provided data.condition must be a string');
             }
-
-            $expression->evaluate($resource['data']['condition'], []);
         }
 
-        AttributeMapValidator::validate($resource['data']['map'], $expression);
+        if (!is_int($resource['data']['priority'])) {
+            throw new InvalidArgumentException('provided data.priority must be an integer');
+        }
+
+        $resource['data']['map'] = AttributeMapValidator::validate($resource['data']['map']);
 
         return $resource;
     }

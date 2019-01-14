@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -113,7 +113,7 @@ class Factory extends ResourceFactory
      */
     public function add(EndpointInterface $endpoint, array $resource): ObjectIdInterface
     {
-        $resource = Validator::validateWorkflow($resource, $this->script);
+        $resource = Validator::validateWorkflow($resource);
 
         if ($this->has($endpoint, $resource['name'])) {
             throw new Exception\NotUnique('workflow '.$resource['name'].' does already exists');
@@ -132,7 +132,7 @@ class Factory extends ResourceFactory
     public function update(WorkflowInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
-        $data = Validator::validateWorkflow($data, $this->script);
+        $data = Validator::validateWorkflow($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

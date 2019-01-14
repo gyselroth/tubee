@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -83,7 +83,6 @@ class Ldap extends AbstractEndpoint
      */
     public function __construct(string $name, string $type, LdapServer $ldap, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->filter_all = '(objectClass=*)';
         $this->ldap = $ldap;
 
         if (isset($resource['data']['resource'])) {
@@ -206,9 +205,11 @@ class Ldap extends AbstractEndpoint
 
         if ($simulate === false) {
             $this->ldap->modifyBatch($dn, $diff);
+
+            return $dn;
         }
 
-        return $dn;
+        return null;
     }
 
     /**
@@ -246,9 +247,11 @@ class Ldap extends AbstractEndpoint
 
         if ($simulate === false) {
             $this->ldap->add($dn, $object);
+
+            return $dn;
         }
 
-        return $dn;
+        return null;
     }
 
     /**

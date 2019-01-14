@@ -38,7 +38,7 @@
         "gyselroth/mongodb-php-task-scheduler": "^3.0.0",
         "hassankhan/config": "^2.0.0",
         "symfony/yaml": "~3.1",
-        "monolog/monolog": "^1.23",
+        "monolog/monolog": "^2.0.0-beta1",
         "bramus/monolog-colored-line-formatter": "~2.0",
         "zendframework/zend-servicemanager": "^3.3",
         "icewind/smb": "^2.0",
@@ -62,8 +62,7 @@
         "psr/http-message": "^1.0",
         "gyselroth/stream-iterator": "dev-master",
         "guzzlehttp/guzzle": "~6.0",
-        "paragonie/halite": "^4",
-        "justinrainbow/json-schema": "^5.2"
+        "paragonie/halite": "^4"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -27,6 +27,7 @@ class Validator extends ResourceValidator
             'data' => [
                 'type' => EndpointInterface::TYPE_BROWSE,
                 'options' => [
+                    'identifier' => null,
                     'flush' => false,
                     'import' => [],
                     'filter_one' => null,
@@ -49,12 +50,35 @@ class Validator extends ResourceValidator
             throw new InvalidArgumentException('source endpoint must include at least one options.import attribute');
         }
 
-        if ($resource['data']['type'] === EndpointInterface::TYPE_DESTINATION && (!isset($resource['data']['options']['filter_one']) || !is_string($resource['data']['options']['filter_one']))) {
+        if ($resource['data']['type'] === EndpointInterface::TYPE_DESTINATION && !isset($resource['data']['options']['filter_one'])) {
             throw new InvalidArgumentException('destintation endpoint must have single object filter options.filter_one as a string');
         }
 
         if (!is_array($resource['data']['resource'])) {
             throw new InvalidArgumentException('resource as array must be provided');
+        }
+
+        foreach ($resource['data']['options'] as $option => $value) {
+            switch ($option) {
+                case 'flush':
+                    if (!is_bool($value)) {
+                        throw new InvalidArgumentException('options.flush must be a boolean');
+                    }
+
+                break;
+                case 'identifier':
+                case 'import':
+                break;
+                case 'filter_all':
+                case 'filter_one':
+                    if (!is_string($value) && !is_null($value)) {
+                        throw new InvalidArgumentException('options.'.$option.' must be a string');
+                    }
+
+                break;
+                default:
+                    throw new InvalidArgumentException('unknown option '.$option.' provided');
+            }
         }
 
         return self::validateEndpoint($resource);

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -49,22 +49,6 @@ class Mongodb extends AbstractEndpoint
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         return $this->build($this->get($object, $attributes));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function exists(array $object): bool
-    {
-        try {
-            $this->get($object);
-
-            return true;
-        } catch (Exception\ObjectMultipleFound $e) {
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
     }
 
     /**

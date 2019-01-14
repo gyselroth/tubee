@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -60,12 +60,18 @@ class Routes
             $r->addRoute('PATCH', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}', [v1\Objects::class, 'patch']);
             $r->addRoute('PUT', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}', [v1\Objects::class, 'put']);
             $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/history', [v1\Objects::class, 'getHistory']);
-            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives', [v1\ObjectRelatives::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives', [v1\ObjectRelatives::class, 'watchAll']);
-            $r->addRoute('POST', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives', [v1\ObjectRelatives::class, 'post']);
-            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives/{relative}', [v1\ObjectRelatives::class, 'getOne']);
-            $r->addRoute('DELETE', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives/{relative}', [v1\ObjectRelatives::class, 'delete']);
-            $r->addRoute('PUT', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relatives/{relative}', [v1\ObjectRelatives::class, 'put']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations', [v1\ObjectRelations::class, 'getAll']);
+            $r->addRoute('POST', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations', [v1\ObjectRelations::class, 'post']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}', [v1\ObjectRelations::class, 'getOne']);
+            $r->addRoute('DELETE', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}', [v1\ObjectRelations::class, 'delete']);
+            $r->addRoute('PUT', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}', [v1\ObjectRelations::class, 'put']);
+            $r->addRoute('GET', '/api/v1/watch/namespaces/{namespace}/relations', [v1\ObjectRelations::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/relations', [v1\ObjectRelations::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/relations/{relation}', [v1\ObjectRelations::class, 'getOne']);
+            $r->addRoute('POST', '/api/v1/namespaces/{namespace}/relations', [v1\ObjectRelations::class, 'post']);
+            $r->addRoute('PATCH', '/api/v1/namespaces/{namespace}/relations/{relation}', [v1\ObjectRelations::class, 'patch']);
+            $r->addRoute('DELETE', '/api/v1/namespaces/{namespace}/relations/{relation}', [v1\ObjectRelations::class, 'delete']);
+            $r->addRoute('PUT', '/api/v1/namespaces/{namespace}/relations', [v1\ObjectRelations::class, 'put']);
             $r->addRoute('GET', '/api/v1/access-rules', [v1\AccessRules::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/access-rules', [v1\AccessRules::class, 'watchAll']);
             $r->addRoute('POST', '/api/v1/access-rules', [v1\AccessRules::class, 'post']);
@@ -87,22 +93,23 @@ class Routes
             $r->addRoute('DELETE', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'delete']);
             $r->addRoute('PUT', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'put']);
             $r->addRoute('PATCH', '/api/v1/secrets/{secret}', [v1\Secrets::class, 'patch']);
-            $r->addRoute('GET', '/api/v1/jobs', [v1\Jobs::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/jobs', [v1\Jobs::class, 'watchAll']);
-            $r->addRoute('POST', '/api/v1/jobs', [v1\Jobs::class, 'post']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}', [v1\Jobs::class, 'getOne']);
-            $r->addRoute('PATCH', '/api/v1/jobs/{job}', [v1\Jobs::class, 'patch']);
-            $r->addRoute('GET', '/api/v1/processes', [v1\Processes::class, 'getAll']);
-            $r->addRoute('POST', '/api/v1/processes', [v1\Processes::class, 'post']);
-            $r->addRoute('GET', '/api/v1/watch/processes', [v1\Processes::class, 'watchAll']);
-            $r->addRoute('GET', '/api/v1/processes/{process}', [v1\Processes::class, 'getOne']);
-            $r->addRoute('DELETE', '/api/v1/processes/{process}', [v1\Processes::class, 'delete']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/logs', [v1\Logs::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/jobs/{job}/logs', [v1\Logs::class, 'watchAll']);
-            $r->addRoute('GET', '/api/v1/jobs/{job}/logs/{log}', [v1\Logs::class, 'getOne']);
-            $r->addRoute('GET', '/api/v1/processes/{process}/logs', [v1\Logs::class, 'getAll']);
-            $r->addRoute('GET', '/api/v1/watch/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
-            $r->addRoute('GET', '/api/v1/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/jobs', [v1\Jobs::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/namespaces/{namespace}/jobs', [v1\Jobs::class, 'watchAll']);
+            $r->addRoute('POST', '/api/v1/namespaces/{namespace}/jobs', [v1\Jobs::class, 'post']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/jobs/{job}', [v1\Jobs::class, 'getOne']);
+            $r->addRoute('PATCH', '/api/v1/namespaces/{namespace}/jobs/{job}', [v1\Jobs::class, 'patch']);
+            $r->addRoute('DELETE', '/api/v1/namespaces/{namespace}/jobs/{job}', [v1\Jobs::class, 'delete']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/processes', [v1\Processes::class, 'getAll']);
+            $r->addRoute('POST', '/api/v1/namespaces/{namespace}/processes', [v1\Processes::class, 'post']);
+            $r->addRoute('GET', '/api/v1/watch/namespaces/{namespace}/processes', [v1\Processes::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/processes/{process}', [v1\Processes::class, 'getOne']);
+            $r->addRoute('DELETE', '/api/v1/namespaces/{namespace}/processes/{process}', [v1\Processes::class, 'delete']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/jobs/{job}/logs', [v1\Logs::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/namespaces/{namespace}/jobs/{job}/logs', [v1\Logs::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/jobs/{job}/logs/{log}', [v1\Logs::class, 'getOne']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/processes/{process}/logs', [v1\Logs::class, 'getAll']);
+            $r->addRoute('GET', '/api/v1/watch/namespaces/{namespace}/processes/{process}/logs', [v1\Logs::class, 'watchAll']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/processes/{process}/(logs/{log}', [v1\Logs::class, 'getOne']);
             $r->addRoute('GET', '/api/v1/users', [v1\Users::class, 'getAll']);
             $r->addRoute('GET', '/api/v1/watch/users', [v1\Users::class, 'watchAll']);
             $r->addRoute('POST', '/api/v1/users', [v1\Users::class, 'post']);

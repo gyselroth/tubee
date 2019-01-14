@@ -5,13 +5,13 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
 namespace Tubee\Bootstrap;
 
-use Bramus\Monolog\Formatter\ColoredLineFormatter;
+//use Bramus\Monolog\Formatter\ColoredLineFormatter;
 use GetOpt\GetOpt;
 use Monolog\Handler\FilterHandler;
 use Monolog\Handler\StreamHandler;
@@ -132,8 +132,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Remove logger.
-     *
-     * @return Cli
      */
     protected function reduceLogLevel(): self
     {
@@ -152,10 +150,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Configure cli logger.
-     *
-     * @param int $level
-     *
-     * @return Cli
      */
     protected function configureLogger(?int $level = null): self
     {
@@ -165,14 +159,14 @@ class Cli extends AbstractBootstrap
             $level = (4 - $level) * 100;
         }
 
-        $formatter = new ColoredLineFormatter();
+        //$formatter = new ColoredLineFormatter();
         $handler = new StreamHandler('php://stderr', Logger::EMERGENCY);
-        $handler->setFormatter($formatter);
+        //$handler->setFormatter($formatter);
         $this->logger->pushHandler($handler);
 
         $handler = new StreamHandler('php://stdout', $level);
         $filter = new FilterHandler($handler, $level, Logger::ERROR);
-        $handler->setFormatter($formatter);
+        //$handler->setFormatter($formatter);
 
         $this->logger->pushHandler($filter);
 
@@ -181,8 +175,6 @@ class Cli extends AbstractBootstrap
 
     /**
      * Set exception handler.
-     *
-     * @return Cli
      */
     protected function setExceptionHandler(): self
     {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -122,7 +122,7 @@ class Endpoints
         $namespace = $this->namespace_factory->getOne($namespace);
         $collection = $namespace->getCollection($collection);
         $endpoint = $collection->getEndpoint($endpoint);
-        $doc = ['data' => $endpoint->getData()];
+        $doc = ['data' => $endpoint->getData(), 'secrets' => $endpoint->getSecrets()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
         $patched = $patch->apply();

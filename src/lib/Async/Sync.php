@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -85,43 +85,40 @@ class Sync extends AbstractJob
      */
     public function start(): bool
     {
-        $filter = in_array('*', $this->data['namespaces']) ? [] : ['name' => ['$in' => $this->data['namespaces']]];
         $procs = [];
+        $namespace = $this->namespace_factory->getOne($this->data['namespace']);
 
-        foreach ($this->namespace_factory->getAll($filter) as $namespace) {
-            $filter = in_array('*', $this->data['collections']) ? [] : ['name' => ['$in' => $this->data['collections']]];
-            foreach ($namespace->getCollections($filter) as $collection) {
-                $filter = in_array('*', $this->data['endpoints']) ? [] : ['name' => ['$in' => $this->data['endpoints']]];
-                foreach ($collection->getEndpoints($filter) as $endpoint) {
-                    if ($this->data['loadbalance'] === true) {
-                        $data = $this->data;
-                        $data = array_merge($data, [
-                            'namespaces' => [$namespace->getName()],
-                            'endpoints' => [$endpoint->getName()],
-                            'parent' => $this->getId(),
-                            'loadbalance' => false,
-                        ]);
+        $filter = in_array('*', $this->data['collections']) ? [] : ['name' => ['$in' => $this->data['collections']]];
+        foreach ($namespace->getCollections($filter) as $collection) {
+            $filter = in_array('*', $this->data['endpoints']) ? [] : ['name' => ['$in' => $this->data['endpoints']]];
+            foreach ($collection->getEndpoints($filter) as $endpoint) {
+                if ($this->data['loadbalance'] === true) {
+                    $data = $this->data;
+                    $data = array_merge($data, [
+                        'endpoints' => [$endpoint->getName()],
+                        'parent' => $this->getId(),
+                        'loadbalance' => false,
+                    ]);
 
-                        $procs[] = $this->scheduler->addJob(self::class, $data);
-                    } else {
-                        $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
-                            'process' => (string) $this->getId(),
-                            'parent' => isset($this->data['parent']) ? (string) $this->data['parent'] : null,
-                            'start' => $this->timestamp,
-                            'namespace' => $namespace->getName(),
-                            'collection' => $collection->getName(),
-                            'endpoint' => $endpoint->getName(),
-                        ]);
+                    $procs[] = $this->scheduler->addJob(self::class, $data);
+                } else {
+                    $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
+                        'process' => (string) $this->getId(),
+                        'parent' => isset($this->data['parent']) ? (string) $this->data['parent'] : null,
+                        'start' => $this->timestamp,
+                        'namespace' => $namespace->getName(),
+                        'collection' => $collection->getName(),
+                        'endpoint' => $endpoint->getName(),
+                    ]);
 
-                        if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
-                            $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
-                        } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-                            $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
-                        }
-
-                        $this->logger->popProcessor();
-                        $this->notify();
+                    if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
+                        $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+                    } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
+                        $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
                     }
+
+                    $this->logger->popProcessor();
+                    $this->notify();
                 }
             }
         }

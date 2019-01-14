@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -52,6 +52,16 @@ class AttributeMapTest extends TestCase
         $this->assertSame(['bar' => 'bar'], $result);
     }
 
+    public function testAttributeNameAlias()
+    {
+        $map = new AttributeMap([
+            'bar' => ['value' => 'foo', 'name' => '$foo'],
+        ], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
+
+        $result = $map->map([]);
+        $this->assertSame(['$foo' => 'foo'], $result);
+    }
+
     public function testAttributeEnsureMergeNotArray()
     {
         $this->expectException(InvalidArgumentException::class);
@@ -86,7 +96,7 @@ class AttributeMapTest extends TestCase
     {
         $this->expectException(Exception\AttributeNotResolvable::class);
         $map = new AttributeMap([
-            'foo' => ['from' => 'bar'],
+            'foo' => ['required' => true, 'from' => 'bar'],
         ], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -243,11 +253,10 @@ class AttributeMapTest extends TestCase
     {
         $this->expectException(Exception\AttributeNotResolvable::class);
         $map = new AttributeMap([
-            'foo' => ['script' => 'bar'],
+            'foo' => ['required' => true, 'script' => 'foobar'],
         ], new ExpressionLanguage(), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'foo']);
-        $this->assertSame('foobar', $result['foo']);
     }
 
     public function testAttributeDynamicValueNotResolvableNotRequired()
@@ -365,13 +374,33 @@ class AttributeMapTest extends TestCase
     public function testGetDiffNoChange()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo'],
+            'foo' => ['ensure' => 'last', 'from' => 'foo'],
         ], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
 
         $mapped = ['foo' => 'foo'];
         $existing = ['foo' => 'foo'];
         $result = $map->getDiff($mapped, $existing);
         $this->assertSame([], $result);
+    }
+
+    public function testGetDiffAttributeNameAlias()
+    {
+        $map = new AttributeMap([
+            'foo' => ['ensure' => 'last', 'from' => 'foo', 'name' => '$foo'],
+        ], $this->createMock(ExpressionLanguage::class), $this->createMock(LoggerInterface::class));
+
+        $mapped = ['$foo' => 'foo'];
+        $existing = ['$foo' => 'bar'];
+        $result = $map->getDiff($mapped, $existing);
+
+        $expected = [
+            '$foo' => [
+                'action' => AttributeMapInterface::ACTION_REPLACE,
+                'value' => 'foo',
+            ],
+        ];
+
+        $this->assertSame($expected, $result);
     }
 
     public function testGetDiffUpdateValue()

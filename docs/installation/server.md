@@ -122,7 +122,7 @@ docker exec tubee-stable-tubee_1 tubeecli upgrade -i -vvv
 >**Note** All tubee containers provide a version tag besides `latest`. It is best practice to use an exact version of a service instead the latest tag in production environment.
 The containers provide a `latest-unstable` tag for the tubee-jobs, tubee and tubee-web container. It is in no way reccomened to use pre-releases in production environments! 
 
->**Note** If you want to install beta and alpha versions replace `latest` with `latest-unstable` or specify an exact version tag. Pre-releases are only ment for testing purposes and are in **no** way recommended in production environements!
+>**Note** If you want to install beta and alpha versions replace `latest` with `latest-unstable` or specify an exact version tag. Pre-releases are only ment for testing purposes and are in no way recommended in production environements!
 
 ## Deploy on kubernetes
 

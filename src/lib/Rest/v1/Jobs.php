@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -60,14 +60,15 @@ class Jobs
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $jobs = $this->job_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $jobs = $this->job_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $jobs);
     }
@@ -75,9 +76,10 @@ class Jobs
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $job): ResponseInterface
     {
-        $resource = $this->job_factory->getOne($job);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $resource = $this->job_factory->getOne($namespace, $job);
 
         return Helper::getOne($request, $identity, $resource);
     }
@@ -85,9 +87,10 @@ class Jobs
     /**
      * Delete job.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, string $job): ResponseInterface
     {
-        $this->job_factory->deleteOne($job);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $this->job_factory->deleteOne($namespace, $job);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
@@ -95,18 +98,18 @@ class Jobs
     /**
      * Add new job.
      */
-    public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
         $job = array_merge(['namespaces' => []], $body);
 
-        $this->namespace_factory->getAll($job['namespaces']);
-        $id = $this->job_factory->create($job);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $this->job_factory->create($namespace, $job);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->job_factory->getOne($job['name'])->decorate($request),
+            $this->job_factory->getOne($namespace, $job['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -114,11 +117,13 @@ class Jobs
     /**
      * Patch.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $job): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace, string $job): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $job = $this->job_factory->getOne($job);
+
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $job = $this->job_factory->getOne($namespace, $job);
         $doc = ['data' => $job->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
@@ -128,7 +133,7 @@ class Jobs
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->job_factory->getOne($job->getName())->decorate($request),
+            $this->job_factory->getOne($namespace, $job->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -136,7 +141,7 @@ class Jobs
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -144,7 +149,8 @@ class Jobs
             'existing' => true,
         ], $request->getQueryParams());
 
-        $cursor = $this->job_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $cursor = $this->job_factory->watch($namespace, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

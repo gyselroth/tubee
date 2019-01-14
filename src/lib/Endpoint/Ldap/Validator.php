@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -21,6 +21,10 @@ class Validator
     public static function validate(array $resource): array
     {
         $defaults = [
+            'options' => [
+                'identifier' => 'entrydn',
+                'filter_all' => '(objectClass=*)',
+            ],
             'resource' => [
                 'uri' => 'ldap://127.0.0.1:389',
                 'binddn' => null,

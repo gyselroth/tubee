@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -20,9 +20,17 @@ use Tubee\Log\LogInterface;
 use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 class Process extends AbstractResource implements ProcessInterface
 {
+    /**
+     * Namespace.
+     *
+     * @var ResourceNamespace
+     */
+    protected $namespace;
+
     /**
      * Log factory.
      *
@@ -33,9 +41,10 @@ class Process extends AbstractResource implements ProcessInterface
     /**
      * Process.
      */
-    public function __construct(array $resource, LogFactory $log_factory)
+    public function __construct(array $resource, ResourceNamespaceInterface $namespace, LogFactory $log_factory)
     {
         $this->resource = $resource;
+        $this->namespace = $namespace;
         $this->log_factory = $log_factory;
     }
 
@@ -49,6 +58,7 @@ class Process extends AbstractResource implements ProcessInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Process',
+            'namespace' => $this->namespace->getName(),
             'changed' => $this->getCreated()->toDateTime()->format('c'),
             'data' => $this->getData(),
             'status' => [

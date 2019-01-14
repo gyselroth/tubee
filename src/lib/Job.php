@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee.io
  *
- * @copyright   Copryright (c) 2017-2018 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -17,7 +17,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use TaskScheduler\JobInterface as TaskJobInterface;
 use TaskScheduler\Process;
 use TaskScheduler\Scheduler;
-use Tubee\Async\Sync;
 use Tubee\Job\JobInterface;
 use Tubee\Log\Factory as LogFactory;
 use Tubee\Log\LogInterface;
@@ -25,9 +24,17 @@ use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Process\ProcessInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 class Job extends AbstractResource implements JobInterface
 {
+    /**
+     * Namespace.
+     *
+     * @var ResourceNamespaceInterface
+     */
+    protected $namespace;
+
     /**
      * Process factory.
      *
@@ -52,9 +59,10 @@ class Job extends AbstractResource implements JobInterface
     /**
      * Data object.
      */
-    public function __construct(array $resource, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory)
+    public function __construct(array $resource, ResourceNamespaceInterface $namespace, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory)
     {
         $this->resource = $resource;
+        $this->namespace = $namespace;
         $this->process_factory = $process_factory;
         $this->log_factory = $log_factory;
         $this->scheduler = $scheduler;
@@ -73,6 +81,7 @@ class Job extends AbstractResource implements JobInterface
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Job',
+            'namespace' => $this->namespace->getName(),
             'data' => $this->getData(),
             'status' => function () use ($resource, $scheduler) {
                 $process = iterator_to_array($scheduler->getJobs([
@@ -115,20 +124,6 @@ class Job extends AbstractResource implements JobInterface
     }
 
     /**
-     * Trigger job by force.
-     */
-    /*public function trigger(): Process
-    {
-        $resource = $this->resource['data'];
-        $options = $this->resource['data']['options'];
-        unset($options['at'], $options['interval']);
-
-        $resource += ['job' => $this->getId()];
-
-        return $this->scheduler->addJob(Sync::class, $resource, $options);
-    }*/
-
-    /**
      * {@inheritdoc}
      */
     public function getLog(ObjectIdInterface $id): LogInterface
@@ -143,7 +138,7 @@ class Job extends AbstractResource implements JobInterface
     {
         $query['job'] = $this->getId();
 
-        return $this->process_factory->getAll($query, $offset, $limit, $sort);
+        return $this->process_factory->getAll($this->namespace, $query, $offset, $limit, $sort);
     }
 
     /**
@@ -151,6 +146,6 @@ class Job extends AbstractResource implements JobInterface
      */
     public function getProcess(ObjectIdInterface $id): ProcessInterface
     {
-        return $this->process_factory->getOne($id);
+        return $this->process_factory->getOne($this->namespace, $id);
     }
 }
