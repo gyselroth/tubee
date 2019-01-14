@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use MongoDB\BSON\Binary;
 use Psr\Log\LoggerInterface;
+use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Schema\Exception;
 use Tubee\Schema\SchemaInterface;
 
@@ -45,19 +47,7 @@ class Schema implements SchemaInterface
      */
     public function getSchema(): array
     {
-        $default = [
-            'label' => null,
-            'required' => false,
-            'type' => null,
-            'require_regex' => null,
-        ];
-
-        $result = [];
-        foreach ($this->schema as $attribute => $schema) {
-            $result[$attribute] = array_merge($default, $schema);
-        }
-
-        return $result;
+        return $this->schema;
     }
 
     /**
@@ -82,7 +72,7 @@ class Schema implements SchemaInterface
                 continue;
             }
 
-            if ($value['type'] !== null && gettype($data[$attribute]) !== $value['type']) {
+            if (isset($value['type']) && $this->getType($data[$attribute]) !== $value['type']) {
                 throw new Exception\AttributeInvalidType('attribute '.$attribute.' value is not of type '.$value['type']);
             }
 
@@ -90,13 +80,39 @@ class Schema implements SchemaInterface
                 $this->requireRegex($data[$attribute], $attribute, $value['require_regex']);
             }
 
-            $this->logger->debug('schema attribute ['.$attribute.'] to [<'.$value['type'].'> {value}]', [
+            $this->logger->debug('schema attribute ['.$attribute.'] with value [{value}] is valid', [
                 'category' => get_class($this),
                 'value' => $data[$attribute],
             ]);
         }
 
         return true;
+    }
+
+    /**
+     * Get type.
+     */
+    protected function getType($value): ?string
+    {
+        $map = [
+            'string' => AttributeMapInterface::TYPE_STRING,
+            'array' => AttributeMapInterface::TYPE_ARRAY,
+            'integer' => AttributeMapInterface::TYPE_INT,
+            'double' => AttributeMapInterface::TYPE_FLOAT,
+            'boolean' => AttributeMapInterface::TYPE_BOOL,
+            'null' => AttributeMapInterface::TYPE_NULL,
+        ];
+
+        $type = gettype($value);
+
+        if (isset($map[$type])) {
+            return $map[$type];
+        }
+        if ($value instanceof Binary) {
+            return AttributeMapInterface::TYPE_BINARY;
+        }
+
+        return null;
     }
 
     /**

@@ -254,7 +254,7 @@ class LdapTest extends TestCase
         ];
 
         $result = $ldap->create($this->createMock(AttributeMapInterface::class), $object, true);
-        $this->assertSame($object['entrydn'], $result);
+        $this->assertNull($result);
     }
 
     public function testCreateObjectNoDN()
@@ -386,5 +386,96 @@ class LdapTest extends TestCase
         $expected = '(|(foo>1)(bar<2))';
         $result = $ldap->transformQuery($query);
         $this->assertSame($expected, $result);
+    }
+
+    public function testDeleteObject()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->once())->method('delete');
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ldap->delete($this->createMock(AttributeMapInterface::class), $object, $object);
+        $this->assertTrue($result);
+    }
+
+    public function testDeleteObjectSimulate()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->never())->method('delete');
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ldap->delete($this->createMock(AttributeMapInterface::class), $object, $object, true);
+        $this->assertTrue($result);
+    }
+
+    public function testChangeObject()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->never())->method('rename');
+        $client->expects($this->once())->method('modifyBatch');
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'foo',
+        ];
+
+        $diff = [[
+            'attrib' => 'foo',
+            'modtype' => LDAP_MODIFY_BATCH_REPLACE,
+            'values' => ['foo'],
+        ]];
+
+        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object);
+        $this->assertSame('uid=foo,ou=bar', $result);
+    }
+
+    public function testChangeObjectSimulate()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->never())->method('modifyBatch');
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'foo',
+        ];
+
+        $diff = [[
+            'attrib' => 'foo',
+            'modtype' => LDAP_MODIFY_BATCH_REPLACE,
+            'values' => ['foo'],
+        ]];
+
+        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object, true);
+        $this->assertNull($result);
+    }
+
+    public function testMoveObject()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->once())->method('rename');
+        $client->expects($this->once())->method('modifyBatch');
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'foo',
+        ];
+
+        $ep_object = [
+            'entrydn' => 'uid=foo,ou=foo',
+            'foo' => 'foo',
+        ];
+
+        $diff = [];
+
+        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+        $this->assertSame('uid=foo,ou=bar', $result);
     }
 }

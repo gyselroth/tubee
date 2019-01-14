@@ -151,7 +151,6 @@ data:
   mail: user2@example.org
   firstname: user2
   lastname: bar
-  disabled: null
 ---
 name: groups
 namespace: playground

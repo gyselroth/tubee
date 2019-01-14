@@ -54,7 +54,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * {@inheritdoc}
      */
-    public function getMap(): Iterable
+    public function getMap(): array
     {
         return $this->map;
     }

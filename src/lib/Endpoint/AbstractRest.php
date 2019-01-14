@@ -188,6 +188,8 @@ abstract class AbstractRest extends AbstractEndpoint
 
             return $this->getResourceId($body);
         }
+
+        return null;
     }
 
     /**

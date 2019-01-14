@@ -205,9 +205,11 @@ class Ldap extends AbstractEndpoint
 
         if ($simulate === false) {
             $this->ldap->modifyBatch($dn, $diff);
+
+            return $dn;
         }
 
-        return $dn;
+        return null;
     }
 
     /**
@@ -245,9 +247,11 @@ class Ldap extends AbstractEndpoint
 
         if ($simulate === false) {
             $this->ldap->add($dn, $object);
+
+            return $dn;
         }
 
-        return $dn;
+        return null;
     }
 
     /**

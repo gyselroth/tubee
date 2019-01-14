@@ -62,7 +62,7 @@ interface AttributeMapInterface
     /**
      * Get attribute map.
      */
-    public function getMap(): Iterable;
+    public function getMap(): array;
 
     /**
      * Get attributes.

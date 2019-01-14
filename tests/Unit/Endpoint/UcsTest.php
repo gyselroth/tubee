@@ -315,6 +315,316 @@ class UcsTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testCreateObject()
+    {
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
+        $this->assertSame('uid=foo,ou=bar', $result);
+    }
+
+    public function testCreateObjectInvalidResponse()
+    {
+        $this->expectException(Exception\NotIterable::class);
+        $response = [
+            'result' => 'foo',
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
+    }
+
+    public function testCreateObjectRequestFailedNoDetail()
+    {
+        $this->expectException(UcsException\RequestFailed::class);
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => false,
+                ],
+            ],
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
+    }
+
+    public function testCreateObjectRequestFailedDetails()
+    {
+        $this->expectException(UcsException\RequestFailed::class);
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => false,
+                    'detail' => 'foo',
+                ],
+            ],
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
+    }
+
+    public function testCreateObjectSimulate()
+    {
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object, true);
+        $this->assertNull($result);
+    }
+
+    public function testCreateObjectNoIdentifier()
+    {
+        $this->expectException(UcsException\NoEntryDn::class);
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'foo' => 'bar',
+        ];
+
+        $ucs->create($this->createMock(AttributeMapInterface::class), $object);
+    }
+
+    public function testTransformSingleQuery()
+    {
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $query = [
+            'foo' => 'bar',
+        ];
+
+        $expected = [
+            'objectProperty' => 'foo',
+            'objectPropertyValue' => 'bar',
+        ];
+
+        $result = $ucs->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformEmptyQuery()
+    {
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $query = [];
+
+        $expected = [
+            'objectProperty' => 'None',
+        ];
+
+        $result = $ucs->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformFilterAllQuery()
+    {
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => [
+                'options' => [
+                    'filter_all' => json_encode([
+                        'objectProperty' => 'foo',
+                        'objectPropertyValue' => 'bar',
+                    ]),
+                ],
+            ],
+        ]);
+
+        $query = [];
+
+        $expected = [
+            'objectProperty' => 'foo',
+            'objectPropertyValue' => 'bar',
+        ];
+
+        $result = $ucs->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
+    public function testTransformInvalidFilterAllQuery()
+    {
+        $this->expectException(UcsException\InvalidFilter::class);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => [
+                'options' => [
+                    'filter_all' => '{',
+                ],
+            ],
+        ]);
+
+        $result = $ucs->transformQuery([]);
+    }
+
+    public function testDeleteObject()
+    {
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $object);
+        $this->assertTrue($result);
+    }
+
+    public function testDeleteObjectSimulate()
+    {
+        $client = $this->createMock(Client::class);
+        $client->expects($this->never())->method('__call')
+            ->with(
+                $this->equalTo('post')
+            );
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+            'foo' => 'bar',
+        ];
+
+        $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $object, true);
+        $this->assertTrue($result);
+    }
+
+    public function testChangeObject()
+    {
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+
+        $client = $this->getMockClient($response);
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'foo',
+        ];
+
+        $diff = [
+            'foo' => 'foo',
+        ];
+
+        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object);
+        $this->assertSame('uid=foo,ou=bar', $result);
+    }
+
+    public function testChangeObjectSimulate()
+    {
+        $client = $this->createMock(Client::class);
+        $client->expects($this->never())->method('__call')
+            ->with(
+                $this->equalTo('post')
+            );
+
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'foo',
+        ];
+
+        $diff = [
+            'foo' => 'foo',
+        ];
+
+        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object, true);
+        $this->assertNull($result);
+    }
+
+    public function testMoveObject()
+    {
+        $response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+        $client = $this->getMockClient($response);
+        $client->expects($this->exactly(2))->method('__call');
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'foo',
+        ];
+
+        $ep_object = [
+            '$dn$' => 'uid=foo,ou=foo,ou=foobar',
+            'foo' => 'foo',
+        ];
+
+        $diff = [];
+
+        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+        $this->assertSame('uid=foo,ou=bar', $result);
+    }
+
     protected function getMockClient($response = [])
     {
         $body = $this->createMock(StreamInterface::class);

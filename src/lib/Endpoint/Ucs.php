@@ -169,6 +169,8 @@ class Ucs extends AbstractEndpoint
 
             return $this->getResourceId($result);
         }
+
+        return null;
     }
 
     /**
@@ -226,9 +228,11 @@ class Ucs extends AbstractEndpoint
 
             $result = array_shift($result);
             $this->verifyWriteResult($result);
+
+            return $dn;
         }
 
-        return $dn;
+        return null;
     }
 
     /**
@@ -238,7 +242,7 @@ class Ucs extends AbstractEndpoint
     {
         $result = null;
 
-        if ($this->filter_all !== null && $query === null) {
+        if ($this->filter_all !== null && empty($query)) {
             $filter_all = json_decode(stripslashes($this->getFilterAll()), true);
             if (!isset($filter_all['objectProperty']) || !isset($filter_all['objectPropertyValue'])) {
                 throw new UcsException\InvalidFilter('Either objectProperty or objectPropertyValue not set in filter_all');
