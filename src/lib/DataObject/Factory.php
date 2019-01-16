@@ -127,7 +127,7 @@ class Factory extends ResourceFactory
      */
     public function create(CollectionInterface $collection, array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
-        $collection->getSchema()->validate($object);
+        $collection->getSchema()->validate((array) $object['data']);
 
         $object['_id'] = new ObjectId();
 
@@ -154,9 +154,7 @@ class Factory extends ResourceFactory
      */
     public function update(CollectionInterface $collection, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
     {
-        $collection->getSchema()->validate($data);
-
-        $data = ['data' => $data];
+        $collection->getSchema()->validate((array) $data['data']);
 
         if ($endpoints !== null) {
             $existing = $object->getEndpoints();

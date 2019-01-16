@@ -130,8 +130,6 @@ class Factory extends ResourceFactory
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE) {
             $this->ensureIndex($collection, $resource['data']['options']['import']);
-        } elseif (!empty($resource['data']['options']['filter_all'])) {
-            $this->ensureIndex($collection, array_keys($resource['data']['options']['filter_all']));
         }
 
         $resource['namespace'] = $collection->getResourceNamespace()->getName();

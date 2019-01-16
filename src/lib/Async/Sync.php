@@ -124,7 +124,7 @@ class Sync extends AbstractJob
         }
 
         foreach ($procs as $process) {
-            $process->wait();
+//            $process->wait();
         }
 
         return true;

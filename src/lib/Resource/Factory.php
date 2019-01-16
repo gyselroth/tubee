@@ -173,7 +173,6 @@ class Factory
      */
     public function watchFrom(Collection $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = [], ?Closure $build = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        //$this->logger->debug("PIPE WATCH");
         if ($build === null) {
             $build = function ($resource) {
                 return $this->build($resource);

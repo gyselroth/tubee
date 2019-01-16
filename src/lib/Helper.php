@@ -71,9 +71,9 @@ class Helper
      */
     public static function associativeArrayToPath(Iterable $arr, Iterable $narr = [], $nkey = ''): array
     {
-        if ($nkey !== '') {
+        /*if ($nkey !== '') {
             $narr[substr($nkey, 0, -1)] = $arr;
-        }
+        }*/
 
         foreach ($arr as $key => $value) {
             if (is_array($value)) {

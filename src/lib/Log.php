@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee;
 
-use DateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Log\LogInterface;
 use Tubee\Resource\AbstractResource;
@@ -40,13 +39,12 @@ class Log extends AbstractResource implements LogInterface
             ],
             'kind' => 'Log',
             'id' => (string) $this->getId(),
-            'created' => (new DateTime($this->resource['datetime']))->format('c'),
-            'changed' => (new DateTime($this->resource['datetime']))->format('c'),
+            'created' => $this->resource['datetime']->toDateTime()->format('c'),
+            'changed' => $this->resource['datetime']->toDateTime()->format('c'),
             'data' => [
                 'level' => $this->resource['level'],
                 'level_name' => $this->resource['level_name'],
                 'message' => $this->resource['message'],
-                'created' => (new DateTime($this->resource['datetime']))->format('c'),
                 'category' => $this->resource['context']['category'],
                 'exception' => function ($resource) use ($data) {
                     if (isset($data['context']['exception'])) {

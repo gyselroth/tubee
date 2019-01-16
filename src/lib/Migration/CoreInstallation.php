@@ -71,7 +71,7 @@ class CoreInstallation implements DeltaInterface
         $this->db->access_rules->createIndex(['name' => 1], ['unique' => true]);
         $this->db->secrets->createIndex(['name' => 1], ['unique' => true]);
         $this->db->users->createIndex(['name' => 1], ['unique' => true]);
-        $this->db->jobs->createIndex(['name' => 1], ['unique' => true]);
+        $this->db->jobs->createIndex(['name' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->namespaces->createIndex(['name' => 1], ['unique' => true]);
         $this->db->collections->createIndex(['name' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->endpoints->createIndex(['name' => 1, 'collection' => 1, 'namespace' => 1], ['unique' => true]);

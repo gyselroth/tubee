@@ -51,10 +51,14 @@ class Validator
             'rewrite' => [],
             'require_regex' => null,
             'required' => false,
-            'map' => [],
+            'map' => null,
         ];
 
         foreach ($schema as $option => $definition) {
+            if (is_null($definition)) {
+                continue;
+            }
+
             switch ($option) {
                 case 'ensure':
                     if (!in_array($definition, AttributeMapInterface::VALID_ENSURES)) {
@@ -72,12 +76,11 @@ class Validator
                 break;
                 case 'rewrite':
                 break;
-                case 'script':
-                break;
                 case 'value':
                 break;
                 case 'name':
                 case 'from':
+                case 'script':
                 case 'require_regex':
                     if (!is_string($definition)) {
                         throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type string');

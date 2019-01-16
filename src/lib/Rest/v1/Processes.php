@@ -108,7 +108,7 @@ class Processes
     public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, ObjectId $process): ResponseInterface
     {
         $namespace = $this->namespace_factory->getOne($namespace);
-        $this->process_factory->getOne($process)->deleteOne($namespace, $process);
+        $this->process_factory->deleteOne($namespace, $process);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

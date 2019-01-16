@@ -7,6 +7,8 @@ services:
     image: osixia/openldap:latest
     environment:
       - LDAP_ADMIN_PASSWORD=admin
+    ports:
+      - "3899:389"
   mongodb-endpoint:
     image: mongo:3.6.0
   mariadb-endpoint:

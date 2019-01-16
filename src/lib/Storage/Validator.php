@@ -30,6 +30,7 @@ class Validator
         $class = StorageInterface::STORAGE_MAP[$resource['kind']];
         $validator = $class.'\\Validator';
         $resource = $validator::validate($resource);
+        $resource = array_merge($defaults, $resource);
 
         return $resource;
     }

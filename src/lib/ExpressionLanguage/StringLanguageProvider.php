@@ -32,8 +32,6 @@ class StringLanguageProvider implements ExpressionFunctionProviderInterface
             ExpressionFunction::fromPhp('json_decode'),
             ExpressionFunction::fromPhp('base64_encode'),
             ExpressionFunction::fromPhp('base64_decode'),
-            ExpressionFunction::fromPhp('serialize'),
-            ExpressionFunction::fromPhp('unserialize'),
             ExpressionFunction::fromPhp('str_replace'),
             ExpressionFunction::fromPhp('substr'),
             ExpressionFunction::fromPhp('pack'),
