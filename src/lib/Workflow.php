@@ -16,7 +16,6 @@ use InvalidArgumentException;
 use MongoDB\BSON\UTCDateTimeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
@@ -26,8 +25,10 @@ use Tubee\Endpoint\Exception as EndpointException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
+use Tubee\V8\Engine as V8Engine;
 use Tubee\Workflow\Exception;
 use Tubee\Workflow\WorkflowInterface;
+use V8Js;
 
 class Workflow extends AbstractResource implements WorkflowInterface
 {
@@ -72,20 +73,20 @@ class Workflow extends AbstractResource implements WorkflowInterface
     protected $condition;
 
     /**
-     * Expression.
+     * V8 engine.
      *
-     * @var ExpressionLanguage
+     * @var V8Engine
      */
-    protected $expression;
+    protected $v8;
 
     /**
      * Initialize.
      */
-    public function __construct(string $name, string $ensure, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $ensure, V8Engine $v8, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
         $this->ensure = $ensure;
-        $this->expression = $expression;
+        $this->v8 = $v8;
         $this->attribute_map = $attribute_map;
         $this->endpoint = $endpoint;
         $this->logger = $logger;
@@ -275,7 +276,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
-        $attributes['relations'] = $this->getRelations($object);
+        $attributes['relations'] = iterator_to_array($this->getRelations($object));
         if ($this->checkCondition($attributes) === false) {
             return false;
         }
@@ -448,10 +449,11 @@ class Workflow extends AbstractResource implements WorkflowInterface
         ]);
 
         try {
-            return (bool) $this->expression->evaluate($this->condition, [
-                'object' => $object,
-                'garbage' => false,
-            ]);
+            $this->v8->object = $object;
+            $this->v8->garbage = false;
+            $this->v8->executeString($this->condition, '', V8Js::FLAG_FORCE_ARRAY);
+
+            return (bool) $this->v8->getLastResult();
         } catch (\Exception $e) {
             $this->logger->error('failed execute workflow condition ['.$this->condition.']', [
                 'category' => get_class($this),

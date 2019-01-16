@@ -15,10 +15,10 @@ use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Resource\Factory as ResourceFactory;
+use Tubee\V8\Engine as V8Engine;
 use Tubee\Workflow;
 
 class Factory extends ResourceFactory
@@ -29,19 +29,19 @@ class Factory extends ResourceFactory
     public const COLLECTION_NAME = 'workflows';
 
     /**
-     * Expression lang.
+     * V8 engine.
      *
-     * @var ExpressionLanguage
+     * @var V8Js
      */
-    protected $script;
+    protected $v8;
 
     /**
      * Initialize.
      */
-    public function __construct(Database $db, ExpressionLanguage $script, LoggerInterface $logger)
+    public function __construct(Database $db, V8Engine $v8, LoggerInterface $logger)
     {
         parent::__construct($db, $logger);
-        $this->script = $script;
+        $this->v8 = $v8;
     }
 
     /**
@@ -152,8 +152,8 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, EndpointInterface $endpoint): WorkflowInterface
     {
-        $map = new AttributeMap($resource['data']['map'], $this->script, $this->logger);
+        $map = new AttributeMap($resource['data']['map'], $this->v8, $this->logger);
 
-        return $this->initResource(new Workflow($resource['name'], $resource['data']['ensure'], $this->script, $map, $endpoint, $this->logger, $resource));
+        return $this->initResource(new Workflow($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $resource));
     }
 }

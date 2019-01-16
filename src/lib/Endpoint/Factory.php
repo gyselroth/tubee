@@ -146,6 +146,10 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
         $data = Validator::validate($data);
+        $data['_id'] = $resource->getId();
+
+        $endpoint = $this->build($data, $resource->getCollection());
+        $endpoint->setup();
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

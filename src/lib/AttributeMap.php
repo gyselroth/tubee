@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace Tubee;
 
 use InvalidArgumentException;
+use MongoDB\BSON\Binary;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\AttributeMap\Exception;
 use Tubee\AttributeMap\Transform;
+use Tubee\V8\Engine as V8Engine;
+use V8Js;
 
 class AttributeMap implements AttributeMapInterface
 {
@@ -35,20 +37,20 @@ class AttributeMap implements AttributeMapInterface
     protected $logger;
 
     /**
-     * Expression language.
+     * V8.
      *
-     * @var ExpressionLanguage
+     * @var V8Engine
      */
-    protected $expression;
+    protected $v8;
 
     /**
      * Init attribute map.
      */
-    public function __construct(array $map = [], ExpressionLanguage $expression, LoggerInterface $logger)
+    public function __construct(array $map = [], V8Engine $v8, LoggerInterface $logger)
     {
         $this->map = $map;
         $this->logger = $logger;
-        $this->expression = $expression;
+        $this->v8 = $v8;
     }
 
     /**
@@ -72,6 +74,8 @@ class AttributeMap implements AttributeMapInterface
      */
     public function map(array $data): array
     {
+        $this->v8->object = $data;
+
         $result = [];
         foreach ($this->map as $attr => $value) {
             if (isset($attrv)) {
@@ -99,7 +103,7 @@ class AttributeMap implements AttributeMapInterface
 
                 $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
                     'category' => get_class($this),
-                    'value' => $result[$attr],
+                    'value' => ($result[$attr] instanceof Binary) ? '<bin '.mb_strlen($result[$attr]->getData()).'>' : $result[$attr],
                 ]);
             }
         }
@@ -268,7 +272,8 @@ class AttributeMap implements AttributeMapInterface
 
         try {
             if (isset($value['script'])) {
-                $result = $this->expression->evaluate($value['script'], $data);
+                $this->v8->executeString($value['script'], '', V8Js::FLAG_FORCE_ARRAY);
+                $result = $this->v8->getLastResult();
             }
         } catch (\Exception $e) {
             $this->logger->warning('failed to execute script ['.$value['script'].'] of attribute ['.$attr.']', [

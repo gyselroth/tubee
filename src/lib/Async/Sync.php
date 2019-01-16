@@ -87,8 +87,8 @@ class Sync extends AbstractJob
     {
         $procs = [];
         $namespace = $this->namespace_factory->getOne($this->data['namespace']);
-
         $filter = in_array('*', $this->data['collections']) ? [] : ['name' => ['$in' => $this->data['collections']]];
+
         foreach ($namespace->getCollections($filter) as $collection) {
             $filter = in_array('*', $this->data['endpoints']) ? [] : ['name' => ['$in' => $this->data['endpoints']]];
             foreach ($collection->getEndpoints($filter) as $endpoint) {
@@ -115,6 +115,10 @@ class Sync extends AbstractJob
                         $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
                     } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
                         $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+                    } else {
+                        $this->logger->warning('skip endpoint ['.$endpoint->getIdentifier().'], endpoint type is neither source nor destination', [
+                            'category' => get_class($this),
+                        ]);
                     }
 
                     $this->logger->popProcessor();
