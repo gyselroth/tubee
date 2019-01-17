@@ -89,9 +89,13 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function getData(): array
+    public function toArray(): array
     {
-        return $this->resource['data'];
+        $resource = $this->resource;
+        $resource['namespace'] = $this->collection->getResourceNamespace()->getName();
+        $resource['collection'] = $this->collection->getName();
+
+        return $resource;
     }
 
     /**

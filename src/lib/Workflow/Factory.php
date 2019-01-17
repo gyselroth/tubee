@@ -31,7 +31,7 @@ class Factory extends ResourceFactory
     /**
      * V8 engine.
      *
-     * @var V8Js
+     * @var V8Engine
      */
     protected $v8;
 
@@ -89,6 +89,8 @@ class Factory extends ResourceFactory
             'namespace' => $endpoint->getCollection()->getResourceNamespace()->getName(),
             'collection' => $endpoint->getCollection()->getName(),
             'endpoint' => $endpoint->getName(),
+        ], [
+            'projection' => ['history' => 0],
         ]);
 
         if ($result === null) {

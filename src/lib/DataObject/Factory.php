@@ -90,16 +90,15 @@ class Factory extends ResourceFactory
      */
     public function getOne(CollectionInterface $collection, array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
-        //$pipeline = $this->preparePipeline($filter, $include_dataset, $version);
-
-        $this->logger->debug('find one object with pipeline [{pipeline}] from ['.$collection->getCollection().']', [
+        $this->logger->debug('find one object with query [{query}] from ['.$collection->getCollection().']', [
             'category' => get_class($this),
-            //'pipeline' => $pipeline,
+            'query' => $filter,
         ]);
 
-        $cursor = $this->db->{$collection->getCollection()}->aggregate([['$match' => $filter]], [
-            'allowDiskUse' => true,
+        $cursor = $this->db->{$collection->getCollection()}->find($filter, [
+            'projection' => ['history' => 0],
         ]);
+
         $objects = iterator_to_array($cursor);
 
         if (count($objects) === 0) {
@@ -115,7 +114,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function getAll(CollectionInterface $collection, ?array $query = null, bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAll(CollectionInterface $collection, ?array $query = null, bool $include_dataset = true, ?int $offset = 0, ?int $limit = 0, ?array $sort = ['$natural' => -1]): Generator
     {
         return $this->getAllFrom($this->db->{$collection->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($collection) {
             return $this->build($resource, $collection);

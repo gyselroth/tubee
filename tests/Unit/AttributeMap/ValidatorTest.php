@@ -59,7 +59,7 @@ class ValidatorTest extends TestCase
             'unwind' => null,
             'value' => null,
             'rewrite' => [],
-            'map' => [],
+            'map' => null,
             'ensure' => AttributeMapInterface::ENSURE_LAST,
         ]];
 

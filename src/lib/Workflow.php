@@ -470,16 +470,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     protected function getImportObject(CollectionInterface $collection, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
-        /*$prefixed = [];
-        foreach ($filter as $attribute => $value) {
-            $prefixed['data.'.$attribute] = $value;
-        }*/
-
         //TODO: debug import line here
-
-        var_dump($filter);
-        var_dump($this->endpoint->getImport());
-        //var_dump($prefixed);
 
         if (empty($filter) || count($filter) !== count($this->endpoint->getImport())) {
             throw new Exception\ImportConditionNotMet('import condition attributes are not available from mapping');

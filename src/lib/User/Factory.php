@@ -93,7 +93,11 @@ class Factory extends ResourceFactory
      */
     public function getOne(string $name): UserInterface
     {
-        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
+            'name' => $name,
+        ], [
+            'projection' => ['history' => 0],
+        ]);
 
         if ($result === null) {
             throw new Exception\NotFound('user '.$name.' is not registered');

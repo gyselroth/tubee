@@ -168,6 +168,7 @@ class Sync extends AbstractJob
         ]);
 
         $endpoints = iterator_to_array($collection->getDestinationEndpoints($endpoints));
+        $workflows = [];
 
         foreach ($endpoints as $ep) {
             if ($ep->flushRequired()) {
@@ -177,18 +178,25 @@ class Sync extends AbstractJob
             $ep->setup($simulate);
         }
 
+        $i = 0;
         foreach ($collection->getObjects($filter) as $id => $object) {
-            $this->logger->debug('process write for object ['.(string) $id.'] from data type ['.$collection->getIdentifier().']', [
+            ++$i;
+            $this->logger->debug('process ['.$i.'] export for object ['.(string) $id.'] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
             foreach ($endpoints as $ep) {
-                $this->logger->info('start write onto destination endpoint ['.$ep->getIdentifier().']', [
+                $identifier = $ep->getIdentifier();
+                $this->logger->info('start expot to destination endpoint ['.$identifier.']', [
                     'category' => get_class($this),
                 ]);
 
+                if (!isset($workflows[$identifier])) {
+                    $workflows[$identifier] = iterator_to_array($ep->getWorkflows());
+                }
+
                 try {
-                    foreach ($ep->getWorkflows() as $workflow) {
+                    foreach ($workflows[$identifier] as $workflow) {
                         $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current object', [
                             'category' => get_class($this),
                         ]);
@@ -202,13 +210,13 @@ class Sync extends AbstractJob
                         }
                     }
 
-                    $this->logger->debug('no workflow were executed within endpoint ['.$ep->getIdentifier().'] for the current object', [
+                    $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
                         'category' => get_class($this),
                     ]);
                 } catch (\Exception $e) {
                     ++$this->error_count;
 
-                    $this->logger->error('failed write object to destination endpoint ['.$ep->getIdentifier().']', [
+                    $this->logger->error('failed export object to destination endpoint ['.$identifier.']', [
                         'category' => get_class($this),
                         'object' => $object->getId(),
                         'exception' => $e,
@@ -246,9 +254,11 @@ class Sync extends AbstractJob
         ]);
 
         $endpoints = $collection->getSourceEndpoints($endpoints);
+        $workflows = [];
 
         foreach ($endpoints as $ep) {
-            $this->logger->info('start import from source endpoint ['.$ep->getIdentifier().']', [
+            $identifier = $ep->getIdentifier();
+            $this->logger->info('start import from source endpoint ['.$identifier.']', [
                 'category' => get_class($this),
             ]);
 
@@ -257,15 +267,20 @@ class Sync extends AbstractJob
             }
 
             $ep->setup($simulate);
+            if (!isset($workflows[$identifier])) {
+                $workflows[$identifier] = iterator_to_array($ep->getWorkflows());
+            }
 
+            $i = 0;
             foreach ($ep->getAll($filter) as $id => $object) {
-                $this->logger->debug('process import for object ['.$id.'] into data type ['.$collection->getIdentifier().']', [
+                ++$i;
+                $this->logger->debug('process ['.$i.'] import for object ['.$id.'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
                     'attributes' => $object,
                 ]);
 
                 try {
-                    foreach ($ep->getWorkflows() as $workflow) {
+                    foreach ($workflows as $workflow) {
                         $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current object', [
                             'category' => get_class($this),
                         ]);
@@ -279,13 +294,13 @@ class Sync extends AbstractJob
                         }
                     }
 
-                    $this->logger->debug('no workflow were executed within endpoint ['.$ep->getIdentifier().'] for the current object', [
+                    $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
                         'category' => get_class($this),
                     ]);
                 } catch (\Exception $e) {
                     ++$this->error_count;
 
-                    $this->logger->error('failed import data object from source endpoint ['.$ep->getIdentifier().']', [
+                    $this->logger->error('failed import data object from source endpoint ['.$identifier.']', [
                         'category' => get_class($this),
                         'namespace' => $collection->getResourceNamespace()->getName(),
                         'collection' => $collection->getName(),
@@ -337,13 +352,15 @@ class Sync extends AbstractJob
             'endpoints.'.$endpoint->getName().'.garbage' => true,
         ]]);
 
+        $workflows = iterator_to_array($endpoint->getWorkflows());
+
         foreach ($collection->getObjects($filter, false) as $id => $object) {
             $this->logger->debug('process garbage workflows for garbage object ['.$id.'] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
             try {
-                foreach ($endpoint->getWorkflows() as $workflow) {
+                foreach ($workflows as $workflow) {
                     $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current garbage object', [
                         'category' => get_class($this),
                     ]);

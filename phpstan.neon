@@ -13,6 +13,10 @@ parameters:
         - '#Call to an undefined method Tubee\\Resource\\Factory::build()#'
         - '#Tubee\\Endpoint\\Mysql\\Wrapper\:\:__construct\(\) does not call parent constructor from mysqli#'
         - '#Tubee\\Rest\\Helper#'
+        - '#Access to an undefined property Tubee\\V8\\Engine::\$logger#'
+        - '#Access to an undefined property Tubee\\V8\\Engine::\$crypt#'
+
+
 
     reportUnmatchedIgnoredErrors: false
 includes:

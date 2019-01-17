@@ -94,6 +94,8 @@ class Factory extends ResourceFactory
             'name' => $name,
             'namespace' => $collection->getResourceNamespace()->getName(),
             'collection' => $collection->getName(),
+        ], [
+            'projection' => ['history' => 0],
         ]);
 
         if ($result === null) {

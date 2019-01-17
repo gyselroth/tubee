@@ -73,7 +73,11 @@ class Factory extends ResourceFactory
      */
     public function getOne(string $name): SecretInterface
     {
-        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
+            'name' => $name,
+        ], [
+            'projection' => ['history' => 0],
+        ]);
 
         if ($result === null) {
             throw new Exception\NotFound('secret '.$name.' is not registered');

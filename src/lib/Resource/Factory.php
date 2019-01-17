@@ -156,6 +156,7 @@ class Factory
         }
 
         $result = $collection->find($query, [
+            'projection' => ['history' => 0],
             'skip' => $offset,
             'limit' => $limit,
             'sort' => $sort,
@@ -242,7 +243,7 @@ class Factory
     protected function calcOffset(int $total, ?int $offset = null): ?int
     {
         if ($offset !== null && $total === 0) {
-            $offset = null;
+            $offset = 0;
         } elseif ($offset < 0 && $total >= $offset * -1) {
             $offset = $total + $offset;
         } elseif ($offset < 0) {
