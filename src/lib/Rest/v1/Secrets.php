@@ -18,6 +18,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
 use Tubee\Acl;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Tubee\Secret;
 use Tubee\Secret\Factory as SecretFactory;
@@ -40,25 +41,34 @@ class Secrets
     protected $acl;
 
     /**
+     * namespace factory.
+     *
+     * @var ResourceNamespaceFactory
+     */
+    protected $namespace_factory;
+
+    /**
      * Init.
      */
-    public function __construct(SecretFactory $secret_factory, Acl $acl)
+    public function __construct(SecretFactory $secret_factory, Acl $acl, ResourceNamespaceFactory $namespace_factory)
     {
         $this->secret_factory = $secret_factory;
         $this->acl = $acl;
+        $this->namespace_factory = $namespace_factory;
     }
 
     /**
      * Entrypoint.
      */
-    public function getAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function getAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $query = array_merge([
             'offset' => 0,
             'limit' => 20,
         ], $request->getQueryParams());
 
-        $secrets = $this->secret_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $secrets = $this->secret_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $secrets);
     }
@@ -66,9 +76,10 @@ class Secrets
     /**
      * Entrypoint.
      */
-    public function getOne(ServerRequestInterface $request, Identity $identity, string $secret): ResponseInterface
+    public function getOne(ServerRequestInterface $request, Identity $identity, string $namespace, string $secret): ResponseInterface
     {
-        $resource = $this->secret_factory->getOne($secret);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $resource = $this->secret_factory->getOne($namespace, $secret);
 
         return Helper::getOne($request, $identity, $resource);
     }
@@ -76,9 +87,10 @@ class Secrets
     /**
      * Delete secret.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $secret): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, string $secret): ResponseInterface
     {
-        $this->secret_factory->deleteOne($secret);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $this->secret_factory->deleteOne($namespace, $secret);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
@@ -86,12 +98,13 @@ class Secrets
     /**
      * Add new secret.
      */
-    public function post(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function post(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
 
-        $id = $this->secret_factory->add($body);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $this->secret_factory->add($namespace, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
@@ -103,11 +116,13 @@ class Secrets
     /**
      * Patch.
      */
-    public function patch(ServerRequestInterface $request, Identity $identity, string $secret): ResponseInterface
+    public function patch(ServerRequestInterface $request, Identity $identity, string $namespace, string $secret): ResponseInterface
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $secret = $this->secret_factory->getOne($secret);
+        $namespace = $this->namespace_factory->getOne($namespace);
+
+        $secret = $this->secret_factory->getOne($namespace, $secret);
         $doc = ['data' => $secret->getData()];
 
         $patch = new Patch(json_encode($doc), json_encode($body));
@@ -117,7 +132,7 @@ class Secrets
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
-            $this->secret_factory->getOne($secret->getName())->decorate($request),
+            $this->secret_factory->getOne($namespace, $secret->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }
@@ -125,7 +140,7 @@ class Secrets
     /**
      * Watch.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
+    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
         $query = array_merge([
             'offset' => null,
@@ -133,7 +148,8 @@ class Secrets
             'existing' => true,
         ], $request->getQueryParams());
 
-        $cursor = $this->secret_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $cursor = $this->secret_factory->watch($namespace, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }

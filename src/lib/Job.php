@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use DateTime;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -78,17 +79,19 @@ class Job extends AbstractResource implements JobInterface
 
         $result = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$this->namespace->getName())],
             ],
             'kind' => 'Job',
             'namespace' => $this->namespace->getName(),
             'data' => $this->getData(),
             'status' => function () use ($resource, $scheduler) {
                 $process = iterator_to_array($scheduler->getJobs([
-                    'data.job' => $resource->getId(),
+                    'data.job' => $resource->getName(),
+                    'data.parent' => ['$exists' => false],
                 ]));
 
                 $process = end($process);
+
                 if ($process === false) {
                     return [
                         'status' => false,
@@ -100,7 +103,8 @@ class Job extends AbstractResource implements JobInterface
                 return [
                     'status' => true,
                     'last_process' => [
-                        'id' => (string) $process['_id'],
+                        'process' => (string) $process['_id'],
+                        'next' => $process['options']['at'] === 0 ? null : (new DateTime('@'.(string) $process['options']['at']))->format('c'),
                         'started' => $process['status'] === 0 ? null : $process['started']->toDateTime()->format('c'),
                         'ended' => $process['status'] <= 2 ? null : $process['ended']->toDateTime()->format('c'),
                         'result' => TaskJobInterface::STATUS_MAP[$process['status']],
@@ -121,6 +125,14 @@ class Job extends AbstractResource implements JobInterface
         $query['context.job'] = (string) $this->getId();
 
         return $this->log_factory->getAll($query, $offset, $limit, $sort);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceNamespace(): ResourceNamespaceInterface
+    {
+        return $this->namespace;
     }
 
     /**

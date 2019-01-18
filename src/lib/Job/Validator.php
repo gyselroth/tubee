@@ -46,7 +46,6 @@ class Validator extends ResourceValidator
                 'collections' => [],
                 'endpoints' => [],
                 'filter' => [],
-                'loadbalance' => true,
                 'simulate' => false,
                 'log_level' => 'error',
                 'ignore' => false,
@@ -67,14 +66,13 @@ class Validator extends ResourceValidator
             switch ($option) {
                 case 'collections':
                 case 'endpoints':
-                    if (!is_array($value) || count(array_filter($value, 'is_string')) !== count($value)) {
+                    if (!is_array($value)) {
                         throw new InvalidArgumentException('option '.$option.' must be an array of resource names');
                     }
 
                 break;
 
                 break;
-                case 'loadbalance':
                 case 'simulate':
                 case 'ignore':
                     if (!is_bool($value)) {

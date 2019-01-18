@@ -103,6 +103,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of namespaces"
@@ -327,6 +332,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of collections"
@@ -590,6 +600,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of endpoints"
@@ -888,6 +903,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of workflows"
@@ -1326,6 +1346,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object relatives"
@@ -1464,6 +1489,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object relatives"
@@ -1733,6 +1763,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object history"
@@ -1841,6 +1876,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of objects"
@@ -1887,7 +1927,7 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/secrets:
+  /watch/namespaces/{namespace}/secrets:
     get:
       tags:
       - "secrets"
@@ -1897,6 +1937,11 @@ paths:
       produces:
       - "application/json;stream=watch"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -1929,16 +1974,21 @@ paths:
           description: "List of secrets"
         403:
           description: "Access denied"
-  /secrets:
+  /namespaces/{namespace}/secrets:
     get:
       tags:
       - "secrets"
       summary: "Get secrets"
-      description: "An secret defines what role is granted access to what resource"
+      description: "An secret holds secret data which should not get exposed and is specially encrypted on the server. A secret can be injected into other resources."
       operationId: "getSecrets"
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "query"
         name: "query"
         description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
@@ -1966,6 +2016,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of secrets"
@@ -1981,6 +2036,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: body
         name: data
         schema:
@@ -1992,7 +2052,7 @@ paths:
             $ref: "#/definitions/Secret"
         403:
           description: "Access denied"
-  /secrets/{secret}:
+  /namespaces/{namespace}/secrets/{secret}:
     get:
       tags:
       - "secrets"
@@ -2001,6 +2061,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "secret"
         description: "secret name"
@@ -2025,6 +2090,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "secret"
         description: "secret name"
@@ -2053,6 +2123,11 @@ paths:
       - "application/json"
       parameters:
       - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
         name: "secret"
         description: "secret name"
         required: true
@@ -2076,6 +2151,11 @@ paths:
       produces:
       - "application/json"
       parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
       - in: "path"
         name: "secret"
         description: "secret name"
@@ -2167,6 +2247,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of users"
@@ -2368,6 +2453,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of access rules"
@@ -2569,6 +2659,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of access roles"
@@ -2786,6 +2881,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of active jobs"
@@ -2950,6 +3050,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Process"
@@ -3132,6 +3237,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -3273,6 +3383,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Log"
@@ -3683,24 +3798,20 @@ definitions:
                       type: string
                     default: []
               collections:
-                description: "A list of collections (name) the job should match. You may use a wildcard to specify all collections."
+                description: "A list of collections (name) the job should match. You may use a wildcard to specify all collections. Each element may contain either a single collection name or a list of collections. A list will be processed in parallel while single collections get synchronized syncronely"
                 type: array
                 items:
                   type: string
-                default: ["*"]
+                default: []
               endpoints:
-                description: "A list of endoints (name) the job should match. You may use a wildcard to specify all endpoints."
+                description: "A list of endoints (name) the job should match. You may use a wildcard to specify all endpoints. Each element may contain either a single endpoint name or a list of endpoints. A list will be processed in parallel while single endpoints get synchronized syncronely."
                 type: array
                 items:
                   type: string
-                default: ["*"]
+                default: []
               filter:
                 description: "Data object filter."
                 type: object
-              loadbalance:
-                description: "If enabled the server tries to splitt the job into multiple parallel processes."
-                type: boolean
-                default: true
               ignore:
                 description: "If enabled the server does ignores any sync errors and continue with the process."
                 type: boolean

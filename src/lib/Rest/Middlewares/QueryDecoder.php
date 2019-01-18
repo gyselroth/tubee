@@ -45,6 +45,10 @@ class QueryDecoder implements MiddlewareInterface
             $query['query'] = [];
         }
 
+        if (isset($query['stream']) && $query['stream'] !== 'false' && !empty($query['stream']) && !isset($query['limit'])) {
+            $query['limit'] = null;
+        }
+
         if (isset($query['sort'])) {
             $query['sort'] = json_decode(htmlspecialchars_decode($query['sort']), true);
 

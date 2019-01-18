@@ -140,7 +140,7 @@ class Factory extends ResourceFactory
 
         $resource['data'] += [
             'namespace' => $namespace->getName(),
-            'job' => $result,
+            'job' => $resource['name'],
         ];
 
         $this->scheduler->addJob(Sync::class, $resource['data'], $resource['data']['options']);
@@ -167,9 +167,13 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data = Validator::validate($data);
 
-        $data['data'] += ['job' => $resource->getId()];
-        $this->scheduler->addJob(Sync::class, $data['data'], $data['data']['options']);
-        unset($data['data']['job']);
+        $task = $data['data'];
+        $task += [
+            'job' => $resource->getName(),
+            'namespace' => $resource->getResourceNamespace()->getName(),
+        ];
+
+        $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

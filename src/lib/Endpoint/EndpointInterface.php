@@ -57,6 +57,11 @@ interface EndpointInterface extends ResourceInterface
     public function setup(bool $simulate = false): EndpointInterface;
 
     /**
+     * Get identifier.
+     */
+    public function getIdentifier(): string;
+
+    /**
      * Shutdown endpoint.
      */
     public function shutdown(bool $simulate = false): EndpointInterface;
@@ -105,9 +110,6 @@ interface EndpointInterface extends ResourceInterface
 
     /**
      * Create object on endpoint.
-     *
-     *
-     * @return bool
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string;
 
@@ -118,9 +120,6 @@ interface EndpointInterface extends ResourceInterface
 
     /**
      * Change object on endpoint.
-     *
-     *
-     * @return bool
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string;
 

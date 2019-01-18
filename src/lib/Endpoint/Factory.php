@@ -172,7 +172,7 @@ class Factory extends ResourceFactory
     public function build(array $resource, CollectionInterface $collection)
     {
         $factory = EndpointInterface::ENDPOINT_MAP[$resource['kind']].'\\Factory';
-        $resource = $this->secret_factory->resolve($resource);
+        $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
 
         return $this->initResource($factory::build($resource, $collection, $this->workflow_factory, $this->logger));
     }

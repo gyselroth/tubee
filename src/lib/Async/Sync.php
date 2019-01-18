@@ -22,6 +22,7 @@ use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Job\Validator as JobValidator;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Zend\Mail\Message;
 
 class Sync extends AbstractJob
@@ -69,6 +70,20 @@ class Sync extends AbstractJob
     protected $db;
 
     /**
+     * Process stack.
+     *
+     * @var array
+     */
+    protected $stack = [];
+
+    /**
+     * Resource namespace.
+     *
+     * @var ResourceNamespaceInterface
+     */
+    protected $namespace;
+
+    /**
      * Sync.
      */
     public function __construct(ResourceNamespaceFactory $namespace_factory, Database $db, Scheduler $scheduler, LoggerInterface $logger)
@@ -85,53 +100,91 @@ class Sync extends AbstractJob
      */
     public function start(): bool
     {
-        $procs = [];
-        $namespace = $this->namespace_factory->getOne($this->data['namespace']);
-        $filter = in_array('*', $this->data['collections']) ? [] : ['name' => ['$in' => $this->data['collections']]];
+        $this->namespace = $this->namespace_factory->getOne($this->data['namespace']);
 
-        foreach ($namespace->getCollections($filter) as $collection) {
-            $filter = in_array('*', $this->data['endpoints']) ? [] : ['name' => ['$in' => $this->data['endpoints']]];
-            foreach ($collection->getEndpoints($filter) as $endpoint) {
-                if ($this->data['loadbalance'] === true) {
-                    $data = $this->data;
-                    $data = array_merge($data, [
-                        'endpoints' => [$endpoint->getName()],
-                        'parent' => $this->getId(),
-                        'loadbalance' => false,
-                    ]);
+        foreach ($this->data['collections'] as $collections) {
+            $collections = (array) $collections;
+            $filter = in_array('*', $collections) ? [] : ['name' => ['$in' => $collections]];
+            $collections = iterator_to_array($this->namespace->getCollections($filter));
 
-                    $procs[] = $this->scheduler->addJob(self::class, $data);
-                } else {
-                    $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
-                        'process' => (string) $this->getId(),
-                        'parent' => isset($this->data['parent']) ? (string) $this->data['parent'] : null,
-                        'start' => $this->timestamp,
-                        'namespace' => $namespace->getName(),
-                        'collection' => $collection->getName(),
-                        'endpoint' => $endpoint->getName(),
-                    ]);
-
-                    if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
-                        $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
-                    } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-                        $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
-                    } else {
-                        $this->logger->warning('skip endpoint ['.$endpoint->getIdentifier().'], endpoint type is neither source nor destination', [
-                            'category' => get_class($this),
-                        ]);
-                    }
-
-                    $this->logger->popProcessor();
-                    $this->notify();
-                }
-            }
+            $endpoints = $this->data['endpoints'];
+            $this->loopCollections($collections, $endpoints);
         }
 
-        foreach ($procs as $process) {
-//            $process->wait();
-        }
+        $this->notify();
 
         return true;
+    }
+
+    /**
+     * Loop collections.
+     */
+    protected function loopCollections(array $collections, array $endpoints)
+    {
+        foreach ($endpoints as $ep) {
+            foreach ($collections as $collection) {
+                $this->loopEndpoints($collection, $collections, (array) $ep, $endpoints);
+            }
+
+            $this->logger->debug('wait for child stack ['.count($this->stack).'] to be finished', [
+                'category' => get_class($this),
+            ]);
+
+            foreach ($this->stack as $proc) {
+                $proc->wait();
+            }
+        }
+    }
+
+    /**
+     * Loop endpoints.
+     */
+    protected function loopEndpoints(CollectionInterface $collection, array $all_collections, array $endpoints, array $all_endpoints)
+    {
+        $filter = in_array('*', $endpoints) ? [] : ['name' => ['$in' => $endpoints]];
+        $endpoints = iterator_to_array($collection->getEndpoints($filter));
+
+        foreach ($endpoints as $endpoint) {
+            if (count($all_endpoints) > 1 || count($all_collections) > 1) {
+                $data = $this->data;
+                $data = array_merge($data, [
+                    'collections' => [$collection->getName()],
+                    'endpoints' => [$endpoint->getName()],
+                    'parent' => $this->getId(),
+                ]);
+
+                $this->stack[] = $this->scheduler->addJob(self::class, $data);
+            } else {
+                $this->execute($collection, $endpoint);
+            }
+        }
+    }
+
+    /**
+     * Execute.
+     */
+    protected function execute(CollectionInterface $collection, EndpointInterface $endpoint)
+    {
+        $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
+            'process' => (string) $this->getId(),
+            'parent' => isset($this->data['parent']) ? (string) $this->data['parent'] : null,
+            'start' => $this->timestamp,
+            'namespace' => $this->namespace->getName(),
+            'collection' => $collection->getName(),
+            'endpoint' => $endpoint->getName(),
+        ]);
+
+        if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
+            $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+        } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
+            $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+        } else {
+            $this->logger->warning('skip endpoint ['.$endpoint->getIdentifier().'], endpoint type is neither source nor destination', [
+                'category' => get_class($this),
+            ]);
+        }
+
+        $this->logger->popProcessor();
     }
 
     /**
@@ -280,7 +333,7 @@ class Sync extends AbstractJob
                 ]);
 
                 try {
-                    foreach ($workflows as $workflow) {
+                    foreach ($workflows[$identifier] as $workflow) {
                         $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current object', [
                             'category' => get_class($this),
                         ]);
@@ -342,7 +395,7 @@ class Sync extends AbstractJob
             '$or' => [
                 [
                     'endpoints.'.$endpoint->getName().'.last_sync' => [
-                        '$lte' => $this->timestamp,
+                        '$lt' => $this->timestamp,
                     ],
                 ],
             ],

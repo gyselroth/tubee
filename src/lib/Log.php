@@ -31,14 +31,10 @@ class Log extends AbstractResource implements LogInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
-        $data = $this->resource;
-
-        return AttributeResolver::resolve($request, $this, [
+        $response = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
             ],
             'kind' => 'Log',
-            'id' => (string) $this->getId(),
             'created' => $this->resource['datetime']->toDateTime()->format('c'),
             'changed' => $this->resource['datetime']->toDateTime()->format('c'),
             'data' => [
@@ -46,17 +42,17 @@ class Log extends AbstractResource implements LogInterface
                 'level_name' => $this->resource['level_name'],
                 'message' => $this->resource['message'],
                 'category' => $this->resource['context']['category'],
-                'exception' => function ($resource) use ($data) {
-                    if (isset($data['context']['exception'])) {
-                        return $data['context']['exception'];
-                    }
-                },
-                'object' => function ($resource) use ($data) {
-                    if (isset($data['context']['object'])) {
-                        return $data['context']['object'];
-                    }
-                },
             ],
-        ]);
+        ];
+
+        if (isset($this->resource['context']['exception'])) {
+            $response['data']['exception'] = $this->resource['context']['exception'];
+        }
+
+        if (isset($this->resource['context']['object'])) {
+            $response['data']['object'] = $this->resource['context']['object'];
+        }
+
+        return AttributeResolver::resolve($request, $this, $response);
     }
 }

@@ -92,7 +92,7 @@ class Factory extends ResourceFactory
     {
         $this->logger->debug('find one object with query [{query}] from ['.$collection->getCollection().']', [
             'category' => get_class($this),
-            'query' => $filter,
+            'query' => json_encode($filter),
         ]);
 
         $cursor = $this->db->{$collection->getCollection()}->find($filter, [
