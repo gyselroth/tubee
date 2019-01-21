@@ -24,48 +24,6 @@ paths:
           description: "List of objects"
         403:
           description: "Access denied"
-  /watch/namespaces:
-    get:
-      tags:
-      - "namespaces"
-      summary: "Watch namespaces"
-      description: "Watch namespaces in realtime"
-      operationId: "watchNamespaces"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of objects"
-        403:
-          description: "Access denied"
   /namespaces:
     get:
       tags:
@@ -106,6 +64,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -243,53 +206,6 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/namespaces/{namespace}/collections:
-    get:
-      tags:
-      - "collections"
-      summary: "Watch collections"
-      description: "Watch collections in realtime"
-      operationId: "watchCollections"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of objects"
-        403:
-          description: "Access denied"
   /namespaces/{namespace}/collections:
     get:
       tags:
@@ -335,6 +251,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -501,15 +422,14 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/namespaces/{namespace}/collections/{collection}/endpoints:
+  /namespaces/{namespace}/collections/{collection}/logs:
     get:
       tags:
-      - "endpoints"
-      summary: "Watch endpoints"
-      description: "Watch updates in realtime"
-      operationId: "watchEndpoints"
+      - "collections"
+      summary: "Get logs of a collection"
+      operationId: "getCollectionLogs"
       produces:
-      - "application/json;stream=watch"
+      - "application/json"
       parameters:
       - in: "path"
         name: "namespace"
@@ -548,9 +468,56 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
-          description: "List of objects"
+          description: "Job"
+          schema:
+            $ref: "#/definitions/Log"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+  /namespaces/{namespace}/collections/{collection}/logs/{log}:
+    get:
+      tags:
+      - "collections"
+      summary: "Get a single collection log"
+      operationId: "getCollectionLog"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "collection"
+        description: "Collection"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "log"
+        description: "Log id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Log"
+          schema:
+            $ref: "#/definitions/Log"
+        404:
+          description: "Job does not exists"
         403:
           description: "Access denied"
   /namespaces/{namespace}/collections/{collection}/endpoints:
@@ -603,6 +570,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -794,15 +766,14 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
+  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs:
     get:
       tags:
-      - "workflows"
-      summary: "Watch workflows"
-      description: "Watch updates in realtime"
-      operationId: "watchWorkflows"
+      - "endpoints"
+      summary: "Get logs of an endpoint"
+      operationId: "getEndpointLogs"
       produces:
-      - "application/json;stream=watch"
+      - "application/json"
       parameters:
       - in: "path"
         name: "namespace"
@@ -816,7 +787,7 @@ paths:
         type: "string"
       - in: "path"
         name: "endpoint"
-        description: "Endpoint name"
+        description: "Endpoint"
         required: true
         type: "string"
       - in: "query"
@@ -846,9 +817,61 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
-          description: "List of objects"
+          description: "Job"
+          schema:
+            $ref: "#/definitions/Log"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}:
+    get:
+      tags:
+      - "endpoints"
+      summary: "Get a single endpoint log"
+      operationId: "getEndpointLog"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "collection"
+        description: "Collection"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "endpoint"
+        description: "Endpoint"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "log"
+        description: "Log id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Log"
+          schema:
+            $ref: "#/definitions/Log"
+        404:
+          description: "Job does not exists"
         403:
           description: "Access denied"
   /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
@@ -906,6 +929,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -1351,6 +1379,11 @@ paths:
         description: "Stream resources. There is no limit by default."
         required: false
         type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object relatives"
@@ -1394,55 +1427,6 @@ paths:
           description: "Object relation"
           schema:
             $ref: "#/definitions/ObjectRelation"
-        403:
-          description: "Access denied"
-        404:
-          description: "Resource not found"
-  /watch/namespaces/{namespace}/relations:
-    get:
-      tags:
-      - "dataObjectRelations"
-      summary: "Watch data object relations in realtime"
-      description: "Watch data object relations in realtime"
-      operationId: "watchRelations"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "Object relations"
         403:
           description: "Access denied"
         404:
@@ -1492,6 +1476,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -1702,6 +1691,11 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of objects"
@@ -1768,6 +1762,11 @@ paths:
         description: "Stream resources. There is no limit by default."
         required: false
         type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Object history"
@@ -1777,15 +1776,14 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /watch/namespaces/{namespace}/collections/{collection}/objects:
+  /namespaces/{namespace}/collections/{collection}/objects/{object}/logs:
     get:
       tags:
-      - "dataObjects"
-      summary: "Watch objects"
-      description: "Watch updates in realtime"
-      operationId: "watchObjects"
+      - "jobs"
+      summary: "Get logs of an object"
+      operationId: "getObjectLogs"
       produces:
-      - "application/json;stream=watch"
+      - "application/json"
       parameters:
       - in: "path"
         name: "namespace"
@@ -1795,6 +1793,11 @@ paths:
       - in: "path"
         name: "collection"
         description: "Collection"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
         required: true
         type: "string"
       - in: "query"
@@ -1824,9 +1827,61 @@ paths:
         description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
         required: false
         type: "string"
+      - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
-          description: "List of objects"
+          description: "Job"
+          schema:
+            $ref: "#/definitions/Log"
+        404:
+          description: "Job does not exists"
+        403:
+          description: "Access denied"
+  /namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}:
+    get:
+      tags:
+      - "jobs"
+      summary: "Get a single object log"
+      operationId: "getObjectLog"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "path"
+        name: "namespace"
+        description: "Namespace name"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "collection"
+        description: "Collection"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "object"
+        description: "Object ID"
+        required: true
+        type: "string"
+      - in: "path"
+        name: "log"
+        description: "Log id"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Log"
+          schema:
+            $ref: "#/definitions/Log"
+        404:
+          description: "Job does not exists"
         403:
           description: "Access denied"
   /namespaces/{namespace}/collections/{collection}/objects:
@@ -1881,6 +1936,11 @@ paths:
         description: "Stream resources. There is no limit by default."
         required: false
         type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "List of objects"
@@ -1925,53 +1985,6 @@ paths:
             $ref: "#/definitions/Job"
         404:
           description: "Resource does not exists"
-        403:
-          description: "Access denied"
-  /watch/namespaces/{namespace}/secrets:
-    get:
-      tags:
-      - "secrets"
-      summary: "Watch secrets"
-      description: "Watch updates in realtime"
-      operationId: "watchSecrets"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of secrets"
         403:
           description: "Access denied"
   /namespaces/{namespace}/secrets:
@@ -2019,6 +2032,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -2168,48 +2186,6 @@ paths:
           description: "secret does not exists"
         403:
           description: "Access denied"
-  /watch/users:
-    get:
-      tags:
-      - "users"
-      summary: "Watch users"
-      description: "Watch updates in realtime"
-      operationId: "watchUsers"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of users"
-        403:
-          description: "Access denied"
   /users:
     get:
       tags:
@@ -2250,6 +2226,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -2374,48 +2355,6 @@ paths:
           description: "User does not exists"
         403:
           description: "Access denied"
-  /watch/access-rules:
-    get:
-      tags:
-      - "accessRules"
-      summary: "Watch access rules"
-      description: "Watch updates in realtime"
-      operationId: "watchAccessRules"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of access rules"
-        403:
-          description: "Access denied"
   /access-rules:
     get:
       tags:
@@ -2456,6 +2395,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -2580,48 +2524,6 @@ paths:
           description: "Access rule does not exists"
         403:
           description: "Access denied"
-  /watch/access-roles:
-    get:
-      tags:
-      - "accessRoles"
-      summary: "Watch access roles"
-      description: "Watch updates in realtime"
-      operationId: "watchAccessRoles"
-      produces:
-      - "application/json;stream=watch"
-      parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of access roles"
-        403:
-          description: "Access denied"
   /access-roles:
     get:
       tags:
@@ -2662,6 +2564,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -2792,53 +2699,6 @@ paths:
           description: "Access role does not exists"
         403:
           description: "Access denied"
-  /watch/namespaces/{namespace}/jobs:
-    get:
-      tags:
-      - "jobs"
-      summary: "Get realtime updates"
-      description: "A job is an asynchronous server process"
-      operationId: "watchJobs"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "List of active jobs"
-        403:
-          description: "Access denied"
   /namespaces/{namespace}/jobs:
     get:
       tags:
@@ -2884,6 +2744,11 @@ paths:
       - in: "query"
         name: "stream"
         description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false
         type: "boolean"
       responses:
@@ -3055,6 +2920,11 @@ paths:
         description: "Stream resources. There is no limit by default."
         required: false
         type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Process"
@@ -3086,54 +2956,6 @@ paths:
           description: "Returns a 202 if successful"
           schema:
             $ref: "#/definitions/Process"
-        404:
-          description: "Job does not exists"
-        403:
-          description: "Access denied"
-  /watch/namespaces/{namespace}/processes:
-    get:
-      tags:
-      - "jobs"
-      summary: "Watch job processes"
-      operationId: "watchProcesses"
-      produces:
-      - "application/json+stream"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "Processes"
         404:
           description: "Job does not exists"
         403:
@@ -3242,6 +3064,11 @@ paths:
         description: "Stream resources. There is no limit by default."
         required: false
         type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Job"
@@ -3280,59 +3107,6 @@ paths:
           description: "Log"
           schema:
             $ref: "#/definitions/Log"
-        404:
-          description: "Job does not exists"
-        403:
-          description: "Access denied"
-  /watch/namespaces/{namespace}/jobs/{job}/logs:
-    get:
-      tags:
-      - "jobs"
-      summary: "Watch log stream"
-      operationId: "watchJobLogs"
-      produces:
-      - "application/json+stream"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "Logs"
         404:
           description: "Job does not exists"
         403:
@@ -3388,6 +3162,11 @@ paths:
         description: "Stream resources. There is no limit by default."
         required: false
         type: "boolean"
+      - in: "query"
+        name: "watch"
+        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+        required: false
+        type: "boolean"
       responses:
         200:
           description: "Log"
@@ -3428,59 +3207,6 @@ paths:
             $ref: "#/definitions/Log"
         404:
           description: "Log does not exists"
-        403:
-          description: "Access denied"
-  /watch/namespaces/{namespace}/processes/{process}/logs:
-    get:
-      tags:
-      - "jobs"
-      summary: "Watch log stream"
-      operationId: "watchProcessLogs"
-      produces:
-      - "application/json+stream"
-      parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "process"
-        description: "Process ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
-          type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      responses:
-        200:
-          description: "Logs"
-        404:
-          description: "Job does not exists"
         403:
           description: "Access denied"
 definitions:

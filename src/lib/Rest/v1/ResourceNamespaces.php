@@ -57,6 +57,12 @@ class ResourceNamespaces
             'limit' => 20,
         ], $request->getQueryParams());
 
+        if (isset($query['watch']) && !empty($query['watch'])) {
+            $cursor = $this->namespace_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
         $namespaces = $this->namespace_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $namespaces);
@@ -118,21 +124,5 @@ class ResourceNamespaces
             $this->namespace_factory->getOne($body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
-    }
-
-    /**
-     * Watch.
-     */
-    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
-        ], $request->getQueryParams());
-
-        $cursor = $this->namespace_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
-
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

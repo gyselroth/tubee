@@ -30,6 +30,10 @@ class Helper
     {
         $query = $request->getQueryParams();
 
+        if (isset($query['watch']) && $query['watch'] !== 'false' && !empty($query['watch'])) {
+            return self::watchAll($request, $identity, $acl, $cursor);
+        }
+
         if (isset($query['stream']) && $query['stream'] !== 'false' && !empty($query['stream'])) {
             return self::stream($request, $identity, $acl, $cursor);
         }

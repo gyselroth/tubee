@@ -68,6 +68,13 @@ class Secrets
         ], $request->getQueryParams());
 
         $namespace = $this->namespace_factory->getOne($namespace);
+
+        if (isset($query['watch']) && !empty($query['watch'])) {
+            $cursor = $this->secret_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
         $secrets = $this->secret_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $secrets);
@@ -135,22 +142,5 @@ class Secrets
             $this->secret_factory->getOne($namespace, $secret->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
-    }
-
-    /**
-     * Watch.
-     */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
-        ], $request->getQueryParams());
-
-        $namespace = $this->namespace_factory->getOne($namespace);
-        $cursor = $this->secret_factory->watch($namespace, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
-
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

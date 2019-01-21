@@ -57,6 +57,12 @@ class AccessRules
             'limit' => 20,
         ], $request->getQueryParams());
 
+        if (isset($query['watch']) && !empty($query['watch'])) {
+            $cursor = $this->rule_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
         $rules = $this->rule_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $rules);
@@ -151,21 +157,5 @@ class AccessRules
             $this->rule_factory->getOne($rule->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
-    }
-
-    /**
-     * Watch.
-     */
-    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
-        ], $request->getQueryParams());
-
-        $cursor = $this->rule_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
-
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

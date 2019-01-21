@@ -23,6 +23,10 @@ use Tubee\Job\Factory as JobFactory;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
+use MongoDB\BSON\ObjectIdInterface;
+use Tubee\Log\Factory as LogFactory;
+use MongoDB\BSON\ObjectIdInterface;
+use Tubee\Log\Factory as LogFactory;
 
 class Jobs
 {
@@ -48,13 +52,21 @@ class Jobs
     protected $acl;
 
     /**
+     * Log factory.
+     *
+     * @var LogFactory
+     */
+    protected $log_factory;
+
+    /**
      * Init.
      */
-    public function __construct(JobFactory $job_factory, Acl $acl, ResourceNamespaceFactory $namespace_factory)
+    public function __construct(JobFactory $job_factory, Acl $acl, ResourceNamespaceFactory $namespace_factory, LogFactory $log_factory)
     {
         $this->job_factory = $job_factory;
         $this->acl = $acl;
         $this->namespace_factory = $namespace_factory;
+        $this->log_factory = $log_factory;
     }
 
     /**
@@ -68,8 +80,14 @@ class Jobs
         ], $request->getQueryParams());
 
         $namespace = $this->namespace_factory->getOne($namespace);
-        $jobs = $this->job_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
+
+        if(isset($query['watch']) && !empty($query['watch'])) {
+            $cursor = $this->job_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
+        $jobs = $this->job_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
         return Helper::getAll($request, $identity, $this->acl, $jobs);
     }
 
@@ -139,19 +157,34 @@ class Jobs
     }
 
     /**
-     * Watch.
+     * Entrypoint.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
-    {
+    public function getAllLogs(ServerRequestInterface $request, Identity $identity, string $namespace, string $process): ResponseInterface
+    {c
         $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
+            'offset' => 0,
+            'limit' => 20,
         ], $request->getQueryParams());
 
-        $namespace = $this->namespace_factory->getOne($namespace);
-        $cursor = $this->job_factory->watch($namespace, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        $filter = [
+            'context.namespace' => $namespace,
+            'context.process' => $job,
+        ];
 
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        if(!empty($query['query'])) {
+            $filter = ['$and' => [$filter,$query['query']]];
+        }
+
+        $logs = $this->log_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+        return Helper::getAll($request, $identity, $this->acl, $logs);
+    }
+
+    /**
+     * Entrypoint.
+     */
+    public function getOneLog(ServerRequestInterface $request, Identity $identity, string $namespace, string $process, ObjectIdInterface $log): ResponseInterface
+    {
+        $resource = $this->log_factory->getOne($log);
+        return Helper::getOne($request, $identity, $resource);
     }
 }

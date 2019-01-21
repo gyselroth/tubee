@@ -47,13 +47,21 @@ class Processes
     protected $acl;
 
     /**
+     * Log factory.
+     *
+     * @var LogFactory
+     */
+    protected $log_factory;
+
+    /**
      * Init.
      */
-    public function __construct(Acl $acl, ProcessFactory $process_factory, ResourceNamespaceFactory $namespace_factory)
+    public function __construct(ProcessFactory $process_factory, Acl $acl, ResourceNamespaceFactory $namespace_factory, LogFactory $log_factory)
     {
-        $this->acl = $acl;
         $this->process_factory = $process_factory;
+        $this->acl = $acl;
         $this->namespace_factory = $namespace_factory;
+        $this->log_factory = $log_factory;
     }
 
     /**
@@ -67,9 +75,16 @@ class Processes
         ], $request->getQueryParams());
 
         $namespace = $this->namespace_factory->getOne($namespace);
-        $processes = $this->process_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
-        return Helper::getAll($request, $identity, $this->acl, $processes);
+        if (isset($query['watch']) && !empty($query['watch'])) {
+            $cursor = $this->process_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
+        $jobs = $this->process_factory->getAll($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+
+        return Helper::getAll($request, $identity, $this->acl, $jobs);
     }
 
     /**
@@ -111,22 +126,5 @@ class Processes
         $this->process_factory->deleteOne($namespace, $process);
 
         return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
-    }
-
-    /**
-     * Watch.
-     */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
-        ], $request->getQueryParams());
-
-        $namespace = $this->namespace_factory->getOne($namespace);
-        $cursor = $this->process_factory->watch($namespace, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
-
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }
