@@ -50,7 +50,7 @@ class CoreInstallation implements DeltaInterface
     /**
      * Resource namespace factory.
      *
-     * @var ResourcenNamespaceFactory
+     * @var ResourceNamespaceFactory
      */
     protected $namespace_factory;
 
@@ -129,14 +129,19 @@ class CoreInstallation implements DeltaInterface
                 'logs',
                 [
                 'capped' => true,
-                'size' => 100000000, ]
+                'size' => 10000000, ]
             );
         }
 
-        $this->db->logs->createIndex(['context.process' => 1, 'context.parent' => 1]);
+        /*$this->db->logs->createIndex(['context.process' => 1, 'context.parent' => 1]);
         $this->db->logs->createIndex(['context.process' => 1]);
-        $this->db->logs->createIndex(['context.parent' => 1]);
-        $this->db->logs->createIndex(['context.job' => 1]);
+        $this->db->logs->createIndex(['context.parent' => 1]);*/
+
+        $this->db->logs->createIndex(['context.process' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.job' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.collection' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.endpoint' => 1, 'context.collection' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.object' => 1, 'context.collection' => 1, 'context.namespace' => 1]);
 
         return true;
     }

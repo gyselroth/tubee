@@ -58,7 +58,7 @@ class Users
             'limit' => 20,
         ], $request->getQueryParams());
 
-        if (isset($query['watch']) && !empty($query['watch'])) {
+        if (isset($query['watch'])) {
             $cursor = $this->user_factory->watch(null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);

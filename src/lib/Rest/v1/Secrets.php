@@ -69,7 +69,7 @@ class Secrets
 
         $namespace = $this->namespace_factory->getOne($namespace);
 
-        if (isset($query['watch']) && !empty($query['watch'])) {
+        if (isset($query['watch'])) {
             $cursor = $this->secret_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);

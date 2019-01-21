@@ -1779,7 +1779,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/objects/{object}/logs:
     get:
       tags:
-      - "jobs"
+      - "dataObjects"
       summary: "Get logs of an object"
       operationId: "getObjectLogs"
       produces:
@@ -1849,7 +1849,7 @@ paths:
   /namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}:
     get:
       tags:
-      - "jobs"
+      - "dataObjects"
       summary: "Get a single object log"
       operationId: "getObjectLog"
       produces:

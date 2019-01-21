@@ -14,6 +14,7 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
@@ -77,7 +78,7 @@ class Collections
 
         $namespace = $this->namespace_factory->getOne($namespace);
 
-        if (isset($query['watch']) && !empty($query['watch'])) {
+        if (isset($query['watch'])) {
             $cursor = $this->collection_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
@@ -162,6 +163,21 @@ class Collections
             'limit' => 20,
         ], $request->getQueryParams());
 
+        if (isset($query['watch'])) {
+            $filter = [
+                'fullDocument.context.namespace' => $namespace,
+                'fullDocument.context.collection' => $collection,
+            ];
+
+            if (!empty($query['query'])) {
+                $filter = ['$and' => [$filter, $query['query']]];
+            }
+
+            $logs = $this->log_factory->watch(null, true, $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $logs);
+        }
+
         $filter = [
             'context.namespace' => $namespace,
             'context.collection' => $collection,
@@ -171,7 +187,7 @@ class Collections
             $filter = ['$and' => [$filter, $query['query']]];
         }
 
-        $logs = $this->log_factory->getAll($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+        $logs = $this->log_factory->getAll($filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $logs);
     }

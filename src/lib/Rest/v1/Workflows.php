@@ -69,7 +69,7 @@ class Workflows
         $namespace = $this->namespace_factory->getOne($namespace);
         $endpoint = $namespace->getCollection($collection)->getEndpoint($endpoint);
 
-        if (isset($query['watch']) && !empty($query['watch'])) {
+        if (isset($query['watch'])) {
             $cursor = $this->workflow_factory->watch($endpoint, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);

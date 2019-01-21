@@ -50,6 +50,8 @@ class Routes
             $r->addRoute('DELETE', '/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}', [v1\Workflows::class, 'delete']);
             $r->addRoute('PATCH', '/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}', [v1\Workflows::class, 'patch']);
             $r->addRoute('PUT', '/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}', [v1\Workflows::class, 'post']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs', [v1\Endpoints::class, 'getAllLogs']);
+            $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}', [v1\Endpoints::class, 'getOneLog']);
             $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/objects', [v1\Objects::class, 'getAll']);
             $r->addRoute('POST', '/api/v1/namespaces/{namespace}/collections/{collection}/objects', [v1\Objects::class, 'post']);
             $r->addRoute('GET', '/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}', [v1\Objects::class, 'getOne']);

@@ -35,6 +35,12 @@ class QueryDecoder implements MiddlewareInterface
             $query['limit'] = (int) $query['limit'];
         }
 
+        if (isset($query['watch']) && !empty($query['watch']) && $query['watch'] !== 'false') {
+            $query['watch'] = true;
+        } else {
+            $query['watch'] = null;
+        }
+
         if (isset($query['query'])) {
             $query['query'] = json_decode(htmlspecialchars_decode($query['query']), true);
 

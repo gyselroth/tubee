@@ -76,7 +76,7 @@ class ObjectRelations
             return Helper::getAll($request, $identity, $this->acl, $relatives);
         }
 
-        if (isset($query['watch']) && !empty($query['watch'])) {
+        if (isset($query['watch'])) {
             $cursor = $this->relation_factory->watch($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
