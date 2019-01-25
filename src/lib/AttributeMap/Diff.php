@@ -18,7 +18,7 @@ class Diff
     /**
      * Create diff.
      */
-    public function calculate(array $map, array $object, array $endpoint_object): array
+    public static function calculate(array $map, array $object, array $endpoint_object): array
     {
         $diff = [];
         foreach ($map as $value) {
