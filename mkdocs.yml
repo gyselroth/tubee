@@ -19,6 +19,7 @@ nav:
     - Endpoints: resources/endpoints.md
     - Workflows: resources/workflows.md
     - Secrets: resources/secrets.md
+    - Jobs: resources/jobs.md
  - Installation:
     - Server: installation/server.md
  - AdvancedTopics:

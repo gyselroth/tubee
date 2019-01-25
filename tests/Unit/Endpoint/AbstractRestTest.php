@@ -109,7 +109,7 @@ class AbstractRestTest extends TestCase
             $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), []);
             $this->assertSame([], $result);
         }
-    
+
         public function testGetDiffReplaceValue()
         {
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
@@ -120,15 +120,15 @@ class AbstractRestTest extends TestCase
                     'value' => 'bar',
                 ],
             ];
-    
+
             $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), $diff);
             $expected = [
                 'foo' => 'bar',
             ];
-    
+
             $this->assertSame($expected, $result);
         }
-    
+
         public function testGetDiffReplaceTwoExistingValue()
         {
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
@@ -144,16 +144,16 @@ class AbstractRestTest extends TestCase
                     'value' => 'foo',
                 ],
             ];
-    
+
             $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), $diff);
             $expected = [
                 'foo' => 'bar',
                 'bar' => 'foo',
             ];
-    
+
             $this->assertSame($expected, $result);
         }
-    
+
         public function testGetDiffRemoveValue()
         {
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
@@ -162,15 +162,15 @@ class AbstractRestTest extends TestCase
                     'action' => AttributeMapInterface::ACTION_REMOVE,
                 ],
             ];
-    
+
             $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), $diff);
             $expected = [
                 'foo' => '',
             ];
-    
+
             $this->assertSame($expected, $result);
         }
-    
+
         public function testGetDiffAddValue()
         {
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $this->createMock(Client::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
@@ -180,15 +180,15 @@ class AbstractRestTest extends TestCase
                     'value' => 'bar',
                 ],
             ];
-    
+
             $result = $ucs->getDiff($this->createMock(AttributeMapInterface::class), $diff);
             $expected = [
                 'foo' => 'bar',
             ];
-    
+
             $this->assertSame($expected, $result);
         }
-    
+
         public function testCreateObject()
         {
             $response = [
@@ -199,35 +199,35 @@ class AbstractRestTest extends TestCase
                     ],
                 ],
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'bar',
             ];
-    
+
             $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
             $this->assertSame('uid=foo,ou=bar', $result);
         }
-    
+
         public function testCreateObjectInvalidResponse()
         {
             $this->expectException(Exception\NotIterable::class);
             $response = [
                 'result' => 'foo',
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'bar',
             ];
-    
+
             $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
         }
-    
+
         public function testCreateObjectRequestFailedNoDetail()
         {
             $this->expectException(UcsException\RequestFailed::class);
@@ -239,17 +239,17 @@ class AbstractRestTest extends TestCase
                     ],
                 ],
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'bar',
             ];
-    
+
             $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
         }
-    
+
         public function testCreateObjectRequestFailedDetails()
         {
             $this->expectException(UcsException\RequestFailed::class);
@@ -262,17 +262,17 @@ class AbstractRestTest extends TestCase
                     ],
                 ],
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'bar',
             ];
-    
+
             $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object);
         }
-    
+
         public function testCreateObjectSimulate()
         {
             $response = [
@@ -283,18 +283,18 @@ class AbstractRestTest extends TestCase
                     ],
                 ],
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'bar',
             ];
-    
+
             $result = $ucs->create($this->createMock(AttributeMapInterface::class), $object, true);
             $this->assertNull($result);
         }
-    
+
         public function testCreateObjectNoIdentifier()
         {
             $this->expectException(UcsException\NoEntryDn::class);
@@ -306,16 +306,16 @@ class AbstractRestTest extends TestCase
                     ],
                 ],
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 'foo' => 'bar',
             ];
-    
+
             $ucs->create($this->createMock(AttributeMapInterface::class), $object);
         }
-    
+
         public function testDeleteObject()
         {
             $response = [
@@ -326,18 +326,18 @@ class AbstractRestTest extends TestCase
                     ],
                 ],
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'bar',
             ];
-    
+
             $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $object);
             $this->assertTrue($result);
         }
-    
+
         public function testDeleteObjectSimulate()
         {
             $client = $this->createMock(Client::class);
@@ -350,11 +350,11 @@ class AbstractRestTest extends TestCase
                 'entrydn' => 'uid=foo,ou=bar',
                 'foo' => 'bar',
             ];
-    
+
             $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $object, true);
             $this->assertTrue($result);
         }
-    
+
         public function testChangeObject()
         {
             $response = [
@@ -365,22 +365,22 @@ class AbstractRestTest extends TestCase
                     ],
                 ],
             ];
-    
+
             $client = $this->getMockClient($response);
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'foo',
             ];
-    
+
             $diff = [
                 'foo' => 'foo',
             ];
-    
+
             $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object);
             $this->assertSame('uid=foo,ou=bar', $result);
         }
-    
+
         public function testChangeObjectSimulate()
         {
             $client = $this->createMock(Client::class);
@@ -388,21 +388,21 @@ class AbstractRestTest extends TestCase
                 ->with(
                     $this->equalTo('post')
                 );
-    
+
             $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
             $object = [
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'foo',
             ];
-    
+
             $diff = [
                 'foo' => 'foo',
             ];
-    
+
             $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object, true);
             $this->assertNull($result);
         }
-    
+
         public function testMoveObject()
         {
             $response = [
@@ -420,14 +420,14 @@ class AbstractRestTest extends TestCase
                 '$dn$' => 'uid=foo,ou=bar',
                 'foo' => 'foo',
             ];
-    
+
             $ep_object = [
                 '$dn$' => 'uid=foo,ou=foo,ou=foobar',
                 'foo' => 'foo',
             ];
-    
+
             $diff = [];
-    
+
             $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
             $this->assertSame('uid=foo,ou=bar', $result);
         }
