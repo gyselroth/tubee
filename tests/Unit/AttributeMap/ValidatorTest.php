@@ -53,7 +53,6 @@ class ValidatorTest extends TestCase
         $expected = [[
             'name' => 'foo',
             'type' => 'string',
-            'name' => 'foo',
             'required' => false,
             'require_regex' => '#.*#',
             'from' => 'bar',
