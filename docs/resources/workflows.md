@@ -96,13 +96,13 @@ For example it defines what attributes from a [DataObject](resources/data-object
 The mapping is defined within `map` and contains a list of attribute mappings. Each attribute mapping may have different options.
 
 | Option      | Default | Description  |
-| ------------- |--------------|
+| ------------- | -------------- |--------------|
 | name | `<required>` | The name of the destination attribute. (May also contain `.` to specify a deep path like `data.username`).  |
 | ensure | `last` | Like a workflow itself, each attribute may have a different ensure level.  |
 | from | `null` | Map the value from the attribute 1:1 to the attribute named in `name`.  |
 | value | `null`  | Defines a static value. |
 | script | `null` | Execute JavaScript using the V8 engine.  |
-| type | `<same type as value`> | Convert the value to another type. |
+| type | `<same type as value>` | Convert the value to another type. |
 | rewrite | `null` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
 | unwind | `null`  | Unwind a list and operate attribute options on each list element. |
 

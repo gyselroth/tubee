@@ -77,16 +77,8 @@ This repository gets shipped with an .editorconfig configuration. For more infor
 
 ## Git pre commit hook
 Add the following lines to your git pre-commit hook file, otherwise your build will fail if you do not following code style:
-Note that you will need to install swagger-markdown on your host to compile the OpenAPI spec into markdown doc.
-
 ```
-swagger-markdown -i src/lib/Rest/v1/swagger.yml -o docs/development/api.md
 ./vendor/bin/php-cs-fixer fix --config=.php_cs.dist -v
 ```
 
 This automatically converts your code into the code style guidelines of this project otherwise your build will fail!
-
-Install swagger-markdown:
-```
-npm install -g swagger-markdown
-```
