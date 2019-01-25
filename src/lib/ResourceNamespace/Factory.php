@@ -63,7 +63,11 @@ class Factory extends ResourceFactory
      */
     public function getOne(string $name): ResourceNamespaceInterface
     {
-        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
+            'name' => $name,
+        ], [
+            'projection' => ['history' => 0],
+        ]);
 
         if ($result === null) {
             throw new Exception\NotFound('namespace '.$name.' is not registered');

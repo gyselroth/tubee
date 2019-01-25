@@ -234,7 +234,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * {@inheritdoc}
      */
-    public function getResourceIdentifier(): array
+    public function getResourceIdentifier(): ?string
     {
         return $this->identifier;
     }
@@ -334,7 +334,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
      */
     private function parseAttribute(string $string, array $data): string
     {
-        return preg_replace_callback('/(\{(([^\}\"]*)+)\})(\}?)/', function ($match) use ($string, $data) {
+        return preg_replace_callback('/(\{(([^\}\{\"]*)+)\})/', function ($match) use ($string, $data) {
             if (substr($match[0], 0, 2) === '{{' && $match[4][0] === '}') {
                 return $match[2].$match[4];
             }

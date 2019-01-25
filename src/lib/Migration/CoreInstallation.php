@@ -14,6 +14,7 @@ namespace Tubee\Migration;
 use MongoDB\Database;
 use Tubee\AccessRole\Factory as AccessRoleFactory;
 use Tubee\AccessRule\Factory as AccessRuleFactory;
+use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\User\Factory as UserFactory;
 
 class CoreInstallation implements DeltaInterface
@@ -47,14 +48,22 @@ class CoreInstallation implements DeltaInterface
     protected $user_factory;
 
     /**
+     * Resource namespace factory.
+     *
+     * @var ResourceNamespaceFactory
+     */
+    protected $namespace_factory;
+
+    /**
      * Construct.
      */
-    public function __construct(Database $db, AccessRoleFactory $role_factory, AccessRuleFactory $rule_factory, UserFactory $user_factory)
+    public function __construct(Database $db, AccessRoleFactory $role_factory, AccessRuleFactory $rule_factory, UserFactory $user_factory, ResourceNamespaceFactory $namespace_factory)
     {
         $this->db = $db;
         $this->role_factory = $role_factory;
         $this->rule_factory = $rule_factory;
         $this->user_factory = $user_factory;
+        $this->namespace_factory = $namespace_factory;
     }
 
     /**
@@ -69,15 +78,21 @@ class CoreInstallation implements DeltaInterface
 
         $this->db->access_roles->createIndex(['name' => 1], ['unique' => true]);
         $this->db->access_rules->createIndex(['name' => 1], ['unique' => true]);
-        $this->db->secrets->createIndex(['name' => 1], ['unique' => true]);
+        $this->db->secrets->createIndex(['name' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->users->createIndex(['name' => 1], ['unique' => true]);
-        $this->db->jobs->createIndex(['name' => 1], ['unique' => true]);
+        $this->db->jobs->createIndex(['name' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->namespaces->createIndex(['name' => 1], ['unique' => true]);
         $this->db->collections->createIndex(['name' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->endpoints->createIndex(['name' => 1, 'collection' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->workflows->createIndex(['name' => 1, 'collection' => 1, 'endpoint' => 1, 'namespace' => 1], ['unique' => true]);
         $this->db->relations->createIndex(['data.relation' => 1, 'name' => 1]);
         $this->db->relations->createIndex(['namespace' => 1, 'name' => 1], ['unique' => true]);
+
+        if (!$this->namespace_factory->has('default')) {
+            $this->namespace_factory->add([
+                'name' => 'default',
+            ]);
+        }
 
         if (!$this->user_factory->has('admin')) {
             $this->user_factory->add([
@@ -109,19 +124,18 @@ class CoreInstallation implements DeltaInterface
             ]);
         }
 
-        if (!in_array('logs', $collections)) {
-            $this->db->createCollection(
-                'logs',
-                [
-                'capped' => true,
-                'size' => 100000000, ]
-            );
-        }
-
-        $this->db->logs->createIndex(['context.process' => 1, 'context.parent' => 1]);
+        /*$this->db->logs->createIndex(['context.process' => 1, 'context.parent' => 1]);
         $this->db->logs->createIndex(['context.process' => 1]);
-        $this->db->logs->createIndex(['context.parent' => 1]);
-        $this->db->logs->createIndex(['context.job' => 1]);
+        $this->db->logs->createIndex(['context.parent' => 1]);*/
+
+        //remove logs after 14 days
+        $this->db->logs->createIndex(['datetime' => 1], ['expireAfterSeconds' => 1209600]);
+        $this->db->logs->createIndex(['level_name' => 1]);
+        $this->db->logs->createIndex(['context.process' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.job' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.collection' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.endpoint' => 1, 'context.collection' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['context.object' => 1, 'context.collection' => 1, 'context.namespace' => 1]);
 
         return true;
     }

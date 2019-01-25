@@ -66,15 +66,22 @@ class ObjectRelations
             'limit' => 20,
         ], $request->getQueryParams());
 
+        $namespace = $this->namespace_factory->getOne($namespace);
+
         if ($object !== null) {
-            $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
+            $collection = $namespace->getCollection($collection);
             $object = $collection->getObject(['name' => $object]);
             $relatives = $object->getRelations($query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::getAll($request, $identity, $this->acl, $relatives);
         }
 
-        $namespace = $this->namespace_factory->getOne($namespace);
+        if (isset($query['watch'])) {
+            $cursor = $this->relation_factory->watch($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
         $result = $this->relation_factory->getAll($namespace, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $result);
@@ -150,22 +157,5 @@ class ObjectRelations
             $this->relation_factory->getOne($namespace, $relation->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
-    }
-
-    /**
-     * Watch.
-     */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
-        ], $request->getQueryParams());
-
-        $object = $this->namespace_factory->getOne($namespace);
-        $cursor = $this->relation_factory->watch($namespace, $query['query'], $query['offset'], $query['limit'], $query['sort']);
-
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

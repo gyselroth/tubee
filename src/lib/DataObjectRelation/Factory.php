@@ -45,6 +45,8 @@ class Factory extends ResourceFactory
         $resource = $this->db->{self::COLLECTION_NAME}->findOne([
             'namespace' => $namespace->getName(),
             'name' => $name,
+        ], [
+            'projection' => ['history' => 0],
         ]);
 
         if ($resource === null) {
@@ -152,7 +154,7 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
-    public function createOrUpdate(ResourceNamespaceInterface $namespace, DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
+    public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $relations = [
             [
@@ -166,8 +168,27 @@ class Factory extends ResourceFactory
             ],
         ];
 
-        $resource = $relations;
-        $resource['data.context'] = $context;
+        $name = new ObjectId();
+        $resource = [
+            '_id' => $name,
+            'name' => (string) $name,
+            'data' => [
+                'relation' => [
+                    [
+                        'namespace' => $relations[0]['data.relation.namespace'],
+                        'collection' => $relations[0]['data.relation.collection'],
+                        'object' => $relations[0]['data.relation.object'],
+                    ],
+                    [
+                        'namespace' => $relations[1]['data.relation.namespace'],
+                        'collection' => $relations[1]['data.relation.collection'],
+                        'object' => $relations[1]['data.relation.object'],
+                    ],
+                ],
+                'context' => $context,
+            ],
+            'namespace' => $object_1->getCollection()->getResourceNamespace()->getName(),
+        ];
 
         $exists = $this->db->{self::COLLECTION_NAME}->findOne([
             '$and' => $relations,
@@ -179,7 +200,7 @@ class Factory extends ResourceFactory
 
         if ($exists !== null) {
             $exists = $this->build($exists);
-            $this->update($exists, ['context' => $context]);
+            $this->update($exists, $resource);
 
             return $exists->getId();
         }

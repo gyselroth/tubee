@@ -12,7 +12,12 @@ declare(strict_types=1);
 namespace Tubee\Process;
 
 use Tubee\Resource\ResourceInterface;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 interface ProcessInterface extends ResourceInterface
 {
+    /**
+     * Get resource namespace.
+     */
+    public function getResourceNamespace(): ResourceNamespaceInterface;
 }

@@ -21,13 +21,17 @@ class Validator
     public static function validate(array $resource): array
     {
         $defaults = [
+            'options' => [
+                'identifier' => 'id',
+            ],
             'resource' => [
                 'request_options' => [],
-                'container' => 'data',
                 'auth' => null,
-                'oauth' => [
+                'oauth2' => [
+                    'token_endpoint' => null,
                     'client_id' => null,
-                    'client_pw' => null,
+                    'client_secret' => null,
+                    'scope' => null,
                 ],
                 'basic' => [
                     'username' => null,
@@ -41,17 +45,19 @@ class Validator
         }
 
         foreach ($resource['resource'] as $key => $value) {
+            if ($value === null) {
+                continue;
+            }
+
             switch ($key) {
                 case 'auth':
-                    if ($value !== 'basic' && $value !== 'oauth') {
-                        throw new InvalidArgumentException('resource.auth must be either basic or oauth');
+                    if ($value !== 'basic' && $value !== 'oauth2') {
+                        throw new InvalidArgumentException('resource.auth must be either basic or oauth2');
                     }
 
                 break;
-                case 'container':
-                break;
-                case 'options':
-                case 'oauth':
+                case 'request_options':
+                case 'oauth2':
                 case 'basic':
                 case 'base_uri':
                 break;

@@ -16,7 +16,6 @@ use InvalidArgumentException;
 use MongoDB\BSON\UTCDateTimeInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
@@ -26,8 +25,10 @@ use Tubee\Endpoint\Exception as EndpointException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
+use Tubee\V8\Engine as V8Engine;
 use Tubee\Workflow\Exception;
 use Tubee\Workflow\WorkflowInterface;
+use V8Js;
 
 class Workflow extends AbstractResource implements WorkflowInterface
 {
@@ -72,20 +73,20 @@ class Workflow extends AbstractResource implements WorkflowInterface
     protected $condition;
 
     /**
-     * Expression.
+     * V8 engine.
      *
-     * @var ExpressionLanguage
+     * @var V8Engine
      */
-    protected $expression;
+    protected $v8;
 
     /**
      * Initialize.
      */
-    public function __construct(string $name, string $ensure, ExpressionLanguage $expression, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $ensure, V8Engine $v8, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
     {
         $this->name = $name;
         $this->ensure = $ensure;
-        $this->expression = $expression;
+        $this->v8 = $v8;
         $this->attribute_map = $attribute_map;
         $this->endpoint = $endpoint;
         $this->logger = $logger;
@@ -99,6 +100,14 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function getIdentifier(): string
     {
         return $this->endpoint->getIdentifier().'::'.$this->name;
+    }
+
+    /**
+     * Get ensure.
+     */
+    public function getEnsure(): string
+    {
+        return $this->ensure;
     }
 
     /**
@@ -159,7 +168,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         $map = $this->attribute_map->map($attributes, $ts);
-        $this->logger->debug('mapped object attributes [{map}] for cleanup', [
+        $this->logger->fino('mapped object attributes [{map}] for cleanup', [
             'category' => get_class($this),
             'map' => array_keys($map),
         ]);
@@ -201,12 +210,23 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         $map = $this->attribute_map->map($object, $ts);
-        $this->logger->debug('mapped object attributes [{map}] for import', [
+        $this->logger->info('mapped object attributes [{map}] for import', [
             'category' => get_class($this),
             'map' => array_keys($map),
         ]);
 
         $exists = $this->getImportObject($collection, $map, $object, $ts);
+
+        if ($exists === null) {
+            $this->logger->info('found no existing data object for given import attributes', [
+                'category' => get_class($this),
+            ]);
+        } else {
+            $this->logger->info('identified existing data object ['.$exists->getId().'] for import', [
+                'category' => get_class($this),
+            ]);
+        }
+
         $ensure = $this->ensure;
         if ($exists !== null && $this->ensure === WorkflowInterface::ENSURE_EXISTS) {
             return false;
@@ -230,15 +250,14 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ],
                 ];
 
-                $id = $collection->createObject(['data' => Helper::pathArrayToAssociative($map)], $simulate, $endpoints);
+                $id = $collection->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
                 $this->importRelations($collection->getObject(['_id' => $id]), $map, $simulate, $endpoints);
 
                 return true;
 
             break;
             case WorkflowInterface::ENSURE_LAST:
-                $object = $this->map($map, $exists->getData(), $ts);
-
+                $object = $this->map($map, ['data' => $exists->getData()], $ts);
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
@@ -265,18 +284,23 @@ class Workflow extends AbstractResource implements WorkflowInterface
     public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
-        $attributes['relations'] = $this->getRelations($object);
+        $attributes['relations'] = iterator_to_array($this->getRelations($object));
         if ($this->checkCondition($attributes) === false) {
             return false;
         }
 
         $map = $this->attribute_map->map($attributes, $ts);
-        $this->logger->debug('mapped object attributes [{map}] for write', [
+        $this->logger->info('mapped object attributes [{map}] for write', [
             'category' => get_class($this),
             'map' => array_keys($map),
         ]);
 
-        $exists = $this->getExportObject($map);
+        $exists = $this->getExportObject([
+            'map' => $map,
+            'object' => $attributes,
+        ]);
+
+        $map = Helper::pathArrayToAssociative($map);
         $ensure = $this->ensure;
 
         if ($exists === null && $this->ensure === WorkflowInterface::ENSURE_ABSENT) {
@@ -320,7 +344,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ],
                 ];
 
-                $this->endpoint->getCollection()->changeObject($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
 
                 return true;
 
@@ -343,6 +367,12 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ]);
 
                     $diff = $this->endpoint->getDiff($this->attribute_map, $diff);
+
+                    $this->logger->debug('execute diff [{diff}] on endpoint ['.$this->endpoint->getIdentifier().']', [
+                        'category' => get_class($this),
+                        'diff' => $diff,
+                    ]);
+
                     $result = $this->endpoint->change($this->attribute_map, $diff, $map, $exists->getData(), $simulate);
 
                     if ($result !== null) {
@@ -355,10 +385,14 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 }
 
                 if (!isset($endpoints[$this->endpoint->getName()]['result'])) {
-                    $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getIdentifier()];
+                    if (isset($exists->getData()[$this->endpoint->getResourceIdentifier()])) {
+                        $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getResourceIdentifier()];
+                    } else {
+                        $endpoints[$this->endpoint->getName()]['result'] = null;
+                    }
                 }
 
-                $this->endpoint->getCollection()->changeObject($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
 
                 return true;
 
@@ -387,12 +421,30 @@ class Workflow extends AbstractResource implements WorkflowInterface
      */
     protected function importRelations(DataObjectInterface $object, array $data, bool $simulate, array $endpoints): bool
     {
+        $this->logger->debug('find relationships to be imported for object ['.$object->getId().']', [
+            'category' => get_class($this),
+        ]);
+
         foreach ($this->attribute_map->getMap() as $name => $definition) {
+            $name = isset($definition['name']) ? $definition['name'] : $name;
+
             if (isset($definition['map'])) {
+                if (!isset($data[$name])) {
+                    $this->logger->debug('relation attribute ['.$definition['map']['collection'].':'.$definition['map']['to'].'] not found in mapped data object', [
+                        'category' => get_class($this),
+                    ]);
+
+                    continue;
+                }
+
+                $this->logger->debug('find related objects from ['.$object->getId().'] to ['.$definition['map']['collection'].':'.$definition['map']['to'].'] => ['.$data[$name].']', [
+                    'category' => get_class($this),
+                ]);
+
                 $namespace = $this->endpoint->getCollection()->getResourceNamespace();
                 $collection = $namespace->getCollection($definition['map']['collection']);
                 $relative = $collection->getObject([
-                    'data.'.$definition['map']['to'] => $data[$name],
+                    $definition['map']['to'] => $data[$name],
                 ]);
 
                 $object->createOrUpdateRelation($relative, [], $simulate, $endpoints);
@@ -408,7 +460,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     protected function checkCondition(array $object): bool
     {
         if ($this->condition === null) {
-            $this->logger->debug('no workflow condiditon set for workflow ['.$this->getIdentifier().']', [
+            $this->logger->debug('no workflow condition set for workflow ['.$this->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
@@ -420,9 +472,11 @@ class Workflow extends AbstractResource implements WorkflowInterface
         ]);
 
         try {
-            return (bool) $this->expression->evaluate($this->condition, [
-                'object' => $object,
-            ]);
+            $this->v8->object = $object;
+            $this->v8->garbage = false;
+            $this->v8->executeString($this->condition, '', V8Js::FLAG_FORCE_ARRAY);
+
+            return (bool) $this->v8->getLastResult();
         } catch (\Exception $e) {
             $this->logger->error('failed execute workflow condition ['.$this->condition.']', [
                 'category' => get_class($this),
@@ -439,17 +493,14 @@ class Workflow extends AbstractResource implements WorkflowInterface
     protected function getImportObject(CollectionInterface $collection, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
-        $prefixed = [];
-        foreach ($filter as $attribute => $value) {
-            $prefixed['data.'.$attribute] = $value;
-        }
+        //TODO: debug import line here
 
         if (empty($filter) || count($filter) !== count($this->endpoint->getImport())) {
             throw new Exception\ImportConditionNotMet('import condition attributes are not available from mapping');
         }
 
         try {
-            $exists = $collection->getObject($prefixed, false);
+            $exists = $collection->getObject($filter, false);
         } catch (DataObjectException\MultipleFound $e) {
             throw $e;
         } catch (DataObjectException\NotFound $e) {
@@ -469,7 +520,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Get export object.
      */
-    protected function getExportObject(Iterable $map): ?EndpointObjectInterface
+    protected function getExportObject(array $map): ?EndpointObjectInterface
     {
         try {
             if ($this->endpoint->flushRequired()) {
@@ -503,27 +554,24 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Map.
      */
-    protected function map(Iterable $object, Iterable $mongodb_object, UTCDateTimeInterface $ts): Iterable
+    protected function map(array $object, array $mongodb_object, UTCDateTimeInterface $ts): Iterable
     {
         $object = Helper::associativeArrayToPath($object);
         $mongodb_object = Helper::associativeArrayToPath($mongodb_object);
 
-        foreach ($this->attribute_map->getMap() as $attr => $value) {
-            if (!isset($value['ensure'])) {
-                $value['ensure'] = WorkflowInterface::ENSURE_LAST;
-            }
-
-            $exists = isset($mongodb_object[$attr]);
+        foreach ($this->attribute_map->getMap() as $name => $value) {
+            $name = isset($value['name']) ? $value['name'] : $name;
+            $exists = isset($mongodb_object[$name]);
             if ($value['ensure'] === WorkflowInterface::ENSURE_EXISTS && $exists === true) {
                 continue;
             }
-            if (($value['ensure'] === WorkflowInterface::ENSURE_LAST || $value['ensure'] === WorkflowInterface::ENSURE_EXISTS) && isset($object[$attr])) {
-                $mongodb_object[$attr] = $object[$attr];
-            } elseif ($value['ensure'] === WorkflowInterface::ENSURE_ABSENT && isset($mongodb_object[$attr]) || !isset($object[$attr]) && isset($mongodb_object[$attr])) {
-                unset($mongodb_object[$attr]);
+            if (($value['ensure'] === WorkflowInterface::ENSURE_LAST || $value['ensure'] === WorkflowInterface::ENSURE_EXISTS) && isset($object[$name])) {
+                $mongodb_object[$name] = $object[$name];
+            } elseif ($value['ensure'] === WorkflowInterface::ENSURE_ABSENT && isset($mongodb_object[$name]) || !isset($object[$name]) && isset($mongodb_object[$name])) {
+                unset($mongodb_object[$name]);
             }
         }
 
-        return $mongodb_object;
+        return Helper::pathArrayToAssociative($mongodb_object);
     }
 }

@@ -11,14 +11,20 @@ nav:
     - Create resources: operations/create.md
     - Modify resources: operations/edit.md
     - Apply from file: operations/apply.md
+    - Delete: operations/delete.md
  - Resources:
     - Namespaces: resources/namespaces.md
     - Collections: resources/collections.md
     - DataObjects: resources/data-objects.md
     - Endpoints: resources/endpoints.md
+    - Workflows: resources/workflows.md
+    - Secrets: resources/secrets.md
  - Installation:
     - Server: installation/server.md
+ - Advanced Topics:
+    - Best Practics: advanced/best-practics.md
+    - Scripting: advanced/scripting.md
+ - Examples:
  - Development:
     - Overview: development/overview.md
-    - Api reference: development/api.md
 

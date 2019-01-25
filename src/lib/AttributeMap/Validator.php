@@ -25,11 +25,7 @@ class Validator
                 throw new InvalidArgumentException('map attribute '.$attribute.' definition must be an array');
             }
 
-            if (!is_string($attribute)) {
-                throw new InvalidArgumentException('map attribute '.$attribute.' name must be a string');
-            }
-
-            $resource[$attribute] = self::validateAttribute($attribute, $definition);
+            $resource[$attribute] = self::validateAttribute($definition);
         }
 
         return $resource;
@@ -38,7 +34,7 @@ class Validator
     /**
      * Validate attribute.
      */
-    protected static function validateAttribute(string $name, array $schema): array
+    protected static function validateAttribute(array $schema): array
     {
         $defaults = [
             'ensure' => AttributeMapInterface::ENSURE_LAST,
@@ -51,10 +47,20 @@ class Validator
             'rewrite' => [],
             'require_regex' => null,
             'required' => false,
-            'map' => [],
+            'map' => null,
         ];
 
-        foreach ($schema as $option => $definition) {
+        if (!isset($schema['name'])) {
+            throw new InvalidArgumentException('attribute name is required');
+        }
+
+        $name = $schema['name'];
+
+        foreach ($schema as $option => &$definition) {
+            if (is_null($definition)) {
+                continue;
+            }
+
             switch ($option) {
                 case 'ensure':
                     if (!in_array($definition, AttributeMapInterface::VALID_ENSURES)) {
@@ -71,13 +77,18 @@ class Validator
                 case 'unwind':
                 break;
                 case 'rewrite':
-                break;
-                case 'script':
+                    if (!is_array($definition)) {
+                        throw new InvalidArgumentException('attribute '.$option.' must be an array');
+                    }
+
+                    $definition = self::validateRewriteRules($definition);
+
                 break;
                 case 'value':
                 break;
                 case 'name':
                 case 'from':
+                case 'script':
                 case 'require_regex':
                     if (!is_string($definition)) {
                         throw new InvalidArgumentException('map attribute '.$name.' has an invalid option '.$option.', value must be of type string');
@@ -110,5 +121,42 @@ class Validator
         }
 
         return array_replace_recursive($defaults, $schema);
+    }
+
+    /**
+     * Validate rewrite rules.
+     */
+    protected static function validateRewriteRules(array $rules): array
+    {
+        $defaults = [
+            'from' => null,
+            'to' => null,
+            'match' => null,
+        ];
+
+        foreach ($rules as &$rule) {
+            $rule = array_merge($defaults, $rule);
+
+            foreach ($rule as $key => $value) {
+                if (is_null($value)) {
+                    continue;
+                }
+
+                switch ($key) {
+                    case 'from':
+                    case 'to':
+                    case 'match':
+                        if (!is_string($value)) {
+                            throw new InvalidArgumentException('rewrite option '.$key.' must be a string');
+                        }
+
+                    break;
+                    default:
+                        throw new InvalidArgumentException('Invalid option rewrite.'.$key.' provided');
+                }
+            }
+        }
+
+        return $rules;
     }
 }

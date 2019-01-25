@@ -12,11 +12,13 @@ declare(strict_types=1);
 namespace Tubee;
 
 use InvalidArgumentException;
+use MongoDB\BSON\Binary;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\AttributeMap\Exception;
 use Tubee\AttributeMap\Transform;
+use Tubee\V8\Engine as V8Engine;
+use V8Js;
 
 class AttributeMap implements AttributeMapInterface
 {
@@ -35,20 +37,20 @@ class AttributeMap implements AttributeMapInterface
     protected $logger;
 
     /**
-     * Expression language.
+     * V8.
      *
-     * @var ExpressionLanguage
+     * @var V8Engine
      */
-    protected $expression;
+    protected $v8;
 
     /**
      * Init attribute map.
      */
-    public function __construct(array $map = [], ExpressionLanguage $expression, LoggerInterface $logger)
+    public function __construct(array $map = [], V8Engine $v8, LoggerInterface $logger)
     {
         $this->map = $map;
         $this->logger = $logger;
-        $this->expression = $expression;
+        $this->v8 = $v8;
     }
 
     /**
@@ -64,7 +66,7 @@ class AttributeMap implements AttributeMapInterface
      */
     public function getAttributes(): array
     {
-        return array_keys($this->map);
+        return array_column($this->map, 'name');
     }
 
     /**
@@ -72,11 +74,16 @@ class AttributeMap implements AttributeMapInterface
      */
     public function map(array $data): array
     {
+        $this->v8->object = $data;
+        $attrv = null;
+
         $result = [];
-        foreach ($this->map as $attr => $value) {
+        foreach ($this->map as $value) {
             if (isset($attrv)) {
                 unset($attrv);
             }
+
+            $attr = $value['name'];
 
             if (isset($value['ensure'])) {
                 if ($value['ensure'] === AttributeMapInterface::ENSURE_MERGE && isset($value['type']) && $value['type'] !== AttributeMapInterface::TYPE_ARRAY) {
@@ -99,7 +106,7 @@ class AttributeMap implements AttributeMapInterface
 
                 $this->logger->debug('mapped attribute ['.$attr.'] to [<'.gettype($result[$attr]).'> {value}]', [
                     'category' => get_class($this),
-                    'value' => $result[$attr],
+                    'value' => ($result[$attr] instanceof Binary) ? '<bin '.mb_strlen($result[$attr]->getData()).'>' : $result[$attr],
                 ]);
             }
         }
@@ -113,12 +120,9 @@ class AttributeMap implements AttributeMapInterface
     public function getDiff(array $object, array $endpoint_object): array
     {
         $diff = [];
-        foreach ($this->map as $attr => $value) {
+        foreach ($this->map as $value) {
+            $attr = $value['name'];
             $exists = isset($endpoint_object[$attr]);
-
-            if (isset($value['name'])) {
-                $attr = $value['name'];
-            }
 
             if ($value['ensure'] === AttributeMapInterface::ENSURE_EXISTS && ($exists === true || !isset($object[$attr]))) {
                 continue;
@@ -268,7 +272,8 @@ class AttributeMap implements AttributeMapInterface
 
         try {
             if (isset($value['script'])) {
-                $result = $this->expression->evaluate($value['script'], $data);
+                $this->v8->executeString($value['script'], '', V8Js::FLAG_FORCE_ARRAY);
+                $result = $this->v8->getLastResult();
             }
         } catch (\Exception $e) {
             $this->logger->warning('failed to execute script ['.$value['script'].'] of attribute ['.$attr.']', [
@@ -306,21 +311,13 @@ class AttributeMap implements AttributeMapInterface
     protected function rewrite($value, array $ruleset)
     {
         foreach ($ruleset as $rule) {
-            if (!isset($rule['match'])) {
-                throw new InvalidArgumentException('match in filter is not set');
-            }
-
-            if (!isset($rule['to'])) {
-                throw new InvalidArgumentException('to in filter is not set');
-            }
-
-            if (isset($rule['regex']) && $rule['regex'] === false) {
-                if ($value === $rule['match']) {
+            if (isset($rule['from'])) {
+                if ($value === $rule['from']) {
                     $value = $rule['to'];
 
                     return $value;
                 }
-            } elseif (isset($rule['regex']) && $rule['regex'] === true || !isset($rule['regex'])) {
+            } elseif (isset($rule['match'])) {
                 $value = preg_replace($rule['match'], $rule['to'], $value, -1, $count);
                 if ($count > 0) {
                     return $value;

@@ -27,9 +27,11 @@ class Validator
             'resource' => [
                 'request_options' => [],
                 'auth' => null,
-                'oauth' => [
+                'oauth2' => [
+                    'token_endpoint' => null,
                     'client_id' => null,
                     'client_pw' => null,
+                    'scope' => null,
                 ],
                 'basic' => [
                     'username' => null,
@@ -45,12 +47,12 @@ class Validator
         foreach ($resource['resource'] as $key => $value) {
             switch ($key) {
                 case 'auth':
-                    if ($value !== 'basic' && $value !== 'oauth') {
-                        throw new InvalidArgumentException('resource.auth must be either basic or oauth');
+                    if ($value !== 'basic' && $value !== 'oauth2') {
+                        throw new InvalidArgumentException('resource.auth must be either basic or oauth2');
                     }
 
                 break;
-                case 'options':
+                case 'request_options':
                 case 'base_uri':
                 case 'oauth':
                 case 'basic':

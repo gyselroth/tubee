@@ -14,23 +14,25 @@ namespace Tubee;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Secret\SecretInterface;
 
 class Secret extends AbstractResource implements SecretInterface
 {
     /**
-     * Name.
+     * Namespace.
      *
-     * @var string
+     * @var ResourceNamespaceInterface
      */
-    protected $name;
+    protected $namespace;
 
     /**
      * Initialize.
      */
-    public function __construct(array $resource = [])
+    public function __construct(array $resource, ResourceNamespaceInterface $namespace)
     {
         $this->resource = $resource;
+        $this->namespace = $namespace;
     }
 
     /**
@@ -40,9 +42,10 @@ class Secret extends AbstractResource implements SecretInterface
     {
         $resource = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$this->namespace->getName())],
             ],
             'kind' => 'Secret',
+            'namespace' => $this->namespace->getName(),
             'data' => $this->getData(),
        ];
 

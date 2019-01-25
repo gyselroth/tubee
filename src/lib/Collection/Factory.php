@@ -92,6 +92,8 @@ class Factory extends ResourceFactory
         $result = $this->db->{self::COLLECTION_NAME}->findOne([
             'name' => $name,
             'namespace' => $namespace->getName(),
+        ], [
+            'projection' => ['history' => 0],
         ]);
 
         if ($result === null) {

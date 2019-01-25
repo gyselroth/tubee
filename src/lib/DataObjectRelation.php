@@ -49,12 +49,8 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
             'data' => $this->getData(),
         ];
 
-        $object = $this->object;
-
-        if ($object !== null) {
-            $resource['status']['object'] = function () use ($object, $request) {
-                return $object->decorate($request);
-            };
+        if ($this->object !== null) {
+            $resource['status']['object'] = $this->object->decorate($request);
         }
 
         return AttributeResolver::resolve($request, $this, $resource);

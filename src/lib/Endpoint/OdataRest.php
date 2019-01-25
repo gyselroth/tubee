@@ -12,9 +12,12 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
-use Tubee\AttributeMap\AttributeMapInterface;
+use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\OdataRest\QueryTransformer;
 use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class OdataRest extends AbstractRest
 {
@@ -24,21 +27,13 @@ class OdataRest extends AbstractRest
     public const KIND = 'OdataRestEndpoint';
 
     /**
-     * {@inheritdoc}
+     * Init endpoint.
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->logger->info('update odata rest object on endpoint ['.$this->getIdentifier().'] using ['.$this->update_method.'] to ['.$this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object).']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($simulate === false) {
-            $result = $this->client->patch('/'.$this->getResourceId($endpoint_object), [
-                'json' => $diff,
-            ]);
-        }
-
-        return null;
+        $this->identifier = 'id';
+        $this->container = 'value';
+        parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }
 
     /**
@@ -102,6 +97,7 @@ class OdataRest extends AbstractRest
 
         $options = $this->getRequestOptions();
         $options['query']['$filter'] = $filter;
+        $options['query']['$select'] = join(',', $attributes);
         $result = $this->client->get('', $options);
         $data = $this->getResponse($result);
 

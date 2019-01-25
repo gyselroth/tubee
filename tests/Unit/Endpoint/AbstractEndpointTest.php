@@ -22,6 +22,80 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class AbstractEndpointTest extends TestCase
 {
+    public function testResolveFilterOne()
+    {
+        $mock = $this->getMockForAbstractClass(AbstractEndpoint::class, [
+            'foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+                'data' => [
+                    'options' => [
+                        'filter_one' => '{foobar={map.foo.bar}}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $object = [
+            'map' => [
+                'foo' => [
+                    'bar' => 'foo',
+                    'foo' => 'bar',
+                ],
+            ],
+        ];
+
+        $result = $mock->getFilterOne($object);
+        $this->assertSame('{foobar=foo}', $result);
+    }
+
+    public function testResolveFilterOneMultipleValues()
+    {
+        $mock = $this->getMockForAbstractClass(AbstractEndpoint::class, [
+            'foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+                'data' => [
+                    'options' => [
+                        'filter_one' => '{foobar={map.foo.bar}}-{map.foo.foo}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $object = [
+            'map' => [
+                'foo' => [
+                    'bar' => 'foo',
+                    'foo' => 'bar',
+                ],
+            ],
+        ];
+
+        $result = $mock->getFilterOne($object);
+        $this->assertSame('{foobar=foo}-bar', $result);
+    }
+
+    public function testResolveFilterOneAttributeNotFound()
+    {
+        $this->expectException(Exception\AttributeNotResolvable::class);
+        $mock = $this->getMockForAbstractClass(AbstractEndpoint::class, [
+            'foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+                'data' => [
+                    'options' => [
+                        'filter_one' => '{foobar={map.foo.bar}}',
+                    ],
+                ],
+            ],
+        ]);
+
+        $object = [
+            'map' => [
+                'foo' => [
+                    'foo' => 'bar',
+                ],
+            ],
+        ];
+
+        $mock->getFilterOne($object);
+    }
+
     public function testObjectExists()
     {
         $mock = $this->getMockForAbstractClass(AbstractEndpoint::class, [

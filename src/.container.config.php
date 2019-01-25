@@ -13,9 +13,6 @@ use Monolog\Processor;
 use Tubee\Console;
 use Zend\Mail\Transport\TransportInterface;
 use Zend\Mail\Transport\Smtp;
-use Symfony\Component\ExpressionLanguage\ExpressionLanguage;
-use Tubee\ExpressionLanguage\DateTimeLanguageProvider;
-use Tubee\ExpressionLanguage\StringLanguageProvider;
 use mindplay\middleman\Dispatcher;
 use mindplay\middleman\ContainerResolver;
 use Tubee\Rest\Middlewares\ExceptionHandler;
@@ -38,6 +35,7 @@ use TaskScheduler\WorkerManager;
 use ParagonIE\Halite\Symmetric\EncryptionKey;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\HiddenString\HiddenString;
+use Tubee\V8\Engine as V8Engine;
 
 return [
     Dispatcher::class => [
@@ -233,13 +231,8 @@ return [
             ]
         ]
     ],
-    ExpressionLanguage::class => [
-        'calls' => [
-            [
-                'method' => 'registerProvider',
-                'arguments' => ['provider' => '{'.StringLanguageProvider::class.'}']
-            ],
-        ],
+    V8Js::class => [
+        'use' => V8Engine::class,
     ],
     Auth::class => [
         'calls' => [

@@ -67,7 +67,15 @@ class Workflows
         ], $request->getQueryParams());
 
         $namespace = $this->namespace_factory->getOne($namespace);
-        $workflows = $namespace->getCollection($collection)->getEndpoint($endpoint)->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+        $endpoint = $namespace->getCollection($collection)->getEndpoint($endpoint);
+
+        if (isset($query['watch'])) {
+            $cursor = $this->workflow_factory->watch($endpoint, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
+        $workflows = $endpoint->getWorkflows($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $workflows);
     }
@@ -131,29 +139,11 @@ class Workflows
         $update = json_decode($patched, true);
 
         $this->workflow_factory->update($workflow, $update);
-        exit();
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
             $endpoint->getWorkflow($workflow->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
-    }
-
-    /**
-     * Watch.
-     */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, string $endpoint): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
-        ], $request->getQueryParams());
-
-        $endpoint = $this->namespace_factory->getOne($namespace)->getCollection($collection)->getEndpoint($endpoint);
-        $cursor = $this->workflow_factory->watch($endpoint, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
-
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

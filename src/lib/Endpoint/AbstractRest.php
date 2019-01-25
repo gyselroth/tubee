@@ -29,13 +29,6 @@ abstract class AbstractRest extends AbstractEndpoint
     protected $client;
 
     /**
-     * Request options.
-     *
-     * @var array
-     */
-    protected $request_options = [];
-
-    /**
      * Container.
      *
      * @var string
@@ -50,30 +43,11 @@ abstract class AbstractRest extends AbstractEndpoint
     protected $access_token;
 
     /**
-     * Update put vs patch.
-     *
-     * @var string
-     */
-    protected $update_method = 'PATCH';
-
-    /**
-     * ID field.
-     *
-     * @var string
-     */
-    protected $id_field = 'id';
-
-    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->client = $client;
-
-        if (isset($resource['data']['resource']['rest_options'])) {
-            $this->setRestOptions($resource['data']['resource']['rest_options']);
-        }
-
         parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }
 
@@ -89,8 +63,7 @@ abstract class AbstractRest extends AbstractEndpoint
                 'category' => get_class($this),
             ]);
 
-            $client = new Client();
-            $response = $client->post($oauth['token_endpoint'], [
+            $response = $this->client->post($oauth['token_endpoint'], [
                 'form_params' => [
                     'grant_type' => 'client_credentials',
                     'client_id' => $oauth['client_id'],
@@ -120,38 +93,20 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function setRestOptions(?array $config = null): EndpointInterface
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
-        if ($config === null) {
-            return $this;
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object);
+        $this->logger->info('update rest object on endpoint ['.$this->getIdentifier().'] using [PATCH] to ['.$uri.']', [
+            'category' => get_class($this),
+        ]);
+
+        if ($simulate === false) {
+            $result = $this->client->patch($uri, $this->getRequestOptions([
+                'json' => $diff,
+            ]));
         }
 
-        foreach ($config as $option => $value) {
-            switch ($option) {
-                case 'id_field':
-                case 'container':
-                case 'update_method':
-                    $this->{$option} = (string) $value;
-
-                    break;
-                case 'request_options':
-                    $this->request_options = $value;
-
-                break;
-                default:
-                    throw new InvalidArgumentException('unknown rest option '.$option.' given');
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function shutdown(bool $simulate = false): EndpointInterface
-    {
-        return $this;
+        return null;
     }
 
     /**
@@ -159,12 +114,13 @@ abstract class AbstractRest extends AbstractEndpoint
      */
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $this->logger->info('delete object from endpoint ['.$this->getIdentifier().'] using DELETE to ['.$this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object).']', [
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object);
+        $this->logger->info('delete object from endpoint ['.$this->getIdentifier().'] using DELETE to ['.$uri.']', [
             'category' => get_class($this),
         ]);
 
         if ($simulate === false) {
-            $response = $this->client->delete('/'.$this->getResourceId($endpoint_object));
+            $response = $this->client->delete($uri, $this->getRequestOptions());
         }
 
         return true;
@@ -180,9 +136,9 @@ abstract class AbstractRest extends AbstractEndpoint
         ]);
 
         if ($simulate === false) {
-            $result = $this->client->post('', [
+            $result = $this->client->post('', $this->getRequestOptions([
                 'json' => $object,
-            ]);
+            ]));
 
             $body = json_decode($result->getBody()->getContents(), true);
 
@@ -197,7 +153,6 @@ abstract class AbstractRest extends AbstractEndpoint
      */
     public function getDiff(AttributeMapInterface $map, array $diff): array
     {
-        return $diff;
         $result = [];
         foreach ($diff as $attribute => $update) {
             switch ($update['action']) {
@@ -247,10 +202,8 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * Get headers.
      */
-    protected function getRequestOptions(): array
+    protected function getRequestOptions(array $options = []): array
     {
-        $options = $this->request_options;
-
         if ($this->access_token) {
             return array_merge($options, [
                 'headers' => [
@@ -260,16 +213,18 @@ abstract class AbstractRest extends AbstractEndpoint
             ]);
         }
 
-        return [];
+        return $options;
     }
 
     /**
      * Get identifier.
      */
-    protected function getResourceId(array $object): ?string
+    protected function getResourceId(array $object): string
     {
-        if (isset($object[$this->id_field])) {
-            return $object[$this->id_field];
+        if (isset($object[$this->identifier])) {
+            return $object[$this->identifier];
         }
+
+        throw new RestException\IdNotFound('attribute '.$this->identifier.' is not available');
     }
 }

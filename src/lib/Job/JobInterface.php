@@ -12,7 +12,12 @@ declare(strict_types=1);
 namespace Tubee\Job;
 
 use Tubee\Resource\ResourceInterface;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
 interface JobInterface extends ResourceInterface
 {
+    /**
+     * Get resource namespace.
+     */
+    public function getResourceNamespace(): ResourceNamespaceInterface;
 }

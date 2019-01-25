@@ -89,7 +89,19 @@ class Factory extends ResourceFactory
      */
     public function deleteOne(ResourceNamespaceInterface $namespace, ObjectIdInterface $id): bool
     {
-        $this->scheduler->cancelJob($id);
+        $cursor = $this->db->{$this->scheduler->getJobQueue()}->find([
+            '$or' => [
+                ['_id' => $id],
+                ['data.parent' => $id],
+            ],
+        ]);
+
+        foreach ($cursor as $process) {
+            $this->scheduler->cancelJob($process['_id']);
+            if (isset($process['data']['parent']) && $process['options']['interval'] !== 0) {
+                $this->scheduler->addJob(Sync::class, $process['data'], $process['options']);
+            }
+        }
 
         return true;
     }

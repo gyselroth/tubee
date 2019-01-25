@@ -4,17 +4,17 @@ Modify resources is a combination of options between [get](/operations/get) and 
 edit them in your editor of choice.
 
 ```
-tubectl edit co mynamespace mycollection
+tubectl edit co mycollection -n mynamespace
 ```
 
 The editing works the same as it does for [create](/operations/create).
 
 ## Query and edit
 
-It ist possible to use most options which are also known to working for get. So for example it is possible to query resources and edit them directly:
+It is possible to use most options which are also known to working for get. So for example it is possible to query resources and edit them directly:
 
 ```
-tubectl edit do mynamespace mycollection -q data.field1=test,data.field2=foo
+tubectl edit do mycollection -q data.field1=test,data.field2=foo -n mynamespace
 ```
 
 This will query for DataObject resources whereas data.field1 is test and data.field2 is foo.

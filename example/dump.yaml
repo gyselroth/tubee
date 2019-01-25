@@ -220,7 +220,7 @@ namespace: playground
 collection: accounts
 data:
   resource:
-    options:
+    request_options:
       verify: false
     auth: basic
     oauth:

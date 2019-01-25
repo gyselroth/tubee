@@ -14,11 +14,13 @@ namespace Tubee\Rest\v1;
 use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
+use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Rs\Json\Patch;
 use Tubee\Acl;
 use Tubee\Collection\Factory as CollectionFactory;
+use Tubee\Log\Factory as LogFactory;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\Rest\Helper;
 use Zend\Diactoros\Response;
@@ -47,13 +49,21 @@ class Collections
     protected $acl;
 
     /**
+     * Log factory.
+     *
+     * @var LogFactory
+     */
+    protected $log_factory;
+
+    /**
      * Init.
      */
-    public function __construct(ResourceNamespaceFactory $namespace_factory, CollectionFactory $collection_factory, Acl $acl)
+    public function __construct(ResourceNamespaceFactory $namespace_factory, CollectionFactory $collection_factory, Acl $acl, LogFactory $log_factory)
     {
         $this->namespace_factory = $namespace_factory;
         $this->collection_factory = $collection_factory;
         $this->acl = $acl;
+        $this->log_factory = $log_factory;
     }
 
     /**
@@ -67,6 +77,13 @@ class Collections
         ], $request->getQueryParams());
 
         $namespace = $this->namespace_factory->getOne($namespace);
+
+        if (isset($query['watch'])) {
+            $cursor = $this->collection_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
         $collections = $namespace->getCollections($query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $collections);
@@ -137,19 +154,51 @@ class Collections
     }
 
     /**
-     * Watch.
+     * Entrypoint.
      */
-    public function watchAll(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
+    public function getAllLogs(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection): ResponseInterface
     {
         $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
+            'offset' => 0,
+            'limit' => 20,
         ], $request->getQueryParams());
 
-        $namespace = $this->namespace_factory->getOne($namespace);
-        $cursor = $this->collection_factory->watch($namespace, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+        if (isset($query['watch'])) {
+            $filter = [
+                'fullDocument.context.namespace' => $namespace,
+                'fullDocument.context.collection' => $collection,
+            ];
 
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
+            if (!empty($query['query'])) {
+                $filter = ['$and' => [$filter, $query['query']]];
+            }
+
+            $logs = $this->log_factory->watch(null, isset($query['stream']), $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $logs);
+        }
+
+        $filter = [
+            'context.namespace' => $namespace,
+            'context.collection' => $collection,
+        ];
+
+        if (!empty($query['query'])) {
+            $filter = ['$and' => [$filter, $query['query']]];
+        }
+
+        $logs = $this->log_factory->getAll($filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+        return Helper::getAll($request, $identity, $this->acl, $logs);
+    }
+
+    /**
+     * Entrypoint.
+     */
+    public function getOneLog(ServerRequestInterface $request, Identity $identity, string $namespace, string $collection, ObjectIdInterface $log): ResponseInterface
+    {
+        $resource = $this->log_factory->getOne($log);
+
+        return Helper::getOne($request, $identity, $resource);
     }
 }

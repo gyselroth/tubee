@@ -66,6 +66,12 @@ class AccessRoles
             'limit' => 20,
         ], $request->getQueryParams());
 
+        if (isset($query['watch'])) {
+            $cursor = $this->role_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $cursor);
+        }
+
         $roles = $this->role_factory->getAll($query['query'], $query['offset'], $query['limit'], $query['sort']);
 
         return Helper::getAll($request, $identity, $this->acl, $roles);
@@ -158,21 +164,5 @@ class AccessRoles
             $this->role_factory->getOne($role->getName())->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
-    }
-
-    /**
-     * Watch.
-     */
-    public function watchAll(ServerRequestInterface $request, Identity $identity): ResponseInterface
-    {
-        $query = array_merge([
-            'offset' => null,
-            'limit' => null,
-            'existing' => true,
-        ], $request->getQueryParams());
-
-        $cursor = $this->role_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
-
-        return Helper::watchAll($request, $identity, $this->acl, $cursor);
     }
 }

@@ -156,6 +156,7 @@ class Factory
         }
 
         $result = $collection->find($query, [
+            'projection' => ['history' => 0],
             'skip' => $offset,
             'limit' => $limit,
             'sort' => $sort,
@@ -173,7 +174,6 @@ class Factory
      */
     public function watchFrom(Collection $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = [], ?Closure $build = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        //$this->logger->debug("PIPE WATCH");
         if ($build === null) {
             $build = function ($resource) {
                 return $this->build($resource);
@@ -190,6 +190,7 @@ class Factory
         ]);
 
         if ($existing === true) {
+            $query = $this->prepareQuery($query);
             $total = $collection->count($query);
 
             if ($offset !== null && $total === 0) {
@@ -199,6 +200,7 @@ class Factory
             }
 
             $result = $collection->find($query, [
+                'projection' => ['history' => 0],
                 'skip' => $offset,
                 'limit' => $limit,
                 'sort' => $sort,
@@ -238,12 +240,36 @@ class Factory
     }
 
     /**
+     * Remove fullDocument prefix from keys.
+     */
+    protected function prepareQuery(array $query): array
+    {
+        $filter = $query;
+        if (isset($query['$and'])) {
+            $query = $query['$and'][0];
+        }
+
+        $new = [];
+        foreach ($query as $key => $value) {
+            $new[substr($key, 13)] = $value;
+        }
+
+        if (isset($filter['$and'])) {
+            $filter['$and'][0] = $new;
+
+            return $filter;
+        }
+
+        return $new;
+    }
+
+    /**
      * Calculate offset.
      */
     protected function calcOffset(int $total, ?int $offset = null): ?int
     {
         if ($offset !== null && $total === 0) {
-            $offset = null;
+            $offset = 0;
         } elseif ($offset < 0 && $total >= $offset * -1) {
             $offset = $total + $offset;
         } elseif ($offset < 0) {

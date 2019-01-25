@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Tubee\Rest\Middlewares;
 
+use function MongoDB\BSON\fromJSON;
+use function MongoDB\BSON\toPHP;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -35,14 +37,24 @@ class QueryDecoder implements MiddlewareInterface
             $query['limit'] = (int) $query['limit'];
         }
 
-        if (isset($query['query'])) {
-            $query['query'] = json_decode(htmlspecialchars_decode($query['query']), true);
+        if (isset($query['watch']) && !empty($query['watch']) && $query['watch'] !== 'false') {
+            $query['watch'] = true;
+        } else {
+            $query['watch'] = null;
+        }
 
-            if (json_last_error()) {
-                throw new Exception\InvalidInput('failed to decode provided query: '.json_last_error_msg().', query needs to be valid json');
-            }
+        if (isset($query['query'])) {
+            $query['query'] = toPHP(fromJSON($query['query']), [
+                'root' => 'array',
+                'document' => 'array',
+                'array' => 'array',
+            ]);
         } else {
             $query['query'] = [];
+        }
+
+        if (isset($query['stream']) && $query['stream'] !== 'false' && !empty($query['stream']) && !isset($query['limit'])) {
+            $query['limit'] = null;
         }
 
         if (isset($query['sort'])) {

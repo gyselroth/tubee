@@ -46,7 +46,7 @@ class Pdo extends AbstractSqlDatabase
         if ($filter === null) {
             $sql = 'SELECT * FROM '.$this->table;
         } else {
-            $sql = 'SELECT * FROM '.$this->table; // .' WHERE '.$filter;
+            $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         }
 
         $result = $this->socket->select($sql);

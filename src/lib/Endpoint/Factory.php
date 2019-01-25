@@ -94,6 +94,8 @@ class Factory extends ResourceFactory
             'name' => $name,
             'namespace' => $collection->getResourceNamespace()->getName(),
             'collection' => $collection->getName(),
+        ], [
+            'projection' => ['history' => 0],
         ]);
 
         if ($result === null) {
@@ -130,8 +132,6 @@ class Factory extends ResourceFactory
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE) {
             $this->ensureIndex($collection, $resource['data']['options']['import']);
-        } elseif (!empty($resource['data']['options']['filter_all'])) {
-            $this->ensureIndex($collection, array_keys($resource['data']['options']['filter_all']));
         }
 
         $resource['namespace'] = $collection->getResourceNamespace()->getName();
@@ -148,6 +148,10 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
         $data = Validator::validate($data);
+        $data['_id'] = $resource->getId();
+
+        $endpoint = $this->build($data, $resource->getCollection());
+        $endpoint->setup();
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
@@ -168,7 +172,7 @@ class Factory extends ResourceFactory
     public function build(array $resource, CollectionInterface $collection)
     {
         $factory = EndpointInterface::ENDPOINT_MAP[$resource['kind']].'\\Factory';
-        $resource = $this->secret_factory->resolve($resource);
+        $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
 
         return $this->initResource($factory::build($resource, $collection, $this->workflow_factory, $this->logger));
     }

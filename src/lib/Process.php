@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use DateTime;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -53,15 +54,23 @@ class Process extends AbstractResource implements ProcessInterface
      */
     public function decorate(ServerRequestInterface $request): array
     {
+        $data = $this->getData();
+        $parent = isset($data['parent']) ? (string) $data['parent'] : null;
+        $job = isset($data['job']) ? $data['job'] : null;
+        unset($data['parent'], $data['namespace'], $data['job']);
+
         $result = [
             '_links' => [
-                'self' => ['href' => (string) $request->getUri()],
+                'namespace' => ['href' => (string) $request->getUri()->withPath('/api/v1/namespaces/'.$this->namespace->getName())],
             ],
             'kind' => 'Process',
             'namespace' => $this->namespace->getName(),
             'changed' => $this->getCreated()->toDateTime()->format('c'),
-            'data' => $this->getData(),
+            'data' => $data,
             'status' => [
+                'job' => $job,
+                'parent' => $parent,
+                'next' => $this->resource['options']['at'] === 0 ? null : (new DateTime('@'.(string) $this->resource['options']['at']))->format('c'),
                 'started' => $this->resource['status'] === 0 ? null : $this->resource['started']->toDateTime()->format('c'),
                 'ended' => $this->resource['status'] <= 2 ? null : $this->resource['ended']->toDateTime()->format('c'),
                 'result' => JobInterface::STATUS_MAP[$this->resource['status']],
@@ -70,6 +79,14 @@ class Process extends AbstractResource implements ProcessInterface
         ];
 
         return AttributeResolver::resolve($request, $this, $result);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getResourceNamespace(): ResourceNamespaceInterface
+    {
+        return $this->namespace;
     }
 
     /**

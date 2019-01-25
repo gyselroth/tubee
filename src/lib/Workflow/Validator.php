@@ -34,21 +34,34 @@ class Validator extends ResourceValidator
 
         $resource = array_replace_recursive($defaults, $resource);
 
-        if (!isset($resource['data']['ensure']) || !in_array($resource['data']['ensure'], WorkflowInterface::VALID_ENSURES)) {
-            throw new InvalidArgumentException('data.ensure as string must be provided (one of exists,last,disabled,absent)');
-        }
+        foreach ($resource['data'] as $key => $value) {
+            switch ($key) {
+                case 'ensure':
+                    if (!in_array($value, WorkflowInterface::VALID_ENSURES)) {
+                        throw new InvalidArgumentException('data.ensure as string must be provided (one of exists,last,disabled,absent)');
+                    }
 
-        if (isset($resource['data']['condition'])) {
-            if (!is_string($resource['data']['condition'])) {
-                throw new InvalidArgumentException('provided data.condition must be a string');
+                break;
+                case 'condition':
+                    if ($value !== null && !is_string($value)) {
+                        throw new InvalidArgumentException('provided data.condition must be a string');
+                    }
+
+                break;
+                case 'priority':
+                    if (!is_int($value)) {
+                        throw new InvalidArgumentException('provided data.priority must be an integer');
+                    }
+
+                break;
+                case 'map':
+                    $resource['data']['map'] = AttributeMapValidator::validate($value);
+
+                break;
+                default:
+                    throw new InvalidArgumentException('unknown option '.$key.' provided');
             }
         }
-
-        if (!is_int($resource['data']['priority'])) {
-            throw new InvalidArgumentException('provided data.priority must be an integer');
-        }
-
-        $resource['data']['map'] = AttributeMapValidator::validate($resource['data']['map']);
 
         return $resource;
     }

@@ -22,6 +22,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\Helper;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Resource\ResourceInterface;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Secret;
 
 class Factory extends ResourceFactory
@@ -55,37 +56,57 @@ class Factory extends ResourceFactory
     /**
      * Has secret.
      */
-    public function has(string $name): bool
+    public function has(ResourceNamespaceInterface $namespace, string $name): bool
     {
-        return $this->db->{self::COLLECTION_NAME}->count(['name' => $name]) > 0;
+        return $this->db->{self::COLLECTION_NAME}->count([
+            'namespace' => $namespace->getName(),
+            'name' => $name,
+        ]) > 0;
     }
 
     /**
      * Get all.
      */
-    public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
+        $filter = [
+            'namespace' => $namespace->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace) {
+            return $this->build($resource, $namespace);
+        });
     }
 
     /**
      * Get secret.
      */
-    public function getOne(string $name): SecretInterface
+    public function getOne(ResourceNamespaceInterface $namespace, string $name): SecretInterface
     {
-        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
+            'namespace' => $namespace->getName(),
+            'name' => $name,
+        ], [
+            'projection' => ['history' => 0],
+        ]);
 
         if ($result === null) {
             throw new Exception\NotFound('secret '.$name.' is not registered');
         }
 
-        return $this->build($result);
+        return $this->build($result, $namespace);
     }
 
     /**
      * Resolve resource secrets.
      */
-    public function resolve(array $resource): array
+    public function resolve(ResourceNamespaceInterface $namespace, array $resource): array
     {
         if (isset($resource['secrets'])) {
             $this->logger->info('found secrets to resolve for resource ['.$resource['name'].']', [
@@ -93,7 +114,7 @@ class Factory extends ResourceFactory
             ]);
 
             foreach ($resource['secrets'] as $secret) {
-                $blob = $this->getOne($secret['secret'])->getData();
+                $blob = $this->getOne($namespace, $secret['secret'])->getData();
                 $data = base64_decode(Helper::getArrayValue($blob, $secret['key']));
                 $resource = Helper::setArrayValue($resource, $secret['to'], $data);
             }
@@ -117,9 +138,9 @@ class Factory extends ResourceFactory
     /**
      * Delete by name.
      */
-    public function deleteOne(string $name): bool
+    public function deleteOne(ResourceNamespaceInterface $namespace, string $name): bool
     {
-        $resource = $this->getOne($name);
+        $resource = $this->getOne($namespace, $name);
 
         return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
@@ -139,15 +160,17 @@ class Factory extends ResourceFactory
     /**
      * Add secret.
      */
-    public function add(array $resource): ObjectIdInterface
+    public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         Validator::validate($resource);
 
-        if ($this->has($resource['name'])) {
+        if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('secret '.$resource['name'].' does already exists');
         }
 
         $resource = $this->crypt($resource);
+
+        $resource['namespace'] = $namespace->getName();
 
         return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
@@ -155,7 +178,7 @@ class Factory extends ResourceFactory
     /**
      * Change stream.
      */
-    public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
     }
@@ -163,13 +186,13 @@ class Factory extends ResourceFactory
     /**
      * Build instance.
      */
-    public function build(array $resource): SecretInterface
+    public function build(array $resource, ResourceNamespaceInterface $namespace): SecretInterface
     {
         $decrypted = json_decode(Symmetric::decrypt($resource['blob'], $this->key)->getString(), true);
         $resource['data'] = $decrypted;
         unset($resource['blob']);
 
-        return $this->initResource(new Secret($resource));
+        return $this->initResource(new Secret($resource, $namespace));
     }
 
     /**

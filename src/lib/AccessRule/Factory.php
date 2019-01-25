@@ -44,7 +44,11 @@ class Factory extends ResourceFactory
      */
     public function getOne(string $name): AccessRuleInterface
     {
-        $result = $this->db->{self::COLLECTION_NAME}->findOne(['name' => $name]);
+        $result = $this->db->{self::COLLECTION_NAME}->findOne([
+            'name' => $name,
+        ], [
+            'projection' => ['history' => 0],
+        ]);
 
         if ($result === null) {
             throw new Exception\NotFound('access rule '.$name.' is not registered');

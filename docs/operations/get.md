@@ -126,6 +126,19 @@ Like `--json-sort` there is also a possibility to use `--json-query`. Likewise s
 tubectl get ns --json-query '{"$or":["changed":{"$gt":"2018-10-25"},{"name":"bar"}]}'
 ```
 
+## Using resources in other namespaces
+The default namespace is `default`. You may request a different namespace by using -n or --namespace accordingly.
+For example to query all collections in the namespace foo:
+
+```
+tubectl get co -n foo
+```
+
+You may configure a different namespace by using tubectl config.
+```
+tubectl config edit defaultNamespace foo
+```
+
 ## Tail resources
 By default the server returns the latest 100 resources ordered by created date/time. Meaning the first record is the newest one and the last the oldest (If not more than 100 resources of the requested type are available). By using `-t` or `--tail` accordingly the output is reversed. Meaning the last record is the newest and the first the oldest (Again, if there are not more than 100 resources available of that type.)
 
@@ -149,6 +162,21 @@ This will compare the namespace foo (current version) with the version 1 of itse
 DIFFTOOL=vimdiff tubectl get ns foo --diff 1
 ```
 
+## Limit resources in lists
+By default you get the newest 100 resources. You may lower this limit by using `-L` or `--limit` accordingly.
+```
+tubectl get ns --limit 2
+```
+
+>**Note** The limit can not be higher than 100. If more resources are required either specify a more exact query or request a stream by using `--stream`.
+
+## Stream
+
+To retrive a large list of resources you may use `--stream` which streams the resources back from the server instead normal request.
+```
+tubectl get do foo --stream
+```
+
 ## Watch realtime updates
 
-The tubee server features realtime update to listening clients. By specifying `-w` or `--watch` accordingly you will receive any updates made to resources of the requested type. This includes new resources, modifications or removals. Note that a watch request does operate for 5min and then dies. 
+The tubee server can push realtime updates to listening clients. By specifying `-w` or `--watch` accordingly you will receive any updates made to resources of the requested list. This includes new resources, modifications or removals. Note that a watch request does operate for 5min and then dies. Watch does not include existing resources. If existing resource shall get returned, one may combine `--stream` and `--watch`. 
