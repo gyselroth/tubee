@@ -19,12 +19,13 @@ nav:
     - Endpoints: resources/endpoints.md
     - Workflows: resources/workflows.md
     - Secrets: resources/secrets.md
+    - Jobs: resources/jobs.md
  - Installation:
     - Server: installation/server.md
- - Advanced Topics:
+ - AdvancedTopics:
     - Best Practics: advanced/best-practics.md
     - Scripting: advanced/scripting.md
- - Examples:
+# - Examples:
  - Development:
     - Overview: development/overview.md
 

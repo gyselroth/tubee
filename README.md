@@ -31,6 +31,9 @@ tubee is a data management engine with proxy capabilities for other services and
 * Console client for Linux, Windows and OSX
 
 ## Endpoints
+
+![Endpoints](./docs/_images/endpoints.png)
+
 * Endpoints
     * LDAP (OpenLDAP, ActiveDirectory and other LDAP server)
     * Various SQL Databases (PDO, All relational SQL database engines)

@@ -39,7 +39,7 @@ tubectl login -u raffis -P -s https://tubee.example
 >**Note** tubectl login stores your password in your operating systems credentials vault. You may be asked to unlock it.
 
 As of tubectl v1.0.0 it is only possible to authenticate using http basic credentials eventough the tubee server also offers OpenID-connect.
-By default self signed ssl certificated are not accepted by tubectl, however you may change this behaviour by setting the option -a or --allow-self-signed accordingly.
+By default self signed ssl certificated are not accepted by tubectl, however you may change this behaviour by setting the option `-a` or `--allow-self-signed` accordingly.
 
 Lets start our first request and query the available namespaces:
 
@@ -48,8 +48,7 @@ tubectl get ns
 ```
 
 This lists all namespace resources in a pretty table.
-
-tubectl is programmed for user-friendly i/o system. For requesting resources you need to use `get`, to edit resources `edit` and of course to create new ones `create`. You may just execute tubectl without any options to get the available commands:
+For requesting resources you need to use `get`, to edit resources `edit` and of course to create new ones `create`. You may just execute tubectl without any options to get the available commands:
 
 ```sh
 tubectl

@@ -52,16 +52,6 @@ class AttributeMapTest extends TestCase
         $this->assertSame(['bar' => 'bar'], $result);
     }
 
-    public function testAttributeNameAlias()
-    {
-        $map = new AttributeMap([
-            ['name' => 'bar', 'value' => 'foo', 'name' => '$foo'],
-        ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
-
-        $result = $map->map([]);
-        $this->assertSame(['$foo' => 'foo'], $result);
-    }
-
     public function testAttributeEnsureMergeNotArray()
     {
         $this->expectException(InvalidArgumentException::class);
