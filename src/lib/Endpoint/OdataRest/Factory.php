@@ -41,7 +41,7 @@ class Factory
             }
         }
 
-        $options = array_merge($resource['data']['resource']['options'], $options);
+        $options = array_merge($resource['data']['resource']['request_options'], $options);
         $client = new Client($options);
 
         return new OdataRest($resource['name'], $resource['data']['type'], $client, $collection, $workflow_factory, $logger, $resource);

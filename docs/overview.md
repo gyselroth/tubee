@@ -51,7 +51,7 @@ tubee acts as a central data manager and proxy layer between various services.
     * XML (via different storage backends, see Storage drivers)
     * CSV (via different storage backends, see Storage drivers)
     * JSON (via different storage backends, see Storage drivers)
-    * Images (via different storage backends, see Storage drivers)
+    * Binary Images (via different storage backends, see Storage drivers)
     * Ucs (Univetion Corporate Server)
 * Storage drivers for data formats:
     * LocalFilesystem
@@ -59,7 +59,7 @@ tubee acts as a central data manager and proxy layer between various services.
     * SMB (Windows/Samba share via smb)
     * Stream (HTTP,FTP and more)
 
-## Resorce types
+## Resource types
 
 The tubee server works with various different resource types.
 
@@ -67,18 +67,18 @@ The tubee server works with various different resource types.
 | ------------- |--------------|
 | Namespace | Resources like collections must be part of a single namespace.  |
 | Collection | A collection is group of similar data objects. Each collection holds data objects and is part of a namespace.|
-| Endpoint | An endpoint represents a remote server for proxying, import from, or export to. |
+| Endpoint | An endpoint represents a remote server for proxy, import from, or export to. |
 | DataObject  | An actual object which must be part of a collection. |
 | DataObjectRelation  | Represents a relationship between data objects. |
 | EndpointObject  | Besides data objects there are also endpoint objects. The diference is that an endpoint object represents the state of an object on an endpoint. |
-| Workflow   | A workflow defines how and what data should be synchronized between endpoints and collections. A worklfow is always attached to an endpoint.|
+| Workflow   | A workflow defines how and what data should be synchronized between endpoints and collections. A workflow is always attached to an endpoint.|
 | Secret  | Holds sensible data which can be injected into other resources. Usually secrets injected into endpoint resources. |
 | User  | A simple user with password authentication. (You may also use OpenID-connect or LDAP auth adapter instead local user resources) |
 | AccessRole  | Defines an access role which can be used to gain access. Authenticated users are are part of an access-rule. |
 | AccessRule  | Create access rules (RBAC) based on HTTP requests. |
-| Job | A jobs defines what endpoints (or whole mandators or collections) should be synchronized and at what time/interval. |
-| Process | A process represents a single execution of a job |
-| Log | Each process/job will create log resources which can be requested for each |
+| Job | A jobs defines what endpoints/collections should be synchronized and at what time/interval. |
+| Process | A process represents a single execution of a job. |
+| Log | Each process/job will create log resources which can be requested for Jobs, Processes, Collections, Endpoints and DataObjects. |
 
 
 ## Resource overview

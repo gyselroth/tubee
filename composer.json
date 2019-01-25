@@ -28,7 +28,6 @@
         "ext-mongodb": "*",
         "ext-curl": "*",
         "ext-apcu": "*",
-        "ext-v8js": "*",
         "gyselroth/micro-auth": "^1.0.0-alpha3",
         "gyselroth/micro-container": "^2.0.0",
         "psr/http-factory": "^1.0.0",
@@ -67,6 +66,7 @@
     "minimum-stability": "dev",
     "prefer-stable": true,
     "suggest": {
+        "ext-v8js": "*",
         "ext-ldap": "*",
         "ext-mysqli": "*",
         "ext-pdo": "*",
@@ -74,6 +74,7 @@
         "ext-xml": "*"
     },
     "require-dev": {
+        "phpv8/v8js-stubs": "^1.4.1",
         "friendsofphp/php-cs-fixer": "*",
         "phpunit/phpunit": "^6.0.0",
         "helmich/mongomock": "dev-master#a6c53a4",

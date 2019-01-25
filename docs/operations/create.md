@@ -13,7 +13,7 @@ EDITOR=vi tubectl create ns
 ```
 
 After exiting the editor, tubectl tries to create the specified resource, if this fails for whatever reason the error message gets prepended on the top
-and you may correct the error. If you do not change anything and quit a seccond time the editor gets closed.
+and you may correct the error. If you do not change anything and quit a second time the editor gets closed.
 
 Your changes are not lost, tubectl creates a temporary file in your temp directory which still exists after you quit. This may just get reapplied using the `-f` or `--file` option.
 ```
@@ -101,5 +101,5 @@ data:
 
 You may as well set a specifc resource type as argument to `--from-template`. This may be required if you want to create a new endpoint:
 ```
-tubectl create ep mynamespace mycollection --from-template MongodbEndpoint
+tubectl create ep mycollection -n mynamespace --from-template MongodbEndpoint
 ``` 

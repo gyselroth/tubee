@@ -20,6 +20,7 @@ data:
     kind: StreamStorage
   type: destination
   options:
+    identifier: null
     flush: true
     import: []
     filter_one: test
@@ -35,7 +36,7 @@ tubectl create -f spec.yaml
 Check the just created resource:
 
 ```sh
-tubectl get ep playground accounts json-export -o yaml
+tubectl get ep accounts json-export -n playground -o yaml
 ```
 
 ## Destination endpoints

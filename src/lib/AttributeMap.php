@@ -66,7 +66,7 @@ class AttributeMap implements AttributeMapInterface
      */
     public function getAttributes(): array
     {
-        return array_keys($this->map);
+        return array_column($this->map, 'name');
     }
 
     /**
@@ -78,10 +78,12 @@ class AttributeMap implements AttributeMapInterface
         $attrv = null;
 
         $result = [];
-        foreach ($this->map as $attr => $value) {
+        foreach ($this->map as $value) {
             if (isset($attrv)) {
                 unset($attrv);
             }
+
+            $attr = $value['name'];
 
             if (isset($value['ensure'])) {
                 if ($value['ensure'] === AttributeMapInterface::ENSURE_MERGE && isset($value['type']) && $value['type'] !== AttributeMapInterface::TYPE_ARRAY) {
@@ -118,12 +120,9 @@ class AttributeMap implements AttributeMapInterface
     public function getDiff(array $object, array $endpoint_object): array
     {
         $diff = [];
-        foreach ($this->map as $attr => $value) {
+        foreach ($this->map as $value) {
+            $attr = $value['name'];
             $exists = isset($endpoint_object[$attr]);
-
-            if (isset($value['name'])) {
-                $attr = $value['name'];
-            }
 
             if ($value['ensure'] === AttributeMapInterface::ENSURE_EXISTS && ($exists === true || !isset($object[$attr]))) {
                 continue;
@@ -312,21 +311,13 @@ class AttributeMap implements AttributeMapInterface
     protected function rewrite($value, array $ruleset)
     {
         foreach ($ruleset as $rule) {
-            if (!isset($rule['match'])) {
-                throw new InvalidArgumentException('match in filter is not set');
-            }
-
-            if (!isset($rule['to'])) {
-                throw new InvalidArgumentException('to in filter is not set');
-            }
-
-            if (isset($rule['regex']) && $rule['regex'] === false) {
-                if ($value === $rule['match']) {
+            if (isset($rule['from'])) {
+                if ($value === $rule['from']) {
                     $value = $rule['to'];
 
                     return $value;
                 }
-            } elseif (isset($rule['regex']) && $rule['regex'] === true || !isset($rule['regex'])) {
+            } elseif (isset($rule['match'])) {
                 $value = preg_replace($rule['match'], $rule['to'], $value, -1, $count);
                 if ($count > 0) {
                     return $value;

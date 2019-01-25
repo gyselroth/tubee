@@ -30,7 +30,7 @@ services:
       - MYSQL_ROOT_PASSWORD=moodle
       - MYSQL_USER=moodle
   balloon:
-    image: gyselroth/balloon:2.1.8
+    image: gyselroth/balloon:2.3.3
     links:
       - mongodb3
     entrypoint: php-fpm

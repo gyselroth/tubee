@@ -98,6 +98,9 @@ class Factory extends ResourceFactory
 
         foreach ($cursor as $process) {
             $this->scheduler->cancelJob($process['_id']);
+            if (isset($process['data']['parent']) && $process['options']['interval'] !== 0) {
+                $this->scheduler->addJob(Sync::class, $process['data'], $process['options']);
+            }
         }
 
         return true;

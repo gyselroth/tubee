@@ -25,7 +25,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeEnsureAbsent()
     {
         $map = new AttributeMap([
-            'foo' => ['ensure' => AttributeMapInterface::ENSURE_ABSENT],
+            ['name' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_ABSENT],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -35,7 +35,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeEnsureExists()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_EXISTS],
+            ['name' => 'foo', 'from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_EXISTS],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -45,7 +45,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeChangeName()
     {
         $map = new AttributeMap([
-            'bar' => ['from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_EXISTS],
+            ['name' => 'bar', 'from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_EXISTS],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -55,7 +55,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeNameAlias()
     {
         $map = new AttributeMap([
-            'bar' => ['value' => 'foo', 'name' => '$foo'],
+            ['name' => 'bar', 'value' => 'foo', 'name' => '$foo'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map([]);
@@ -66,7 +66,7 @@ class AttributeMapTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $map = new AttributeMap([
-            'string' => ['from' => 'foo', 'type' => 'string', 'ensure' => AttributeMapInterface::ENSURE_MERGE],
+            ['name' => 'string', 'from' => 'foo', 'type' => 'string', 'ensure' => AttributeMapInterface::ENSURE_MERGE],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -75,12 +75,12 @@ class AttributeMapTest extends TestCase
     public function testAttributeConvert()
     {
         $map = new AttributeMap([
-            'string' => ['from' => 'foo', 'type' => AttributeMapInterface::TYPE_STRING],
-            'int' => ['from' => 'foo', 'type' => AttributeMapInterface::TYPE_INT],
-            'float' => ['from' => 'foo', 'type' => AttributeMapInterface::TYPE_FLOAT],
-            'null' => ['from' => 'foo', 'type' => AttributeMapInterface::TYPE_NULL],
-            'bool' => ['from' => 'foo', 'type' => AttributeMapInterface::TYPE_BOOL],
-            'array' => ['from' => 'foo', 'type' => AttributeMapInterface::TYPE_ARRAY],
+            ['name' => 'string', 'from' => 'foo', 'type' => AttributeMapInterface::TYPE_STRING],
+            ['name' => 'int', 'from' => 'foo', 'type' => AttributeMapInterface::TYPE_INT],
+            ['name' => 'float', 'from' => 'foo', 'type' => AttributeMapInterface::TYPE_FLOAT],
+            ['name' => 'null', 'from' => 'foo', 'type' => AttributeMapInterface::TYPE_NULL],
+            ['name' => 'bool', 'from' => 'foo', 'type' => AttributeMapInterface::TYPE_BOOL],
+            ['name' => 'array', 'from' => 'foo', 'type' => AttributeMapInterface::TYPE_ARRAY],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -96,7 +96,7 @@ class AttributeMapTest extends TestCase
     {
         $this->expectException(Exception\AttributeNotResolvable::class);
         $map = new AttributeMap([
-            'foo' => ['required' => true, 'from' => 'bar'],
+            ['name' => 'foo', 'required' => true, 'from' => 'bar'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -105,7 +105,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeNotRequired()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'bar', 'required' => false],
+            ['name' => 'foo', 'from' => 'bar', 'required' => false],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'bar']);
@@ -115,7 +115,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeRequireRegexMatch()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'require_regex' => '#[a-z][A-Z][a-z]#'],
+            ['name' => 'foo', 'from' => 'foo', 'require_regex' => '#[a-z][A-Z][a-z]#'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'fOo']);
@@ -126,7 +126,7 @@ class AttributeMapTest extends TestCase
     {
         $this->expectException(Exception\AttributeRegexNotMatch::class);
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'require_regex' => '#[a-z][A-Z][a-z]#'],
+            ['name' => 'foo', 'from' => 'foo', 'require_regex' => '#[a-z][A-Z][a-z]#'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'foo']);
@@ -135,41 +135,17 @@ class AttributeMapTest extends TestCase
     public function testAttributeRequireRegexNotMatchNoAttribute()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'bar', 'required' => false, 'require_regex' => '#[a-z][A-Z][a-z]#'],
+            ['name' => 'foo', 'from' => 'bar', 'required' => false, 'require_regex' => '#[a-z][A-Z][a-z]#'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'foo']);
         $this->assertSame([], $result);
     }
 
-    public function testAttributeRewriteRegexRuleNoTo()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'rewrite' => [
-                ['match' => '#^foo$#'],
-            ]],
-        ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
-
-        $result = $map->map(['foo' => 'foo']);
-    }
-
-    public function testAttributeRewriteRegexRuleNoMatch()
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'rewrite' => [
-                ['to' => 'foo'],
-            ]],
-        ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
-
-        $result = $map->map(['foo' => 'foo']);
-    }
-
     public function testAttributeRewriteRegexRule()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'rewrite' => [
+            ['name' => 'foo', 'from' => 'foo', 'rewrite' => [
                 ['match' => '#^foo$#', 'to' => 'bar'],
             ]],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
@@ -181,7 +157,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeRewriteRegexRuleFirstMatch()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'rewrite' => [
+            ['name' => 'foo', 'from' => 'foo', 'rewrite' => [
                 ['match' => '#^foo$#', 'to' => 'bar'],
                 ['match' => '#^foo$#', 'to' => 'foobar'],
             ]],
@@ -194,7 +170,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeRewriteRegexRuleFirstMatchLastRule()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'rewrite' => [
+            ['name' => 'foo', 'from' => 'foo', 'rewrite' => [
                 ['match' => '#^fo$#', 'to' => 'bar'],
                 ['match' => '#^foo$#', 'to' => 'foobar'],
             ]],
@@ -207,8 +183,8 @@ class AttributeMapTest extends TestCase
     public function testAttributeRewriteCompareRule()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'rewrite' => [
-                ['regex' => false, 'match' => 'foo', 'to' => 'bar'],
+            ['name' => 'foo', 'from' => 'foo', 'rewrite' => [
+                ['from' => 'foo', 'to' => 'bar'],
             ]],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
@@ -219,17 +195,17 @@ class AttributeMapTest extends TestCase
     public function testAttributeStaticValue()
     {
         $map = new AttributeMap([
-            'foo' => ['value' => 'foobar'],
+            ['name' => 'foo',  'value' => 'foobar'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'foo']);
         $this->assertSame('foobar', $result['foo']);
     }
 
-    public function testAttributeScriptDynamicValue()
+    /*public function testAttributeScriptDynamicValue()
     {
         $map = new AttributeMap([
-            'foo' => ['script' => 'core.result("foobar")'],
+            ['name' => 'foo', 'script' => 'core.result("foobar")'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['bar' => 'foo']);
@@ -239,7 +215,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeScriptJoinValues()
     {
         $map = new AttributeMap([
-            'foo' => ['script' => 'core.result(core.object.foo+core.object.bar)'],
+            ['name' => 'foo', 'script' => 'core.result(core.object.foo+core.object.bar)'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map([
@@ -247,13 +223,13 @@ class AttributeMapTest extends TestCase
             'bar' => 'bar',
         ]);
         $this->assertSame('foobar', $result['foo']);
-    }
+    }*/
 
     public function testAttributeDynamicValueNotResolvable()
     {
         $this->expectException(Exception\AttributeNotResolvable::class);
         $map = new AttributeMap([
-            'foo' => ['required' => true, 'script' => 'foobar'],
+            ['name' => 'foo', 'required' => true, 'script' => 'foobar'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'foo']);
@@ -262,7 +238,7 @@ class AttributeMapTest extends TestCase
     public function testAttributeDynamicValueNotResolvableNotRequired()
     {
         $map = new AttributeMap([
-            'foo' => ['script' => 'bar', 'required' => false],
+            ['name' => 'foo', 'script' => 'bar', 'required' => false],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'foo']);
@@ -272,7 +248,7 @@ class AttributeMapTest extends TestCase
     public function testArrayAttributeAsString()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'type' => 'string'],
+            ['name' => 'foo', 'from' => 'foo', 'type' => 'string'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => ['foo', 'bar']]);
@@ -282,7 +258,8 @@ class AttributeMapTest extends TestCase
     public function testUnwindConvertElements()
     {
         $map = new AttributeMap([
-            'foo' => [
+            [
+                'name' => 'foo',
                 'from' => 'foo',
                 'type' => 'array',
                 'unwind' => [
@@ -299,7 +276,8 @@ class AttributeMapTest extends TestCase
     public function testUnwindArrayAttributeRequireRegexMatch()
     {
         $map = new AttributeMap([
-            'foo' => [
+            [
+                'name' => 'foo',
                 'from' => 'foo',
                 'type' => 'array',
                 'unwind' => [
@@ -317,7 +295,8 @@ class AttributeMapTest extends TestCase
     {
         $this->expectException(Exception\AttributeRegexNotMatch::class);
         $map = new AttributeMap([
-            'foo' => [
+            [
+                'name' => 'foo',
                 'from' => 'foo',
                 'type' => 'array',
                 'unwind' => [
@@ -333,7 +312,7 @@ class AttributeMapTest extends TestCase
     public function testUnwindArrayAttributeRewriteRegexRule()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'type' => 'array', 'unwind' => ['from' => 'root', 'rewrite' => [
+            ['name' => 'foo', 'from' => 'foo', 'type' => 'array', 'unwind' => ['from' => 'root', 'rewrite' => [
                 ['match' => '#^foo#', 'to' => 'bar'],
             ]]],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
@@ -345,13 +324,14 @@ class AttributeMapTest extends TestCase
     public function testUnwindArrayAttributeRewriteCompareRule()
     {
         $map = new AttributeMap([
-            'foo' => [
+            [
+                'name' => 'foo',
                 'from' => 'foo',
                 'type' => 'array',
                 'unwind' => [
                     'from' => 'root',
                     'rewrite' => [
-                        ['regex' => false, 'match' => 'foo', 'to' => 'bar'],
+                        ['from' => 'foo', 'to' => 'bar'],
                     ],
                 ],
             ],
@@ -364,7 +344,7 @@ class AttributeMapTest extends TestCase
     public function testBinaryType()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'type' => 'binary'],
+            ['name' => 'foo', 'from' => 'foo', 'type' => 'binary'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $result = $map->map(['foo' => 'foo']);
@@ -374,7 +354,7 @@ class AttributeMapTest extends TestCase
     public function testGetDiffNoChange()
     {
         $map = new AttributeMap([
-            'foo' => ['ensure' => 'last', 'from' => 'foo'],
+            ['name' => 'foo', 'ensure' => 'last', 'from' => 'foo'],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $mapped = ['foo' => 'foo'];
@@ -383,30 +363,10 @@ class AttributeMapTest extends TestCase
         $this->assertSame([], $result);
     }
 
-    public function testGetDiffAttributeNameAlias()
-    {
-        $map = new AttributeMap([
-            'foo' => ['ensure' => 'last', 'from' => 'foo', 'name' => '$foo'],
-        ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
-
-        $mapped = ['$foo' => 'foo'];
-        $existing = ['$foo' => 'bar'];
-        $result = $map->getDiff($mapped, $existing);
-
-        $expected = [
-            '$foo' => [
-                'action' => AttributeMapInterface::ACTION_REPLACE,
-                'value' => 'foo',
-            ],
-        ];
-
-        $this->assertSame($expected, $result);
-    }
-
     public function testGetDiffUpdateValue()
     {
         $map = new AttributeMap([
-            'foo' => ['from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_LAST],
+            ['name' => 'foo', 'from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_LAST],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $mapped = ['foo' => 'foo'];

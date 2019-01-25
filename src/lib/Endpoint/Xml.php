@@ -18,6 +18,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
+use Tubee\Endpoint\Xml\Converter;
 use Tubee\Endpoint\Xml\Exception as XmlException;
 use Tubee\Endpoint\Xml\QueryTransformer;
 use Tubee\EndpointObject\EndpointObjectInterface;
@@ -213,7 +214,7 @@ class Xml extends AbstractFile
             $node = $xpath->query($filter);
 
             foreach ($node as $result) {
-                $result = $this->xmlToArray($result);
+                $result = Converter::xmlToArray($result);
                 yield $this->build($result);
                 ++$i;
             }
@@ -342,54 +343,10 @@ class Xml extends AbstractFile
                 throw new Exception\ObjectNotFound('no object found with filter '.$filter);
             }
 
-            $node = $this->xmlToArray(array_shift($nodes));
+            $node = Converter::xmlToArray(array_shift($nodes));
 
             return $this->build($node);
         }
-    }
-
-    /**
-     * Convert XMLElement into nicly formatted php array.
-     */
-    protected function xmlToArray($root)
-    {
-        $result = [];
-
-        if ($root->hasAttributes()) {
-            $attrs = $root->attributes;
-            foreach ($attrs as $attr) {
-                $result['@attributes'][$attr->name] = $attr->value;
-            }
-        }
-
-        if ($root->hasChildNodes()) {
-            $children = $root->childNodes;
-
-            if ($children->length == 1) {
-                $child = $children->item(0);
-
-                if ($child->nodeType === XML_TEXT_NODE || $child->nodeType === XML_CDATA_SECTION_NODE) {
-                    $result['_value'] = $child->nodeValue;
-
-                    return count($result) == 1 ? $result['_value'] : $result;
-                }
-            }
-
-            $groups = [];
-            foreach ($children as $child) {
-                if (!isset($result[$child->nodeName])) {
-                    $result[$child->nodeName] = $this->xmlToArray($child);
-                } else {
-                    if (!isset($groups[$child->nodeName])) {
-                        $result[$child->nodeName] = [$result[$child->nodeName]];
-                        $groups[$child->nodeName] = 1;
-                    }
-                    $result[$child->nodeName][] = $this->xmlToArray($child);
-                }
-            }
-        }
-
-        return $result;
     }
 
     /**

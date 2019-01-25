@@ -32,11 +32,17 @@ class Validator
             ],
         ];
 
+        $resource = array_replace_recursive($defaults, $resource);
+
         if (!isset($resource['file']) || !is_string($resource['file'])) {
             throw new InvalidArgumentException('file is required and must be a string');
         }
 
         foreach ($resource['resource'] as $key => $value) {
+            if (is_null($value)) {
+                continue;
+            }
+
             switch ($key) {
                 case 'format':
                     if (!is_string($value)) {

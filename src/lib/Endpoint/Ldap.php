@@ -84,6 +84,7 @@ class Ldap extends AbstractEndpoint
     public function __construct(string $name, string $type, LdapServer $ldap, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->ldap = $ldap;
+        $this->identifier = 'entrydn';
 
         if (isset($resource['data']['resource'])) {
             $this->setLdapOptions($resource['data']['resource']);

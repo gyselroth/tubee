@@ -41,7 +41,7 @@ class Log extends AbstractResource implements LogInterface
                 'level' => $this->resource['level'],
                 'level_name' => $this->resource['level_name'],
                 'message' => $this->resource['message'],
-                'category' => $this->resource['context']['category'],
+                'category' => isset($this->resource['context']['category']) ? $this->resource['context']['category'] : '<unknown>',
             ],
         ];
 

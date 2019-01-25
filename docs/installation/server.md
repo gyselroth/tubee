@@ -9,7 +9,8 @@ There are multiple supported ways to deploy tubee:
 * Docker (docker-compose or via a orchestration plattform like [Kubernetes](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/))
 * Compile manually from scratch
 
-The docker deployment is the **recommended** way to deploy tubee. And it is also the simplest way.
+The docker deployment using docker-compose or a container orchestration platform like kubernetes is the **recommended** way to deploy tubee. And it is also the simplest way.
+Deploy tubee using debian packages, tar archives or even installing from source requires some advanced system knowledge.
 
 ## Debian based distribution
 

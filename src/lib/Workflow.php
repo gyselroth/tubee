@@ -103,6 +103,14 @@ class Workflow extends AbstractResource implements WorkflowInterface
     }
 
     /**
+     * Get ensure.
+     */
+    public function getEnsure(): string
+    {
+        return $this->ensure;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function decorate(ServerRequestInterface $request): array
@@ -160,7 +168,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         $map = $this->attribute_map->map($attributes, $ts);
-        $this->logger->debug('mapped object attributes [{map}] for cleanup', [
+        $this->logger->fino('mapped object attributes [{map}] for cleanup', [
             'category' => get_class($this),
             'map' => array_keys($map),
         ]);
@@ -202,7 +210,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         $map = $this->attribute_map->map($object, $ts);
-        $this->logger->debug('mapped object attributes [{map}] for import', [
+        $this->logger->info('mapped object attributes [{map}] for import', [
             'category' => get_class($this),
             'map' => array_keys($map),
         ]);
@@ -282,12 +290,17 @@ class Workflow extends AbstractResource implements WorkflowInterface
         }
 
         $map = $this->attribute_map->map($attributes, $ts);
-        $this->logger->debug('mapped object attributes [{map}] for write', [
+        $this->logger->info('mapped object attributes [{map}] for write', [
             'category' => get_class($this),
             'map' => array_keys($map),
         ]);
 
-        $exists = $this->getExportObject($map);
+        $exists = $this->getExportObject([
+            'map' => $map,
+            'object' => $attributes,
+        ]);
+
+        $map = Helper::pathArrayToAssociative($map);
         $ensure = $this->ensure;
 
         if ($exists === null && $this->ensure === WorkflowInterface::ENSURE_ABSENT) {
@@ -331,7 +344,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ],
                 ];
 
-                $this->endpoint->getCollection()->changeObject($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
 
                 return true;
 
@@ -354,6 +367,12 @@ class Workflow extends AbstractResource implements WorkflowInterface
                     ]);
 
                     $diff = $this->endpoint->getDiff($this->attribute_map, $diff);
+
+                    $this->logger->debug('execute diff [{diff}] on endpoint ['.$this->endpoint->getIdentifier().']', [
+                        'category' => get_class($this),
+                        'diff' => $diff,
+                    ]);
+
                     $result = $this->endpoint->change($this->attribute_map, $diff, $map, $exists->getData(), $simulate);
 
                     if ($result !== null) {
@@ -366,10 +385,14 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 }
 
                 if (!isset($endpoints[$this->endpoint->getName()]['result'])) {
-                    $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getIdentifier()];
+                    if (isset($exists->getData()[$this->endpoint->getResourceIdentifier()])) {
+                        $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getResourceIdentifier()];
+                    } else {
+                        $endpoints[$this->endpoint->getName()]['result'] = null;
+                    }
                 }
 
-                $this->endpoint->getCollection()->changeObject($object, $object->getData(), $simulate, $endpoints);
+                $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
 
                 return true;
 
@@ -497,7 +520,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Get export object.
      */
-    protected function getExportObject(Iterable $map): ?EndpointObjectInterface
+    protected function getExportObject(array $map): ?EndpointObjectInterface
     {
         try {
             if ($this->endpoint->flushRequired()) {

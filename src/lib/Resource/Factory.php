@@ -190,6 +190,7 @@ class Factory
         ]);
 
         if ($existing === true) {
+            $query = $this->prepareQuery($query);
             $total = $collection->count($query);
 
             if ($offset !== null && $total === 0) {
@@ -199,6 +200,7 @@ class Factory
             }
 
             $result = $collection->find($query, [
+                'projection' => ['history' => 0],
                 'skip' => $offset,
                 'limit' => $limit,
                 'sort' => $sort,
@@ -235,6 +237,30 @@ class Factory
         ]);
 
         return $resource;
+    }
+
+    /**
+     * Remove fullDocument prefix from keys.
+     */
+    protected function prepareQuery(array $query): array
+    {
+        $filter = $query;
+        if (isset($query['$and'])) {
+            $query = $query['$and'][0];
+        }
+
+        $new = [];
+        foreach ($query as $key => $value) {
+            $new[substr($key, 13)] = $value;
+        }
+
+        if (isset($filter['$and'])) {
+            $filter['$and'][0] = $new;
+
+            return $filter;
+        }
+
+        return $new;
     }
 
     /**

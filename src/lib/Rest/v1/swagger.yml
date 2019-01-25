@@ -3847,7 +3847,7 @@ definitions:
                     description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
                     type: object
                     properties:
-                      token_uri:
+                      token_endpoint:
                         description: "URI to token endpoint."
                         type: string
                       client_id:
@@ -3855,6 +3855,9 @@ definitions:
                         type: string
                       client_secret:
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
+                        type: string
+                      scope:
+                        description: "OAuth2 scopes"
                         type: string
   UcsEndpoint:
     description: "UCS endpoint (Univention Corporate Server, https://www.univention.com/products/ucs)"

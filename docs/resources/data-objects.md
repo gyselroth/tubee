@@ -24,5 +24,5 @@ tubectl create -f spec.yaml
 Check the just created resource:
 
 ```sh
-tubectl get do playground accounts user -o yaml
+tubectl get do accounts user -n playground -o yaml
 ```

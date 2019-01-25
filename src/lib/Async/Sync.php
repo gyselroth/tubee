@@ -234,8 +234,9 @@ class Sync extends AbstractJob
         $i = 0;
         foreach ($collection->getObjects($filter) as $id => $object) {
             ++$i;
-            $this->logger->debug('process ['.$i.'] export for object ['.(string) $id.'] from data type ['.$collection->getIdentifier().']', [
+            $this->logger->debug('process ['.$i.'] export for object ['.(string) $id.'] - [{fields}] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
+                'fields' => array_keys($object->toArray()),
             ]);
 
             foreach ($endpoints as $ep) {
@@ -250,17 +251,20 @@ class Sync extends AbstractJob
 
                 try {
                     foreach ($workflows[$identifier] as $workflow) {
-                        $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current object', [
+                        $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] [ensure='.$workflow->getEnsure().'] for the current object', [
                             'category' => get_class($this),
                         ]);
 
                         if ($workflow->export($object, $this->timestamp, $simulate) === true) {
-                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the current object, skip any further workflows for the current data object', [
+                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $id.'], skip any further workflows for the current data object', [
                                 'category' => get_class($this),
                             ]);
 
                             continue 2;
                         }
+                        $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $id.'], condition does not match or unusable ensure', [
+                                'category' => get_class($this),
+                            ]);
                     }
 
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
@@ -334,17 +338,20 @@ class Sync extends AbstractJob
 
                 try {
                     foreach ($workflows[$identifier] as $workflow) {
-                        $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current object', [
+                        $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] [ensure='.$workflow->getEnsure().'] for the current object', [
                             'category' => get_class($this),
                         ]);
 
                         if ($workflow->import($collection, $object, $this->timestamp, $simulate) === true) {
-                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the current object, skip any further workflows for the current data object', [
+                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $id.'], skip any further workflows for the current data object', [
                                 'category' => get_class($this),
                             ]);
 
                             continue 2;
                         }
+                        $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $id.'], condition does not match or unusable ensure', [
+                                'category' => get_class($this),
+                            ]);
                     }
 
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [

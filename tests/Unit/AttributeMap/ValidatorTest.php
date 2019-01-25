@@ -28,20 +28,21 @@ class ValidatorTest extends TestCase
     public function testAttributeInvalidAttributeName()
     {
         $this->expectException(InvalidArgumentException::class);
-        $resource = [0 => 'foo'];
+        $resource = [['foo' => 'bar']];
         Validator::validate($resource);
     }
 
     public function testAttributeInvalidType()
     {
         $this->expectException(InvalidArgumentException::class);
-        $resource = ['foo' => ['type' => 'foo']];
+        $resource = [['name' => 'foo', 'type' => 'foo']];
         Validator::validate($resource);
     }
 
     public function testValidAttributeMap()
     {
-        $resource = ['foo' => [
+        $resource = [[
+            'name' => 'foo',
             'type' => 'string',
             'required' => false,
             'require_regex' => '#.*#',
@@ -49,9 +50,10 @@ class ValidatorTest extends TestCase
             'script' => null,
         ]];
 
-        $expected = ['foo' => [
+        $expected = [[
+            'name' => 'foo',
             'type' => 'string',
-            'name' => null,
+            'name' => 'foo',
             'required' => false,
             'require_regex' => '#.*#',
             'from' => 'bar',
@@ -69,21 +71,21 @@ class ValidatorTest extends TestCase
     public function testAttributeInvalidEnsure()
     {
         $this->expectException(InvalidArgumentException::class);
-        $resource = ['foo' => ['ensure' => 'foo']];
+        $resource = [['name' => 'foo', 'ensure' => 'foo']];
         Validator::validate($resource);
     }
 
     public function testAttributeInvalidOption()
     {
         $this->expectException(InvalidArgumentException::class);
-        $resource = ['foo' => ['foo' => 'foo']];
+        $resource = [['name' => 'foo', 'foo' => 'foo']];
         Validator::validate($resource);
     }
 
     public function testAttributeInvalidRequire()
     {
         $this->expectException(InvalidArgumentException::class);
-        $resource = ['foo' => ['require' => 'foo']];
+        $resource = [['name' => 'foo', 'require' => 'foo']];
         Validator::validate($resource);
     }
 }

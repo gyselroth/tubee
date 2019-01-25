@@ -41,7 +41,9 @@ class Validator extends ResourceValidator
             throw new InvalidArgumentException('invalid endpoint kind provided, provide one of ['.join(',', array_flip(EndpointInterface::ENDPOINT_MAP)).']');
         }
 
+        $resource = self::validateEndpoint($resource);
         $resource = array_replace_recursive($defaults, $resource);
+
         if (!in_array($resource['data']['type'], EndpointInterface::VALID_TYPES)) {
             throw new InvalidArgumentException('invalid endpoint type provided, provide one of ['.join(',', EndpointInterface::VALID_TYPES).']');
         }
@@ -81,7 +83,7 @@ class Validator extends ResourceValidator
             }
         }
 
-        return self::validateEndpoint($resource);
+        return $resource;
     }
 
     /**

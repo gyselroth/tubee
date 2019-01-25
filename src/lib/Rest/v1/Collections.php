@@ -173,7 +173,7 @@ class Collections
                 $filter = ['$and' => [$filter, $query['query']]];
             }
 
-            $logs = $this->log_factory->watch(null, true, $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            $logs = $this->log_factory->watch(null, isset($query['stream']), $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $logs);
         }

@@ -12,8 +12,11 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
-use Tubee\AttributeMap\AttributeMapInterface;
+use GuzzleHttp\Client;
+use Psr\Log\LoggerInterface;
+use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Balloon extends AbstractRest
 {
@@ -23,21 +26,13 @@ class Balloon extends AbstractRest
     public const KIND = 'BalloonEndpoint';
 
     /**
-     * {@inheritdoc}
+     * Init endpoint.
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->logger->info('update balloon object on endpoint ['.$this->getIdentifier().'] using ['.$this->update_method.'] to ['.$this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object).']', [
-            'category' => get_class($this),
-        ]);
-
-        if ($simulate === false) {
-            $result = $this->client->patch('/'.$this->getResourceId($endpoint_object), [
-                'json' => $diff,
-            ]);
-        }
-
-        return null;
+        $this->identifier = 'id';
+        $this->container = 'data';
+        parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }
 
     /**
@@ -47,14 +42,14 @@ class Balloon extends AbstractRest
     {
         $result = null;
         if ($this->filter_all !== null) {
-            $result = '{"query":'.stripslashes($this->filter_all).'}';
+            $result = stripslashes($this->filter_all);
         }
 
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = '{"query":'.json_encode($query).'}';
+                $result = json_encode($query);
             } else {
-                $result = '{"query":{"$and":['.stripslashes($this->filter_all).', '.json_encode($query).']}}';
+                $result = '{"$and":['.stripslashes($this->filter_all).', '.json_encode($query).']}';
             }
         }
 
@@ -71,11 +66,9 @@ class Balloon extends AbstractRest
         ]);
 
         $options = $this->getRequestOptions();
-        $options['query'] = $this->transformQuery($query);
-
-        if ($options['query'] !== null) {
-            $options['headers']['Content-Type'] = 'application/json';
-        }
+        $options['query'] = [
+            'query' => $this->transformQuery($query),
+        ];
 
         $i = 0;
         $response = $this->client->get('', $options);
@@ -99,8 +92,10 @@ class Balloon extends AbstractRest
         ]);
 
         $options = $this->getRequestOptions();
-        $options['query'] = '{"query":'.stripslashes($filter).'}';
-        $options['headers']['Content-Type'] = 'application/json';
+        $options['query'] = [
+            'query' => stripslashes($filter),
+        ];
+
         $result = $this->client->get('', $options);
         $data = $this->getResponse($result);
 
