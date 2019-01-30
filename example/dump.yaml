@@ -38,9 +38,8 @@ data:
   endpoints:
     - 'bbc'
   filter: []
-  loadbalance: true
   simulate: false
-  log_level: error
+  log_level: debug
   ignore: true
   options:
     at: 0
@@ -57,14 +56,14 @@ endpoint: bbc
 data:
   ensure: exists
   map:
-    title:
+    - name: data.title
       from: title
       required: true
-    description:
+    - name: data.description
       from: description
-    date:
+    - name: data.date
       from: pubDate
-    guid:
+    - name: data.guid
       from: guid._value
   condition: null
 ---
@@ -85,7 +84,7 @@ data:
     flush: false
     import:
       - guid
-    filter_one: 'guid="{guid}"'
+    filter_one: 'guid="{data.guid}"'
     filter_all: null
   file: /tmp/news.xml
 ---
@@ -97,14 +96,14 @@ endpoint: xml-export
 data:
   ensure: exists
   map:
-    title:
+    - name: title
       from: data.title
       required: true
-    description:
+    - name: description
       from: data.description
-    date:
+    - name: date
       from: data.date
-    guid:
+    - name: guid
       from: data.guid
   condition: null
 ---
@@ -215,6 +214,13 @@ data:
     foo: foofoo
 ---
 name: balloon
+kind: Secret
+namespace: playground
+data:
+  username: YWRtaW4=
+  password: YWRtaW4=
+---
+name: balloon
 kind: BalloonEndpoint
 namespace: playground
 collection: accounts
@@ -237,6 +243,13 @@ data:
       - id
     filter_one: '{\"_id\": \"{endpoints.balloon.result}\"}'
     filter_all: null
+secrets:
+- secret: balloon
+  key: username
+  to: 'data.resource.basic.username'
+- secret: balloon
+  key: password
+  to: 'data.resource.basic.password'
 ---
 name: one-time-export
 kind: Process
@@ -250,7 +263,6 @@ data:
   endpoints:
     - 'json-export'
   filter: []
-  loadbalance: true
   simulate: false
   log_level: info
   ignore: true
@@ -263,9 +275,9 @@ endpoint: balloon
 data:
   ensure: last
   map:
-    hard_quota:
+    - name: hard_quota
       value: 4999999999999999
-    username:
+    - name: username
       from: data.username
       required: true
   condition: null
@@ -294,9 +306,9 @@ endpoint: json-export
 data:
   ensure: last
   map:
-    hard_quota:
+    - name: hard_quota
       value: 10
-    username:
+    - name: username
       from: data.username
       required: true
   condition: null
@@ -333,21 +345,20 @@ data:
   priority: 1
   ensure: exists
   map:
-    entryDn:
-      name: "$dn$"
-      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+    - name: "$dn$"
+      script: "core.result('cn='+core.object.data.name+',cn=users,dc=foobar,dc=intranet')"
       required: true
-    username:
+    - name: username
       from: data.username
       required: true
-    lastname:
+    - name: lastname
       from: data.firstname
       required: true
-    description:
+    - name: description
       value: "bar bar"
-    password:
+    - name: password
       value: admin1234
-  condition: "object['data']['disabled'] === null"
+  condition: "core.result(core.object.data.disabled === false)"
 ---
 name: update
 kind: Workflow
@@ -358,19 +369,18 @@ data:
   priority: 2
   ensure: last
   map:
-    entryDn:
-      name: "$dn$"
-      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+    - name: "$dn$"
+      script: "core.result('cn='+core.object.data.name+',cn=users,dc=foobar,dc=intranet')"
       required: true
-    username:
+    - name: username
       from: data.username
       required: true
-    lastname:
+    - name: lastname
       from: data.firstname
       required: true
-    description:
+    - name: description
       value: "foo foo"
-  condition: "object['data']['disabled'] === null"
+  condition: "core.result(core.object.data.disabled === false)"
 ---
 name: disable
 kind: Workflow
@@ -381,19 +391,18 @@ data:
   priority: 4
   ensure: last
   map:
-    entryDn:
-      name: "$dn$"
-      script: "'uid='~data['username']~',cn=users,dc=foobar,dc=intranet'"
+    - name: "$dn$"
+      script: "core.result('cn='+core.object.data.name+',cn=users,dc=foobar,dc=intranet')"
       required: true
-    username:
+    - name: username
       from: data.username
       required: true
-    lastname:
+    - name: lastname
       from: data.firstname
       required: true
-    description:
+    - name: description
       value: "This user is disabled"
-  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 1800"
+  condition: "core.result(core.object.data.disabled === true && (Date.now() / 1000 | 0) >= core.object.endpoints.im-mssql.last_sync.toDateTime().format('U') + 3600)"
 ---
 name: remove
 kind: Workflow
@@ -404,10 +413,10 @@ data:
   priority: 3
   ensure: absent
   map:
-    username:
+    - name: username
       from: data.username
       required: true
-  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 3600"
+  condition: "core.result(core.object.data.disabled === true && (Date.now() / 1000 | 0) >= core.object.endpoints.im-mssql.last_sync.toDateTime().format('U') + 6900)"
 ---
 name: hourly-account-export
 kind: Job
@@ -421,7 +430,6 @@ data:
   endpoints:
     - 'ucs'
   filter: []
-  loadbalance: true
   simulate: false
   log_level: debug
   ignore: true
@@ -457,6 +465,7 @@ secrets:
 ---
 kind: Secret
 name: ucs
+namespace: playground
 data:
   username: QWRtaW5pc3RyYXRvcg==
   password: YWRtaW4xMjM0
@@ -470,20 +479,19 @@ data:
   priority: 3
   ensure: last
   map:
-    entryDn:
-      name: "$dn$"
-      script: "'cn='~data['name']~',cn=groups,dc=foobar,dc=intranet'"
+    - name: "$dn$"
+      script: "core.result('cn='+core.object.data.name+',cn=users,dc=foobar,dc=intranet')"
       required: true
-    name:
+    - name: name
       from: data.name
       required: true
-    users:
+    - name: users
       from: relations
       unwind:
         from: root.object.endpoints.ucs.result
-    description:
+    - name: description
       value: "foobar"
-  condition: null
+  condition: "core.result(core.object.data.disabled === false)"
 ---
 name: remove
 kind: Workflow
@@ -494,7 +502,7 @@ data:
   priority: 1
   ensure: absent
   map:
-    name:
+    - name: name
       from: data.name
       required: true
-  condition: "object['data']['disabled'] !== null and now() >= object['data']['disabled'] + 3600"
+  condition: "core.result(core.object.data.disabled === true && (Date.now() / 1000 | 0) >= core.object.endpoints.im-mssql.last_sync.toDateTime().format('U') + 3600)"
