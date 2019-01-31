@@ -101,7 +101,7 @@ class Helper
     public static function watchAll(ServerRequestInterface $request, Identity $identity, Acl $acl, Iterable $cursor): ResponseInterface
     {
         //Watcher is valid for 5min, after a new requests needs to be sent
-        ini_set('max_execution_time', '300');
+        ini_set('max_executionntime', '300');
 
         $query = $request->getQueryParams();
         $options = isset($query['pretty']) ? JSON_PRETTY_PRINT : 0;

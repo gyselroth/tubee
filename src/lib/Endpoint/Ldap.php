@@ -270,7 +270,7 @@ class Ldap extends AbstractEndpoint
             if ($this->filter_all === null) {
                 $result = QueryTransformer::transform($query);
             } else {
-                $result = '&('.$this->filter_all.')('.QueryTransformer::transform($query).')';
+                $result = '(&'.$this->filter_all.QueryTransformer::transform($query).')';
             }
         }
 

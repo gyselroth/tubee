@@ -37,6 +37,8 @@ class Validator
             throw new InvalidArgumentException('file is required and must be a string');
         }
 
+        $resource = array_replace_recursive($defaults, $resource);
+
         foreach ($resource['resource'] as $key => $value) {
             switch ($key) {
                 case 'root_name':
@@ -58,7 +60,6 @@ class Validator
             }
         }
 
-        $resource = array_replace_recursive($defaults, $resource);
         $resource['storage'] = StorageValidator::validate($resource['storage']);
 
         return $resource;

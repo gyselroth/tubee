@@ -88,9 +88,9 @@ class Json extends AbstractFile
                 }
 
                 $this->storage->syncWriteStream($resource['stream'], $resource['path']);
+            } else {
+                fclose($resource['stream']);
             }
-
-            fclose($resource['stream']);
         }
 
         $this->files = [];

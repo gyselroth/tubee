@@ -67,6 +67,7 @@ class StreamTest extends TestCase
 
     public function testSyncWriteStream()
     {
-        $this->assertTrue($this->storage->syncWriteStream('foo', 'bar'));
+        $stream = fopen('php://memory', 'r');
+        $this->assertTrue($this->storage->syncWriteStream($stream, 'bar'));
     }
 }

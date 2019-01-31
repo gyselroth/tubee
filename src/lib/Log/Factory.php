@@ -47,6 +47,10 @@ class Factory extends ResourceFactory
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        if (empty($sort)) {
+            $sort = ['datetime' => -1];
+        }
+
         return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
     }
 

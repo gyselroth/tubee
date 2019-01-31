@@ -130,7 +130,8 @@ return [
     ],
     Database::class => [
         'use' => '{MongoDB\Client}',
-        'selects' => [[
+        'calls' => [[
+            'select' => true,
             'method' => 'selectDatabase',
             'arguments' => [
                 'databaseName' => 'tubee'
