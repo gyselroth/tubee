@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Rest\Middlewares;
 
 use Exception;
+use Garden\Schema\ValidationException;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -70,12 +71,18 @@ class ExceptionHandler implements MiddlewareInterface
             'error' => $class,
             'message' => $message,
             'code' => $exception->getCode(),
+            'more' => null,
         ];
 
         if ($exception instanceof ExceptionInterface) {
             $http_code = $exception->getStatusCode();
         } else {
             $http_code = $this->response_code;
+        }
+
+        if ($exception instanceof ValidationException) {
+            $body['code'] = 422;
+            $body['more'] = $exception->getValidation()->getErrors();
         }
 
         $this->logger->error('uncaught exception '.$message.']', [

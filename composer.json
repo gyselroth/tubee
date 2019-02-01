@@ -61,7 +61,8 @@
         "psr/http-message": "^1.0",
         "gyselroth/stream-iterator": "dev-master",
         "guzzlehttp/guzzle": "~6.0",
-        "paragonie/halite": "^4"
+        "paragonie/halite": "^4",
+        "vanilla/garden-schema": "^2.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

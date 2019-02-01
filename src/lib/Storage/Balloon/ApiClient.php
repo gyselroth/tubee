@@ -58,7 +58,7 @@ class ApiClient
     /**
      * construct.
      */
-    public function __construct(?Iterable $config = null, LoggerInterface $logger)
+    public function __construct(array $config = [], LoggerInterface $logger)
     {
         $this->setOptions($config);
         $this->logger = $logger;
@@ -66,18 +66,12 @@ class ApiClient
 
     /**
      * Set options.
-     *
-     * @param iterable $config
      */
-    public function setOptions(?Iterable $config): ApiClient
+    public function setOptions(array $config = []): ApiClient
     {
-        if ($config === null) {
-            return $this;
-        }
-
         foreach ($config as $option => $value) {
             switch ($option) {
-                case 'uri':
+                case 'url':
                     $this->uri = (string) $value;
 
                     break;
@@ -89,10 +83,10 @@ class ApiClient
                     $this->password = (string) $value;
 
                     break;
-                case 'options':
-                    foreach ($value as $opt) {
-                        $name = constant($opt['attr']);
-                        $this->curl_options[$name] = $opt['value'];
+                case 'request_options':
+                    foreach ($value as $key => $opt) {
+                        $name = constant($key);
+                        $this->curl_options[$name] = $opt;
                     }
 
                     break;
@@ -132,9 +126,6 @@ class ApiClient
 
     /**
      * REST call.
-     *
-     *
-     * @return array
      */
     public function restCall(string $url, array $params = [], string $method = 'GET'): ?array
     {
@@ -143,24 +134,11 @@ class ApiClient
 
         $params = json_encode($params);
         switch ($method) {
-            case 'POST':
-                curl_setopt($ch, CURLOPT_POST, 1);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-
-                break;
-            case 'DELETE':
-                $url .= '?'.urlencode($params);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'DELETE');
-                // no break
             case 'GET':
                 $url .= '?'.urlencode($params);
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'GET');
 
                 break;
-            case 'PATCH':
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $params);
-                curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PATCH');
-                // no break
             case 'PUT':
                 curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'PUT');
                 curl_setopt($ch, CURLOPT_POSTFIELDS, $params);

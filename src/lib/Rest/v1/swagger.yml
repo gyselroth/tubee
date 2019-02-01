@@ -3930,24 +3930,34 @@ definitions:
     allOf:
       - $ref: '#/definitions/Endpoint'
       - type: object
+        required:
+        - kind
+        - data
         properties:
           kind:
             description: "The type of endpoint. Always BalloonEndpoint."
             type: "string"
             default: "BalloonEndpoint"
           data:
+            type: object
+            required:
+            - resource
             properties:
               resource:
                 description: "Holds the relevant options of how to connect to the endpoint."
                 type: "object"
+                required: 
+                - base_uri
                 properties:
                   base_uri:
                     description: "Base uri to resources (Like https://rest.api/v2/users)."
                     type: string
                   request_options:
+                    default: []
                     description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
                     type: object
                   auth:
+                    default: null
                     description: "Authentication adapter, either of none, http basic authentication or oauth2 using client_credentials flow."
                     type: string
                     enum:
@@ -3956,24 +3966,36 @@ definitions:
                   basic:
                     description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
                     type: object
+                    default: 
+                      username: null
+                      password: null
                     properties:
                       username:
+                        default: null
                         description: "Basic authentication username."
                         type: string
                       password:
+                        default: null
                         description: "Password if required."
                         type: string
                   oauth2:
                     description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
                     type: object
+                    default:
+                      token_uri: null
+                      client_id: null
+                      client_secret: null
                     properties:
                       token_uri:
+                        default: null
                         description: "URI to token endpoint."
                         type: string
                       client_id:
+                        default: null
                         description: "OAuth2 client_id."
                         type: string
                       client_secret:
+                        default: null
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
                         type: string
   CsvEndpoint:

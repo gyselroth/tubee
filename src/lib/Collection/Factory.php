@@ -118,7 +118,7 @@ class Factory extends ResourceFactory
      */
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
-        $resource = Validator::validate($resource);
+        $resource = $this->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('collection '.$resource['name'].' does already exists');
@@ -135,7 +135,7 @@ class Factory extends ResourceFactory
     public function update(CollectionInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
-        $data = Validator::validate($data);
+        $data = $this->validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

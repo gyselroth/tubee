@@ -12,21 +12,14 @@ declare(strict_types=1);
 namespace Tubee\User;
 
 use InvalidArgumentException;
-use Tubee\Resource\Validator as ResourceValidator;
 
-class Validator extends ResourceValidator
+class Validator
 {
     /**
      * Validate resource.
      */
     public static function validatePolicy(array $resource, string $policy): array
     {
-        parent::validate($resource);
-
-        if (!isset($resource['data']['password'])) {
-            throw new InvalidArgumentException('data.password is required');
-        }
-
         if (!preg_match($policy, $resource['data']['password'])) {
             throw new InvalidArgumentException('password does not match password policy '.$policy);
         }
