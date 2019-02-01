@@ -151,6 +151,7 @@ class Factory extends ResourceFactory
     public function update(SecretInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
         $data = $this->validate($data);
         $data = $this->crypt($data);
 
@@ -162,6 +163,7 @@ class Factory extends ResourceFactory
      */
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'Secret';
         $resource = $this->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {

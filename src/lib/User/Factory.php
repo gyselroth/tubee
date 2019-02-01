@@ -122,6 +122,7 @@ class Factory extends ResourceFactory
     public function update(UserInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
         $data = $this->validate($data);
         $data = Validator::validatePolicy($data, $this->password_policy);
 
@@ -133,6 +134,7 @@ class Factory extends ResourceFactory
      */
     public function add(array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'User';
         $resource = $this->validate($resource);
         Validator::validatePolicy($resource, $this->password_policy);
 

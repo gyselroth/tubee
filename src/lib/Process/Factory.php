@@ -76,6 +76,7 @@ class Factory extends ResourceFactory
      */
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'Process';
         $resource = $this->validate($resource);
         $resource['data']['namespace'] = $namespace->getName();
 

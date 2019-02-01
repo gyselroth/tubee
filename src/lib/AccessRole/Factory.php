@@ -73,6 +73,7 @@ class Factory extends ResourceFactory
      */
     public function add(array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'AccessRole';
         $resource = $this->validate($resource);
 
         if ($this->has($resource['name'])) {
@@ -88,6 +89,7 @@ class Factory extends ResourceFactory
     public function update(AccessRoleInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
         $data = $this->validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);

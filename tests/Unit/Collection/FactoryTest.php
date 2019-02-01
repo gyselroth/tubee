@@ -127,7 +127,9 @@ class FactoryTest extends TestCase
     {
         return [
             'name' => $name,
-            'schema' => [],
+            'data' => [
+                'schema' => [],
+            ],
         ];
     }
 }

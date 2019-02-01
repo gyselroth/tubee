@@ -4171,8 +4171,6 @@ components:
       allOf:
         - $ref: "#/components/schemas/Resource"
         - type: object
-          required:
-          - namespace
           properties:
             kind:
               description: The resource type, always Collection.

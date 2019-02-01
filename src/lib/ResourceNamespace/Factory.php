@@ -103,6 +103,7 @@ class Factory extends ResourceFactory
      */
     public function add(array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'Namespace';
         $resource = $this->validate($resource);
 
         if ($this->has($resource['name'])) {

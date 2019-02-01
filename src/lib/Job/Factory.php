@@ -128,6 +128,7 @@ class Factory extends ResourceFactory
      */
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'Job';
         $resource = $this->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
@@ -165,6 +166,7 @@ class Factory extends ResourceFactory
     public function update(JobInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
         $data = $this->validate($data);
 
         $task = $data['data'];

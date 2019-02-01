@@ -213,11 +213,12 @@ class Factory extends ResourceFactory
      */
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'DataObjectRelation';
         $resource = $this->validate($resource);
 
-        $object['_id'] = new ObjectId();
-        if (!isset($object['name'])) {
-            $object['name'] = (string) $object['_id'];
+        $resource['_id'] = new ObjectId();
+        if (!isset($resource['name'])) {
+            $resource['name'] = (string) $resource['_id'];
         }
 
         if ($this->has($namespace, $resource['name'])) {
@@ -235,6 +236,7 @@ class Factory extends ResourceFactory
     public function update(DataObjectRelationInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
         $data = $this->validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);

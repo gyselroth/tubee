@@ -115,6 +115,7 @@ class Factory extends ResourceFactory
      */
     public function add(EndpointInterface $endpoint, array $resource): ObjectIdInterface
     {
+        $resource['kind'] = 'Workflow';
         $resource = $this->validate($resource);
 
         if ($this->has($endpoint, $resource['name'])) {
@@ -134,6 +135,7 @@ class Factory extends ResourceFactory
     public function update(WorkflowInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
+        $data['kind'] = $resource->getKind();
         $data = $this->validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
