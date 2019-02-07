@@ -229,9 +229,6 @@ data:
     request_options:
       verify: false
     auth: basic
-    oauth:
-      client_id: null
-      client_pw: null
     basic:
       username: admin
       password: admin
@@ -295,7 +292,6 @@ data:
     import: []
     filter_one: test
     filter_all: null
-  resource: []
   file: /tmp/accounts.json
 ---
 name: create-update

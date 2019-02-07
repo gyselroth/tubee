@@ -16,6 +16,7 @@ nav:
     - Namespaces: resources/namespaces.md
     - Collections: resources/collections.md
     - DataObjects: resources/data-objects.md
+    - DataObjectRelations: resources/data-object-relations.md
     - Endpoints: resources/endpoints.md
     - Workflows: resources/workflows.md
     - Secrets: resources/secrets.md
@@ -25,7 +26,7 @@ nav:
  - AdvancedTopics:
     - Best Practics: advanced/best-practics.md
     - Scripting: advanced/scripting.md
-# - Examples:
  - Development:
-    - Overview: development/overview.md
-
+    - Server: development/server.md
+    - Client (tubectl): development/client.md
+    - 3rd party & SDK: development/3rdparty.md

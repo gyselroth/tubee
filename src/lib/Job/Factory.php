@@ -167,6 +167,7 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
+
         $data = $this->validate($data);
 
         $task = $data['data'];

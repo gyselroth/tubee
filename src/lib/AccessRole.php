@@ -19,6 +19,11 @@ use Tubee\Resource\AttributeResolver;
 class AccessRole extends AbstractResource implements AccessRoleInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'AccessRole';
+
+    /**
      * Data object.
      */
     public function __construct(array $resource)

@@ -155,12 +155,12 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
 
-        $data = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
+        $data = $this->secret_factory->resolve($resource->getCollection()->getResourceNamespace(), $data);
         $data = $this->validate($data);
         $data = Validator::validate($data);
 
-        foreach ($resource['secrets'] as $secret) {
-            $resource = Helper::deleteArrayValue($resource, $secret['to']);
+        foreach ($data['secrets'] as $secret) {
+            $data = Helper::deleteArrayValue($data, $secret['to']);
         }
 
         $data['_id'] = $resource->getId();

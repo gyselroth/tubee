@@ -1593,7 +1593,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectRelation"
+                $ref: "#/components/schemas/DataObjectRelation"
         "403":
           description: Access denied
         "404":
@@ -1687,14 +1687,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/ObjectRelation"
+        $ref: "#/components/requestBodies/DataObjectRelation"
       responses:
         "200":
           description: Object relation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectRelation"
+                $ref: "#/components/schemas/DataObjectRelation"
         "403":
           description: Access denied
         "404":
@@ -1724,7 +1724,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectRelation"
+                $ref: "#/components/schemas/DataObjectRelation"
         "403":
           description: Access denied
         "404":
@@ -1756,7 +1756,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectRelation"
+                $ref: "#/components/schemas/DataObjectRelation"
         "403":
           description: Access denied
         "404":
@@ -1780,14 +1780,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/ObjectRelation"
+        $ref: "#/components/requestBodies/DataObjectRelation"
       responses:
         "200":
           description: Object relation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectRelation"
+                $ref: "#/components/schemas/DataObjectRelation"
         "403":
           description: Access denied
         "404":
@@ -3626,11 +3626,11 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DataObject"
-    ObjectRelation:
+    DataObjectRelation:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ObjectRelation"
+            $ref: "#/components/schemas/DataObjectRelation"
     Secret:
       content:
         application/json:
@@ -3813,10 +3813,9 @@ components:
       allOf:
         - $ref: "#/components/schemas/Resource"
         - type: object
+          required: 
+          - data
           properties:
-            required: 
-            - name
-            - data
             kind:
               description: The resource type, always User.
               type: string
@@ -3866,8 +3865,8 @@ components:
                 resources: []
               type: object
               properties:
-                default: []
                 roles:
+                  default: []
                   description: A list of access-role names to match the given rule.
                   type: array
                   items:
@@ -3985,8 +3984,6 @@ components:
       allOf:
         - $ref: "#/components/schemas/Resource"
         - type: object
-          required:
-          - namespace
           properties:
             kind:
               description: The resource type, always Job.
@@ -4004,7 +4001,7 @@ components:
                 collections: []
                 endpoints: []
                 filter: []
-                ignore: false
+                ignore: true
                 simulate: false
                 log_level: error
                 options:
@@ -4031,7 +4028,7 @@ components:
                       type: array
                       items:
                         type: string
-                        forma: email
+                        format: email
                       default:
                         []
                 collections:
@@ -4041,8 +4038,6 @@ components:
                     collections. A list will be processed in parallel while
                     single collections get synchronized syncronely
                   type: array
-                  items:
-                    type: string
                   default:
                     []
                 endpoints:
@@ -4052,8 +4047,6 @@ components:
                     endpoints. A list will be processed in parallel while single
                     endpoints get synchronized syncronely.
                   type: array
-                  items:
-                    type: string
                   default:
                     []
                 filter:
@@ -4064,7 +4057,7 @@ components:
                   description: If enabled the server does ignores any sync errors and
                     continue with the process.
                   type: boolean
-                  default: false
+                  default: true
                 simulate:
                   description: Dry run mode. Job runs normally but does not do any changes.
                   type: boolean
@@ -4096,8 +4089,7 @@ components:
                     at:
                       description: Holds a unix timestamp at what time the job should be
                         executed.
-                      type: string
-                      format: integer
+                      type: integer
                       default: 0
                     interval:
                       description: The number of secconds after the job should be executed
@@ -4180,41 +4172,47 @@ components:
               description: The resource namespace
               type: string
             data:
+              default:
+                schema: {}
               type: object
-              additionalProperties: 
-                type: object
-                properties:
-                  label:
-                    description: "Label for the attribute"
-                    type: string
-                    nullable: true
-                    default: null
-                  description:
-                    description: "Additional description for the attribute"
-                    type: string
-                    nullable: true
-                    default: null
-                  type:
-                    description: "Enforce attribute type"
-                    type: string
-                    nullable: true
-                    default: null
-                    enum:
-                    - string
-                    - integer
-                    - float
-                    - boolean
-                    - array
-                    - binary
-                  require_regex:
-                    description: "Enforce value pattern with a PCRE compatible regex."
-                    type: string
-                    nullable: true
-                    default: null
-                  required:
-                    description: "Attribute must have a value."
-                    type: boolean
-                    default: false
+              properties:
+                schema:
+                  default: {}
+                  type: object
+                  additionalProperties: 
+                    type: object
+                    properties:
+                      label:
+                        description: "Label for the attribute"
+                        type: string
+                        nullable: true
+                        default: null
+                      description:
+                        description: "Additional description for the attribute"
+                        type: string
+                        nullable: true
+                        default: null
+                      type:
+                        description: "Enforce attribute type"
+                        type: string
+                        nullable: true
+                        default: null
+                        enum:
+                        - string
+                        - int
+                        - float
+                        - bool
+                        - array
+                        - binary
+                      require_regex:
+                        description: "Enforce value pattern with a PCRE compatible regex."
+                        type: string
+                        nullable: true
+                        default: null
+                      required:
+                        description: "Attribute must have a value."
+                        type: boolean
+                        default: false
     StreamStorage:
       type: object
       required: 
@@ -4327,6 +4325,7 @@ components:
               description: The type of endpoint.
               type: string
               enum:
+                - LdapEndpoint
                 - PdoEndpoint
                 - MysqlEndpoint
                 - XmlEndpoint
@@ -4619,6 +4618,55 @@ components:
                           type: string
                           nullable: true
                           default: null
+    ImageEndpoint:
+      description: Images (Files)
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always ImageEndpoint.
+              type: string
+              default: ImageEndpoint
+            data:
+              type: object
+              required:
+              - file
+              properties:
+                storage:
+                  default: 
+                    kind: StreamStorage
+                  oneOf: 
+                  - $ref: "#/components/schemas/StreamStorage"
+                  - $ref: "#/components/schemas/SmbStorage"
+                  - $ref: "#/components/schemas/BalloonStorage"
+                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  discriminator:
+                    propertyName: kind
+                file:
+                  description: File uri or pattern, depends what storage you have choosen.
+                  type: string
+                resource:
+                  description: Image (formatting) options.
+                  type: object
+                  default: 
+                    format: null
+                    max_width: 0
+                    max_height: 0
+                  properties:
+                    format:
+                      description: "Format (Convert image format to another format). A list of available formats is to be found here: http://www.imagemagick.org/script/formats.php"
+                      type: string
+                      nullable: true
+                      default: null
+                    max_width:
+                      description: "Resize the image to a max. width (in pixels)"
+                      type: integer
+                      default: 0
+                    max_height:
+                      description: "Resize image to a max. height (in pixels)."
+                      type: integer
+                      default: 0
     UcsEndpoint:
       description: UCS endpoint (Univention Corporate Server,
         https://www.univention.com/products/ucs)
@@ -4869,7 +4917,15 @@ components:
               - file
               properties:
                 storage:
-                  $ref: "#/components/schemas/Storage"
+                  default: 
+                    kind: StreamStorage
+                  oneOf: 
+                  - $ref: "#/components/schemas/StreamStorage"
+                  - $ref: "#/components/schemas/SmbStorage"
+                  - $ref: "#/components/schemas/BalloonStorage"
+                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  discriminator:
+                    propertyName: kind
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -4916,7 +4972,15 @@ components:
               - file
               properties:
                 storage:
-                  $ref: "#/components/schemas/Storage"
+                  default: 
+                    kind: StreamStorage
+                  oneOf: 
+                  - $ref: "#/components/schemas/StreamStorage"
+                  - $ref: "#/components/schemas/SmbStorage"
+                  - $ref: "#/components/schemas/BalloonStorage"
+                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  discriminator:
+                    propertyName: kind
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -4924,17 +4988,17 @@ components:
       description: The storage defines where data can be fetched.
       type: object
       default:
-        kind: Stream
+        kind: StreamStorage
       properties:
         kind:
           description: The kind of storage where data shall be fetched.
           type: string
-          default: Stream
+          default: StreamStorage
           enum:
-            - Stream
-            - LocalFilesystem
-            - Smb
-            - Balloon
+            - StreamStorage
+            - LocalFilesystemStorage
+            - SmbStorage
+            - BalloonStorage
     Workflows:
       description: A list of workflows.
       allOf:
@@ -4957,6 +5021,9 @@ components:
               description: The resource type, always Workflow.
               type: string
               default: Workflow
+              enum:
+              - GarbageWorkflow
+              - Workflow
             data:
               type: object
               required: 
@@ -4973,7 +5040,6 @@ components:
                     - last
                     - exists
                     - absent
-                    - merge
                   default: last
                 condition:
                   description: Holds a scripted condition if a given workflow gets matched
@@ -4989,10 +5055,39 @@ components:
                   type: array
                   items:
                     $ref: "#/components/schemas/MapAttribute"
+    GarbageWorkflow:
+      description: A workflow gets used if an endpoint gets imported or exported. A
+        workflow defines if and what object and also if and what attributes of
+        an object should be written to or from an endpoint.
+      allOf:
+        - $ref: "#/components/schemas/Workflow"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always GarbageWorkflow.
+              type: string
+              default: GarbageWorkflow
+              enum:
+              - GarbageWorkflow
+              - Workflow
+            data:
+              type: object
+              required: 
+              - map
+              properties:
+                priority:
+                  description: The priority defines in what order multiple workflows get
+                    executed. 0 (Default) is the highest priority.
+                  type: integer
+                  default: 0
+                ensure:
+                  type: string
+                  enum:
+                    - last
+                    - absent
+                  default: last
     MapAttribute:
       type: object
-      required:
-      - name
       properties:
         name:
           type: string
@@ -5003,7 +5098,6 @@ components:
           nullable: true
           default: null
         value:
-          type: string
           nullable: true
           default: null
           description: Defines a static value attribute. (Note you must define one of from, value or script).
@@ -5021,7 +5115,7 @@ components:
           - exists
           - absent
           - merge
-        rewind:
+        unwind:
           $ref: "#/components/schemas/MapAttribute"
         type:
           description: "Convert attribute to a different type."
@@ -5030,9 +5124,9 @@ components:
           default: null
           enum:
           - string
-          - integer
+          - int
           - float
-          - boolean
+          - bool
           - array
           - binary
         map:
@@ -5050,6 +5144,18 @@ components:
             to:
               description: "The field name to match the value. (You may use `.` to delimit a path)"
               type: string
+            ensure:
+              description: "Ensure releation exists, latest or absent."
+              type: string
+              default: last
+              enum:
+              - exists
+              - last
+              - absent
+        required:
+          description: "Attribute must exists."
+          type: boolean
+          default: false
         require_regex:
           description: "Enforce value pattern with a PCRE compatible regex."
           type: string
@@ -5134,8 +5240,8 @@ components:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/ObjectRelation"
-    ObjectRelation:
+                $ref: "#/components/schemas/DataObjectRelation"
+    DataObjectRelation:
       description: An object relation represents a releationship between two data objects.
         A relationship may apply to objects of different collections and/or
         namespaces.

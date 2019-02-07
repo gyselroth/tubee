@@ -23,6 +23,11 @@ use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 class ResourceNamespace extends AbstractResource implements ResourceNamespaceInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Namespace';
+
+    /**
      * Name.
      *
      * @var string

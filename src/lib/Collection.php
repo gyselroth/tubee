@@ -28,6 +28,11 @@ use Tubee\Schema\SchemaInterface;
 class Collection extends AbstractResource implements CollectionInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Collection';
+
+    /**
      * Collection name.
      *
      * @var string

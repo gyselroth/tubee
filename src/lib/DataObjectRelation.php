@@ -20,6 +20,11 @@ use Tubee\Resource\AttributeResolver;
 class DataObjectRelation extends AbstractResource implements DataObjectRelationInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'DataObjectRelation';
+
+    /**
      * Data object.
      *
      * @var DataObjectInterface

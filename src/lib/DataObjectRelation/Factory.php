@@ -154,6 +154,30 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
+    public function deleteFromObject(DataObjectInterface $object_1, DataObjectInterface $object_2, bool $simulate = false): bool
+    {
+        $relations = [
+            [
+                'data.relation.namespace' => $object_1->getCollection()->getResourceNamespace()->getName(),
+                'data.relation.collection' => $object_1->getCollection()->getName(),
+                'data.relation.object' => $object_1->getName(),
+            ], [
+                'data.relation.namespace' => $object_2->getCollection()->getResourceNamespace()->getName(),
+                'data.relation.collection' => $object_2->getCollection()->getName(),
+                'data.relation.object' => $object_2->getName(),
+            ],
+        ];
+
+        $this->db->{self::COLLECTION_NAME}->remove([
+            '$and' => $relations,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $relations = [

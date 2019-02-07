@@ -26,6 +26,11 @@ use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 class Process extends AbstractResource implements ProcessInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Process';
+
+    /**
      * Namespace.
      *
      * @var ResourceNamespace

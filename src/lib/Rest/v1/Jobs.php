@@ -119,14 +119,13 @@ class Jobs
     {
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
-        $job = array_merge(['namespaces' => []], $body);
 
         $namespace = $this->namespace_factory->getOne($namespace);
-        $this->job_factory->create($namespace, $job);
+        $this->job_factory->create($namespace, $body);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_ACCEPTED),
-            $this->job_factory->getOne($namespace, $job['name'])->decorate($request),
+            $this->job_factory->getOne($namespace, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

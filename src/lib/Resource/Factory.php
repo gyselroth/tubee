@@ -293,7 +293,7 @@ class Factory
     protected static function loadSpecification(): array
     {
         if (apcu_exists(self::SPEC)) {
-            //    return apcu_fetch(self::SPEC);
+            //return apcu_fetch(self::SPEC);
         }
 
         $data = Yaml::parseFile(self::SPEC);

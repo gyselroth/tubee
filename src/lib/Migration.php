@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee;
 
 use MongoDB\Database;
+use MongoDB\Driver\Exception\ServerException;
 use Psr\Log\LoggerInterface;
 use Tubee\Migration\DeltaInterface;
 use Tubee\Migration\Exception;
@@ -53,7 +54,15 @@ class Migration
      */
     public function isDeltaApplied(string $class): bool
     {
-        return null !== $this->db->deltas->findOne(['class' => $class]);
+        try {
+            return null !== $this->db->deltas->findOne(['class' => $class]);
+        } catch (ServerException $e) {
+            if ($e->getCode() === 13436) {
+                return false;
+            }
+
+            throw $e;
+        }
     }
 
     /**

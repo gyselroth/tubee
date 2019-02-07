@@ -115,7 +115,10 @@ class Factory extends ResourceFactory
      */
     public function add(EndpointInterface $endpoint, array $resource): ObjectIdInterface
     {
-        $resource['kind'] = 'Workflow';
+        if (!isset($resource['kind'])) {
+            $resource['kind'] = 'Workflow';
+        }
+
         $resource = $this->validate($resource);
 
         if ($this->has($endpoint, $resource['name'])) {

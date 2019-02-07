@@ -93,15 +93,10 @@ class ResourceNamespaces
      */
     public function patch(ServerRequestInterface $request, Identity $identity, string $namespace): ResponseInterface
     {
+        //there is nothing to patch for a resource namespace
         $body = $request->getParsedBody();
         $query = $request->getQueryParams();
         $namespace = $this->namespace_factory->getOne($namespace);
-        $doc = ['data' => $namespace->getData()];
-
-        $patch = new Patch(json_encode($doc), json_encode($body));
-        $patched = $patch->apply();
-        $update = json_decode($patched, true);
-        $this->namespace_factory->update($namespace, $update);
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),

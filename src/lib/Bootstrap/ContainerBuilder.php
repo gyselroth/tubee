@@ -26,7 +26,6 @@ class ContainerBuilder
     {
         $config = self::loadConfig();
         $container = new Container($config);
-
         self::setErrorHandler($container->get(LoggerInterface::class));
 
         return $container;

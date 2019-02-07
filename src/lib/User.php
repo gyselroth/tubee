@@ -19,6 +19,11 @@ use Tubee\User\UserInterface;
 class User extends AbstractResource implements UserInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'User';
+
+    /**
      * Initialize.
      */
     public function __construct(array $resource = [])

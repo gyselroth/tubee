@@ -115,7 +115,7 @@ class Secrets
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_CREATED),
-            $this->secret_factory->getOne($body['name'])->decorate($request),
+            $this->secret_factory->getOne($namespace, $body['name'])->decorate($request),
             ['pretty' => isset($query['pretty'])]
         );
     }

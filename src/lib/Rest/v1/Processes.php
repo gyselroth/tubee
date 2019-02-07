@@ -122,7 +122,7 @@ class Processes
     /**
      * Stop process.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, ObjectId $process): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, ObjectIdInterface $process): ResponseInterface
     {
         $namespace = $this->namespace_factory->getOne($namespace);
         $this->process_factory->deleteOne($namespace, $process);
@@ -142,8 +142,13 @@ class Processes
 
         if (isset($query['watch'])) {
             $filter = [
-                'fullDocument.context.namespace' => $namespace,
-                'fullDocument.context.process' => $process,
+                '$or' => [[
+                    'fullDocument.context.namespace' => $namespace,
+                    'fullDocument.context.process' => $process,
+                ], [
+                    'fullDocument.context.namespace' => $namespace,
+                    'fullDocument.context.parent' => $process,
+                ]],
             ];
 
             if (!empty($query['query'])) {
@@ -156,8 +161,13 @@ class Processes
         }
 
         $filter = [
-            'context.namespace' => $namespace,
-            'context.process' => $process,
+            '$or' => [[
+                'context.namespace' => $namespace,
+                'context.process' => $process,
+            ], [
+                'context.namespace' => $namespace,
+                'context.parent' => $process,
+            ]],
         ];
 
         if (!empty($query['query'])) {
@@ -172,7 +182,7 @@ class Processes
     /**
      * Entrypoint.
      */
-    public function getOneLog(ServerRequestInterface $request, Identity $identity, string $namespace, string $process, ObjectIdInterface $log): ResponseInterface
+    public function getOneLog(ServerRequestInterface $request, Identity $identity, string $namespace, string $process, ObjectId $log): ResponseInterface
     {
         $resource = $this->log_factory->getOne($log);
 

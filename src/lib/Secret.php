@@ -20,6 +20,11 @@ use Tubee\Secret\SecretInterface;
 class Secret extends AbstractResource implements SecretInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Secret';
+
+    /**
      * Namespace.
      *
      * @var ResourceNamespaceInterface

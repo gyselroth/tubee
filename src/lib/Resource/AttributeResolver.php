@@ -50,6 +50,7 @@ class AttributeResolver
                 'self' => ['href' => (string) $request->getUri()],
             ],
             'id' => (string) $resource->getId(),
+            'kind' => $resource->getKind(),
             'name' => $resource->getName(),
             'version' => isset($data['version']) ? $data['version'] : 0,
             'created' => isset($data['created']) ? $data['created']->toDateTime()->format('c') : null,

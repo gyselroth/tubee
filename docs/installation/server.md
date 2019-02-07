@@ -4,10 +4,11 @@ This is a step-by-step tutorial how to correctly deploy the tubee server.
 
 There are multiple supported ways to deploy tubee:
 
+* Docker (docker-compose)
+* Container orchestration plattform like [Kubernetes](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/))
 * Classic way as deb package via apt
 * Manually as tar archive
-* Docker (docker-compose or via a orchestration plattform like [Kubernetes](https://kubernetes.io/docs/concepts/overview/what-is-kubernetes/))
-* Compile manually from scratch
+* Compile manually from source
 
 The docker deployment using docker-compose or a container orchestration platform like kubernetes is the **recommended** way to deploy tubee. And it is also the simplest way.
 Deploy tubee using debian packages, tar archives or even installing from source requires some advanced system knowledge.
@@ -17,6 +18,7 @@ Deploy tubee using debian packages, tar archives or even installing from source 
 Both the server and the web ui get distributed as .deb packages to make it easy to install and upgrade.
 
 **Requirements**:
+
 * Debian based linux distribution
 
 You need a running debian based linux distribution. This can be [debian](https://www.debian.org) itself or debian based distribution like [Ubuntu](https://www.ubuntu.com). You may also convert the package using `alien` to rpm and other package formats. 
@@ -37,7 +39,7 @@ wget -qO - https://bintray.com/user/downloadSubjectPublicKey?username=gyselroth 
 sudo apt-get update
 ```
 
->**Note** If you want to install beta and alpha versions replace `stable` with `unstable`. Pre-releases are only ment for testing purposes and are in **no** way recommended in production environements!
+>**Note** If you want to install beta and alpha versions replace `stable` with `unstable`. Pre-releases are only ment for testing purposes and are in no way recommended in production environements!
 
 >**Note** This repository also includes the shell client `tubectl`.
 
@@ -126,6 +128,27 @@ The containers provide a `latest-unstable` tag for the tubee-jobs, tubee and tub
 >**Note** If you want to install beta and alpha versions replace `latest` with `latest-unstable` or specify an exact version tag. Pre-releases are only ment for testing purposes and are in no way recommended in production environements!
 
 ## Deploy on kubernetes
+tubee runs awesome on kubernetes (And is developed with cloud native in mind).
+
+**Requirements**:
+
+* Kubernetes cluster
+* kubectl
+* git
+* Persistent storage provider
+
+tubee itself does not require any persistent storage, but MongoDB does. It is recommended to deploy a [MongoDB replset](https://docs.mongodb.com/manual/tutorial/deploy-replica-set/) using a kubernetes [statefulset](https://kubernetes.io/docs/concepts/workloads/controllers/statefulset/).
+
+Tubee comes with working kubernetes resources:
+```
+git clone https://github.com/gyselroth/tubee/tree/master/packaging/kubernetes tubee-kube
+cd tubee-kube
+kubectl apply -f .
+```
+
+>**Note** This will create a new namespace tubee. The MongoDB replset gets made using [mongo-k8s-sidecar](https://github.com/cvallance/mongo-k8s-sidecar).
+
+If you have no possibility to deploy persistent volumes, you may also just deploy tubee on kubernetes and use another MongoDB instance elsewhere.
 
 ## Using the tar archive
 Instead a deb package you may also use a tar archive and install tubee manually on your system. 
@@ -137,6 +160,7 @@ This topic is only for advanced users or developers and describes how to deploy 
 If you are a developer please also continue reading [this](https://github.com/gyselroth/tubee/blob/master/CONTRIBUTING.md) article.
 
 **Requirements**:
+
 * posix based operating system (Basically every linux/unix)
 * make
 * [comoser](https://getcomposer.org/download/)
@@ -148,6 +172,7 @@ If you are a developer please also continue reading [this](https://github.com/gy
 * php ext-posix
 * php ext-pnctl
 * php ext-apcu
+* php ext-sysvmsg
 
 **Optional requirements**:
 

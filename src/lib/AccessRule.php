@@ -19,6 +19,11 @@ use Tubee\Resource\AttributeResolver;
 class AccessRule extends AbstractResource implements AccessRuleInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'AccessRule';
+
+    /**
      * Data object.
      */
     public function __construct(array $resource)

@@ -41,6 +41,10 @@ abstract class AbstractResource implements ResourceInterface
      */
     public function getKind(): string
     {
+        if (isset($this->resource['kind'])) {
+            return $this->resource['kind'];
+        }
+
         return static::KIND;
     }
 

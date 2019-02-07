@@ -233,6 +233,7 @@ class Sync extends AbstractJob
             'category' => get_class($this),
         ]);
 
+        return true;
         $endpoints = iterator_to_array($collection->getDestinationEndpoints($endpoints));
         $workflows = [];
 
@@ -259,7 +260,7 @@ class Sync extends AbstractJob
                 ]);
 
                 if (!isset($workflows[$identifier])) {
-                    $workflows[$identifier] = iterator_to_array($ep->getWorkflows());
+                    $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
                 }
 
                 try {
@@ -338,11 +339,11 @@ class Sync extends AbstractJob
 
             $ep->setup($simulate);
             if (!isset($workflows[$identifier])) {
-                $workflows[$identifier] = iterator_to_array($ep->getWorkflows());
+                $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
             }
 
             $i = 0;
-            foreach ($ep->getAll($filter) as $id => $object) {
+            /*foreach ($ep->getAll($filter) as $id => $object) {
                 ++$i;
                 $this->logger->debug('process ['.$i.'] import for object ['.$id.'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
@@ -385,7 +386,7 @@ class Sync extends AbstractJob
                         return false;
                     }
                 }
-            }
+            }*/
 
             $this->garbageCollector($collection, $ep, $simulate, $ignore);
             $ep->shutdown($simulate);
@@ -425,10 +426,12 @@ class Sync extends AbstractJob
             'endpoints.'.$endpoint->getName().'.garbage' => true,
         ]]);
 
-        $workflows = iterator_to_array($endpoint->getWorkflows());
+        $workflows = iterator_to_array($endpoint->getWorkflows(['kind' => 'GarbageWorkflow']));
 
+        $i = 0;
         foreach ($collection->getObjects($filter, false) as $id => $object) {
-            $this->logger->debug('process garbage workflows for garbage object ['.$id.'] from data type ['.$collection->getIdentifier().']', [
+            ++$i;
+            $this->logger->debug('process ['.$i.'] garbage workflows for garbage object ['.$id.'] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 

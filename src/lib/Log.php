@@ -19,6 +19,11 @@ use Tubee\Resource\AttributeResolver;
 class Log extends AbstractResource implements LogInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Log';
+
+    /**
      * Data object.
      */
     public function __construct(array $resource)

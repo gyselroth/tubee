@@ -30,6 +30,11 @@ use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 class Job extends AbstractResource implements JobInterface
 {
     /**
+     * Kind.
+     */
+    public const KIND = 'Job';
+
+    /**
      * Namespace.
      *
      * @var ResourceNamespaceInterface
