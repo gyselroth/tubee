@@ -442,21 +442,30 @@ class Workflow extends AbstractResource implements WorkflowInterface
                 $definition['map']['to'] => $data[$definition['name']],
             ]);
 
-            $this->logger->debug('ensure relation state ['.$definiton['map']['ensure'].'] for relation to ['.$relative->getId().']', [
+            $this->logger->debug('ensure relation state ['.$definition['map']['ensure'].'] for relation to ['.$relative->getId().']', [
                 'category' => get_class($this),
             ]);
 
-            switch ($definiton['map']['ensure']) {
-                case WorkflowInterface::ENSURE_ABSENT:
-                    $object->removeRelation($relative, $simulate);
-
-                break;
-                default:
+            switch ($definition['map']['ensure']) {
+                //case WorkflowInterface::ENSURE_ABSENT:
+                //    $object->removeRelation($relative, $simulate);
+                //
+                //break;
+                //default:
                 case WorkflowInterface::ENSURE_EXISTS:
                 case WorkflowInterface::ENSURE_LAST:
+                    $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
+                    $collection = $this->endpoint->getCollection()->getName();
+                    $ep = $this->endpoint->getName();
+
+                    $endpoints = [
+                        join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
+                    ];
+
                     $object->createOrUpdateRelation($relative, [], $simulate, $endpoints);
 
                 break;
+                default:
             }
         }
 

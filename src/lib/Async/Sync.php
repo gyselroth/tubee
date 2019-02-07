@@ -233,7 +233,6 @@ class Sync extends AbstractJob
             'category' => get_class($this),
         ]);
 
-        return true;
         $endpoints = iterator_to_array($collection->getDestinationEndpoints($endpoints));
         $workflows = [];
 
@@ -343,7 +342,7 @@ class Sync extends AbstractJob
             }
 
             $i = 0;
-            /*foreach ($ep->getAll($filter) as $id => $object) {
+            foreach ($ep->getAll($filter) as $id => $object) {
                 ++$i;
                 $this->logger->debug('process ['.$i.'] import for object ['.$id.'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
@@ -386,7 +385,7 @@ class Sync extends AbstractJob
                         return false;
                     }
                 }
-            }*/
+            }
 
             $this->garbageCollector($collection, $ep, $simulate, $ignore);
             $ep->shutdown($simulate);
@@ -413,12 +412,8 @@ class Sync extends AbstractJob
         ]);
 
         $filter = [
-            '$or' => [
-                [
-                    'endpoints.'.$endpoint->getName().'.last_sync' => [
-                        '$lt' => $this->timestamp,
-                    ],
-                ],
+            'endpoints.'.$endpoint->getName().'.last_sync' => [
+                '$lt' => $this->timestamp,
             ],
         ];
 
@@ -461,7 +456,38 @@ class Sync extends AbstractJob
             }
         }
 
+        $this->relationGarbageCollector($collection, $endpoint, $workflows);
+
         return true;
+    }
+
+    /**
+     * Relation garbage collector.
+     */
+    protected function relationGarbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, $workflows)
+    {
+        $namespace = $endpoint->getCollection()->getResourceNamespace()->getName();
+        $collection = $endpoint->getCollection()->getName();
+        $ep = $endpoint->getName();
+        $key = join('/', [$namespace, $collection, $ep]);
+
+        $filter = [
+            'endpoints.'.$key.'.last_sync' => [
+                '$lt' => $this->timestamp,
+            ],
+        ];
+
+        $this->db->relations->updateMany($filter, ['$set' => [
+            'endpoints.'.$key.'.garbage' => true,
+        ]]);
+
+        foreach ($workflows as $workflow) {
+            foreach ($workflow->getAttributeMap()->getMap() as $attr) {
+                if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
+                    $this->db->relations->deleteMany(['endpoints.'.$key.'.garbage' => true]);
+                }
+            }
+        }
     }
 
     /**
