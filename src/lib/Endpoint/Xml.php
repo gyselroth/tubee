@@ -164,9 +164,9 @@ class Xml extends AbstractFile
                 }
 
                 $this->storage->syncWriteStream($resource['stream'], $resource['path']);
+            } else {
+                fclose($resource['stream']);
             }
-
-            fclose($resource['stream']);
         }
 
         $this->files = [];
@@ -179,18 +179,21 @@ class Xml extends AbstractFile
      */
     public function transformQuery(?array $query = null)
     {
-        $pre = '//'.$this->node_name;
-        $result = $pre;
-
         if ($this->filter_all !== null) {
-            $result = $pre.'['.$this->filter_all.']';
+            $result = $this->filter_all;
         }
 
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = $pre.'['.QueryTransformer::transform($query).']';
+                $result = '//*['.QueryTransformer::transform($query).']';
             } else {
-                $result = $pre.'['.$this->filter_all.' and '.QueryTransformer::transform($query).']';
+                if (preg_match('#\[([^)]+)\]#', $this->filter_all, $match)) {
+                    $new = '['.$match[1].' and '.QueryTransformer::transform($query).']';
+
+                    return str_replace($match[0], $new, $this->filter_all);
+                }
+
+                $result = $this->filter_all.'['.QueryTransformer::transform($query).']';
             }
         }
 
@@ -293,7 +296,7 @@ class Xml extends AbstractFile
 
                 break;
                 case AttributeMapInterface::ACTION_ADD:
-                    $child->appendChild($xml['dom']->createElement($attribute, $update['value']));
+                    $node->appendChild($xml['dom']->createElement($attribute, $update['value']));
 
                 break;
                 default:
@@ -324,7 +327,7 @@ class Xml extends AbstractFile
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        $filter = $pre = '//'.$this->node_name.'['.$this->getFilterOne($object).']';
+        $filter = $this->getFilterOne($object);
 
         foreach ($this->files as $xml) {
             $this->logger->debug('find xml node with xpath ['.$filter.'] in ['.$xml['path'].'] on endpoint ['.$this->getIdentifier().']', [

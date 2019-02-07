@@ -130,8 +130,9 @@ class Csv extends AbstractFile
         foreach ($this->files as $csv) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
                 $this->storage->syncWriteStream($csv['resource'], $this->file);
+            } else {
+                fclose($csv['resource']);
             }
-            fclose($csv['resource']);
         }
 
         return $this;

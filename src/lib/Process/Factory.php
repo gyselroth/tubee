@@ -76,7 +76,8 @@ class Factory extends ResourceFactory
      */
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
-        $resource = Validator::validate($resource);
+        $resource['kind'] = 'Process';
+        $resource = $this->validate($resource);
         $resource['data']['namespace'] = $namespace->getName();
 
         $process = $this->scheduler->addJob(Sync::class, $resource['data']);

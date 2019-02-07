@@ -1,0 +1,5182 @@
+openapi: 3.0.0
+info:
+  description: ""
+  version: 1.0.0
+  title: Tubee API
+  termsOfService: ""
+  contact:
+    email: opensource@gyselroth.net
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+paths:
+  /:
+    get:
+      summary: Get api entrypoint
+      operationId: root
+      responses:
+        "200":
+          description: List of objects
+        "403":
+          description: Access denied
+  /namespaces:
+    get:
+      tags:
+        - namespaces
+      summary: Get namespaces
+      description: A namespace is a logical group of collections
+      operationId: getNamespaces
+      parameters:
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of namespaces
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Namespaces"
+        "403":
+          description: Access denied
+    post:
+      tags:
+        - namespaces
+      summary: Add namespace
+      operationId: addNamespace
+      requestBody:
+        $ref: "#/components/requestBodies/Namespace"
+      responses:
+        "201":
+          description: If successful the server will respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Namespace"
+        "403":
+          description: Access denied
+  "/namespaces/{namespace}":
+    get:
+      tags:
+        - namespaces
+      summary: Get specific namespace
+      description: A namespace is a logical group of collections
+      operationId: getNamespace
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Namespace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Namespace"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    delete:
+      tags:
+        - namespaces
+      summary: Delete specific namespace
+      operationId: deleteNamespace
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: If successful the server will respond with 204 No Content
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    put:
+      tags:
+        - namespaces
+      summary: Create or replace namespace
+      operationId: replaceNamespace
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/Namespace"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Namespace"
+        "201":
+          description: If successful and the object was newly created the server will
+            respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Namespace"
+        "403":
+          description: Access denied
+    patch:
+      tags:
+        - namespaces
+      summary: Patch namespace as rfc6902 request
+      operationId: updateNamespace
+      description: Update specific attributes of a namespace
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/JsonPatch"
+        description: Namespace
+      responses:
+        "200":
+          description: Namespace
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Namespace"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections":
+    get:
+      tags:
+        - collections
+      summary: Get collections
+      description: A collection is collection of data objects of a specific type
+      operationId: getCollections
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of collections
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collections"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    post:
+      tags:
+        - collections
+      summary: Add collection
+      operationId: addCollection
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/Collection"
+      responses:
+        "201":
+          description: If successful the server will respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}":
+    get:
+      tags:
+        - collections
+      summary: Get specific collection
+      description: A collection is collection of dataobjects of a specific type
+      operationId: getCollection
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Collection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    delete:
+      tags:
+        - collections
+      summary: Delete specific collection
+      operationId: deleteCollection
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: If successful the server will respond with 204 No Content
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    put:
+      tags:
+        - collections
+      summary: Create or replace collection
+      operationId: replaceCollection
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/Collection"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        "201":
+          description: If successful and the object was newly created the server will
+            respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        "403":
+          description: Access denied
+    patch:
+      tags:
+        - collections
+      summary: Patch collection as rfc6902 request
+      description: Update specific attributes of a collection
+      operationId: updateCollection
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/JsonPatchArray2"
+      responses:
+        "200":
+          description: Collection
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Collection"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/logs":
+    get:
+      tags:
+        - collections
+      summary: Get logs of a collection
+      operationId: getCollectionLogs
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/collections/{collection}/logs/{log}":
+    get:
+      tags:
+        - collections
+      summary: Get a single collection log
+      operationId: getCollectionLog
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: log
+          description: Log id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/collections/{collection}/endpoints":
+    get:
+      tags:
+        - endpoints
+      summary: Get endpoints
+      description: An endpoint is either of type source or destination and defines an
+        import/export destination
+      operationId: getEndpoints
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of endpoints
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoints"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    post:
+      tags:
+        - endpoints
+      summary: Add Endpoint
+      operationId: addEndpoint
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "201":
+          description: If successful the server will respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoint"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}":
+    get:
+      tags:
+        - endpoints
+      summary: Get specific endpoint
+      description: An endpoint is either of type source or destination and defines an
+        import/export destination
+      operationId: getEndpoint
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Endpoint
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoint"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    delete:
+      tags:
+        - endpoints
+      summary: Delete specific endpoint
+      operationId: deleteEndpoint
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: If successful the server will respond with 204 No Content
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    put:
+      tags:
+        - endpoints
+      summary: Create or replace endppoint
+      operationId: replaceEndpoint
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Endpoint"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoint"
+        "201":
+          description: If successful and the object was newly created the server will
+            respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoint"
+        "403":
+          description: Access denied
+    patch:
+      tags:
+        - endpoints
+      summary: Patch collection as rfc6902 request
+      description: Update specific attributes of a endpoint
+      operationId: updateEndpoint
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/JsonPatchArray2"
+      responses:
+        "200":
+          description: Endpoint
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Endpoint"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs":
+    get:
+      tags:
+        - endpoints
+      summary: Get logs of an endpoint
+      operationId: getEndpointLogs
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}":
+    get:
+      tags:
+        - endpoints
+      summary: Get a single endpoint log
+      operationId: getEndpointLog
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: log
+          description: Log id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows":
+    get:
+      tags:
+        - workflows
+      summary: Get endpoint workflows
+      description: A workflow is an action how to import/export a collection and with what
+        attribute map
+      operationId: getWorkflows
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflows"
+        "403":
+          description: Access denied
+    post:
+      tags:
+        - workflows
+      summary: Add worfklow to endpoint
+      operationId: addWorkflow
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/Workflow"
+      responses:
+        "201":
+          description: If successful the server will respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}":
+    get:
+      tags:
+        - workflows
+      summary: Get specifc endpoint workflow
+      description: A workflow is an action how to import/export a collection and with what
+        attribute map
+      operationId: getWorkflow
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: workflow
+          description: Workflow name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Workflow
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    delete:
+      tags:
+        - workflows
+      summary: Delete specific workflow from
+      operationId: deleteWorkflow
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: workflow
+          description: Workflow name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: If successful the server will respond with 204 No Content
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    put:
+      tags:
+        - workflows
+      summary: Create or replace workflow
+      operationId: replaceWorkflow
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: workflow
+          description: Workflow name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/Workflow"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "201":
+          description: If successful and the object was newly created the server will
+            respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "403":
+          description: Access denied
+    patch:
+      tags:
+        - workflows
+      summary: Patch workflow as rfc6902 request
+      description: Update specific attributes of a workflow
+      operationId: updateWorkflow
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: workflow
+          description: Workflow name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/JsonPatch"
+        description: Workflow
+      responses:
+        "200":
+          description: Workflow
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Workflow"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/objects/{object}":
+    get:
+      tags:
+        - dataObjects
+      summary: Get specific object
+      description: Get an object of a specific collection
+      operationId: getObject
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object ID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        "200":
+          description: Data object
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    patch:
+      tags:
+        - dataObjects
+      summary: Patch object as rfc6902 request
+      description: Update specific attributes of an object
+      operationId: updateObject
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/JsonPatchArray"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataObject"
+        "202":
+          description: If write argument is true the server will respond with 202 Accepted
+            since this is an asynchronous request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    put:
+      tags:
+        - dataObjects
+      summary: Replace or create object
+      description: Replace all data attributes of an object (Or create one if not exists)
+      operationId: replaceObject
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object ID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: write
+          description: If true, the objects gets synced to all configured destination
+            endpoints
+          required: false
+          schema:
+            type: boolean
+      requestBody:
+        $ref: "#/components/requestBodies/DataObject"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataObject"
+        "201":
+          description: If successful and the object was newly created the server will
+            respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataObject"
+        "202":
+          description: If write argument is true the server will respond with 202 Accepted
+            since this is an asynchronous request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    delete:
+      tags:
+        - dataObjects
+      summary: Delete object
+      description: Delete a specific object
+      operationId: deleteObject
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "202":
+          description: If write argument is true the server will respond with 202 Accepted
+            since this is an asynchronous request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "204":
+          description: If successful the server will respond with 204 No Content
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/objects/{object}/relations":
+    get:
+      tags:
+        - dataObjects
+      summary: Get relative objects of an object
+      description: Get all objects the object is related to
+      operationId: getObjectRelations
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Object relatives
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectRelations"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource not found
+  "/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}":
+    get:
+      tags:
+        - dataObjects
+      summary: Get single relative object of an object
+      operationId: getObjectRelation
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relation
+          description: Relation name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Object relation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectRelation"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource not found
+  "/namespaces/{namespace}/relations":
+    get:
+      tags:
+        - dataObjectRelations
+      summary: Get data object relations
+      description: Get data object relations
+      operationId: getRelations
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Object relatives
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectRelations"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource not found
+    post:
+      tags:
+        - dataObjectRelations
+      summary: Add new object relation
+      operationId: addRelation
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/ObjectRelation"
+      responses:
+        "200":
+          description: Object relation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectRelation"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource not found
+  "/namespaces/{namespace}/relations/{relation}":
+    get:
+      tags:
+        - dataObjectRelations
+      summary: Get single relation
+      operationId: getRelation
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relation
+          description: Relation
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Object relation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectRelation"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource not found
+    patch:
+      tags:
+        - dataObjectRelations
+      summary: Patch relation as rfc6902 request
+      description: Update specific attributes of a relation
+      operationId: updateRelation
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relation
+          description: Relation
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/JsonPatchArray"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectRelation"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    put:
+      tags:
+        - dataObjectRelations
+      summary: Replace object relation
+      operationId: replaceRelation
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relation
+          description: Relation
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/ObjectRelation"
+      responses:
+        "200":
+          description: Object relation
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ObjectRelation"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource not found
+    delete:
+      tags:
+        - dataObjectRelations
+      summary: Delete object relation
+      operationId: deleteObjectRelation
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: relation
+          description: Relation
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No body if successfully deleted
+        "403":
+          description: Access denied
+        "404":
+          description: Resource not found
+  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects":
+    get:
+      tags:
+        - endpointObjects
+      summary: Get objects from endpoint
+      description: An endpoint is either of type source or destination and defines an
+        import/export destination
+      operationId: getEndpointObjects
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: endpoint
+          description: Endpoint
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of objects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EndpointObjects"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/objects/{object}/history":
+    get:
+      tags:
+        - dataObjects
+      summary: Get object history
+      description: Get the history of all modifications from a specific object
+      operationId: getObjectHistory
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object ID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Object history
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataObjects"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/collections/{collection}/objects/{object}/logs":
+    get:
+      tags:
+        - dataObjects
+      summary: Get logs of an object
+      operationId: getObjectLogs
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object ID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}":
+    get:
+      tags:
+        - dataObjects
+      summary: Get a single object log
+      operationId: getObjectLog
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: object
+          description: Object ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: log
+          description: Log id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/collections/{collection}/objects":
+    get:
+      tags:
+        - dataObjects
+      summary: Get objects of a specific collection
+      description: A object is a data object from a specifc collection
+      operationId: getObjects
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of objects
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataObjects"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+    post:
+      tags:
+        - dataObjects
+      summary: Add a new object of a specifc collection
+      operationId: addObject
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: collection
+          description: Collection
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/DataObject"
+      responses:
+        "201":
+          description: If successful the server will respond with 201 Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataObject"
+        "202":
+          description: If write argument is true the server will respond with 202 Accepted
+            since this is an asynchronous request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/secrets":
+    get:
+      tags:
+        - secrets
+      summary: Get secrets
+      description: An secret holds secret data which should not get exposed and is
+        specially encrypted on the server. A secret can be injected into other
+        resources.
+      operationId: getSecrets
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of secrets
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Secrets"
+        "403":
+          description: Access denied
+    post:
+      tags:
+        - secrets
+      summary: Create a new secret
+      operationId: addSecret
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/Secret"
+      responses:
+        "201":
+          description: The created secret
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Secret"
+        "403":
+          description: Access denied
+  "/namespaces/{namespace}/secrets/{secret}":
+    get:
+      tags:
+        - secrets
+      summary: Get secret by name
+      operationId: getSecret
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: secret
+          description: secret name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: secret
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Secret"
+        "403":
+          description: Access denied
+        "404":
+          description: secret does not exists
+    patch:
+      tags:
+        - secrets
+      summary: Patch secret as rfc6902 request
+      operationId: updateSecret
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: secret
+          description: secret name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/JsonPatch"
+        description: secret json patch
+      responses:
+        "200":
+          description: The updated secret
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Secret"
+        "403":
+          description: Access denied
+    put:
+      tags:
+        - secrets
+      summary: Create or replace an secret
+      operationId: replaceSecret
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: secret
+          description: secret name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/Secret"
+      responses:
+        "201":
+          description: The created secret
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Secret"
+        "403":
+          description: Access denied
+    delete:
+      tags:
+        - secrets
+      summary: Delete secret by name
+      operationId: deleteSecret
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: secret
+          description: secret name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Server responds with 204 No Content if secret removal was successful
+        "403":
+          description: Access denied
+        "404":
+          description: secret does not exists
+  /users:
+    get:
+      tags:
+        - users
+      summary: Get users
+      description: An User defines what role is granted access to what resource
+      operationId: getUsers
+      parameters:
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of users
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Users"
+        "403":
+          description: Access denied
+    post:
+      tags:
+        - users
+      summary: Create a new User
+      operationId: addUser
+      requestBody:
+        $ref: "#/components/requestBodies/User"
+      responses:
+        "201":
+          description: The created User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "403":
+          description: Access denied
+  "/users/{User}":
+    get:
+      tags:
+        - users
+      summary: Get User by name
+      operationId: getUser
+      parameters:
+        - in: path
+          name: User
+          description: User name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "403":
+          description: Access denied
+        "404":
+          description: User does not exists
+    patch:
+      tags:
+        - users
+      summary: Patch User as rfc6902 request
+      operationId: updateUser
+      parameters:
+        - in: path
+          name: User
+          description: User name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/JsonPatch"
+        description: User json patch
+      responses:
+        "200":
+          description: The updated User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "403":
+          description: Access denied
+    put:
+      tags:
+        - users
+      summary: Create or replace an User
+      operationId: replaceUser
+      parameters:
+        - in: path
+          name: User
+          description: User name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/User"
+      responses:
+        "201":
+          description: The created User
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "403":
+          description: Access denied
+    delete:
+      tags:
+        - users
+      summary: Delete User by name
+      operationId: deleteUser
+      parameters:
+        - in: path
+          name: User
+          description: User name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Server responds with 204 No Content if User removal was successful
+        "403":
+          description: Access denied
+        "404":
+          description: User does not exists
+  /access-rules:
+    get:
+      tags:
+        - accessRules
+      summary: Get access rules
+      description: An access rule defines what role is granted access to what resource
+      operationId: getAccessRules
+      parameters:
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of access rules
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRules"
+        "403":
+          description: Access denied
+    post:
+      tags:
+        - accessRules
+      summary: Create a new access rule
+      operationId: addAccessRule
+      requestBody:
+        $ref: "#/components/requestBodies/AccessRule"
+      responses:
+        "201":
+          description: The created access rule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRule"
+        "403":
+          description: Access denied
+  "/access-rules/{access-rule}":
+    get:
+      tags:
+        - accessRules
+      summary: Get access rule by name
+      operationId: getAccessRule
+      parameters:
+        - in: path
+          name: access-rule
+          description: Access rule name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Acccess rule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRule"
+        "403":
+          description: Access denied
+        "404":
+          description: access rule does not exists
+    patch:
+      tags:
+        - accessRules
+      summary: Patch access rule as rfc6902 request
+      operationId: updateAccessRule
+      parameters:
+        - in: path
+          name: access-rule
+          description: Access rule name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/JsonPatch"
+        description: Access rule json patch
+      responses:
+        "200":
+          description: The updated access rule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRule"
+        "403":
+          description: Access denied
+    put:
+      tags:
+        - accessRules
+      summary: Create or replace an access rule
+      operationId: replaceAccessRule
+      parameters:
+        - in: path
+          name: access-rule
+          description: Access rule name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/AccessRule"
+      responses:
+        "201":
+          description: The created access rule
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRule"
+        "403":
+          description: Access denied
+    delete:
+      tags:
+        - accessRules
+      summary: Delete access-rule by name
+      operationId: deleteAccessRule
+      parameters:
+        - in: path
+          name: access-rule
+          description: Access rule name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Server responds with 204 No Content if access rule removal was
+            successful
+        "403":
+          description: Access denied
+        "404":
+          description: Access rule does not exists
+  /access-roles:
+    get:
+      tags:
+        - accessRoles
+      summary: Get access roles
+      description: An access role defines what role is granted access to what resource
+      operationId: getAccessRoles
+      parameters:
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of access roles
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRoles"
+        "403":
+          description: Access denied
+    post:
+      tags:
+        - accessRoles
+      summary: Create a new access role
+      operationId: addAccessRole
+      requestBody:
+        $ref: "#/components/requestBodies/AccessRole"
+      responses:
+        "201":
+          description: The created access role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRole"
+        "403":
+          description: Access denied
+  "/access-roles/{access-role}":
+    get:
+      tags:
+        - accessRoles
+      summary: Get access role by name
+      operationId: getAccessRole
+      parameters:
+        - in: path
+          name: access-role
+          description: Access role name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Acccess role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRole"
+        "403":
+          description: Access denied
+        "404":
+          description: access role does not exists
+    patch:
+      tags:
+        - accessRoles
+      summary: Patch access role as rfc6902 request
+      operationId: updateAccessRole
+      parameters:
+        - in: path
+          name: access-role
+          description: Access role name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json-patch+json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/JsonPatch"
+        description: Access role json patch
+      responses:
+        "200":
+          description: The updated access role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRole"
+        "403":
+          description: Access denied
+    put:
+      tags:
+        - accessRoles
+      summary: Create or replace an access role
+      operationId: replaceAccessRole
+      parameters:
+        - in: path
+          name: access-role
+          description: Access role name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/AccessRole"
+      responses:
+        "200":
+          description: The updated access role
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRole"
+        "201":
+          description: The created access role if it did not exists yet
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AccessRole"
+        "403":
+          description: Access denied
+    delete:
+      tags:
+        - accessRoles
+      summary: Delete access-role by name
+      operationId: deleteAccessRole
+      parameters:
+        - in: path
+          name: access-role
+          description: Access role name
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Server responds with 204 No Content if access role removal was
+            successful
+        "403":
+          description: Access denied
+        "404":
+          description: Access role does not exists
+  "/namespaces/{namespace}/jobs":
+    get:
+      tags:
+        - jobs
+      summary: Get list of active queued jobs
+      description: A job is an asynchronous server process
+      operationId: getJobs
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: List of active jobs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Jobs"
+        "403":
+          description: Access denied
+    post:
+      tags:
+        - jobs
+      summary: Create new job
+      operationId: addJob
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Job"
+      responses:
+        "202":
+          description: The created job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/jobs/{job}":
+    get:
+      tags:
+        - jobs
+      summary: Get job by id
+      operationId: getJob
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: job
+          description: Job ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+    delete:
+      tags:
+        - jobs
+      summary: Delete job by id
+      operationId: deleteJob
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: job
+          description: Job ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Server responds with 204 No Content if job removal was successful
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+    patch:
+      tags:
+        - jobs
+      summary: Patch job as rfc6902 request
+      description: Update specific attributes of a job
+      operationId: updateJob
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: job
+          description: Job ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        $ref: "#/components/requestBodies/JsonPatchArray"
+      responses:
+        "200":
+          description: If successful the server will respond with 200 OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Job"
+        "403":
+          description: Access denied
+        "404":
+          description: Resource does not exists
+  "/namespaces/{namespace}/processes":
+    get:
+      tags:
+        - jobs
+      summary: Get all processes
+      operationId: getProcesses
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Process
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Processes"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+    post:
+      tags:
+        - jobs
+      summary: Trigger a new process
+      operationId: addProcess
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Process"
+      responses:
+        "202":
+          description: Returns a 202 if successful
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Process"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/processes/{process}":
+    get:
+      tags:
+        - jobs
+      summary: Get a single process of a job
+      operationId: getProcess
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: process
+          description: Process ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Process
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Process"
+        "403":
+          description: Access denied
+        "404":
+          description: Process does not exists
+    delete:
+      tags:
+        - jobs
+      summary: Abort running process
+      operationId: deleteProcess
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: process
+          description: Process ID
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Server responds with 204 No Content if process abort was successful
+        "403":
+          description: Access denied
+        "404":
+          description: Process does not exists
+  "/namespaces/{namespace}/jobs/{job}/logs":
+    get:
+      tags:
+        - jobs
+      summary: Get logs of a job
+      operationId: getJobLogs
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: job
+          description: Job ID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Job
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/jobs/{job}/logs/{log}":
+    get:
+      tags:
+        - jobs
+      summary: Get a single job error
+      operationId: getJobLog
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: job
+          description: Job ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: log
+          description: Log id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Job does not exists
+  "/namespaces/{namespace}/processes/{process}/logs":
+    get:
+      tags:
+        - jobs
+      summary: Get logs of a process
+      operationId: getProcessLogs
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: process
+          description: Process ID
+          required: true
+          schema:
+            type: string
+        - in: query
+          name: query
+          description: "Specify a MongoDB based resource query
+            (https://docs.mongodb.com/manual/tutorial/query-documents) using
+            JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: attributes
+          description: Filter attributes
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - in: query
+          name: offset
+          description: Objects offset, per default it starts from 0. You may also request a
+            negative offset which will return results from the end [total -
+            offset].
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: limit
+          description: Objects limit, per default 20 objects will get returned
+          required: false
+          schema:
+            type: number
+        - in: query
+          name: sort
+          description: 'Specify a MongoDB sort operation
+            (https://docs.mongodb.com/manual/reference/method/cursor.sort/)
+            using JSON (For example: {"name": -1}).'
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
+          name: watch
+          description: Watch resources. By default a stream and useful to retrieve UPDATE,
+            DELETE and ADD updates.
+          required: false
+          schema:
+            type: boolean
+      responses:
+        "200":
+          description: Log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Process does not exists
+  "/namespaces/{namespace}/process/{process}/logs/{log}":
+    get:
+      tags:
+        - jobs
+      summary: Get a single process log
+      operationId: getProcessLog
+      parameters:
+        - in: path
+          name: namespace
+          description: Namespace name
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: process
+          description: Process ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: log
+          description: Log id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Log
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Log"
+        "403":
+          description: Access denied
+        "404":
+          description: Log does not exists
+servers:
+  - url: /api/v1
+components:
+  requestBodies:
+    JsonPatchArray:
+      content:
+        application/json-patch+json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/JsonPatch"
+      description: Object
+    Namespace:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Namespace"
+    Collection:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Collection"
+    AccessRule:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccessRule"
+    JsonPatchArray2:
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/JsonPatch"
+      description: Collection
+    Workflow:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Workflow"
+    DataObject:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DataObject"
+    ObjectRelation:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ObjectRelation"
+    Secret:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Secret"
+    User:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    AccessRole:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/AccessRole"
+  schemas:
+    JsonPatch:
+      description: A JSON Patch according rfc6902.
+      type: object
+      required:
+      - op
+      - path
+      - value
+      properties:
+        op:
+          type: string
+        path:
+          type: string
+        value:
+          type: string
+    Links:
+      description: Contains resource links (URL) to other resources.
+      type: object
+      properties:
+        self:
+          $ref: "#/components/schemas/Link"
+    ListLinks:
+      type: object
+      properties:
+        self:
+          $ref: "#/components/schemas/Link"
+        prev:
+          $ref: "#/components/schemas/Link"
+        next:
+          $ref: "#/components/schemas/Link"
+    Link:
+      type: object
+      properties:
+        href:
+          type: string
+    List:
+      type: object
+      properties:
+        _links:
+          $ref: "#/components/schemas/ListLinks"
+        kind:
+          description: The resource type, always List.
+          type: string
+          default: List
+        count:
+          description: Holds the number of items in the current list response.
+          type: number
+        total:
+          description: Holds the number of total available items on the server. Note that a
+            List resource is always paged. You need to traverse with offset and
+            limit to request further resources in the list.
+          type: number
+    Resource:
+      type: object
+      properties:
+        _links:
+          $ref: "#/components/schemas/Links"
+        name:
+          description: Resource identifier. Note that the name is immutable once created on
+            the server and must be unique in its own resource context.
+          type: string
+          pattern: '^[a-z\-\_0-9]+$'
+        id:
+          description: Unique 12-byte resource identifier. Note this is a MongoDB ObjectId.
+            The name is the standard resource identifier, the id only useful to
+            verify that a given resource was completely recreated. An ID is
+            immutable and will be created on the server.
+          type: string
+        version:
+          description: The version of the resource. A version gets increased once the
+            resource have been modified.
+          type: number
+        created:
+          description: ISO 8601 timestamp when the resource was created.
+          type: string
+        changed:
+          description: ISO 8601 timestamp when the resource was changed.
+          type: string
+        secrets:
+          default: []
+          description: Injected secrets in this resource.
+          type: array
+          items:
+            $ref: "#/components/schemas/SecretMount"
+    SecretMount:
+      type: object
+      required:
+      - secret
+      - key
+      - to
+      properties:
+        secret:
+          description: The name of the secret from which the key's value should be injected.
+          type: string
+        key:
+          description: "The name of the key which should be taken from a secret (You may
+            use a recursive path by delimiting keys with '.', for example:
+            password)."
+          type: string
+        to:
+          description: "The resource path where the secret value should be injected (You
+            may use a recursive path by delimiting keys with '.', for example:
+            data.resource.password)."
+          type: string
+    Namespaces:
+      description: A list of namespaces.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Namespace"
+    Namespace:
+      description: A namespace is a namespace to separate resources.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always Namespace.
+              type: string
+              default: Namespace
+    Secrets:
+      description: A list of secrets.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Secret"
+    Secret:
+      description: A secret is sensitive information which can be injected into another
+        resource. A secret gets specially encrypted on the server and is always
+        base64 encoded.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          required: 
+          - data
+          properties:
+            kind:
+              description: The resource type, always Secret.
+              type: string
+              default: Secret
+            data:
+              description: "The secrets data. You may specify multiple keys. Important: You
+                need to base64 encode the values!"
+              type: object
+    Users:
+      description: A list of users.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
+    User:
+      description: A local tubee user.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            required: 
+            - name
+            - data
+            kind:
+              description: The resource type, always User.
+              type: string
+              default: User
+            data:
+              description: The user information.
+              type: object
+              required:
+              - password
+              properties:
+                password:
+                  description: The users password. Gets hashed on the server and can not be
+                    retrieved after.
+                  type: string
+    AccessRules:
+      description: A list of access rules.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccessRule"
+    AccessRule:
+      description: An access rule allows to specify what access roles can access which
+        resources.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          default:
+            data:
+              roles: []
+              verbs: []
+              selectors: []
+              resources: []
+          properties:
+            kind:
+              description: The resource type, always AccessRule.
+              type: string
+              default: AccessRule
+            data:
+              default:
+                roles: []
+                verbs: []
+                selectors: []
+                resources: []
+              type: object
+              properties:
+                default: []
+                roles:
+                  description: A list of access-role names to match the given rule.
+                  type: array
+                  items:
+                    type: string
+                verbs:
+                  default: []
+                  description: List of allowed HTTP rfc7231 verbs, you may also specify a
+                    wildcard to match all verbs.
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - "*"
+                      - GET
+                      - POST
+                      - PUT
+                      - PATCH
+                      - DELETE
+                      - HEAD
+                selectors:
+                  default: []
+                  description: A list of selectors to match resources, for example
+                    namespace, collection, endpoint, ...
+                  type: array
+                  items:
+                    type: string
+                resources:
+                  default: []
+                  description: Values according to your selector list required to match a
+                    request.
+                  type: array
+                  items:
+                    type: string
+    AccessRoles:
+      description: A list of access roles.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/AccessRole"
+    AccessRole:
+      description: An access role is defined list which matches authenticated user
+        identifiers.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          default: 
+            data:
+              selectors: []
+          properties:
+            kind:
+              description: The resource type, always AccessRole.
+              type: string
+              default: AccessRole
+            data:
+              type: object
+              default: 
+                selectors: []
+              properties:
+                selectors:
+                  description: A list of user identifiers which the access role should
+                    match. It is also possible to specify a wildcard to match
+                    all identifiers.
+                  default: []
+                  type: array
+                  items:
+                    type: string
+    Processes:
+      description: A list of processes.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Process"
+    Process:
+      description: A process is a sub resource of a job. Each process represents one job
+        execution.
+      allOf:
+        - $ref: "#/components/schemas/Job"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always Process.
+              type: string
+              default: Process
+            namespace:
+              description: The resource namespace
+              type: string
+            status:
+              description: Holds the status of this resource. Note that status is immutable.
+              type: object
+              properties:
+                code:
+                  description: The result code of the process.
+                  type: number
+    Jobs:
+      description: A list of jobs.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Job"
+    Job:
+      description: A job is a synchronization job which declares when and what collections
+        should be synchronized.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          required:
+          - namespace
+          properties:
+            kind:
+              description: The resource type, always Job.
+              type: string
+              default: Job
+            namespace:
+              description: The resource namespace
+              type: string
+            data:
+              type: object
+              default:
+                notification:
+                  enabled: false
+                  receiver: []
+                collections: []
+                endpoints: []
+                filter: []
+                ignore: false
+                simulate: false
+                log_level: error
+                options:
+                  at: 0
+                  interval: 0
+                  retry: 0
+                  retry_interval: 0
+                  timeout: 0
+              properties:
+                notification:
+                  type: object
+                  default: 
+                    enabled: false
+                    receiver: []
+                  properties:
+                    enabled:
+                      description: You may enable mail notification for a given job.
+                      default: false
+                      type: boolean
+                    receiver:
+                      description: A list of mail adresses which the notification should be
+                        sent to. This option has no affect if notification is
+                        disabled.
+                      type: array
+                      items:
+                        type: string
+                        forma: email
+                      default:
+                        []
+                collections:
+                  description: A list of collections (name) the job should match. You may
+                    use a wildcard to specify all collections. Each element may
+                    contain either a single collection name or a list of
+                    collections. A list will be processed in parallel while
+                    single collections get synchronized syncronely
+                  type: array
+                  items:
+                    type: string
+                  default:
+                    []
+                endpoints:
+                  description: A list of endoints (name) the job should match. You may use
+                    a wildcard to specify all endpoints. Each element may
+                    contain either a single endpoint name or a list of
+                    endpoints. A list will be processed in parallel while single
+                    endpoints get synchronized syncronely.
+                  type: array
+                  items:
+                    type: string
+                  default:
+                    []
+                filter:
+                  description: Data object filter.
+                  default: []           
+                  type: object
+                ignore:
+                  description: If enabled the server does ignores any sync errors and
+                    continue with the process.
+                  type: boolean
+                  default: false
+                simulate:
+                  description: Dry run mode. Job runs normally but does not do any changes.
+                  type: boolean
+                  default: false
+                log_level:
+                  description: You may change the log level which gets applied during a
+                    sync job. Note that a log level too verbose has a big impact
+                    on the sync performance.
+                  type: string
+                  default: error
+                  enum:
+                    - emergency
+                    - critical
+                    - error
+                    - warning
+                    - info
+                    - notice
+                    - debug
+                options:
+                  description: Holds options about when a job should start and with what
+                    interval.
+                  type: object
+                  default:
+                    at: 0
+                    interval: 0
+                    retry: 0
+                    retry_interval: 0
+                  properties:
+                    at:
+                      description: Holds a unix timestamp at what time the job should be
+                        executed.
+                      type: string
+                      format: integer
+                      default: 0
+                    interval:
+                      description: The number of secconds after the job should be executed
+                        again. The default is only run once.
+                      type: integer
+                      default: 0
+                    retry:
+                      description: The number of times a failed job should be restarted.
+                        The default is never.
+                      type: integer
+                      default: 0
+                    retry_interval:
+                      description: The number of secconds beween failed job retries. The
+                        default is 300 (5min).
+                      type: integer
+                      default: 0
+                    timeout:
+                      description: Maximum runtime of a job (process). By default there is no timeout. This option should be handled carefully.
+                      type: integer
+                      default: 0
+    Logs:
+      description: A list of logs.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Log"
+    Log:
+      description: A log messagage from a process.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always Log.
+              type: string
+              default: Log
+            data:
+              type: object
+              properties:
+                level:
+                  type: integer
+                level_name:
+                  type: string
+                message:
+                  description: The log message.
+                  type: string
+                category:
+                  description: The server component which logged the message.
+                  type: string
+                exception:
+                  description: Holds an exception object if the log message holds an
+                    exception reference.
+                  type: object
+    Collections:
+      description: A list of collections.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Collections"
+    Collection:
+      description: A collection is a collection of data objects, meaning a collection of
+        similar objects.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always Collection.
+              type: string
+              default: Collection
+            namespace:
+              description: The resource namespace
+              type: string
+            data:
+              type: object
+              additionalProperties: 
+                type: object
+                properties:
+                  label:
+                    description: "Label for the attribute"
+                    type: string
+                    nullable: true
+                    default: null
+                  description:
+                    description: "Additional description for the attribute"
+                    type: string
+                    nullable: true
+                    default: null
+                  type:
+                    description: "Enforce attribute type"
+                    type: string
+                    nullable: true
+                    default: null
+                    enum:
+                    - string
+                    - integer
+                    - float
+                    - boolean
+                    - array
+                    - binary
+                  require_regex:
+                    description: "Enforce value pattern with a PCRE compatible regex."
+                    type: string
+                    nullable: true
+                    default: null
+                  required:
+                    description: "Attribute must have a value."
+                    type: boolean
+                    default: false
+    StreamStorage:
+      type: object
+      required: 
+      - kind
+      properties:
+        kind:
+          description: "Use a streaming endpoint to fetch data. Usually used for a http url."
+          type: string
+          enum:
+          - StreamStorage
+    SmbStorage:
+      type: object
+      required:
+      - kind
+      - host
+      - share
+      properties:
+        kind:
+          description: "SMB/CIFS Share."
+          type: string
+          enum:
+          - SmbStorage
+        host:
+          description: "SMB server hostname or IP address"
+          type: string
+        share:
+          description: "The name of the SMB share."
+          type: string
+        root:
+          description: "Path of sub directory."
+          type: string
+          default: "/"
+        username:
+          description: "SMB username used for authenticated share."
+          type: string
+          nullable: true
+          default: null
+        password:
+          description: "SMB password used for authenticated share"
+          type: string
+          nullable: true
+          default: null
+    BalloonStorage:
+      type: object
+      required:
+      - kind
+      - uri
+      - username
+      - password
+      properties:
+        kind:
+          description: "Balloon cloud storage."
+          type: string
+          enum:
+          - BalloonStorage
+        url:
+          description: "URL of the balloon server."
+          type: string
+        username:
+          description: "Username for authentication."
+          type: string
+        password:
+          description: "Password for authentication."
+          type: string
+        collection:
+          description: "Collection ID within the balloon cloud. NULL (default) is the root."
+          type: string
+          nullable: true
+          default: null
+        request_options:
+          description: "Advanced request options"
+          type: object
+          default: {}
+    LocalFilesystemStorage:
+      type: object
+      required:
+      - kind
+      - root
+      properties:
+        kind:
+          description: "Local filesystem storage."
+          type: string
+          enum:
+          - LocalFilesystemStorage
+        root:
+          description: "Root directory."
+          type: string
+          default: "/root"
+    Endpoints:
+      description: A list of endpoints.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Endpoint"
+    Endpoint:
+      description: An endpoint represents an external resource to browse (proxy), import or
+        export. This may be a database, a file, a http service, ...
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          required: 
+          - endpoint
+          - data
+          properties:
+            kind:
+              description: The type of endpoint.
+              type: string
+              enum:
+                - PdoEndpoint
+                - MysqlEndpoint
+                - XmlEndpoint
+                - CsvEndpoint
+                - ImageEndpoint
+                - JsonEndpoint
+                - MongodbEndpoint
+                - MoodleEndpoint
+                - BalloonEndpoint
+                - OdataRestEndpoint
+                - UcsEndpoint
+            data:
+              type: object
+              properties:
+                type:
+                  description: Specify the type of the endpoint.
+                  type: string
+                  default: browse
+                  enum:
+                    - browse
+                    - source
+                    - destination
+                options:
+                  type: object
+                  default: 
+                    identifier: null
+                    import: []
+                    flush: false
+                    filter_one: null
+                    filter_all: null
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: null
+                      description: Endpoint resource identifier.
+                      type: string
+                    import:
+                      description: A list of attributes which gets used to uniquely
+                        identify an object on the endpoint.
+                      type: array
+                      default: []
+                      items:
+                        type: string
+                    flush:
+                      description: If true and the endpoint is of type source, the endpoint
+                        gets flushed before export. If the type is destination,
+                        the endpoints collection gets flushed before import. Pay
+                        attention with flush as it may result in data loss!
+                      type: boolean
+                      default: false
+                    filter_one:
+                      description: Specify an endpoint filter which gets used to filter for
+                        a single object.
+                      nullable: true
+                      default: null
+                      type: string
+                    filter_all:
+                      nullable: true
+                      default: null
+                      description: Specify a filter which always gets applied to the
+                        endpoint if objects are retrieved.
+                      type: string
+    PdoEndpoint:
+      description: Pdo endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always PdoEndpoint.
+              type: string
+              default: PdoEndpoint
+            data:
+              type: object
+              required: 
+              - table
+              - resource
+              properties:
+                table:
+                  description: Table or view
+                  type: string
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required: 
+                  - dsn
+                  properties:
+                    dsn:
+                      description: Data source name (DSN).
+                      type: string
+                    username:
+                      description: Username if required.
+                      type: string
+                      nullable: true
+                      default: null
+                    passwd:
+                      description: Password if required.
+                      type: string
+                      nullable: true
+                      default: null
+                    options:
+                      description: Driver specific connection options.
+                      type: object
+                      default:
+                        {}
+    MysqlEndpoint:
+      description: MySQL/MariaDB (and other MySQL forks) endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always MysqlEndpoint.
+              type: string
+              default: MysqlEndpoint
+            data:
+              type: object
+              required:
+              - table
+              - resource
+              properties:
+                table:
+                  description: Table or view
+                  type: string
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required: 
+                  - host
+                  properties:
+                    host:
+                      description: MySQL Server (Or compatible MySQL fork like MariaDB).
+                      type: string
+                    username:
+                      description: Username.
+                      type: string
+                      nullable: true
+                      default: null
+                    passwd:
+                      description: Password if required.
+                      type: string
+                      nullable: true
+                      default: null
+                    port:
+                      description: Specifies the port number to attempt to connect to the
+                        MySQL server.
+                      type: integer
+                      default: 3306
+                    socket:
+                      description: Specifies the socket or named pipe that should be used.
+                      type: string
+                      nullable: true
+                      default: null
+    LdapEndpoint:
+      description: LDAP (OpenLDAP, Microsoft AD and other LDAP compatible Server) endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always LdapEndpoint.
+              type: string
+              default: LdapEndpoint
+            data:
+              type: object
+              required: 
+              - resource
+              properties:
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required:
+                  - uri
+                  properties:
+                    uri:
+                      description: A full LDAP URI of the form ldap://hostname:port or
+                        ldaps://hostname:port for SSL encryption.
+                      type: string
+                    binddn:
+                      description: Bind DN if required.
+                      type: string
+                      nullable: true
+                      default: null
+                    bindpw:
+                      description: Bind password if required.
+                      type: string
+                      nullable: true
+                      default: null
+                    basedn:
+                      description: Specifies the base dn (Like dc=example,dc=net).
+                      type: string
+                      nullable: true
+                      default: null
+                    tls:
+                      description: Set to true if TLS shall be used.
+                      type: boolean
+                      default: false
+                    options:
+                      description: More ldap specific settings
+                        (http://php.net/manual/en/function.ldap-set-option.php).
+                      type: object
+                      default: {}
+    OdataRestEndpoint:
+      description: OData REST API endpoint (Compatible with Microsoft graph (Office365 and
+        more) and other OData compatible api's)
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always OdataRestEndpoint.
+              type: string
+              default: OdataRestEndpoint
+            data:
+              type: object
+              required:
+              - resource
+              properties:
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required: 
+                  - base_uri
+                  properties:
+                    base_uri:
+                      description: Base uri to resources (Like
+                        https://rest.api/v1/resources).
+                      type: string
+                    request_options:
+                      description: Advanced request options, see
+                        http://docs.guzzlephp.org/en/stable/request-options.html
+                      type: object
+                      default: {}
+                    auth:
+                      nullable: true
+                      default: null
+                      description: Authentication adapter, either of none, http basic
+                        authentication or oauth2 using client_credentials flow.
+                      type: string
+                      enum:
+                        - basic
+                        - oauth2
+                    basic:
+                      description: HTTP Basic authentication. auth must be set to basic if
+                        this adapter should be used.
+                      default:
+                        username: null
+                        password: null
+                      type: object
+                      properties:
+                        username:
+                          description: Basic authentication username.
+                          type: string
+                          nullable: true
+                          default: null
+                        password:
+                          description: Password if required.
+                          type: string
+                          nullable: true
+                          default: null
+                    oauth2:
+                      description: Oauth2 client credentials flow. auth must be set to
+                        oauth2 if this adapter should be used.
+                      type: object
+                      default:
+                        token_endpoint: null
+                        client_id: null
+                        client_secret: null
+                        scope: null
+                      properties:
+                        token_endpoint:
+                          description: URI to token endpoint.
+                          type: string
+                          nullable: true
+                          default: null
+                        client_id:
+                          description: OAuth2 client_id.
+                          type: string
+                          nullable: true
+                          default: null
+                        client_secret:
+                          description: OAuth2 client_secret. Note the client_secret gets
+                            encrypted on the server an can't be retrieved after
+                            it.
+                          type: string
+                          nullable: true
+                          default: null
+                        scope:
+                          description: OAuth2 scopes
+                          type: string
+                          nullable: true
+                          default: null
+    UcsEndpoint:
+      description: UCS endpoint (Univention Corporate Server,
+        https://www.univention.com/products/ucs)
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always UcsEndpoint.
+              type: string
+              default: UcsEndpoint
+            data:
+              type: object
+              required:
+              - resource
+              properties:
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required: 
+                  - base_uri
+                  - flavor
+                  properties:
+                    base_uri:
+                      description: Base uri to univention server (usually including
+                        /univention) (Like https://master/univention).
+                      type: string
+                    flavor:
+                      description: Object type flavor (For example users/user or
+                        groups/group).
+                      type: string
+                    request_options:
+                      description: Advanced request options, see
+                        http://docs.guzzlephp.org/en/stable/request-options.html
+                      type: object
+                      default: {}
+                    auth:
+                      description: HTTP Basic authentication. auth must be set to basic if
+                        this adapter should be used.
+                      type: object
+                      default:
+                        username: null
+                        password: null
+                      properties:
+                        username:
+                          description: Basic authentication username.
+                          type: string
+                          nullable: true
+                          default: null
+                        password:
+                          description: Password if required.
+                          type: string
+                          nullable: true
+                          default: null
+    MongodbEndpoint:
+      description: MongoDB endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always MongodbEndpoint.
+              type: string
+              default: MongodbEndpoint
+            data:
+              type: object
+              required:
+              - collection
+              - resource
+              properties:
+                collection:
+                  description: The name of the MongoDB collection where the data is located
+                    at.
+                  type: string
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required:
+                  - uri
+                  properties:
+                    uri:
+                      description: MongoDB connection uri
+                      type: string
+                    uri_options:
+                      description: Advanced URI options
+                      type: object
+                      default:
+                        {}
+                    driver_options:
+                      description: Advanced Driver options
+                      type: object
+                      default:
+                        {}
+    BalloonEndpoint:
+      description: Balloon cloud server endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          required:
+            - kind
+            - data
+          properties:
+            kind:
+              description: The type of endpoint. Always BalloonEndpoint.
+              type: string
+              default: BalloonEndpoint
+            data:
+              type: object
+              required:
+                - resource
+              properties:
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required:
+                    - base_uri
+                  properties:
+                    base_uri:
+                      description: Base uri to resources (Like https://rest.api/v2/users).
+                      type: string
+                    request_options:
+                      default:
+                        {}
+                      description: Advanced request options, see
+                        http://docs.guzzlephp.org/en/stable/request-options.html
+                      type: object
+                    auth:
+                      nullable: true
+                      default: null
+                      description: Authentication adapter, either of none, http basic
+                        authentication or oauth2 using client_credentials flow.
+                      type: string
+                      enum:
+                        - basic
+                        - oauth2
+                    basic:
+                      description: HTTP Basic authentication. auth must be set to basic if
+                        this adapter should be used.
+                      type: object
+                      default:
+                        username: null
+                        password: null
+                      properties:
+                        username:
+                          nullable: true
+                          default: null
+                          description: Basic authentication username.
+                          type: string
+                        password:
+                          nullable: true
+                          default: null
+                          description: Password if required.
+                          type: string
+                    oauth2:
+                      description: Oauth2 client credentials flow. auth must be set to
+                        oauth2 if this adapter should be used.
+                      type: object
+                      default:
+                        token_uri: null
+                        client_id: null
+                        client_secret: null
+                        scopes: null
+                      properties:
+                        token_uri:
+                          description: URI to token endpoint.
+                          nullable: true
+                          default: null
+                          type: string
+                        client_id:
+                          description: OAuth2 client_id.
+                          nullable: true
+                          default: null
+                          type: string
+                        client_secret:
+                          description: OAuth2 client_secret. Note the client_secret gets
+                            encrypted on the server an can't be retrieved after
+                            it.
+                          nullable: true
+                          default: null
+                          type: string
+                        scopes:
+                          description: OAuth2 scopes
+                          nullable: true
+                          default: null
+                          type: string
+    CsvEndpoint:
+      description: CSV data format endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always CsvEndpoint.
+              type: string
+              default: CsvEndpoint
+            data:
+              type: object
+              required:
+              - file 
+              - storage 
+              properties:
+                storage:
+                  default: 
+                    kind: StreamStorage
+                  oneOf: 
+                  - $ref: "#/components/schemas/StreamStorage"
+                  - $ref: "#/components/schemas/SmbStorage"
+                  - $ref: "#/components/schemas/BalloonStorage"
+                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  discriminator:
+                    propertyName: kind
+                file:
+                  description: File uri or pattern, depends what storage you have choosen.
+                  type: string
+                resource:
+                  description: CSV parse options.
+                  type: object
+                  default:
+                    delimiter: ","
+                    enclosure: '"'
+                    escape: \
+                  properties:
+                    delimiter:
+                      description: Field delimiter.
+                      type: string
+                      default: ","
+                    enclosure:
+                      description: Field enclosure.
+                      type: string
+                      default: '"'
+                    escape:
+                      description: Escape character.
+                      type: string
+                      default: \
+    XmlEndpoint:
+      description: XML data format endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always XmlEndpoint.
+              type: string
+              default: XmlEndpoint
+            data:
+              type: object
+              required:
+              - file
+              properties:
+                storage:
+                  $ref: "#/components/schemas/Storage"
+                file:
+                  description: File uri or pattern, depends what storage you have choosen.
+                  type: string
+                resource:
+                  description: CSV parse options.
+                  type: object
+                  default: 
+                    root_name: data
+                    node_name: row
+                    pretty: true
+                    preserve_whitespace: false
+                  properties:
+                    root_name:
+                      description: The name of the root element.
+                      type: string
+                      default: data
+                    node_name:
+                      description: "The name for the sub node (DataObject) of the root element."
+                      type: string
+                      default: row
+                    pretty:
+                      description: Prettify xml output, note this is only useful if the
+                        XmlEndpoint is a destination endpoint.
+                      type: boolean
+                      default: true
+                    preserve_whitespace:
+                      description: Preserve whitespace, note this is only useful if the
+                        XmlEndpoint is a destination endpoint.
+                      type: boolean
+                      default: false
+    JsonEndpoint:
+      description: JSON data format endpoint
+      allOf:
+        - $ref: "#/components/schemas/Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always JsonEndpoint.
+              type: string
+              default: JsonEndpoint
+            data:
+              type: object
+              required:
+              - file
+              properties:
+                storage:
+                  $ref: "#/components/schemas/Storage"
+                file:
+                  description: File uri or pattern, depends what storage you have choosen.
+                  type: string
+    Storage:
+      description: The storage defines where data can be fetched.
+      type: object
+      default:
+        kind: Stream
+      properties:
+        kind:
+          description: The kind of storage where data shall be fetched.
+          type: string
+          default: Stream
+          enum:
+            - Stream
+            - LocalFilesystem
+            - Smb
+            - Balloon
+    Workflows:
+      description: A list of workflows.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Workflow"
+    Workflow:
+      description: A workflow gets used if an endpoint gets imported or exported. A
+        workflow defines if and what object and also if and what attributes of
+        an object should be written to or from an endpoint.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always Workflow.
+              type: string
+              default: Workflow
+            data:
+              type: object
+              required: 
+              - map
+              properties:
+                priority:
+                  description: The priority defines in what order multiple workflows get
+                    executed. 0 (Default) is the highest priority.
+                  type: integer
+                  default: 0
+                ensure:
+                  type: string
+                  enum:
+                    - last
+                    - exists
+                    - absent
+                    - merge
+                  default: last
+                condition:
+                  description: Holds a scripted condition if a given workflow gets matched
+                    and executed.
+                  type: string
+                  nullable: true
+                  default: null
+                map:
+                  description: Map attributes from the endpoint to the collection schema
+                    (if the endpoint is of type source) or map attributes from
+                    the collection to the endpoint if the endpoint is of type
+                    destination.
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/MapAttribute"
+    MapAttribute:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The name of the attribute to map to
+        from:
+          type: string
+          description: Use from to map source attribute to destination one to one. (Note you must define one of from, value or script).
+          nullable: true
+          default: null
+        value:
+          type: string
+          nullable: true
+          default: null
+          description: Defines a static value attribute. (Note you must define one of from, value or script).
+        script:
+          type: string
+          nullable: true
+          default: null
+          description: Define a scripted attribute. Write a vanilla javascript code to resolve a value. Return the value with `core.result()`. The current object is available in the variable `core.object` (Note you must define one of from, value or script).
+        ensure:
+          type: string
+          description: The name of the attribute to map to
+          default: last
+          enum:
+          - last
+          - exists
+          - absent
+          - merge
+        rewind:
+          $ref: "#/components/schemas/MapAttribute"
+        type:
+          description: "Convert attribute to a different type."
+          type: string
+          nullable: true
+          default: null
+          enum:
+          - string
+          - integer
+          - float
+          - boolean
+          - array
+          - binary
+        map:
+          description: "Map object to another object. Automatically generate DataObjectRelation resource."
+          type: object
+          nullable: true
+          default: null
+          required:
+          - collection
+          - to
+          properties:
+            collection:
+              description: "The collection to lookup the object"
+              type: string
+            to:
+              description: "The field name to match the value. (You may use `.` to delimit a path)"
+              type: string
+        require_regex:
+          description: "Enforce value pattern with a PCRE compatible regex."
+          type: string
+          nullable: true
+          default: null
+        rewrite:
+          type: array
+          description: Rewrite resolved attribute values
+          items:
+            type: object
+            required:
+            - to
+            properties:
+              match:
+                description: "Regex value matcher."
+                type: string
+                nullable: true
+                default: null
+              from:
+                description: "Static from matcher. If from = value rewrite to the value of to."
+                type: string
+                nullable: true
+                default: null                
+              to:
+                type: string   
+                description: "The destination value. You may use variables ($1, $2,...) from regex subsets if match has been used."
+    EndpointObjects:
+      description: A list of endpoint objects.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always EndpointObject.
+              type: string
+              default: EndpointObject
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/EndpointObject"
+    EndpointObject:
+      description: An endpoint object is the actual object on an endpoint itself.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            data:
+              description: Attributes
+              type: object
+    DataObjects:
+      description: List of data objects.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/DataObject"
+    DataObject:
+      description: A data object represents a single object in a collection (data
+        collection).
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          required:
+          - data
+          properties:
+            kind:
+              description: The resource type, always DataObject.
+              type: string
+              default: dataObjects
+            data:
+              description: Attributes
+              type: object
+    ObjectRelations:
+      description: A list of relations.
+      allOf:
+        - $ref: "#/components/schemas/List"
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/ObjectRelation"
+    ObjectRelation:
+      description: An object relation represents a releationship between two data objects.
+        A relationship may apply to objects of different collections and/or
+        namespaces.
+      allOf:
+        - $ref: "#/components/schemas/Resource"
+        - type: object
+          properties:
+            kind:
+              description: The resource type, always DataObjectRelation.
+              type: string
+              default: DataObjectRelation
+            data:
+              type: object
+              required:
+              - relation
+              properties:
+                context:
+                  description: Optional context context data which describes the
+                    relationship.
+                  type: object
+                  default:
+                    {}
+                relation:
+                  description: Holds the relationship between two objects. You may create
+                    cross collection and cross namespace object relationships.
+                  type: array
+                  minItems: 2
+                  maxItems: 2
+                  items:
+                    type: object
+                    required: 
+                    - namespace
+                    - collection
+                    - object
+                    properties:
+                      namespace:
+                        description: Name of the objects namespace
+                        type: string
+                      collection:
+                        description: Name of the objects collection
+                        type: string
+                      object:
+                        description: Name of the object
+                        type: string

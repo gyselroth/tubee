@@ -125,7 +125,7 @@ class Acl
     /**
      * Filter output resources.
      */
-    public function filterOutput(ServerRequestInterface $request, Identity $user, Iterable $resources): Generator
+    public function filterOutput(ServerRequestInterface $request, Identity $user, Iterable $resources)// : Generator
     {
         $count = 0;
         foreach ($resources as $resource) {

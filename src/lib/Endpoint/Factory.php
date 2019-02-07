@@ -17,6 +17,7 @@ use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
+use Tubee\Helper;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Secret\Factory as SecretFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -120,7 +121,13 @@ class Factory extends ResourceFactory
      */
     public function add(CollectionInterface $collection, array $resource): ObjectIdInterface
     {
+        $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
+        $resource = $this->validate($resource);
         $resource = Validator::validate($resource);
+
+        foreach ($resource['secrets'] as $secret) {
+            $resource = Helper::deleteArrayValue($resource, $secret['to']);
+        }
 
         if ($this->has($collection, $resource['name'])) {
             throw new Exception\NotUnique('endpoint '.$resource['name'].' does already exists');
@@ -147,7 +154,15 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
+
+        $data = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
+        $data = $this->validate($data);
         $data = Validator::validate($data);
+
+        foreach ($resource['secrets'] as $secret) {
+            $resource = Helper::deleteArrayValue($resource, $secret['to']);
+        }
+
         $data['_id'] = $resource->getId();
 
         $endpoint = $this->build($data, $resource->getCollection());

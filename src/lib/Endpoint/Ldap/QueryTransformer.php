@@ -105,9 +105,4 @@ class QueryTransformer
 
         return $result;
     }
-
-    protected static function transformOperator($value)
-    {
-        return $value;
-    }
 }

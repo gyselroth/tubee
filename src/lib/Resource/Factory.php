@@ -12,16 +12,22 @@ declare(strict_types=1);
 namespace Tubee\Resource;
 
 use Closure;
+use Garden\Schema\ArrayRefLookup;
+use Garden\Schema\Schema;
 use Generator;
+use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class Factory
 {
+    const SPEC = __DIR__.'/../Rest/v1/openapi.yml';
+
     /**
      * Logger.
      *
@@ -37,12 +43,54 @@ class Factory
     protected $db;
 
     /**
+     * Storage.
+     *
+     * @var array
+     */
+    protected static $storage;
+
+    /**
      * Initialize.
      */
     public function __construct(Database $db, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->logger = $logger;
+    }
+
+    /**
+     * Get resource schema.
+     */
+    public static function getSchema(string $kind): Schema
+    {
+        if (isset(self::$storage[$kind])) {
+            return self::$storage[$kind];
+        }
+
+        $spec = self::loadSpecification();
+
+        if (!isset($spec['components']['schemas'][$kind])) {
+            throw new InvalidArgumentException('Provided resource kind is invalid');
+        }
+
+        $schema = new Schema($spec['components']['schemas'][$kind]);
+        $schema->setRefLookup(new ArrayRefLookup($spec));
+        $schema->setFlags(Schema::VALIDATE_EXTRA_PROPERTY_EXCEPTION);
+        self::$storage[$kind] = $schema;
+
+        return $schema;
+    }
+
+    /**
+     * Validate resource.
+     */
+    public function validate(array $resource): array
+    {
+        $this->logger->debug('validate resource ['.$resource['kind'].'] against schema', [
+            'category' => get_class($this),
+        ]);
+
+        return self::getSchema($resource['kind'])->validate($resource);
     }
 
     /**
@@ -237,6 +285,21 @@ class Factory
         ]);
 
         return $resource;
+    }
+
+    /**
+     * Load openapi specs.
+     */
+    protected static function loadSpecification(): array
+    {
+        if (apcu_exists(self::SPEC)) {
+            //    return apcu_fetch(self::SPEC);
+        }
+
+        $data = Yaml::parseFile(self::SPEC);
+        apcu_store(self::SPEC, $data);
+
+        return $data;
     }
 
     /**

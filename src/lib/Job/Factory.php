@@ -128,7 +128,8 @@ class Factory extends ResourceFactory
      */
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
-        $resource = Validator::validate($resource);
+        $resource['kind'] = 'Job';
+        $resource = $this->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('job '.$resource['name'].' does already exists');
@@ -165,7 +166,8 @@ class Factory extends ResourceFactory
     public function update(JobInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
-        $data = Validator::validate($data);
+        $data['kind'] = $resource->getKind();
+        $data = $this->validate($data);
 
         $task = $data['data'];
         $task += [

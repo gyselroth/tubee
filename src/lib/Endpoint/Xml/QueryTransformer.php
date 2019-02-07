@@ -14,32 +14,112 @@ namespace Tubee\Endpoint\Xml;
 class QueryTransformer
 {
     /**
-     * Convert mongodb like query to xpath.
+     * Convert mongodb like query to ldap query.
      */
-    public static function transform(array $query): string
+    public static function transform($query): string
     {
         $result = '';
 
+        if (!is_array($query)) {
+            return $query;
+        }
+
+        $simple = '';
         foreach ($query as $key => $value) {
+            if (is_array($value) && isset($value['$and']) || isset($value['$or'])) {
+                $result .= self::transform($value);
+
+                continue;
+            }
+
+            $key = (string) $key;
             switch ($key) {
                 case '$and':
-                    //$result .= 'and';
+                    $part = '(';
                     foreach ($value as $sub) {
-                        $result .= self::transform($sub);
+                        if ($part !== '(') {
+                            $part .= ' and ';
+                        }
+
+                        $part .= self::transform($sub);
                     }
+
+                    $result .= $part.')';
 
                 break;
                 case '$or':
-                    //$result .= 'or';
+                    $part = '(';
                     foreach ($value as $sub) {
-                        $result .= self::transform($sub);
+                        if ($part !== '(') {
+                            $part .= ' or ';
+                        }
+
+                        $part .= self::transform($sub);
                     }
+
+                    $result .= $part.')';
 
                 break;
                 default:
-                    $result .= $key.'="'.$value.'"';
+                    $part = '';
+
+                    if (is_array($value)) {
+                        foreach ($value as $t => $a) {
+                            if ($part !== '') {
+                                $part .= ' and ';
+                            }
+
+                            if (!is_array($a) && $t[0] !== '$') {
+                                $part .= "($t='$a')";
+                            }
+
+                            switch ($t) {
+                                case '$gt':
+                                    $part .= "($key>'$a')";
+
+                                break;
+                                case '$lt':
+                                    $part .= "($key<'$a')";
+
+                                break;
+                                case '$lte':
+                                    $part .= "($key<='$a')";
+
+                                break;
+                                case '$gte':
+                                    $part .= "($key>='$a')";
+
+                                break;
+                                case '$ne':
+                                    $part .= "($key!='$a')";
+
+                                break;
+                            }
+                        }
+
+                        if (count($value) > 1) {
+                            $result .= '('.$part.')';
+                        } else {
+                            $result .= $part;
+                        }
+                    } else {
+                        if ($simple !== '') {
+                            $simple .= ' and ';
+                        }
+
+                        $simple .= "($key='$value')";
+                    }
 
                 break;
+            }
+        }
+
+        if (!empty($simple)) {
+            if (count($query) > 1) {
+                $simple = '('.$simple.')';
+                $result .= $simple;
+            } else {
+                $result .= $simple;
             }
         }
 

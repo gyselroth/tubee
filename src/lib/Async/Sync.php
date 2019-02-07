@@ -20,13 +20,26 @@ use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Job\Validator as JobValidator;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Zend\Mail\Message;
 
 class Sync extends AbstractJob
 {
+    /**
+     * Log levels.
+     */
+    public const LOG_LEVELS = [
+        'debug' => Logger::DEBUG,
+        'info' => Logger::INFO,
+        'notice' => Logger::NOTICE,
+        'warning' => Logger::WARNING,
+        'error' => Logger::ERROR,
+        'critical' => Logger::CRITICAL,
+        'alert' => Logger::ALERT,
+        'emergency' => Logger::EMERGENCY,
+    ];
+
     /**
      * ResourceNamespace factory.
      *
@@ -165,7 +178,7 @@ class Sync extends AbstractJob
      */
     protected function execute(CollectionInterface $collection, EndpointInterface $endpoint)
     {
-        $this->setupLogger(JobValidator::LOG_LEVELS[$this->data['log_level']], [
+        $this->setupLogger(self::LOG_LEVELS[$this->data['log_level']], [
             'process' => (string) $this->getId(),
             'parent' => isset($this->data['parent']) ? (string) $this->data['parent'] : null,
             'start' => $this->timestamp,

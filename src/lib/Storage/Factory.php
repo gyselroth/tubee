@@ -36,8 +36,10 @@ class Factory
 
             break;
             case 'BalloonStorage':
-                $server = new ApiClient(['host' => $resource['host']], $logger);
+                unset($resource['kind']);
                 $collection = isset($resource['collection']) ? new ObjectId($resource['collection']) : null;
+                unset($resource['collection']);
+                $server = new ApiClient($resource, $logger);
 
                 return new Balloon($server, $logger, $collection);
 

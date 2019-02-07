@@ -73,7 +73,8 @@ class Factory extends ResourceFactory
      */
     public function add(array $resource): ObjectIdInterface
     {
-        $resource = Validator::validate($resource);
+        $resource['kind'] = 'AccessRole';
+        $resource = $this->validate($resource);
 
         if ($this->has($resource['name'])) {
             throw new Exception\NotUnique('access role '.$resource['name'].' does already exists');
@@ -88,7 +89,8 @@ class Factory extends ResourceFactory
     public function update(AccessRoleInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
-        $data = Validator::validate($data);
+        $data['kind'] = $resource->getKind();
+        $data = $this->validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

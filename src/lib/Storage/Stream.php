@@ -87,6 +87,6 @@ class Stream implements StorageInterface
      */
     public function SyncWriteStream($stream, string $uri): bool
     {
-        return true;
+        return fclose($stream);
     }
 }

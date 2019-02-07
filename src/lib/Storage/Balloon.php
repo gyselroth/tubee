@@ -162,7 +162,7 @@ class Balloon implements StorageInterface
             $session = $result['session'];
         }
 
-        return true;
+        return fclose($stream);
     }
 
     /**

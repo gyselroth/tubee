@@ -151,7 +151,8 @@ class Factory extends ResourceFactory
     public function update(SecretInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
-        $data = Validator::validate($data);
+        $data['kind'] = $resource->getKind();
+        $data = $this->validate($data);
         $data = $this->crypt($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
@@ -162,7 +163,8 @@ class Factory extends ResourceFactory
      */
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
-        Validator::validate($resource);
+        $resource['kind'] = 'Secret';
+        $resource = $this->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('secret '.$resource['name'].' does already exists');

@@ -115,7 +115,8 @@ class Factory extends ResourceFactory
      */
     public function add(EndpointInterface $endpoint, array $resource): ObjectIdInterface
     {
-        $resource = Validator::validateWorkflow($resource);
+        $resource['kind'] = 'Workflow';
+        $resource = $this->validate($resource);
 
         if ($this->has($endpoint, $resource['name'])) {
             throw new Exception\NotUnique('workflow '.$resource['name'].' does already exists');
@@ -134,7 +135,8 @@ class Factory extends ResourceFactory
     public function update(WorkflowInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
-        $data = Validator::validateWorkflow($data);
+        $data['kind'] = $resource->getKind();
+        $data = $this->validate($data);
 
         return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

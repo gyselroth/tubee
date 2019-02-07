@@ -20,6 +20,10 @@
         {
             "type": "git",
             "url": "https://github.com/raffis/php-mongomock"
+        },
+        {
+            "type": "git",
+            "url": "https://github.com/raffis/garden-schema"
         }
     ],
     "require": {
@@ -61,7 +65,8 @@
         "psr/http-message": "^1.0",
         "gyselroth/stream-iterator": "dev-master",
         "guzzlehttp/guzzle": "~6.0",
-        "paragonie/halite": "^4"
+        "paragonie/halite": "^4",
+        "vanilla/garden-schema": "dev-master#4dc60e0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

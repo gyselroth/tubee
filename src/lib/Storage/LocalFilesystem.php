@@ -111,7 +111,7 @@ class LocalFilesystem implements StorageInterface
      */
     public function SyncWriteStream($stream, string $file): bool
     {
-        return true;
+        return fclose($stream);
     }
 
     /**

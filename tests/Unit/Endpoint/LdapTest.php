@@ -295,6 +295,26 @@ class LdapTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testTransformQueryAndFilterAll()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+        'data' => [
+            'options' => [
+                'filter_all' => '(objectClass=foo)',
+            ],
+        ],
+    ]);
+
+        $query = [
+            'foo' => 'bar',
+            'bar' => 'foo',
+        ];
+
+        $expected = '(&(objectClass=foo)(&(foo=bar)(bar=foo)))';
+        $result = $ldap->transformQuery($query);
+        $this->assertSame($expected, $result);
+    }
+
     public function testTransformAndQuery()
     {
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
