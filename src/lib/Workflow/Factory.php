@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * tubee.io
+ * tubee
  *
  * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
@@ -161,6 +161,22 @@ class Factory extends ResourceFactory
     {
         $map = new AttributeMap($resource['data']['map'], $this->v8, $this->logger);
 
-        return $this->initResource(new Workflow($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $resource));
+        switch ($endpoint->getType()) {
+            case EndpointInterface::TYPE_SOURCE:
+                $class = ImportWorkflow::class;
+
+            break;
+            case EndpointInterface::TYPE_DESTINATION:
+                $class = ExportWorkflow::class;
+
+            break;
+            default:
+            case EndpointInterface::TYPE_BROWSE:
+                $class = Workflow::class;
+
+            break;
+        }
+
+        return $this->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $resource));
     }
 }

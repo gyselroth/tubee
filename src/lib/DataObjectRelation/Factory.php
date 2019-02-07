@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * tubee.io
+ * tubee
  *
  * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
@@ -223,8 +223,13 @@ class Factory extends ResourceFactory
         }
 
         if ($exists !== null) {
+            $data = [
+                'data' => $exists['data'],
+                'endpoints' => array_replace_recursive($exists['endpoints'], $endpoints),
+            ];
+
             $exists = $this->build($exists);
-            $this->update($exists, $resource);
+            $this->updateIn($this->db->{self::COLLECTION_NAME}, $exists, $data);
 
             return $exists->getId();
         }

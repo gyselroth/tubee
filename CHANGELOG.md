@@ -17,6 +17,7 @@
 * CORE: [FEATURE] Remove DataObjectRelation with GarbageWorkflows
 * CORE: [CHANGE] CoreInstallation delta now initializes required MongoDB replset if this has not been done yet
 * CORE: [CHANGE] Possibility to automatically remove DataObjectRelations during GarbageWorkflows (set map[].ensure to absent)
+* CORE: [CHANGE] Refactoring Workflow into Workflow\ImportWorkflow and Workflow\ExportWorkflow
 * API: [FIX] uncaught exception: Argument 1 passed to Tubee\Secret\Factory::getOne() must implement interface Tubee\ResourceNamespace\ResourceNamespaceInterface, string given at POST /api/v1/secrets
 * API: [FIX] uncaught exception: Undefined variable: job]  [object] (ErrorException(code: 0): Undefined variable: job at POST /api/v1/jobs
 * API: [FIX] Added ImageEndpoint to openapi v3 specs
