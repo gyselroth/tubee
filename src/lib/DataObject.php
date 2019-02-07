@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * tubee.io
+ * tubee
  *
  * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
@@ -119,11 +119,19 @@ class DataObject extends AbstractResource implements DataObjectInterface
     }
 
     /**
-     * Add relation.
+     * Add or update relation.
      */
     public function createOrUpdateRelation(DataObjectInterface $object, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         return $this->relation_factory->createOrUpdate($this, $object, $context, $simulate, $endpoints);
+    }
+
+    /**
+     * Delete relation.
+     */
+    public function deleteRelation(DataObjectInterface $object, bool $simulate = false): bool
+    {
+        return $this->relation_factory->deleteFromObject($this, $object, $simulate);
     }
 
     /**

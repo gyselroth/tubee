@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * tubee.io
+ * tubee
  *
  * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
@@ -259,7 +259,7 @@ class Sync extends AbstractJob
                 ]);
 
                 if (!isset($workflows[$identifier])) {
-                    $workflows[$identifier] = iterator_to_array($ep->getWorkflows());
+                    $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
                 }
 
                 try {
@@ -338,7 +338,7 @@ class Sync extends AbstractJob
 
             $ep->setup($simulate);
             if (!isset($workflows[$identifier])) {
-                $workflows[$identifier] = iterator_to_array($ep->getWorkflows());
+                $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
             }
 
             $i = 0;
@@ -412,12 +412,8 @@ class Sync extends AbstractJob
         ]);
 
         $filter = [
-            '$or' => [
-                [
-                    'endpoints.'.$endpoint->getName().'.last_sync' => [
-                        '$lt' => $this->timestamp,
-                    ],
-                ],
+            'endpoints.'.$endpoint->getName().'.last_sync' => [
+                '$lt' => $this->timestamp,
             ],
         ];
 
@@ -425,10 +421,12 @@ class Sync extends AbstractJob
             'endpoints.'.$endpoint->getName().'.garbage' => true,
         ]]);
 
-        $workflows = iterator_to_array($endpoint->getWorkflows());
+        $workflows = iterator_to_array($endpoint->getWorkflows(['kind' => 'GarbageWorkflow']));
 
+        $i = 0;
         foreach ($collection->getObjects($filter, false) as $id => $object) {
-            $this->logger->debug('process garbage workflows for garbage object ['.$id.'] from data type ['.$collection->getIdentifier().']', [
+            ++$i;
+            $this->logger->debug('process ['.$i.'] garbage workflows for garbage object ['.$id.'] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
@@ -458,7 +456,38 @@ class Sync extends AbstractJob
             }
         }
 
+        $this->relationGarbageCollector($collection, $endpoint, $workflows);
+
         return true;
+    }
+
+    /**
+     * Relation garbage collector.
+     */
+    protected function relationGarbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, $workflows)
+    {
+        $namespace = $endpoint->getCollection()->getResourceNamespace()->getName();
+        $collection = $endpoint->getCollection()->getName();
+        $ep = $endpoint->getName();
+        $key = join('/', [$namespace, $collection, $ep]);
+
+        $filter = [
+            'endpoints.'.$key.'.last_sync' => [
+                '$lt' => $this->timestamp,
+            ],
+        ];
+
+        $this->db->relations->updateMany($filter, ['$set' => [
+            'endpoints.'.$key.'.garbage' => true,
+        ]]);
+
+        foreach ($workflows as $workflow) {
+            foreach ($workflow->getAttributeMap()->getMap() as $attr) {
+                if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
+                    $this->db->relations->deleteMany(['endpoints.'.$key.'.garbage' => true]);
+                }
+            }
+        }
     }
 
     /**

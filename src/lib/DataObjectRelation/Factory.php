@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * tubee.io
+ * tubee
  *
  * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
@@ -154,6 +154,30 @@ class Factory extends ResourceFactory
     /**
      * {@inheritdoc}
      */
+    public function deleteFromObject(DataObjectInterface $object_1, DataObjectInterface $object_2, bool $simulate = false): bool
+    {
+        $relations = [
+            [
+                'data.relation.namespace' => $object_1->getCollection()->getResourceNamespace()->getName(),
+                'data.relation.collection' => $object_1->getCollection()->getName(),
+                'data.relation.object' => $object_1->getName(),
+            ], [
+                'data.relation.namespace' => $object_2->getCollection()->getResourceNamespace()->getName(),
+                'data.relation.collection' => $object_2->getCollection()->getName(),
+                'data.relation.object' => $object_2->getName(),
+            ],
+        ];
+
+        $this->db->{self::COLLECTION_NAME}->remove([
+            '$and' => $relations,
+        ]);
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $relations = [
@@ -199,8 +223,13 @@ class Factory extends ResourceFactory
         }
 
         if ($exists !== null) {
+            $data = [
+                'data' => $exists['data'],
+                'endpoints' => array_replace_recursive($exists['endpoints'], $endpoints),
+            ];
+
             $exists = $this->build($exists);
-            $this->update($exists, $resource);
+            $this->updateIn($this->db->{self::COLLECTION_NAME}, $exists, $data);
 
             return $exists->getId();
         }

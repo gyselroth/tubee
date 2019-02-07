@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * tubee.io
+ * tubee
  *
  * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
@@ -57,17 +57,17 @@ interface WorkflowInterface extends ResourceInterface
     /**
      * Cleanup.
      */
-    public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
+    //public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Import from endpoint.
      */
-    public function import(CollectionInterface $collection, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
+    //public function import(CollectionInterface $collection, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 
     /**
      * Write to endpoint.
      *
      * @param iterable $object
      */
-    public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
+    //public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool;
 }

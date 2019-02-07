@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * tubee.io
+ * tubee
  *
  * @copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
@@ -167,6 +167,7 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
+
         $data = $this->validate($data);
 
         $task = $data['data'];

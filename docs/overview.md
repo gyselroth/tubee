@@ -1,13 +1,8 @@
-# What can it do?
+# Overview
 
 First of all, tubee is just a simple data management application. Meaning you may enter data, edit it and remove it.
 tubee uses MongoDB as its main database. Therefore this application is highly scalable to your needs. Tubee itself is also 
 written for fast performance and is easy scalable.
-
-tubee comes with a full features REST API and provides [OpenAPI](https://github.com/OAI/OpenAPI-Specification) schemas.
-Everything in tubee is a resource, a namespace, a collection, data itself and so on. Meaning you manipulate resources which are stored
-on the tubee server. tubee acts as a user-friendly data management engine. Unlike (most) native databases, tubee provides features like LDAP authentication, OpenID-connect integration,
-schema based collections of data obejcts, handles object relations, provides a nice HTTP API and much more.
 
 Well this is not a big deal so far, pretty straight forward stuff. The real tubee features come into play when 
 you need to sync your data resources to other systems such as databases, ldap server, structured data files such as XML, web services and more.
@@ -15,6 +10,11 @@ tubee can handle various such services (they are called endpoints in tubee). You
 It is also possible to use tubee as a proxy layer between users and such endpoints. Meaning you can have all tubee features for endpoints. Where tubee also glances is, you can
 query those very endpoints with the same query language.
 tubee acts as a central data manager and proxy layer between various services.
+
+tubee comes with a full featured REST API and provides [OpenAPI](https://github.com/OAI/OpenAPI-Specification) schemas.
+Everything in tubee is a resource, a namespace, a collection, data itself and so on. Meaning you manipulate resources which are stored
+on the tubee server. tubee acts as a user-friendly data management engine. Unlike (most) native databases, tubee provides features like LDAP authentication, OpenID-connect integration,
+schema based collections of data obejcts, handles object relations, provides a nice HTTP API and much more.
 
 ## More features
 
@@ -72,6 +72,7 @@ The tubee server works with various different resource types.
 | DataObjectRelation  | Represents a relationship between data objects. |
 | EndpointObject  | Besides data objects there are also endpoint objects. The diference is that an endpoint object represents the state of an object on an endpoint. |
 | Workflow   | A workflow defines how and what data should be synchronized between endpoints and collections. A workflow is always attached to an endpoint.|
+| GarbageWorkflow   | Similar to a Workflow but only applies to DataObjects which are not available from a source endpoint anymore.|
 | Secret  | Holds sensible data which can be injected into other resources. Usually secrets injected into endpoint resources. |
 | User  | A simple user with password authentication. (You may also use OpenID-connect or LDAP auth adapter instead local user resources) |
 | AccessRole  | Defines an access role which can be used to gain access. Authenticated users are are part of an access-rule. |

@@ -1,13 +1,14 @@
 apiVersion: v1
 data:
-  config.yaml: |- 
+  config.yaml: |-
     MongoDB\Client:
       arguments:
         uri: "{ENV(TUBEE_MONGODB_URI,mongodb://localhost:27017)}"
     MongoDB\Database:
       use: '{MongoDB\Client}'
-      selects:
+      calls:
         - method: selectDatabase
+          select: true
           arguments:
             databaseName: 'tubee'
     Tubee\Async\Mail:

@@ -127,7 +127,7 @@ tubectl get ns --json-query '{"$or":["changed":{"$gt":"2018-10-25"},{"name":"bar
 ```
 
 ## Using resources in other namespaces
-The default namespace is `default`. You may request a different namespace by using -n or --namespace accordingly.
+The default namespace is `default`. You may request a different namespace by using `-n` or `--namespace` accordingly.
 For example to query all collections in the namespace foo:
 
 ```

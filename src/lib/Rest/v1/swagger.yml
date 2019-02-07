@@ -3335,19 +3335,7 @@ definitions:
             default: "Secret"
           data:
             description: "The secrets data. You may specify multiple keys. Important: You need to base64 encode the values!"
-            type: "array"
-            items:
-              type: "object"
-              properties:
-                secret:
-                  description: "The name of the secret."
-                  type: "string"
-                key:
-                  description: "The key name from the secret."
-                  type: "string"
-                to:
-                  description: "The injection destination within this resource. You may delimit by using '. For example: data.resource.password"
-                  type: "string"  
+            type: object
   Users:
     description: "A list of users."
     allOf:
