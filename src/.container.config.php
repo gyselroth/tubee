@@ -36,6 +36,9 @@ use ParagonIE\Halite\Symmetric\EncryptionKey;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\HiddenString\HiddenString;
 use Tubee\V8\Engine as V8Engine;
+use Psr\SimpleCache\CacheInterface;
+use Cache\Adapter\Void\VoidCachePool;
+use Cache\Adapter\Apcu\ApcuCachePool;
 
 return [
     Dispatcher::class => [
@@ -138,6 +141,9 @@ return [
             ]
         ]]
     ],
+    CacheInterface::class => [
+        'use' => '{ENV(TUBEE_CACHE_ADAPTER,'.ApcuCachePool::class.')}'
+    ],
     LoggerInterface::class => [
         'use' => Logger::class,
         'arguments' => [
@@ -188,7 +194,7 @@ return [
                 'use' => Monolog\Handler\StreamHandler::class,
                 'arguments' => [
                     'stream' => '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log',
-                    'level' => 100
+                    'level' => '{ENV(TUBEE_LOG_LEVEL,300)}'
                  ],
                 'calls' => [
                     'formatter' => [
@@ -220,7 +226,7 @@ return [
                         'use' => Monolog\Handler\StreamHandler::class,
                         'arguments' => [
                             'stream' => 'php://stdout',
-                            'level' => 100
+                            'level' => '{ENV(TUBEE_LOG_LEVEL,300)}'
                         ],
                         'calls' => [
                             'formatter' => [

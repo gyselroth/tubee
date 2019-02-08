@@ -4214,16 +4214,18 @@ components:
                         type: boolean
                         default: false
     StreamStorage:
+      description: Use a streaming endpoint to fetch data. Usually used for a http url.
       type: object
       required: 
       - kind
       properties:
         kind:
-          description: "Use a streaming endpoint to fetch data. Usually used for a http url."
+          description: "Always StreamStorage."
           type: string
           enum:
           - StreamStorage
     SmbStorage:
+      description: SMB/CIFS share.
       type: object
       required:
       - kind
@@ -4231,7 +4233,7 @@ components:
       - share
       properties:
         kind:
-          description: "SMB/CIFS Share."
+          description: "Always SmbStorage."
           type: string
           enum:
           - SmbStorage
@@ -4256,6 +4258,7 @@ components:
           nullable: true
           default: null
     BalloonStorage:
+      description: Access a balloon cloud storage.
       type: object
       required:
       - kind
@@ -4264,7 +4267,7 @@ components:
       - password
       properties:
         kind:
-          description: "Balloon cloud storage."
+          description: "Always BalloonStorage."
           type: string
           enum:
           - BalloonStorage
@@ -4287,13 +4290,14 @@ components:
           type: object
           default: {}
     LocalFilesystemStorage:
+      description: Access the local filesystem from the tubee server point of view.
       type: object
       required:
       - kind
       - root
       properties:
         kind:
-          description: "Local filesystem storage."
+          description: "Always LocalFilesystemStorage."
           type: string
           enum:
           - LocalFilesystemStorage

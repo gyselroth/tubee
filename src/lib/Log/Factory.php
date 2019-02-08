@@ -14,12 +14,11 @@ namespace Tubee\Log;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
-use Psr\Log\LoggerInterface;
 use Tubee\Job\JobInterface;
 use Tubee\Log;
 use Tubee\Resource\Factory as ResourceFactory;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
@@ -27,11 +26,26 @@ class Factory extends ResourceFactory
     public const COLLECTION_NAME = 'logs';
 
     /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory)
     {
-        parent::__construct($db, $logger);
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
     }
 
     /**
@@ -39,7 +53,7 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): LogInterface
     {
-        return $this->initResource(new Log($resource));
+        return $this->resource_factory->initResource(new Log($resource));
     }
 
     /**
@@ -51,7 +65,11 @@ class Factory extends ResourceFactory
             $sort = ['datetime' => -1];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort, function (array $resource) use ($that) {
+            return $that->build($resource);
+        });
     }
 
     /**
@@ -59,7 +77,11 @@ class Factory extends ResourceFactory
      */
     public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($that) {
+            return $that->build($resource);
+        }, $offset, $limit, $sort);
     }
 
     /**

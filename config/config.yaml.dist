@@ -36,6 +36,8 @@ ParagonIE\Halite\Symmetric\EncryptionKey:
     ParagonIE\HiddenString\HiddenString:
       arguments:
         value: "{ENV(ENTUBEE_ENCRYPTION_KEY,314004004b3cef33ba8ea540b424736408364317d9ebfbc9293b8478a8d2478e23dba1ba30ded48ab0dd059cfe3dce2daf00d10eb40af1c0bf429553a2d64802272a514cfde95ac31956baa3929ee01c7338c95805c3a619e254f7aa2966e6a7cdad4783)}"
+Psr\SimpleCache\CacheInteface:
+  use: "{ENV(TUBEE_CACHE_ADAPTER,Cache\Adapter\Apcu\ApcuCachePool)}"
 Psr\Log\LoggerInterface:
   use: "Monolog\\Logger"
   arguments:
@@ -65,7 +67,7 @@ Psr\Log\LoggerInterface:
       use: Monolog\Handler\StreamHandler
       arguments:
         stream: '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log'
-        level: 100
+        level: "{ENV(TUBEE_LOG_LEVEL,300)}"
       calls:
         formatter:
           method: setFormatter
@@ -81,14 +83,14 @@ Psr\Log\LoggerInterface:
       use: Monolog\Handler\FilterHandler
       arguments:
         handler: '{output}'
-        minLevelOrList: 100
+        minLevelOrList: 300
         maxLevel: 550
       services:
         output:
           use: Monolog\Handler\StreamHandler
           arguments:
             stream: 'php://stdout'
-            level: 100
+            level: "{ENV(TUBEE_LOG_LEVEL,300)}"
           calls:
             formatter:
               method: setFormatter

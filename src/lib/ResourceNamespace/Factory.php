@@ -14,17 +14,30 @@ namespace Tubee\ResourceNamespace;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
-use Psr\Log\LoggerInterface;
 use Tubee\Collection\Factory as CollectionFactory;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'namespaces';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
 
     /**
      * Datatype.
@@ -36,10 +49,11 @@ class Factory extends ResourceFactory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, CollectionFactory $collection_factory, LoggerInterface $logger)
+    public function __construct(Database $db, CollectionFactory $collection_factory, ResourceFactory $resource_factory)
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->collection_factory = $collection_factory;
-        parent::__construct($db, $logger);
     }
 
     /**
@@ -55,7 +69,11 @@ class Factory extends ResourceFactory
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort, function (array $resource) use ($that) {
+            return $that->build($resource);
+        });
     }
 
     /**
@@ -83,9 +101,9 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -95,7 +113,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($name);
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+        return $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -104,13 +122,13 @@ class Factory extends ResourceFactory
     public function add(array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Namespace';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($resource['name'])) {
             throw new Exception\NotUnique('namespace '.$resource['name'].' does already exists');
         }
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -118,7 +136,11 @@ class Factory extends ResourceFactory
      */
     public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($that) {
+            return $that->build($resource);
+        }, $offset, $limit, $sort);
     }
 
     /**
@@ -126,6 +148,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): ResourceNamespaceInterface
     {
-        return $this->initResource(new ResourceNamespace($resource['name'], $this, $this->collection_factory, $resource));
+        return $this->resource_factory->initResource(new ResourceNamespace($resource['name'], $this, $this->collection_factory, $resource));
     }
 }

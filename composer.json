@@ -66,7 +66,10 @@
         "gyselroth/stream-iterator": "dev-master",
         "guzzlehttp/guzzle": "~6.0",
         "paragonie/halite": "^4",
-        "vanilla/garden-schema": "dev-master#4dc60e0"
+        "vanilla/garden-schema": "dev-master#4dc60e0",
+        "cache/void-adapter": "^1.0",
+        "cache/apcu-adapter": "^1.0",
+        "psr/simple-cache": "^1.0"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

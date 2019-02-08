@@ -15,16 +15,29 @@ use Generator;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
-use Psr\Log\LoggerInterface;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\User;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'users';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
 
     /**
      * Password policy.
@@ -43,10 +56,11 @@ class Factory extends ResourceFactory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, LoggerInterface $logger, array $options = [])
+    public function __construct(Database $db, ResourceFactory $resource_factory, array $options = [])
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->setOptions($options);
-        parent::__construct($db, $logger);
     }
 
     /**
@@ -85,7 +99,11 @@ class Factory extends ResourceFactory
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort, function (array $resource) use ($that) {
+            return $that->build($resource);
+        });
     }
 
     /**
@@ -113,7 +131,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($name);
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+        return $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -123,10 +141,10 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
         $data = Validator::validatePolicy($data, $this->password_policy);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -135,7 +153,7 @@ class Factory extends ResourceFactory
     public function add(array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'User';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
         Validator::validatePolicy($resource, $this->password_policy);
 
         if ($this->has($resource['name'])) {
@@ -145,7 +163,7 @@ class Factory extends ResourceFactory
         $resource['hash'] = password_hash($resource['data']['password'], $this->password_hash);
         unset($resource['data']['password']);
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -153,7 +171,11 @@ class Factory extends ResourceFactory
      */
     public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($that) {
+            return $that->build($resource);
+        }, $offset, $limit, $sort);
     }
 
     /**
@@ -161,6 +183,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): UserInterface
     {
-        return $this->initResource(new User($resource));
+        return $this->resource_factory->initResource(new User($resource));
     }
 }

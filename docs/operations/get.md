@@ -136,7 +136,7 @@ tubectl get co -n foo
 
 You may configure a different namespace by using tubectl config.
 ```
-tubectl config edit defaultNamespace foo
+tubectl edit config defaultNamespace foo
 ```
 
 ## Tail resources

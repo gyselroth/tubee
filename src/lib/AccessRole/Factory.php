@@ -13,15 +13,38 @@ namespace Tubee\AccessRole;
 
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
+use MongoDB\Database;
 use Tubee\AccessRole;
 use Tubee\Resource\Factory as ResourceFactory;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'access_roles';
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
+
+    /**
+     * Initialize.
+     */
+    public function __construct(Database $db, ResourceFactory $resource_factory)
+    {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
+    }
 
     /**
      * Has resource.
@@ -36,7 +59,11 @@ class Factory extends ResourceFactory
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort, function ($resource) use ($that) {
+            return $that->build($resource);
+        });
     }
 
     /**
@@ -63,7 +90,7 @@ class Factory extends ResourceFactory
     public function deleteOne(string $name): bool
     {
         $resource = $this->getOne($name);
-        $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+        $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
 
         return true;
     }
@@ -74,13 +101,13 @@ class Factory extends ResourceFactory
     public function add(array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'AccessRole';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($resource['name'])) {
             throw new Exception\NotUnique('access role '.$resource['name'].' does already exists');
         }
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -90,9 +117,9 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -100,7 +127,11 @@ class Factory extends ResourceFactory
      */
     public function watch(?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, (function ($resource) use ($that) {
+            return $that->build($resource);
+        })->bindTo($this), $offset, $limit, $sort);
     }
 
     /**
@@ -108,6 +139,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource): AccessRoleInterface
     {
-        return $this->initResource(new AccessRole($resource));
+        return $this->resource_factory->initResource(new AccessRole($resource));
     }
 }

@@ -20,7 +20,7 @@ The recomended way to get started in development is to use the available docker 
 You need [docker](https://docs.docker.com/engine/installation/linux/docker-ce/debian) and [docker-compose](https://docs.docker.com/compose/install) installed on your local machine.
 
 For starters you can use the full stack development composing configuration `docker-compose-dev.yml` located in the root (git master).
-Start the development stack `docker-compose -c docker-compose-dev.yml up` and you are ready to go.
+Start the development stack `docker-compose -f docker-compose-dev.yml up` and you are ready to go.
 
 >**Note:** You need the entire git base on your host to run the dev server since the base gets mounted in the dev container.
 The first start of the container may take a while since all depenedices need to get installed first! Please be patient.
@@ -31,21 +31,23 @@ Your tubee server is now available at `https://localhost:8090`. You may verify t
 curl -k https://localhost:8090/api/v1
 ```
 
->**Note:** The dev server gets started with a self-signed ssl certificate.
+The dev server gets started with a self-signed ssl certificate.
 
 If this is your first start of the dev server it may happen that you need to initialize the server manually:
 (This gets executed during the container bootstrap, but it may happen that no MongoDB server is available yet.)
 ```
 docker exec -ti tubee_tubee-dev_1 bash
-php /srv/www/tubee/src/cgi-bin/cli.php upgrade -i -vvvv;
+php /srv/www/tubee/src/cgi-bin/cli.php upgrade -vvvv;
 ```
+
+>**Note** After the server initializtion is completed, you may use the user admin (password admin) to continue.
 
 ## Jobs server
 Tubee runs stuff through a job queue. This server does not start automatically using the docker development environment by design.
 You may start a job server using:
 ```
 docker exec -ti tubee_tubee-dev_1 bash 
-php /srv/www/tubee/src/cgi-bin/cli.php jobs -i -vvvv;
+php /srv/www/tubee/src/cgi-bin/cli.php jobs -vvvv;
 ```
 
 ## Make

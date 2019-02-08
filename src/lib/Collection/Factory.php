@@ -22,12 +22,26 @@ use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Schema;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'collections';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
 
     /**
      * Object factory.
@@ -44,13 +58,22 @@ class Factory extends ResourceFactory
     protected $endpoint_factory;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, EndpointFactory $endpoint_factory, DataObjectFactory $object_factory, LoggerInterface $logger)
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->endpoint_factory = $endpoint_factory;
         $this->object_factory = $object_factory;
-        parent::__construct($db, $logger);
+        $this->logger = $logger;
     }
 
     /**
@@ -79,8 +102,10 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace) {
-            return $this->build($resource, $namespace);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
         });
     }
 
@@ -110,7 +135,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($namespace, $name);
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+        return $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -119,7 +144,7 @@ class Factory extends ResourceFactory
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Collection';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('collection '.$resource['name'].' does already exists');
@@ -127,7 +152,7 @@ class Factory extends ResourceFactory
 
         $resource['namespace'] = $namespace->getName();
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -137,9 +162,9 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = 'Collection';
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -147,8 +172,10 @@ class Factory extends ResourceFactory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace) {
-            return $this->build($resource, $namespace);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
         }, $offset, $limit, $sort);
     }
 
@@ -159,6 +186,6 @@ class Factory extends ResourceFactory
     {
         $schema = new Schema($resource['data']['schema'], $this->logger);
 
-        return $this->initResource(new Collection($resource['name'], $namespace, $this->endpoint_factory, $this->object_factory, $schema, $this->logger, $resource));
+        return $this->resource_factory->initResource(new Collection($resource['name'], $namespace, $this->endpoint_factory, $this->object_factory, $schema, $this->logger, $resource));
     }
 }

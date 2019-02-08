@@ -1,6 +1,6 @@
 apiVersion: v1
 data:
-  config.yaml: |-
+  config.yaml: |
     MongoDB\Client:
       arguments:
         uri: "{ENV(TUBEE_MONGODB_URI,mongodb://localhost:27017)}"
@@ -21,7 +21,7 @@ data:
         config:
           job_queue_size: 1000000
           event_queue_size: 5000000
-    TaskScheduler\Queue:
+    TaskScheduler\WorkerManager:
       arguments:
         config:
           pm: dynamic
@@ -36,18 +36,14 @@ data:
       use: "Zend\\Mail\\Transport\\Smtp"
     ParagonIE\Halite\Symmetric\EncryptionKey:
       services:
-        ParagonIE\Halite\HiddenString:
+        ParagonIE\HiddenString\HiddenString:
           arguments:
-            value: "{ENV(ENTUBEE_ENCRYPTION_KEY,314004004b3cef33ba8ea540b424736408364317d9ebfbc9293b8478a8d2478e23dba1ba30ded48ab0dd059cfe3dce2daf00d10eb40af1c0bf429553a2d64802272a514cfde95ac31956baa3929ee01c7338c95805c3a619e254f7aa2966e6a7cdad4783)}"
+            value: "{ENV(ENTUBEE_ENCRYPTION_KEY,314004004fde30cdb0eb624c53eb681e78995b528f7a110f49eb4e5dcdfa2af1412c3d4e7aff5cdb68c821d14704cbb608210a9b6d1ca5077809055c3ff83be0fddb2b4ebb7f3ed3a45459aa2af2a8ca9e809821c809aa20b949dfb04c01452e4954e3c8)}"
     Psr\Log\LoggerInterface:
       use: "Monolog\\Logger"
       arguments:
         name: default
       calls:
-        file:
-          method: pushHandler
-          arguments:
-            handler: '{file}'
         stderr:
           method: pushHandler
           arguments:
@@ -64,14 +60,6 @@ data:
             format: "%datetime% [%context.category%,%level_name%]: %message% %context.params% %context.exception%\n"
           calls:
             - method: includeStacktraces
-        file:
-          use: Monolog\Handler\StreamHandler
-          arguments:
-            stream: '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log'
-            level: 100
-          calls:
-            formatter:
-              method: setFormatter
         stderr:
           use: Monolog\Handler\StreamHandler
           arguments:
@@ -101,6 +89,10 @@ data:
           method: injectAdapter
           arguments:
             adapter: '{basic_db}'
+        ldap:
+          method: injectAdapter
+          arguments:
+            adapter: '{ldap}'
       services:
         basic_db:
           use: "Tubee\\User\\AuthAdapter"
@@ -111,38 +103,17 @@ data:
               provider_url: "https://openidconnect.example.net"
         ldap:
           use: "Micro\\Auth\\Adapter\\Basic\\Ldap"
-          services:
-            Micro\Auth\Ldap:
-              arguments:
-                config:
-                  uri: "ldap://localhost:389"
-                  basedn: "dc=example,dc=org"
-                  binddn: "cn=admin,dc=example,dc=org"
-                  bindpw: 1234
-                  tls: true
-                  options:
-                    LDAP_OPT_PROTOCOL_VERSION: 3
           arguments:
-            config:
-              account_filter: "(uid=%s)"
-              attr_sync_cache: 3600
-              map:
-                namespace:
-                  type: "string"
-                  attr: "o"
-                avatar:
-                  type: "binary"
-                  attr: "jpegphoto"
-                hard_quota:
-                  type: "int"
-                  attr: "customhardquota"
-                soft_quota:
-                  type: "int"
-                  attr: "customsoftquota"
-                mail:
-                  type: "string"
-                  attr: "mail"
+            ldap_options:
+              uri: "ldap://ldap-master001.gyselroth.net:389"
+              basedn: "dc=gyselroth,dc=net"
+              binddn: "uid=raffael.sahli,ou=it,ou=users,dc=gyselroth,dc=net"
+              bindpw: Admin-rs-1@IhRSuw
+              tls: true
+              options:
+                LDAP_OPT_PROTOCOL_VERSION: 3
 kind: ConfigMap
 metadata:
-  name: tubee-config
+  creationTimestamp: null
   namespace: tubee
+  name: tubee-config
