@@ -78,7 +78,7 @@ mostlyclean:
 
 
 .PHONY: deps
-deps: composer npm
+deps: composer
 
 
 .PHONY: build

@@ -177,7 +177,7 @@ class Factory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $$this->resource_factory->validate($data);
+        $data = $this->resource_factory->validate($data);
         $data = $this->crypt($data);
 
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
@@ -189,7 +189,7 @@ class Factory
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Secret';
-        $resource = $$this->resource_factory->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('secret '.$resource['name'].' does already exists');
@@ -223,7 +223,7 @@ class Factory
         $resource['data'] = $decrypted;
         unset($resource['blob']);
 
-        return $$this->resource_factory->initResource(new Secret($resource, $namespace));
+        return $this->resource_factory->initResource(new Secret($resource, $namespace));
     }
 
     /**

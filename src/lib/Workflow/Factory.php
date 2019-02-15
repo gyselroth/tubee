@@ -144,7 +144,7 @@ class Factory
             $resource['kind'] = 'Workflow';
         }
 
-        $resource = $$this->resource_factory->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($endpoint, $resource['name'])) {
             throw new Exception\NotUnique('workflow '.$resource['name'].' does already exists');
@@ -164,7 +164,7 @@ class Factory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $$this->resource_factory->validate($data);
+        $data = $this->resource_factory->validate($data);
 
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

@@ -145,7 +145,7 @@ class Factory
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Job';
-        $resource = $$this->resource_factory->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('job '.$resource['name'].' does already exists');
@@ -184,7 +184,7 @@ class Factory
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
 
-        $data = $$this->resource_factory->validate($data);
+        $data = $this->resource_factory->validate($data);
 
         $task = $data['data'];
         $task += [

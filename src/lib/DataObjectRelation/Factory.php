@@ -262,7 +262,7 @@ class Factory
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'DataObjectRelation';
-        $resource = $$this->resource_factory->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         $resource['_id'] = new ObjectId();
         if (!isset($resource['name'])) {
@@ -282,7 +282,7 @@ class Factory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $$this->resource_factory->validate($data);
+        $data = $this->resource_factory->validate($data);
 
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
@@ -311,6 +311,6 @@ class Factory
      */
     public function build(array $resource, ?DataObjectInterface $object = null): DataObjectRelationInterface
     {
-        return $$this->resource_factory->initResource(new DataObjectRelation($resource, $object));
+        return $this->resource_factory->initResource(new DataObjectRelation($resource, $object));
     }
 }

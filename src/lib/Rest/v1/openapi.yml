@@ -3798,6 +3798,7 @@ components:
               description: "The secrets data. You may specify multiple keys. Important: You
                 need to base64 encode the values!"
               type: object
+              additionalProperties: true
     Users:
       description: A list of users.
       allOf:

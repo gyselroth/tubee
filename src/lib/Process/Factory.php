@@ -93,7 +93,7 @@ class Factory
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Process';
-        $resource = $$this->resource_factory->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
         $resource['data']['namespace'] = $namespace->getName();
 
         $process = $this->scheduler->addJob(Sync::class, $resource['data']);
@@ -150,6 +150,6 @@ class Factory
      */
     public function build(array $process, ResourceNamespaceInterface $namespace): ProcessInterface
     {
-        return $$this->resource_factory->initResource(new ProcessWrapper($process, $namespace, $this->log_factory));
+        return $this->resource_factory->initResource(new ProcessWrapper($process, $namespace, $this->log_factory));
     }
 }

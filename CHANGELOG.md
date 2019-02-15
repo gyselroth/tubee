@@ -4,6 +4,7 @@
 
 * TESTING: [CHANGE] Added new xml endpoint unit tests
 * PACKAGING: [CHANGE] Dev docker container now sets TUBEE_SECRET_KEY, Cache adapter to void and log level to debug (100)
+* PACKAGING: [FIX] fixes no make dep npm
 * DOCS: [CHANGE] Various fixes
 * CORE: [FIX] Do not block GET /logs requests if log response from MongoDB is empty (do not use natural sorting)
 * CORE: [FIX] Xml, Csv validators merge defaults before validation

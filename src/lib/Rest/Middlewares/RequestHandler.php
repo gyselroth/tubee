@@ -57,7 +57,7 @@ class RequestHandler implements MiddlewareInterface
      */
     public function process(
         ServerRequestInterface $request,
-RequestHandlerInterface $handler
+        RequestHandlerInterface $handler
     ): ResponseInterface {
         $requestHandler = $request->getAttribute($this->handlerAttribute);
 
@@ -133,7 +133,7 @@ required input parameter '.$param->name);
 
                 $return[$param->name] = $this->convertParam(
                     $type,
-$param_value
+                    $param_value
                 );
             }
 

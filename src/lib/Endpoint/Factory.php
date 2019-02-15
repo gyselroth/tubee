@@ -147,7 +147,7 @@ class Factory
     public function add(CollectionInterface $collection, array $resource): ObjectIdInterface
     {
         $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
-        $resource = $$this->resource_factory->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
         $resource = Validator::validate($resource);
 
         foreach ($resource['secrets'] as $secret) {
@@ -181,7 +181,7 @@ class Factory
         $data['kind'] = $resource->getKind();
 
         $data = $this->secret_factory->resolve($resource->getCollection()->getResourceNamespace(), $data);
-        $data = $$this->resource_factory->validate($data);
+        $data = $this->resource_factory->validate($data);
         $data = Validator::validate($data);
 
         foreach ($data['secrets'] as $secret) {
