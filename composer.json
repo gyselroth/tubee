@@ -84,7 +84,7 @@
     "require-dev": {
         "phpv8/v8js-stubs": "^1.4.1",
         "friendsofphp/php-cs-fixer": "*",
-        "phpunit/phpunit": "^6.0.0",
+        "phpunit/phpunit": "^5.7.0",
         "helmich/mongomock": "dev-master#a6c53a4",
         "phpstan/phpstan": "*"
     }
