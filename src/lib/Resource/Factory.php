@@ -284,12 +284,12 @@ class Factory
      */
     protected function loadSpecification(): array
     {
-        if ($this->cache->has(self::SPEC)) {
-            return $this->cache->get(self::SPEC);
+        if ($this->cache->has('openapi')) {
+            return $this->cache->get('openapi');
         }
 
         $data = Yaml::parseFile(self::SPEC);
-        $this->cache->set(self::SPEC, $data);
+        $this->cache->set('openapi', $data);
 
         return $data;
     }
