@@ -194,7 +194,7 @@ return [
                 'use' => Monolog\Handler\StreamHandler::class,
                 'arguments' => [
                     'stream' => '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log',
-                    'level' => '{ENV(TUBEE_LOG_LEVEL,300)}'
+                    'level' => 100
                  ],
                 'calls' => [
                     'formatter' => [
@@ -226,7 +226,7 @@ return [
                         'use' => Monolog\Handler\StreamHandler::class,
                         'arguments' => [
                             'stream' => 'php://stdout',
-                            'level' => '{ENV(TUBEE_LOG_LEVEL,300)}'
+                            'level' => 100
                         ],
                         'calls' => [
                             'formatter' => [
