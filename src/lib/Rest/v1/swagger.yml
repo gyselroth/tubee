@@ -9,25 +9,40 @@ info:
   license:
     name: "MIT"
     url: "https://opensource.org/licenses/MIT"
-basePath: "/api/v1"
+basePath: "/"
 schemes:
 - "https"
 paths:
-  /:
+  /api:
     get:
+      tags:
+      - "v1"
       summary: "Get api entrypoint"
-      operationId: "root"
+      operationId: "getApi"
       produces:
       - "application/json"
       responses:
         200:
-          description: "List of objects"
+          description: "Api"
         403:
           description: "Access denied"
-  /namespaces:
+  /api/v1:
     get:
       tags:
-      - "namespaces"
+      - "v1"
+      summary: "Get api entrypoint"
+      operationId: "getV1"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "Api"
+        403:
+          description: "Access denied"
+  /api/v1/namespaces:
+    get:
+      tags:
+      - "v1"
       summary: "Get namespaces"
       description: "A namespace is a logical group of collections"
       operationId: "getNamespaces"
@@ -80,7 +95,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "namespaces"
+      - "v1"
       summary: "Add namespace"
       operationId: "addNamespace"
       produces:
@@ -97,10 +112,10 @@ paths:
             $ref: "#/definitions/Namespace"
         403:
           description: "Access denied"
-  /namespaces/{namespace}:
+  /api/v1/namespaces/{namespace}:
     get:
       tags:
-      - "namespaces"
+      - "v1"
       summary: "Get specific namespace"
       description: "A namespace is a logical group of collections"
       operationId: "getNamespace"
@@ -130,7 +145,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "namespaces"
+      - "v1"
       summary: "Delete specific namespace"
       operationId: "deleteNamespace"
       produces:
@@ -150,7 +165,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "namespaces"
+      - "v1"
       summary: "Create or replace namespace"
       operationId: "replaceNamespace"
       produces:
@@ -178,7 +193,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "namespaces"
+      - "v1"
       summary: "Patch namespace as rfc6902 request"
       operationId: "updateNamespace"
       description: "Update specific attributes of a namespace"
@@ -206,10 +221,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections:
+  /api/v1/namespaces/{namespace}/collections:
     get:
       tags:
-      - "collections"
+      - "v1"
       summary: "Get collections"
       description: "A collection is collection of data objects of a specific type"
       operationId: "getCollections"
@@ -269,7 +284,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "collections"
+      - "v1"
       summary: "Add collection"
       operationId: "addCollection"
       produces:
@@ -293,10 +308,10 @@ paths:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-  /namespaces/{namespace}/collections/{collection}:
+  /api/v1/namespaces/{namespace}/collections/{collection}:
     get:
       tags:
-      - "collections"
+      - "v1"
       summary: "Get specific collection"
       description: "A collection is collection of dataobjects of a specific type"
       operationId: "getCollection"
@@ -331,7 +346,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "collections"
+      - "v1"
       summary: "Delete specific collection"
       operationId: "deleteCollection"
       produces:
@@ -356,7 +371,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "collections"
+      - "v1"
       summary: "Create or replace collection"
       operationId: "replaceCollection"
       produces:
@@ -389,7 +404,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "collections"
+      - "v1"
       summary: "Patch collection as rfc6902 request"
       description: "Update specific attributes of a collection"
       operationId: "updateCollection"
@@ -422,10 +437,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/logs:
+  /api/v1/namespaces/{namespace}/collections/{collection}/logs:
     get:
       tags:
-      - "collections"
+      - "v1"
       summary: "Get logs of a collection"
       operationId: "getCollectionLogs"
       produces:
@@ -487,10 +502,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/logs/{log}:
+  /api/v1/namespaces/{namespace}/collections/{collection}/logs/{log}:
     get:
       tags:
-      - "collections"
+      - "v1"
       summary: "Get a single collection log"
       operationId: "getCollectionLog"
       produces:
@@ -520,10 +535,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/endpoints:
+  /api/v1/namespaces/{namespace}/collections/{collection}/endpoints:
     get:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Get endpoints"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoints"
@@ -588,7 +603,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Add Endpoint"
       operationId: "addEndpoint"
       produces:
@@ -617,10 +632,10 @@ paths:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}:
+  /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}:
     get:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Get specific endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoint"
@@ -660,7 +675,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Delete specific endpoint"
       operationId: "deleteEndpoint"
       produces:
@@ -690,7 +705,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Create or replace endppoint"
       operationId: "replaceEndpoint"
       produces:
@@ -728,7 +743,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Patch collection as rfc6902 request"
       description: "Update specific attributes of a endpoint"
       operationId: "updateEndpoint"
@@ -766,10 +781,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs:
+  /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs:
     get:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Get logs of an endpoint"
       operationId: "getEndpointLogs"
       produces:
@@ -836,10 +851,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}:
+  /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}:
     get:
       tags:
-      - "endpoints"
+      - "v1"
       summary: "Get a single endpoint log"
       operationId: "getEndpointLog"
       produces:
@@ -874,10 +889,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
+  /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
     get:
       tags:
-      - "workflows"
+      - "v1"
       summary: "Get endpoint workflows"
       description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflows"
@@ -945,7 +960,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "workflows"
+      - "v1"
       summary: "Add worfklow to endpoint"
       operationId: "addWorkflow"
       produces:
@@ -979,10 +994,10 @@ paths:
           description: "Access denied"
         404:
           description: "Resource does not exists"
-  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}:
+  /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}:
     get:
       tags:
-      - "workflows"
+      - "v1"
       summary: "Get specifc endpoint workflow"
       description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflow"
@@ -1027,7 +1042,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "workflows"
+      - "v1"
       summary: "Delete specific workflow from"
       operationId: "deleteWorkflow"
       produces:
@@ -1062,7 +1077,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "workflows"
+      - "v1"
       summary: "Create or replace workflow"
       operationId: "replaceWorkflow"
       produces:
@@ -1105,7 +1120,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "workflows"
+      - "v1"
       summary: "Patch workflow as rfc6902 request"
       description: "Update specific attributes of a workflow"
       operationId: "updateWorkflow"
@@ -1148,10 +1163,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}:
+  /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}:
     get:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Get specific object"
       description: "Get an object of a specific collection"
       operationId: "getObject"
@@ -1189,7 +1204,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Patch object as rfc6902 request"
       description: "Update specific attributes of an object"
       operationId: "updateObject"
@@ -1235,7 +1250,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Replace or create object"
       description: "Replace all data attributes of an object (Or create one if not exists)"
       operationId: "replaceObject"
@@ -1287,7 +1302,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Delete object"
       description: "Delete a specific object"
       operationId: "deleteObject"
@@ -1322,10 +1337,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}/relations:
+  /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations:
     get:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Get relative objects of an object"
       description: "Get all objects the object is related to"
       operationId: "getObjectRelations"
@@ -1393,10 +1408,10 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}:
+  /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}:
     get:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Get single relative object of an object"
       operationId: "getObjectRelation"
       produces:
@@ -1431,10 +1446,10 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-  /namespaces/{namespace}/relations:
+  /api/v1/namespaces/{namespace}/relations:
     get:
       tags:
-      - "dataObjectRelations"
+      - "v1"
       summary: "Get data object relations"
       description: "Get data object relations"
       operationId: "getRelations"
@@ -1494,7 +1509,7 @@ paths:
           description: "Resource not found"
     post:
       tags:
-      - "dataObjectRelations"
+      - "v1"
       summary: "Add new object relation"
       operationId: "addRelation"
       produces:
@@ -1518,10 +1533,10 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-  /namespaces/{namespace}/relations/{relation}:
+  /api/v1/namespaces/{namespace}/relations/{relation}:
     get:
       tags:
-      - "dataObjectRelations"
+      - "v1"
       summary: "Get single relation"
       operationId: "getRelation"
       produces:
@@ -1548,7 +1563,7 @@ paths:
           description: "Resource not found"
     patch:
       tags:
-      - "dataObjectRelations"
+      - "v1"
       summary: "Patch relation as rfc6902 request"
       description: "Update specific attributes of a relation"
       operationId: "updateRelation"
@@ -1585,7 +1600,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "dataObjectRelations"
+      - "v1"
       summary: "Replace object relation"
       operationId: "replaceRelation"
       produces:
@@ -1616,7 +1631,7 @@ paths:
           description: "Resource not found"
     delete:
       tags:
-      - "dataObjectRelations"
+      - "v1"
       summary: "Delete object relation"
       operationId: "deleteObjectRelation"
       produces:
@@ -1639,10 +1654,10 @@ paths:
           description: "Access denied"
         404:
           description: "Resource not found"
-  /namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects:
+  /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects:
     get:
       tags:
-      - "endpointObjects"
+      - "v1"
       summary: "Get objects from endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpointObjects"
@@ -1705,10 +1720,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}/history:
+  /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/history:
     get:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Get object history"
       description: "Get the history of all modifications from a specific object"
       operationId: "getObjectHistory"
@@ -1776,10 +1791,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}/logs:
+  /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs:
     get:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Get logs of an object"
       operationId: "getObjectLogs"
       produces:
@@ -1846,10 +1861,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}:
+  /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}:
     get:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Get a single object log"
       operationId: "getObjectLog"
       produces:
@@ -1884,10 +1899,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/collections/{collection}/objects:
+  /api/v1/namespaces/{namespace}/collections/{collection}/objects:
     get:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Get objects of a specific collection"
       description: "A object is a data object from a specifc collection"
       operationId: "getObjects"
@@ -1952,7 +1967,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "dataObjects"
+      - "v1"
       summary: "Add a new object of a specifc collection"
       operationId: "addObject"
       consumes:
@@ -1987,10 +2002,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/secrets:
+  /api/v1/namespaces/{namespace}/secrets:
     get:
       tags:
-      - "secrets"
+      - "v1"
       summary: "Get secrets"
       description: "An secret holds secret data which should not get exposed and is specially encrypted on the server. A secret can be injected into other resources."
       operationId: "getSecrets"
@@ -2048,7 +2063,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "secrets"
+      - "v1"
       summary: "Create a new secret"
       operationId: "addSecret"
       produces:
@@ -2070,10 +2085,10 @@ paths:
             $ref: "#/definitions/Secret"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/secrets/{secret}:
+  /api/v1/namespaces/{namespace}/secrets/{secret}:
     get:
       tags:
-      - "secrets"
+      - "v1"
       summary: "Get secret by name"
       operationId: "getSecret"
       produces:
@@ -2100,7 +2115,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "secrets"
+      - "v1"
       summary: "Patch secret as rfc6902 request"
       operationId: "updateSecret"
       consumes:
@@ -2134,7 +2149,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "secrets"
+      - "v1"
       summary: "Create or replace an secret"
       operationId: "replaceSecret"
       produces:
@@ -2163,7 +2178,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "secrets"
+      - "v1"
       summary: "Delete secret by name"
       operationId: "deleteSecret"
       produces:
@@ -2186,10 +2201,10 @@ paths:
           description: "secret does not exists"
         403:
           description: "Access denied"
-  /users:
+  /api/v1/users:
     get:
       tags:
-      - "users"
+      - "v1"
       summary: "Get users"
       description: "An User defines what role is granted access to what resource"
       operationId: "getUsers"
@@ -2242,7 +2257,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "users"
+      - "v1"
       summary: "Create a new User"
       operationId: "addUser"
       produces:
@@ -2259,10 +2274,10 @@ paths:
             $ref: "#/definitions/User"
         403:
           description: "Access denied"
-  /users/{User}:
+  /api/v1/users/{User}:
     get:
       tags:
-      - "users"
+      - "v1"
       summary: "Get User by name"
       operationId: "getUser"
       produces:
@@ -2284,7 +2299,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "users"
+      - "v1"
       summary: "Patch User as rfc6902 request"
       operationId: "updateUser"
       consumes:
@@ -2313,7 +2328,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "users"
+      - "v1"
       summary: "Create or replace an User"
       operationId: "replaceUser"
       produces:
@@ -2337,7 +2352,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "users"
+      - "v1"
       summary: "Delete User by name"
       operationId: "deleteUser"
       produces:
@@ -2355,10 +2370,10 @@ paths:
           description: "User does not exists"
         403:
           description: "Access denied"
-  /access-rules:
+  /api/v1/access-rules:
     get:
       tags:
-      - "accessRules"
+      - "v1"
       summary: "Get access rules"
       description: "An access rule defines what role is granted access to what resource"
       operationId: "getAccessRules"
@@ -2411,7 +2426,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "accessRules"
+      - "v1"
       summary: "Create a new access rule"
       operationId: "addAccessRule"
       produces:
@@ -2428,10 +2443,10 @@ paths:
             $ref: "#/definitions/AccessRule"
         403:
           description: "Access denied"
-  /access-rules/{access-rule}:
+  /api/v1/access-rules/{access-rule}:
     get:
       tags:
-      - "accessRules"
+      - "v1"
       summary: "Get access rule by name"
       operationId: "getAccessRule"
       produces:
@@ -2453,7 +2468,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "accessRules"
+      - "v1"
       summary: "Patch access rule as rfc6902 request"
       operationId: "updateAccessRule"
       consumes:
@@ -2482,7 +2497,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "accessRules"
+      - "v1"
       summary: "Create or replace an access rule"
       operationId: "replaceAccessRule"
       produces:
@@ -2506,7 +2521,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "accessRules"
+      - "v1"
       summary: "Delete access-rule by name"
       operationId: "deleteAccessRule"
       produces:
@@ -2524,10 +2539,10 @@ paths:
           description: "Access rule does not exists"
         403:
           description: "Access denied"
-  /access-roles:
+  /api/v1/access-roles:
     get:
       tags:
-      - "accessRoles"
+      - "v1"
       summary: "Get access roles"
       description: "An access role defines what role is granted access to what resource"
       operationId: "getAccessRoles"
@@ -2580,7 +2595,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "accessRoles"
+      - "v1"
       summary: "Create a new access role"
       operationId: "addAccessRole"
       produces:
@@ -2597,10 +2612,10 @@ paths:
             $ref: "#/definitions/AccessRole"
         403:
           description: "Access denied"
-  /access-roles/{access-role}:
+  /api/v1/access-roles/{access-role}:
     get:
       tags:
-      - "accessRoles"
+      - "v1"
       summary: "Get access role by name"
       operationId: "getAccessRole"
       produces:
@@ -2622,7 +2637,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "accessRoles"
+      - "v1"
       summary: "Patch access role as rfc6902 request"
       operationId: "updateAccessRole"
       consumes:
@@ -2651,7 +2666,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "accessRoles"
+      - "v1"
       summary: "Create or replace an access role"
       operationId: "replaceAccessRole"
       consumes:
@@ -2681,7 +2696,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "accessRoles"
+      - "v1"
       summary: "Delete access-role by name"
       operationId: "deleteAccessRole"
       produces:
@@ -2699,10 +2714,10 @@ paths:
           description: "Access role does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/jobs:
+  /api/v1/namespaces/{namespace}/jobs:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get list of active queued jobs"
       description: "A job is an asynchronous server process"
       operationId: "getJobs"
@@ -2760,7 +2775,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Create new job"
       operationId: "addJob"
       produces:
@@ -2784,10 +2799,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/jobs/{job}:
+  /api/v1/namespaces/{namespace}/jobs/{job}:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get job by id"
       operationId: "getJob"
       produces:
@@ -2814,7 +2829,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Delete job by id"
       operationId: "deleteJob"
       produces:
@@ -2839,7 +2854,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Patch job as rfc6902 request"
       description: "Update specific attributes of a job"
       operationId: "updateJob"
@@ -2874,10 +2889,10 @@ paths:
           description: "Resource does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/processes:
+  /api/v1/namespaces/{namespace}/processes:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get all processes"
       operationId: "getProcesses"
       produces:
@@ -2936,7 +2951,7 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Trigger a new process"
       operationId: "addProcess"
       produces:
@@ -2960,10 +2975,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/processes/{process}:
+  /api/v1/namespaces/{namespace}/processes/{process}:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get a single process of a job"
       operationId: "getProcess"
       produces:
@@ -2990,7 +3005,7 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Abort running process"
       operationId: "deleteProcess"
       produces:
@@ -3013,10 +3028,10 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/jobs/{job}/logs:
+  /api/v1/namespaces/{namespace}/jobs/{job}/logs:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get logs of a job"
       operationId: "getJobLogs"
       produces:
@@ -3078,10 +3093,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/jobs/{job}/logs/{log}:
+  /api/v1/namespaces/{namespace}/jobs/{job}/logs/{log}:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get a single job error"
       operationId: "getJobLog"
       produces:
@@ -3111,10 +3126,10 @@ paths:
           description: "Job does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/processes/{process}/logs:
+  /api/v1/namespaces/{namespace}/processes/{process}/logs:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get logs of a process"
       operationId: "getProcessLogs"
       produces:
@@ -3176,10 +3191,10 @@ paths:
           description: "Process does not exists"
         403:
           description: "Access denied"
-  /namespaces/{namespace}/process/{process}/logs/{log}:
+  /api/v1/namespaces/{namespace}/process/{process}/logs/{log}:
     get:
       tags:
-      - "jobs"
+      - "v1"
       summary: "Get a single process log"
       operationId: "getProcessLog"
       produces:
