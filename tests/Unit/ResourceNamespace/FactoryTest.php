@@ -15,7 +15,9 @@ use Helmich\MongoMock\MockDatabase;
 use MongoDB\BSON\ObjectId;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Tubee\Collection\Factory as CollectionFactory;
+use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace\Exception;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
@@ -34,7 +36,8 @@ class FactoryTest extends TestCase
             ],
         ]);
 
-        $this->factory = new ResourceNamespaceFactory($db, $this->createMock(CollectionFactory::class), $this->createMock(LoggerInterface::class));
+        $resource_factory = new ResourceFactory($this->createMock(LoggerInterface::class), $this->createMock(CacheInterface::class));
+        $this->factory = new ResourceNamespaceFactory($db, $this->createMock(CollectionFactory::class), $resource_factory);
     }
 
     public function testAdd()

@@ -22,10 +22,14 @@ use MongoDB\BSON\UTCDateTime;
 use MongoDB\Collection;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
+use Psr\SimpleCache\CacheInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class Factory
 {
+    /**
+     * OpenAPI.
+     */
     const SPEC = __DIR__.'/../Rest/v1/openapi.yml';
 
     /**
@@ -43,31 +47,31 @@ class Factory
     protected $db;
 
     /**
-     * Storage.
+     * Cache.
      *
-     * @var array
+     * @var CacheInterface
      */
-    protected static $storage;
+    protected $cache;
 
     /**
      * Initialize.
      */
-    public function __construct(Database $db, LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, CacheInterface $cache)
     {
-        $this->db = $db;
         $this->logger = $logger;
+        $this->cache = $cache;
     }
 
     /**
      * Get resource schema.
      */
-    public static function getSchema(string $kind): Schema
+    public function getSchema(string $kind): Schema
     {
-        if (isset(self::$storage[$kind])) {
-            return self::$storage[$kind];
+        if ($this->cache->has($kind)) {
+            //    return $this->cache->get($kind);
         }
 
-        $spec = self::loadSpecification();
+        $spec = $this->loadSpecification();
 
         if (!isset($spec['components']['schemas'][$kind])) {
             throw new InvalidArgumentException('Provided resource kind is invalid');
@@ -76,7 +80,7 @@ class Factory
         $schema = new Schema($spec['components']['schemas'][$kind]);
         $schema->setRefLookup(new ArrayRefLookup($spec));
         $schema->setFlags(Schema::VALIDATE_EXTRA_PROPERTY_EXCEPTION);
-        self::$storage[$kind] = $schema;
+        $this->cache->set($kind, $schema);
 
         return $schema;
     }
@@ -90,7 +94,7 @@ class Factory
             'category' => get_class($this),
         ]);
 
-        return self::getSchema($resource['kind'])->validate($resource);
+        return $this->getSchema($resource['kind'])->validate($resource);
     }
 
     /**
@@ -190,12 +194,6 @@ class Factory
      */
     public function getAllFrom(Collection $collection, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null, ?Closure $build = null): Generator
     {
-        if ($build === null) {
-            $build = function ($resource) {
-                return $this->build($resource);
-            };
-        }
-
         $total = $collection->count($query);
         $offset = $this->calcOffset($total, $offset);
 
@@ -222,12 +220,6 @@ class Factory
      */
     public function watchFrom(Collection $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = [], ?Closure $build = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        if ($build === null) {
-            $build = function ($resource) {
-                return $this->build($resource);
-            };
-        }
-
         $pipeline = $query;
         if (!empty($pipeline)) {
             $pipeline = [['$match' => $query]];
@@ -290,14 +282,14 @@ class Factory
     /**
      * Load openapi specs.
      */
-    protected static function loadSpecification(): array
+    protected function loadSpecification(): array
     {
-        if (apcu_exists(self::SPEC)) {
-            //return apcu_fetch(self::SPEC);
+        if ($this->cache->has('openapi')) {
+            //return $this->cache->get('openapi');
         }
 
         $data = Yaml::parseFile(self::SPEC);
-        apcu_store(self::SPEC, $data);
+        $this->cache->set('openapi', $data);
 
         return $data;
     }

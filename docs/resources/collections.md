@@ -18,7 +18,7 @@ tubectl create -f spec.yaml
 Check the just created resource:
 
 ```sh
-tubectl get co playground accounts -o yaml
+tubectl get co accounts -n playground -o yaml
 ```
 
 The collection `accounts` is now ready to be used.

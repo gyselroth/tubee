@@ -257,6 +257,6 @@ class Collection extends AbstractResource implements CollectionInterface
      */
     public function flush(bool $simulate = false): bool
     {
-        return $this->object_factory->deleteAll($simulate);
+        return $this->object_factory->deleteAll($this, $simulate);
     }
 }

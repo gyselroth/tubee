@@ -36,6 +36,9 @@ use ParagonIE\Halite\Symmetric\EncryptionKey;
 use ParagonIE\Halite\KeyFactory;
 use ParagonIE\HiddenString\HiddenString;
 use Tubee\V8\Engine as V8Engine;
+use Psr\SimpleCache\CacheInterface;
+use Cache\Adapter\Void\VoidCachePool;
+use Cache\Adapter\Apcu\ApcuCachePool;
 
 return [
     Dispatcher::class => [
@@ -137,6 +140,9 @@ return [
                 'databaseName' => 'tubee'
             ]
         ]]
+    ],
+    CacheInterface::class => [
+        'use' => '{ENV(TUBEE_CACHE_ADAPTER,'.ApcuCachePool::class.')}'
     ],
     LoggerInterface::class => [
         'use' => Logger::class,

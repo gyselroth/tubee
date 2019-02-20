@@ -14,7 +14,6 @@ namespace Tubee\Job;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
-use Psr\Log\LoggerInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Async\Sync;
 use Tubee\Job;
@@ -23,12 +22,26 @@ use Tubee\Process\Factory as ProcessFactory;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'jobs';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
 
     /**
      * Job scheduler.
@@ -54,12 +67,13 @@ class Factory extends ResourceFactory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory)
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->scheduler = $scheduler;
         $this->process_factory = $process_factory;
         $this->log_factory = $log_factory;
-        parent::__construct($db, $logger);
     }
 
     /**
@@ -77,8 +91,10 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace) {
-            return $this->build($resource, $namespace);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
         });
     }
 
@@ -101,7 +117,7 @@ class Factory extends ResourceFactory
             }
         }
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $job->getId());
+        return $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $job->getId());
     }
 
     /**
@@ -129,7 +145,7 @@ class Factory extends ResourceFactory
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Job';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('job '.$resource['name'].' does already exists');
@@ -137,7 +153,7 @@ class Factory extends ResourceFactory
 
         $resource['namespace'] = $namespace->getName();
 
-        $result = $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        $result = $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
 
         $resource['data'] += [
             'namespace' => $namespace->getName(),
@@ -168,7 +184,7 @@ class Factory extends ResourceFactory
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
 
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
 
         $task = $data['data'];
         $task += [
@@ -178,7 +194,7 @@ class Factory extends ResourceFactory
 
         $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -186,8 +202,10 @@ class Factory extends ResourceFactory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace) {
-            return $this->build($resource, $namespace);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
         }, $offset, $limit, $sort);
     }
 
@@ -196,6 +214,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, ResourceNamespaceInterface $namespace): JobInterface
     {
-        return $this->initResource(new Job($resource, $namespace, $this->scheduler, $this->process_factory, $this->log_factory));
+        return $this->resource_factory->initResource(new Job($resource, $namespace, $this->scheduler, $this->process_factory, $this->log_factory));
     }
 }

@@ -21,8 +21,22 @@ use Tubee\DataObject;
 use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\Resource\Factory as ResourceFactory;
 
-class Factory extends ResourceFactory
+class Factory
 {
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
+
     /**
      * Data object relation factory.
      *
@@ -31,12 +45,21 @@ class Factory extends ResourceFactory
     protected $relation_factory;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, DataObjectRelationFactory $relation_factory, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, DataObjectRelationFactory $relation_factory, LoggerInterface $logger)
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->relation_factory = $relation_factory;
-        parent::__construct($db, $logger);
+        $this->logger = $logger;
     }
 
     /**
@@ -49,9 +72,6 @@ class Factory extends ResourceFactory
         ]) > 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getObjectHistory(CollectionInterface $collection, ObjectIdInterface $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [
@@ -85,9 +105,6 @@ class Factory extends ResourceFactory
         return 1;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getOne(CollectionInterface $collection, array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
         $this->logger->debug('find one object with query [{query}] from ['.$collection->getCollection().']', [
@@ -111,19 +128,15 @@ class Factory extends ResourceFactory
         return $this->build(array_shift($objects), $collection);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAll(CollectionInterface $collection, ?array $query = null, bool $include_dataset = true, ?int $offset = 0, ?int $limit = 0, ?array $sort = ['$natural' => -1]): Generator
     {
-        return $this->getAllFrom($this->db->{$collection->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($collection) {
-            return $this->build($resource, $collection);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{$collection->getCollection()}, $query, $offset, $limit, $sort, function (array $resource) use ($collection, $that) {
+            return $that->build($resource, $collection);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function create(CollectionInterface $collection, array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $collection->getSchema()->validate((array) $object['data']);
@@ -145,12 +158,9 @@ class Factory extends ResourceFactory
             'endpoints' => $endpoints,
         ];
 
-        return $this->addTo($this->db->{$collection->getCollection()}, $object, $simulate);
+        return $this->resource_factory->addTo($this->db->{$collection->getCollection()}, $object, $simulate);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(CollectionInterface $collection, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
     {
         $collection->getSchema()->validate((array) $data['data']);
@@ -160,27 +170,27 @@ class Factory extends ResourceFactory
             $data['endpoints'] = array_replace_recursive($existing, $endpoints);
         }
 
-        return $this->updateIn($this->db->{$collection->getCollection()}, $object, $data, $simulate);
+        return $this->resource_factory->updateIn($this->db->{$collection->getCollection()}, $object, $data, $simulate);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteOne(CollectionInterface $collection, string $name, bool $simulate = false): bool
     {
         $resource = $this->getOne($collection, ['name' => $name]);
 
-        return $this->deleteFrom($this->db->{$collection->getCollection()}, $resource->getId(), $simulate);
+        return $this->resource_factory->deleteFrom($this->db->{$collection->getCollection()}, $resource->getId(), $simulate);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function deleteAll(CollectionInterface $collection, ObjectIdInterface $id, bool $simulate = false): bool
+    public function deleteAll(CollectionInterface $collection, bool $simulate = false): bool
     {
-        /*$this->logger->info('delete object ['.$id.'] from ['.$collection->getCollection().']', [
+        $this->logger->info('flush collection ['.$collection->getIdentifier().']', [
             'category' => get_class($this),
-        ]);*/
+        ]);
+
+        if ($simulate === false) {
+            $this->db->{$collection->getCollection()}->deleteMany([]);
+        }
+
+        return true;
     }
 
     /**
@@ -188,8 +198,10 @@ class Factory extends ResourceFactory
      */
     public function watch(CollectionInterface $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{$collection->getCollection()}, $after, $existing, $query, function (array $resource) use ($collection) {
-            return $this->build($collection, $resource);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{$collection->getCollection()}, $after, $existing, $query, function (array $resource) use ($collection, $that) {
+            return $that->build($collection, $resource);
         }, $offset, $limit, $sort);
     }
 
@@ -198,6 +210,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, CollectionInterface $collection): DataObjectInterface
     {
-        return $this->initResource(new DataObject($resource, $collection, $this->relation_factory));
+        return $this->resource_factory->initResource(new DataObject($resource, $collection, $this->relation_factory));
     }
 }

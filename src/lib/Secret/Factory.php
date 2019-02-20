@@ -25,7 +25,7 @@ use Tubee\Resource\ResourceInterface;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Secret;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
@@ -38,6 +38,20 @@ class Factory extends ResourceFactory
     private const DEFAULT_KEY = '314004004b3cef33ba8ea540b424736408364317d9ebfbc9293b8478a8d2478e23dba1ba30ded48ab0dd059cfe3dce2daf00d10eb40af1c0bf429553a2d64802272a514cfde95ac31956baa3929ee01c7338c95805c3a619e254f7aa2966e6a7cdad4783';
 
     /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
+
+    /**
      * Encryption key.
      *
      * @var EncryptionKey
@@ -45,12 +59,21 @@ class Factory extends ResourceFactory
     protected $key;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, EncryptionKey $key, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, EncryptionKey $key, LoggerInterface $logger)
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->key = $key;
-        parent::__construct($db, $logger);
+        $this->logger = $logger;
     }
 
     /**
@@ -79,8 +102,10 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace) {
-            return $this->build($resource, $namespace);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
         });
     }
 
@@ -142,7 +167,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($namespace, $name);
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+        return $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -152,10 +177,10 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
         $data = $this->crypt($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -164,7 +189,7 @@ class Factory extends ResourceFactory
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Secret';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('secret '.$resource['name'].' does already exists');
@@ -174,7 +199,7 @@ class Factory extends ResourceFactory
 
         $resource['namespace'] = $namespace->getName();
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -182,7 +207,11 @@ class Factory extends ResourceFactory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, $offset, $limit, $sort);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
+        }, $offset, $limit, $sort);
     }
 
     /**
@@ -194,7 +223,7 @@ class Factory extends ResourceFactory
         $resource['data'] = $decrypted;
         unset($resource['blob']);
 
-        return $this->initResource(new Secret($resource, $namespace));
+        return $this->resource_factory->initResource(new Secret($resource, $namespace));
     }
 
     /**

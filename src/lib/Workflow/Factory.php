@@ -21,12 +21,26 @@ use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\V8\Engine as V8Engine;
 use Tubee\Workflow;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'workflows';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
 
     /**
      * V8 engine.
@@ -36,12 +50,21 @@ class Factory extends ResourceFactory
     protected $v8;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, V8Engine $v8, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, V8Engine $v8, LoggerInterface $logger)
     {
-        parent::__construct($db, $logger);
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->v8 = $v8;
+        $this->logger = $logger;
     }
 
     /**
@@ -74,8 +97,10 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($endpoint) {
-            return $this->build($resource, $endpoint);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($endpoint, $that) {
+            return $that->build($resource, $endpoint);
         });
     }
 
@@ -107,7 +132,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($endpoint, $name);
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+        return $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -119,7 +144,7 @@ class Factory extends ResourceFactory
             $resource['kind'] = 'Workflow';
         }
 
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         if ($this->has($endpoint, $resource['name'])) {
             throw new Exception\NotUnique('workflow '.$resource['name'].' does already exists');
@@ -129,7 +154,7 @@ class Factory extends ResourceFactory
         $resource['collection'] = $endpoint->getCollection()->getName();
         $resource['endpoint'] = $endpoint->getName();
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -139,9 +164,9 @@ class Factory extends ResourceFactory
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -149,8 +174,10 @@ class Factory extends ResourceFactory
      */
     public function watch(EndpointInterface $endpoint, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($endpoint) {
-            return $this->build($resource, $endpoint);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($endpoint, $that) {
+            return $that->build($resource, $endpoint);
         }, $offset, $limit, $sort);
     }
 
@@ -177,6 +204,6 @@ class Factory extends ResourceFactory
             break;
         }
 
-        return $this->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $resource));
+        return $this->resource_factory->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $resource));
     }
 }

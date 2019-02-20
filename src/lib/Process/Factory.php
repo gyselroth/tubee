@@ -14,7 +14,6 @@ namespace Tubee\Process;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
-use Psr\Log\LoggerInterface;
 use TaskScheduler\Process;
 use TaskScheduler\Scheduler;
 use Tubee\Async\Sync;
@@ -24,8 +23,22 @@ use Tubee\Process as ProcessWrapper;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
-class Factory extends ResourceFactory
+class Factory
 {
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
+
     /**
      * Job scheduler.
      *
@@ -43,11 +56,12 @@ class Factory extends ResourceFactory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, Scheduler $scheduler, LogFactory $log_factory, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, Scheduler $scheduler, LogFactory $log_factory)
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->scheduler = $scheduler;
         $this->log_factory = $log_factory;
-        parent::__construct($db, $logger);
     }
 
     /**
@@ -66,8 +80,10 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{$this->scheduler->getJobQueue()}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace) {
-            return $this->build($resource, $namespace);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{$this->scheduler->getJobQueue()}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
         });
     }
 
@@ -77,7 +93,7 @@ class Factory extends ResourceFactory
     public function create(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'Process';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
         $resource['data']['namespace'] = $namespace->getName();
 
         $process = $this->scheduler->addJob(Sync::class, $resource['data']);
@@ -122,8 +138,10 @@ class Factory extends ResourceFactory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{$this->scheduler->getJobQueue()}, $after, $existing, $query, function (array $resource) use ($namespace) {
-            return $this->build($resource, $namespace);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{$this->scheduler->getJobQueue()}, $after, $existing, $query, function (array $resource) use ($namespace, $that) {
+            return $that->build($resource, $namespace);
         }, $offset, $limit, $sort);
     }
 
@@ -132,6 +150,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $process, ResourceNamespaceInterface $namespace): ProcessInterface
     {
-        return $this->initResource(new ProcessWrapper($process, $namespace, $this->log_factory));
+        return $this->resource_factory->initResource(new ProcessWrapper($process, $namespace, $this->log_factory));
     }
 }

@@ -22,12 +22,26 @@ use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\Secret\Factory as SecretFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'endpoints';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
 
     /**
      * Factory.
@@ -44,13 +58,22 @@ class Factory extends ResourceFactory
     protected $secret_factory;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, WorkflowFactory $workflow_factory, SecretFactory $secret_factory, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, WorkflowFactory $workflow_factory, SecretFactory $secret_factory, LoggerInterface $logger)
     {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
         $this->workflow_factory = $workflow_factory;
         $this->secret_factory = $secret_factory;
-        parent::__construct($db, $logger);
+        $this->logger = $logger;
     }
 
     /**
@@ -81,8 +104,10 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($collection) {
-            return $this->build($resource, $collection);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($collection, $that) {
+            return $that->build($resource, $collection);
         });
     }
 
@@ -113,7 +138,7 @@ class Factory extends ResourceFactory
     {
         $resource = $this->getOne($collection, $name);
 
-        return $this->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
+        return $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource->getId());
     }
 
     /**
@@ -122,7 +147,7 @@ class Factory extends ResourceFactory
     public function add(CollectionInterface $collection, array $resource): ObjectIdInterface
     {
         $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
         $resource = Validator::validate($resource);
 
         foreach ($resource['secrets'] as $secret) {
@@ -144,7 +169,7 @@ class Factory extends ResourceFactory
         $resource['namespace'] = $collection->getResourceNamespace()->getName();
         $resource['collection'] = $collection->getName();
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -156,7 +181,7 @@ class Factory extends ResourceFactory
         $data['kind'] = $resource->getKind();
 
         $data = $this->secret_factory->resolve($resource->getCollection()->getResourceNamespace(), $data);
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
         $data = Validator::validate($data);
 
         foreach ($data['secrets'] as $secret) {
@@ -168,7 +193,7 @@ class Factory extends ResourceFactory
         $endpoint = $this->build($data, $resource->getCollection());
         $endpoint->setup();
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
     /**
@@ -176,8 +201,10 @@ class Factory extends ResourceFactory
      */
     public function watch(CollectionInterface $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($collection) {
-            return $this->build($resource, $collection);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($collection, $that) {
+            return $that->build($resource, $collection);
         }, $offset, $limit, $sort);
     }
 
@@ -189,7 +216,7 @@ class Factory extends ResourceFactory
         $factory = EndpointInterface::ENDPOINT_MAP[$resource['kind']].'\\Factory';
         $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
 
-        return $this->initResource($factory::build($resource, $collection, $this->workflow_factory, $this->logger));
+        return $this->resource_factory->initResource($factory::build($resource, $collection, $this->workflow_factory, $this->logger));
     }
 
     /**

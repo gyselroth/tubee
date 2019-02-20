@@ -14,17 +14,41 @@ namespace Tubee\DataObjectRelation;
 use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\ObjectIdInterface;
+use MongoDB\Database;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObjectRelation;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 
-class Factory extends ResourceFactory
+class Factory
 {
     /**
      * Collection name.
      */
     public const COLLECTION_NAME = 'relations';
+
+    /**
+     * Database.
+     *
+     * @var Database
+     */
+    protected $db;
+
+    /**
+     * Resource factory.
+     *
+     * @var ResourceFactory
+     */
+    protected $resource_factory;
+
+    /**
+     * Initialize.
+     */
+    public function __construct(Database $db, ResourceFactory $resource_factory)
+    {
+        $this->db = $db;
+        $this->resource_factory = $resource_factory;
+    }
 
     /**
      * Has resource.
@@ -116,7 +140,9 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation) {
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation, $that) {
             $object_1 = $resource['data']['relation'][0];
             $object_2 = $resource['data']['relation'][1];
             $related = $object_1;
@@ -127,13 +153,10 @@ class Factory extends ResourceFactory
 
             $related = $object->getCollection()->getResourceNamespace()->switch($related['namespace'])->getCollection($related['collection'])->getObject(['name' => $related['object']]);
 
-            return $this->build($resource, $related);
+            return $that->build($resource, $related);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         $filter = [
@@ -146,14 +169,13 @@ class Factory extends ResourceFactory
             ];
         }
 
-        return $this->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) {
-            return $this->build($resource);
+        $that = $this;
+
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($that) {
+            return $that->build($resource);
         });
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteFromObject(DataObjectInterface $object_1, DataObjectInterface $object_2, bool $simulate = false): bool
     {
         $relations = [
@@ -175,9 +197,6 @@ class Factory extends ResourceFactory
         return true;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $relations = [
@@ -229,12 +248,12 @@ class Factory extends ResourceFactory
             ];
 
             $exists = $this->build($exists);
-            $this->updateIn($this->db->{self::COLLECTION_NAME}, $exists, $data);
+            $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $exists, $data);
 
             return $exists->getId();
         }
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
     /**
@@ -243,7 +262,7 @@ class Factory extends ResourceFactory
     public function add(ResourceNamespaceInterface $namespace, array $resource): ObjectIdInterface
     {
         $resource['kind'] = 'DataObjectRelation';
-        $resource = $this->validate($resource);
+        $resource = $this->resource_factory->validate($resource);
 
         $resource['_id'] = new ObjectId();
         if (!isset($resource['name'])) {
@@ -256,31 +275,21 @@ class Factory extends ResourceFactory
 
         $resource['namespace'] = $namespace->getName();
 
-        return $this->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function update(DataObjectRelationInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
-        $data = $this->validate($data);
+        $data = $this->resource_factory->validate($data);
 
-        return $this->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
+        return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function deleteOne(DataObjectRelationInterface $relation, bool $simulate = false): bool
     {
-        $this->logger->info('delete object relation ['.$relation->getId()().'] from ['.self::COLLECTION_NAME.']', [
-            'category' => get_class($this),
-        ]);
-
-        $this->db->{self::COLLECTION_NAME}->deleteOne(['_id' => $relation->getId()]);
+        $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $relation->getId());
 
         return true;
     }
@@ -290,8 +299,10 @@ class Factory extends ResourceFactory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) {
-            return $this->build($resource);
+        $that = $this;
+
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($that) {
+            return $that->build($resource);
         }, $offset, $limit, $sort);
     }
 
@@ -300,6 +311,6 @@ class Factory extends ResourceFactory
      */
     public function build(array $resource, ?DataObjectInterface $object = null): DataObjectRelationInterface
     {
-        return $this->initResource(new DataObjectRelation($resource, $object));
+        return $this->resource_factory->initResource(new DataObjectRelation($resource, $object));
     }
 }

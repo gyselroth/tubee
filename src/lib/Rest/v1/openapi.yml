@@ -10,19 +10,32 @@ info:
     name: MIT
     url: https://opensource.org/licenses/MIT
 paths:
-  /:
-    get:
-      summary: Get api entrypoint
-      operationId: root
-      responses:
-        "200":
-          description: List of objects
-        "403":
-          description: Access denied
-  /namespaces:
+  /api:
     get:
       tags:
-        - namespaces
+        - v1
+      summary: Get api entrypoint
+      operationId: getApi
+      responses:
+        "200":
+          description: Api
+        "403":
+          description: Access denied
+  /api/v1:
+    get:
+      tags:
+        - v1
+      summary: Get api entrypoint
+      operationId: getV1
+      responses:
+        "200":
+          description: Api
+        "403":
+          description: Access denied
+  /api/v1/namespaces:
+    get:
+      tags:
+        - v1
       summary: Get namespaces
       description: A namespace is a logical group of collections
       operationId: getNamespaces
@@ -89,7 +102,7 @@ paths:
           description: Access denied
     post:
       tags:
-        - namespaces
+        - v1
       summary: Add namespace
       operationId: addNamespace
       requestBody:
@@ -103,10 +116,10 @@ paths:
                 $ref: "#/components/schemas/Namespace"
         "403":
           description: Access denied
-  "/namespaces/{namespace}":
+  "/api/v1/namespaces/{namespace}":
     get:
       tags:
-        - namespaces
+        - v1
       summary: Get specific namespace
       description: A namespace is a logical group of collections
       operationId: getNamespace
@@ -138,7 +151,7 @@ paths:
           description: Resource does not exists
     delete:
       tags:
-        - namespaces
+        - v1
       summary: Delete specific namespace
       operationId: deleteNamespace
       parameters:
@@ -157,7 +170,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - namespaces
+        - v1
       summary: Create or replace namespace
       operationId: replaceNamespace
       parameters:
@@ -187,7 +200,7 @@ paths:
           description: Access denied
     patch:
       tags:
-        - namespaces
+        - v1
       summary: Patch namespace as rfc6902 request
       operationId: updateNamespace
       description: Update specific attributes of a namespace
@@ -217,10 +230,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections":
+  "/api/v1/namespaces/{namespace}/collections":
     get:
       tags:
-        - collections
+        - v1
       summary: Get collections
       description: A collection is collection of data objects of a specific type
       operationId: getCollections
@@ -295,7 +308,7 @@ paths:
           description: Resource does not exists
     post:
       tags:
-        - collections
+        - v1
       summary: Add collection
       operationId: addCollection
       parameters:
@@ -318,10 +331,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}":
     get:
       tags:
-        - collections
+        - v1
       summary: Get specific collection
       description: A collection is collection of dataobjects of a specific type
       operationId: getCollection
@@ -359,7 +372,7 @@ paths:
           description: Resource does not exists
     delete:
       tags:
-        - collections
+        - v1
       summary: Delete specific collection
       operationId: deleteCollection
       parameters:
@@ -384,7 +397,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - collections
+        - v1
       summary: Create or replace collection
       operationId: replaceCollection
       parameters:
@@ -420,7 +433,7 @@ paths:
           description: Access denied
     patch:
       tags:
-        - collections
+        - v1
       summary: Patch collection as rfc6902 request
       description: Update specific attributes of a collection
       operationId: updateCollection
@@ -450,10 +463,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/logs":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/logs":
     get:
       tags:
-        - collections
+        - v1
       summary: Get logs of a collection
       operationId: getCollectionLogs
       parameters:
@@ -531,10 +544,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/collections/{collection}/logs/{log}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/logs/{log}":
     get:
       tags:
-        - collections
+        - v1
       summary: Get a single collection log
       operationId: getCollectionLog
       parameters:
@@ -567,10 +580,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/collections/{collection}/endpoints":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints":
     get:
       tags:
-        - endpoints
+        - v1
       summary: Get endpoints
       description: An endpoint is either of type source or destination and defines an
         import/export destination
@@ -652,7 +665,7 @@ paths:
           description: Resource does not exists
     post:
       tags:
-        - endpoints
+        - v1
       summary: Add Endpoint
       operationId: addEndpoint
       parameters:
@@ -684,10 +697,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}":
     get:
       tags:
-        - endpoints
+        - v1
       summary: Get specific endpoint
       description: An endpoint is either of type source or destination and defines an
         import/export destination
@@ -732,7 +745,7 @@ paths:
           description: Resource does not exists
     delete:
       tags:
-        - endpoints
+        - v1
       summary: Delete specific endpoint
       operationId: deleteEndpoint
       parameters:
@@ -763,7 +776,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - endpoints
+        - v1
       summary: Create or replace endppoint
       operationId: replaceEndpoint
       parameters:
@@ -808,7 +821,7 @@ paths:
           description: Access denied
     patch:
       tags:
-        - endpoints
+        - v1
       summary: Patch collection as rfc6902 request
       description: Update specific attributes of a endpoint
       operationId: updateEndpoint
@@ -844,10 +857,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs":
     get:
       tags:
-        - endpoints
+        - v1
       summary: Get logs of an endpoint
       operationId: getEndpointLogs
       parameters:
@@ -931,10 +944,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}":
     get:
       tags:
-        - endpoints
+        - v1
       summary: Get a single endpoint log
       operationId: getEndpointLog
       parameters:
@@ -973,10 +986,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows":
     get:
       tags:
-        - workflows
+        - v1
       summary: Get endpoint workflows
       description: A workflow is an action how to import/export a collection and with what
         attribute map
@@ -1062,7 +1075,7 @@ paths:
           description: Access denied
     post:
       tags:
-        - workflows
+        - v1
       summary: Add worfklow to endpoint
       operationId: addWorkflow
       parameters:
@@ -1097,10 +1110,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}":
     get:
       tags:
-        - workflows
+        - v1
       summary: Get specifc endpoint workflow
       description: A workflow is an action how to import/export a collection and with what
         attribute map
@@ -1151,7 +1164,7 @@ paths:
           description: Resource does not exists
     delete:
       tags:
-        - workflows
+        - v1
       summary: Delete specific workflow from
       operationId: deleteWorkflow
       parameters:
@@ -1188,7 +1201,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - workflows
+        - v1
       summary: Create or replace workflow
       operationId: replaceWorkflow
       parameters:
@@ -1236,7 +1249,7 @@ paths:
           description: Access denied
     patch:
       tags:
-        - workflows
+        - v1
       summary: Patch workflow as rfc6902 request
       description: Update specific attributes of a workflow
       operationId: updateWorkflow
@@ -1284,10 +1297,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/objects/{object}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}":
     get:
       tags:
-        - dataObjects
+        - v1
       summary: Get specific object
       description: Get an object of a specific collection
       operationId: getObject
@@ -1327,7 +1340,7 @@ paths:
           description: Resource does not exists
     patch:
       tags:
-        - dataObjects
+        - v1
       summary: Patch object as rfc6902 request
       description: Update specific attributes of an object
       operationId: updateObject
@@ -1372,7 +1385,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - dataObjects
+        - v1
       summary: Replace or create object
       description: Replace all data attributes of an object (Or create one if not exists)
       operationId: replaceObject
@@ -1431,7 +1444,7 @@ paths:
           description: Resource does not exists
     delete:
       tags:
-        - dataObjects
+        - v1
       summary: Delete object
       description: Delete a specific object
       operationId: deleteObject
@@ -1468,10 +1481,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/objects/{object}/relations":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations":
     get:
       tags:
-        - dataObjects
+        - v1
       summary: Get relative objects of an object
       description: Get all objects the object is related to
       operationId: getObjectRelations
@@ -1556,10 +1569,10 @@ paths:
           description: Access denied
         "404":
           description: Resource not found
-  "/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}":
     get:
       tags:
-        - dataObjects
+        - v1
       summary: Get single relative object of an object
       operationId: getObjectRelation
       parameters:
@@ -1598,10 +1611,10 @@ paths:
           description: Access denied
         "404":
           description: Resource not found
-  "/namespaces/{namespace}/relations":
+  "/api/v1/namespaces/{namespace}/relations":
     get:
       tags:
-        - dataObjectRelations
+        - v1
       summary: Get data object relations
       description: Get data object relations
       operationId: getRelations
@@ -1676,7 +1689,7 @@ paths:
           description: Resource not found
     post:
       tags:
-        - dataObjectRelations
+        - v1
       summary: Add new object relation
       operationId: addRelation
       parameters:
@@ -1699,10 +1712,10 @@ paths:
           description: Access denied
         "404":
           description: Resource not found
-  "/namespaces/{namespace}/relations/{relation}":
+  "/api/v1/namespaces/{namespace}/relations/{relation}":
     get:
       tags:
-        - dataObjectRelations
+        - v1
       summary: Get single relation
       operationId: getRelation
       parameters:
@@ -1731,7 +1744,7 @@ paths:
           description: Resource not found
     patch:
       tags:
-        - dataObjectRelations
+        - v1
       summary: Patch relation as rfc6902 request
       description: Update specific attributes of a relation
       operationId: updateRelation
@@ -1763,7 +1776,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - dataObjectRelations
+        - v1
       summary: Replace object relation
       operationId: replaceRelation
       parameters:
@@ -1794,7 +1807,7 @@ paths:
           description: Resource not found
     delete:
       tags:
-        - dataObjectRelations
+        - v1
       summary: Delete object relation
       operationId: deleteObjectRelation
       parameters:
@@ -1817,10 +1830,10 @@ paths:
           description: Access denied
         "404":
           description: Resource not found
-  "/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects":
     get:
       tags:
-        - endpointObjects
+        - v1
       summary: Get objects from endpoint
       description: An endpoint is either of type source or destination and defines an
         import/export destination
@@ -1900,10 +1913,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/objects/{object}/history":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/history":
     get:
       tags:
-        - dataObjects
+        - v1
       summary: Get object history
       description: Get the history of all modifications from a specific object
       operationId: getObjectHistory
@@ -1988,10 +2001,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/collections/{collection}/objects/{object}/logs":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs":
     get:
       tags:
-        - dataObjects
+        - v1
       summary: Get logs of an object
       operationId: getObjectLogs
       parameters:
@@ -2075,10 +2088,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}":
     get:
       tags:
-        - dataObjects
+        - v1
       summary: Get a single object log
       operationId: getObjectLog
       parameters:
@@ -2117,10 +2130,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/collections/{collection}/objects":
+  "/api/v1/namespaces/{namespace}/collections/{collection}/objects":
     get:
       tags:
-        - dataObjects
+        - v1
       summary: Get objects of a specific collection
       description: A object is a data object from a specifc collection
       operationId: getObjects
@@ -2201,7 +2214,7 @@ paths:
           description: Resource does not exists
     post:
       tags:
-        - dataObjects
+        - v1
       summary: Add a new object of a specifc collection
       operationId: addObject
       parameters:
@@ -2237,10 +2250,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/secrets":
+  "/api/v1/namespaces/{namespace}/secrets":
     get:
       tags:
-        - secrets
+        - v1
       summary: Get secrets
       description: An secret holds secret data which should not get exposed and is
         specially encrypted on the server. A secret can be injected into other
@@ -2315,7 +2328,7 @@ paths:
           description: Access denied
     post:
       tags:
-        - secrets
+        - v1
       summary: Create a new secret
       operationId: addSecret
       parameters:
@@ -2336,10 +2349,10 @@ paths:
                 $ref: "#/components/schemas/Secret"
         "403":
           description: Access denied
-  "/namespaces/{namespace}/secrets/{secret}":
+  "/api/v1/namespaces/{namespace}/secrets/{secret}":
     get:
       tags:
-        - secrets
+        - v1
       summary: Get secret by name
       operationId: getSecret
       parameters:
@@ -2368,7 +2381,7 @@ paths:
           description: secret does not exists
     patch:
       tags:
-        - secrets
+        - v1
       summary: Patch secret as rfc6902 request
       operationId: updateSecret
       parameters:
@@ -2403,7 +2416,7 @@ paths:
           description: Access denied
     put:
       tags:
-        - secrets
+        - v1
       summary: Create or replace an secret
       operationId: replaceSecret
       parameters:
@@ -2432,7 +2445,7 @@ paths:
           description: Access denied
     delete:
       tags:
-        - secrets
+        - v1
       summary: Delete secret by name
       operationId: deleteSecret
       parameters:
@@ -2455,10 +2468,10 @@ paths:
           description: Access denied
         "404":
           description: secret does not exists
-  /users:
+  /api/v1/users:
     get:
       tags:
-        - users
+        - v1
       summary: Get users
       description: An User defines what role is granted access to what resource
       operationId: getUsers
@@ -2525,7 +2538,7 @@ paths:
           description: Access denied
     post:
       tags:
-        - users
+        - v1
       summary: Create a new User
       operationId: addUser
       requestBody:
@@ -2539,15 +2552,15 @@ paths:
                 $ref: "#/components/schemas/User"
         "403":
           description: Access denied
-  "/users/{User}":
+  "/api/v1/users/{user}":
     get:
       tags:
-        - users
+        - v1
       summary: Get User by name
       operationId: getUser
       parameters:
         - in: path
-          name: User
+          name: user
           description: User name
           required: true
           schema:
@@ -2565,7 +2578,7 @@ paths:
           description: User does not exists
     patch:
       tags:
-        - users
+        - v1
       summary: Patch User as rfc6902 request
       operationId: updateUser
       parameters:
@@ -2594,7 +2607,7 @@ paths:
           description: Access denied
     put:
       tags:
-        - users
+        - v1
       summary: Create or replace an User
       operationId: replaceUser
       parameters:
@@ -2617,7 +2630,7 @@ paths:
           description: Access denied
     delete:
       tags:
-        - users
+        - v1
       summary: Delete User by name
       operationId: deleteUser
       parameters:
@@ -2634,10 +2647,10 @@ paths:
           description: Access denied
         "404":
           description: User does not exists
-  /access-rules:
+  /api/v1/access-rules:
     get:
       tags:
-        - accessRules
+        - v1
       summary: Get access rules
       description: An access rule defines what role is granted access to what resource
       operationId: getAccessRules
@@ -2704,7 +2717,7 @@ paths:
           description: Access denied
     post:
       tags:
-        - accessRules
+        - v1
       summary: Create a new access rule
       operationId: addAccessRule
       requestBody:
@@ -2718,10 +2731,10 @@ paths:
                 $ref: "#/components/schemas/AccessRule"
         "403":
           description: Access denied
-  "/access-rules/{access-rule}":
+  "/api/v1/access-rules/{access-rule}":
     get:
       tags:
-        - accessRules
+        - v1
       summary: Get access rule by name
       operationId: getAccessRule
       parameters:
@@ -2744,7 +2757,7 @@ paths:
           description: access rule does not exists
     patch:
       tags:
-        - accessRules
+        - v1
       summary: Patch access rule as rfc6902 request
       operationId: updateAccessRule
       parameters:
@@ -2773,7 +2786,7 @@ paths:
           description: Access denied
     put:
       tags:
-        - accessRules
+        - v1
       summary: Create or replace an access rule
       operationId: replaceAccessRule
       parameters:
@@ -2796,7 +2809,7 @@ paths:
           description: Access denied
     delete:
       tags:
-        - accessRules
+        - v1
       summary: Delete access-rule by name
       operationId: deleteAccessRule
       parameters:
@@ -2814,10 +2827,10 @@ paths:
           description: Access denied
         "404":
           description: Access rule does not exists
-  /access-roles:
+  /api/v1/access-roles:
     get:
       tags:
-        - accessRoles
+        - v1
       summary: Get access roles
       description: An access role defines what role is granted access to what resource
       operationId: getAccessRoles
@@ -2884,7 +2897,7 @@ paths:
           description: Access denied
     post:
       tags:
-        - accessRoles
+        - v1
       summary: Create a new access role
       operationId: addAccessRole
       requestBody:
@@ -2898,10 +2911,10 @@ paths:
                 $ref: "#/components/schemas/AccessRole"
         "403":
           description: Access denied
-  "/access-roles/{access-role}":
+  "/api/v1/access-roles/{access-role}":
     get:
       tags:
-        - accessRoles
+        - v1
       summary: Get access role by name
       operationId: getAccessRole
       parameters:
@@ -2924,7 +2937,7 @@ paths:
           description: access role does not exists
     patch:
       tags:
-        - accessRoles
+        - v1
       summary: Patch access role as rfc6902 request
       operationId: updateAccessRole
       parameters:
@@ -2953,7 +2966,7 @@ paths:
           description: Access denied
     put:
       tags:
-        - accessRoles
+        - v1
       summary: Create or replace an access role
       operationId: replaceAccessRole
       parameters:
@@ -2982,7 +2995,7 @@ paths:
           description: Access denied
     delete:
       tags:
-        - accessRoles
+        - v1
       summary: Delete access-role by name
       operationId: deleteAccessRole
       parameters:
@@ -3000,10 +3013,10 @@ paths:
           description: Access denied
         "404":
           description: Access role does not exists
-  "/namespaces/{namespace}/jobs":
+  "/api/v1/namespaces/{namespace}/jobs":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get list of active queued jobs
       description: A job is an asynchronous server process
       operationId: getJobs
@@ -3076,7 +3089,7 @@ paths:
           description: Access denied
     post:
       tags:
-        - jobs
+        - v1
       summary: Create new job
       operationId: addJob
       parameters:
@@ -3102,10 +3115,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/jobs/{job}":
+  "/api/v1/namespaces/{namespace}/jobs/{job}":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get job by id
       operationId: getJob
       parameters:
@@ -3134,7 +3147,7 @@ paths:
           description: Job does not exists
     delete:
       tags:
-        - jobs
+        - v1
       summary: Delete job by id
       operationId: deleteJob
       parameters:
@@ -3159,7 +3172,7 @@ paths:
           description: Job does not exists
     patch:
       tags:
-        - jobs
+        - v1
       summary: Patch job as rfc6902 request
       description: Update specific attributes of a job
       operationId: updateJob
@@ -3189,10 +3202,10 @@ paths:
           description: Access denied
         "404":
           description: Resource does not exists
-  "/namespaces/{namespace}/processes":
+  "/api/v1/namespaces/{namespace}/processes":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get all processes
       operationId: getProcesses
       parameters:
@@ -3266,7 +3279,7 @@ paths:
           description: Job does not exists
     post:
       tags:
-        - jobs
+        - v1
       summary: Trigger a new process
       operationId: addProcess
       parameters:
@@ -3292,10 +3305,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/processes/{process}":
+  "/api/v1/namespaces/{namespace}/processes/{process}":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get a single process of a job
       operationId: getProcess
       parameters:
@@ -3324,7 +3337,7 @@ paths:
           description: Process does not exists
     delete:
       tags:
-        - jobs
+        - v1
       summary: Abort running process
       operationId: deleteProcess
       parameters:
@@ -3347,10 +3360,10 @@ paths:
           description: Access denied
         "404":
           description: Process does not exists
-  "/namespaces/{namespace}/jobs/{job}/logs":
+  "/api/v1/namespaces/{namespace}/jobs/{job}/logs":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get logs of a job
       operationId: getJobLogs
       parameters:
@@ -3428,10 +3441,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/jobs/{job}/logs/{log}":
+  "/api/v1/namespaces/{namespace}/jobs/{job}/logs/{log}":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get a single job error
       operationId: getJobLog
       parameters:
@@ -3464,10 +3477,10 @@ paths:
           description: Access denied
         "404":
           description: Job does not exists
-  "/namespaces/{namespace}/processes/{process}/logs":
+  "/api/v1/namespaces/{namespace}/processes/{process}/logs":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get logs of a process
       operationId: getProcessLogs
       parameters:
@@ -3545,10 +3558,10 @@ paths:
           description: Access denied
         "404":
           description: Process does not exists
-  "/namespaces/{namespace}/process/{process}/logs/{log}":
+  "/api/v1/namespaces/{namespace}/process/{process}/logs/{log}":
     get:
       tags:
-        - jobs
+        - v1
       summary: Get a single process log
       operationId: getProcessLog
       parameters:
@@ -3582,7 +3595,7 @@ paths:
         "404":
           description: Log does not exists
 servers:
-  - url: /api/v1
+  - url: /
 components:
   requestBodies:
     JsonPatchArray:
@@ -3798,6 +3811,7 @@ components:
               description: "The secrets data. You may specify multiple keys. Important: You
                 need to base64 encode the values!"
               type: object
+              additionalProperties: true
     Users:
       description: A list of users.
       allOf:
@@ -4214,16 +4228,18 @@ components:
                         type: boolean
                         default: false
     StreamStorage:
+      description: Use a streaming endpoint to fetch data. Usually used for a http url.
       type: object
       required: 
       - kind
       properties:
         kind:
-          description: "Use a streaming endpoint to fetch data. Usually used for a http url."
+          description: "Always StreamStorage."
           type: string
           enum:
           - StreamStorage
     SmbStorage:
+      description: SMB/CIFS share.
       type: object
       required:
       - kind
@@ -4231,7 +4247,7 @@ components:
       - share
       properties:
         kind:
-          description: "SMB/CIFS Share."
+          description: "Always SmbStorage."
           type: string
           enum:
           - SmbStorage
@@ -4256,6 +4272,7 @@ components:
           nullable: true
           default: null
     BalloonStorage:
+      description: Access a balloon cloud storage.
       type: object
       required:
       - kind
@@ -4264,7 +4281,7 @@ components:
       - password
       properties:
         kind:
-          description: "Balloon cloud storage."
+          description: "Always BalloonStorage."
           type: string
           enum:
           - BalloonStorage
@@ -4287,13 +4304,14 @@ components:
           type: object
           default: {}
     LocalFilesystemStorage:
+      description: Access the local filesystem from the tubee server point of view.
       type: object
       required:
       - kind
       - root
       properties:
         kind:
-          description: "Local filesystem storage."
+          description: "Always LocalFilesystemStorage."
           type: string
           enum:
           - LocalFilesystemStorage
@@ -4692,7 +4710,7 @@ components:
                   properties:
                     base_uri:
                       description: Base uri to univention server (usually including
-                        /univention) (Like https://master/univention).
+                        /api/v1/univention) (Like https://master/univention).
                       type: string
                     flavor:
                       description: Object type flavor (For example users/user or
