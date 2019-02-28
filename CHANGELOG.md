@@ -24,6 +24,7 @@
 * CORE: [CHANGE] Added TUBEE_CACHE_ADAPTER and TUBEE_LOG_LEVEL env variables to default container config
 * CORE: [CHANGE] All resource factories now depend on Resource\Factory which itself uses a Psr cache for resource validation
 * CORE: [FIX] flush: true results in "TypeError: Argument 1 passed to Tubee\DataObject\Factory::deleteAll() must implement interface Tubee\Collection\CollectionInterface, boolean given"
+* CORE: [FEATURE] Added -f to cli jobs (flush queue)
 * API: [FIX] uncaught exception: Argument 1 passed to Tubee\Secret\Factory::getOne() must implement interface Tubee\ResourceNamespace\ResourceNamespaceInterface, string given at POST /api/v1/secrets
 * API: [FIX] uncaught exception: Undefined variable: job]  [object] (ErrorException(code: 0): Undefined variable: job at POST /api/v1/jobs
 * API: [FIX] Added ImageEndpoint to openapi v3 specs
