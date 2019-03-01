@@ -50,7 +50,7 @@ tubectl create -f spec.yaml
 Check the just created resource:
 
 ```sh
-tubectl get wf accounts ldap create-updat -n playground -o yaml
+tubectl get wf accounts ldap create-update -n playground -o yaml
 ```
 
 ## Ensure

@@ -71,7 +71,7 @@ There is a possibility to open a template in the editor. Meaning you have pre de
 This is done by specifying `--from--template`. 
 
 ```
-tubectl create ep mynamespace mycollection --from-template
+tubectl create ep mycollection -n mynamespace --from-template
 ``` 
 
 This will open the requested resource with all configuration possibilities. Usually you only need to modify things in `data`, and the resource coordinates such as `namespace`, `collection`, `endpoint` and `name`.

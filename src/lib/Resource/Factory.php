@@ -68,13 +68,13 @@ class Factory
     public function getSchema(string $kind): Schema
     {
         if ($this->cache->has($kind)) {
-            //    return $this->cache->get($kind);
+            return $this->cache->get($kind);
         }
 
         $spec = $this->loadSpecification();
 
         if (!isset($spec['components']['schemas'][$kind])) {
-            throw new InvalidArgumentException('Provided resource kind is invalid');
+            throw new InvalidArgumentException('provided resource kind is invalid');
         }
 
         $schema = new Schema($spec['components']['schemas'][$kind]);
@@ -285,7 +285,7 @@ class Factory
     protected function loadSpecification(): array
     {
         if ($this->cache->has('openapi')) {
-            //return $this->cache->get('openapi');
+            return $this->cache->get('openapi');
         }
 
         $data = Yaml::parseFile(self::SPEC);
