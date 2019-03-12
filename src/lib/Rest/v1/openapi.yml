@@ -4350,8 +4350,7 @@ components:
               type: string
               enum:
                 - LdapEndpoint
-                - 
-PdoEndpoint
+                - PdoEndpoint
                 - MysqlEndpoint
                 - XmlEndpoint
                 - CsvEndpoint

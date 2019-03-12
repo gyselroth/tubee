@@ -288,8 +288,10 @@ class Ldap extends AbstractEndpoint
         ]);
 
         $i = 0;
-        $result = $this->ldap->ldapSearch($this->basedn, $filter);
-        foreach ($result->getEntries() as $object) {
+        $result = $this->ldap->ldapSearch($this->basedn, $filter)->getEntries();
+	array_shift($result);
+
+        foreach ($result as $object) {
             yield $this->build($object);
         }
 
