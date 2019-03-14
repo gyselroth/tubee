@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
+use Helmich\MongoMock\MockCollection;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
@@ -22,6 +23,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Csv extends AbstractFile
 {
+    use LoggerTrait;
+
     /**
      * Kind.
      */
@@ -144,6 +147,8 @@ class Csv extends AbstractFile
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $filter = $this->getFilterOne($object);
+        $this->logGetOne($filter);
+
         foreach ($this->getAll($filter) as $object) {
             return $this->build($object);
         }
@@ -164,16 +169,34 @@ class Csv extends AbstractFile
      */
     public function transformQuery(?array $query = null)
     {
-        return '';
+        if ($this->filter_all !== null && empty($query)) {
+            return $this->getFilterAll();
+        }
+        if (!empty($query)) {
+            if ($this->filter_all === null) {
+                return $query;
+            }
+
+            return [
+                    '$and' => [
+                        $this->getFilterAll(),
+                        $query,
+                    ],
+                ];
+        }
+
+        return null;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = []): Generator
+    public function getAll(?array $query = null): Generator
     {
         $i = 0;
-        $filter = array_merge((array) $this->filter_all, (array) $filter);
+        $filter = $this->transformQuery($query);
+        $this->logGetAll($filter);
+
         foreach ($this->files as $csv) {
             while (($line = fgetcsv($csv['resource'], 0, $this->delimiter, $this->enclosure, $this->escape)) !== false) {
                 $data = array_combine($csv['header'], $line);
@@ -182,19 +205,13 @@ class Csv extends AbstractFile
                     'line' => $data,
                 ]);
 
-                foreach ($filter as $attribute => $value) {
-                    if (!array_key_exists($attribute, $data) || is_array($value) && !in_array($data[$attribute], $value) || !is_array($value) && $value !== $data[$attribute]) {
-                        $this->logger->debug('line does not match filter [{filter}], skip it', [
-                            'category' => get_class($this),
-                            'filter' => $filter,
-                        ]);
+                $collection = new MockCollection();
+                $collection->documents[] = $data;
 
-                        continue 2;
-                    }
+                if ($collection->count($filter)) {
+                    yield $this->build($data);
+                    ++$i;
                 }
-
-                yield $this->build($data);
-                ++$i;
             }
         }
 
@@ -206,6 +223,8 @@ class Csv extends AbstractFile
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
+        $this->logCreate($object);
+
         foreach ($object as $key => $value) {
             if (is_array($value)) {
                 throw new Exception\EndpointCanNotHandleArray('endpoint can not handle arrays ["'.$key.'"], did you forget to set a decorator?');

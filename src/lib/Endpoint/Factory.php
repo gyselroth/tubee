@@ -160,6 +160,13 @@ class Factory
 
         $resource['_id'] = new ObjectId();
         $endpoint = $this->build($resource, $collection);
+
+        try {
+            $endpoint->transformQuery();
+        } catch (\Throwable $e) {
+            throw new Exception\InvalidFilter('filters must be tubee (MongoDb) compatible dql');
+        }
+
         $endpoint->setup();
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_SOURCE) {
@@ -191,6 +198,13 @@ class Factory
         $data['_id'] = $resource->getId();
 
         $endpoint = $this->build($data, $resource->getCollection());
+
+        try {
+            $endpoint->transformQuery();
+        } catch (\Throwable $e) {
+            throw new Exception\InvalidFilter('filters must be tubee (MongoDb) compatible dql');
+        }
+
         $endpoint->setup();
 
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);

@@ -3700,6 +3700,7 @@ components:
       properties:
         href:
           type: string
+          readOnly: true
     List:
       type: object
       properties:
@@ -3709,14 +3710,17 @@ components:
           description: The resource type, always List.
           type: string
           default: List
+          readOnly: true
         count:
           description: Holds the number of items in the current list response.
           type: number
+          readOnly: true
         total:
           description: Holds the number of total available items on the server. Note that a
             List resource is always paged. You need to traverse with offset and
             limit to request further resources in the list.
           type: number
+          readOnly: true
     Resource:
       type: object
       properties:
@@ -3733,16 +3737,20 @@ components:
             verify that a given resource was completely recreated. An ID is
             immutable and will be created on the server.
           type: string
+          readOnly: true
         version:
           description: The version of the resource. A version gets increased once the
             resource have been modified.
           type: number
+          readOnly: true
         created:
           description: ISO 8601 timestamp when the resource was created.
           type: string
+          readOnly: true
         changed:
           description: ISO 8601 timestamp when the resource was changed.
           type: string
+          readOnly: true
         secrets:
           default: []
           description: Injected secrets in this resource.

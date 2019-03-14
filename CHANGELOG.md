@@ -3,7 +3,7 @@
 **Date**: Fri Jan 25 17:14:01 CET 2019\
 
 * TESTING: [CHANGE] Added new xml endpoint unit tests
-* PACKAGING: [CHANGE] Dev docker container now sets TUBEE_SECRET_KEY, Cache adapter to void and log level to debug (100)
+* PACKAGING: [CHANGE] Dev docker container now sets TUBEE_SECRET_KEY
 * PACKAGING: [FIX] fixes no make dep npm
 * DOCS: [CHANGE] Various fixes
 * CORE: [FIX] Do not block GET /logs requests if log response from MongoDB is empty (do not use natural sorting)
@@ -26,12 +26,17 @@
 * CORE: [FIX] flush: true results in "TypeError: Argument 1 passed to Tubee\DataObject\Factory::deleteAll() must implement interface Tubee\Collection\CollectionInterface, boolean given"
 * CORE: [FEATURE] Added -f to cli jobs (flush queue)
 * CORE: [FEATURE] Added (bool)`skip` to attribute mapping to skip attributes to map
+* CORE: [CHANGE] endpoint filter_all and filter_one use the tubee (mongodb) dql now instead filters in endpoint specific formats
+* CORE: [FEATURE] filter_one and filter_all can now be used for Csv and Json endpoints (Note that performance is not optimal since those formats do not have a propper query language and neither now indexing)
+* CORE: [CHANGE] Added Endpoint\LoggerTrait to apply generic endpoint operation logging
+* CORE: [FIX] readOnly attributes get stripped out from request
 * API: [FIX] uncaught exception: Argument 4 passed to Tubee\Rest\v1\Processes::delete() must implement interface MongoDB\BSON\ObjectIdInterface
 * API: [FIX] uncaught exception: Argument 1 passed to Tubee\Secret\Factory::getOne() must implement interface Tubee\ResourceNamespace\ResourceNamespaceInterface, string given at POST /api/v1/secrets
 * API: [FIX] uncaught exception: Undefined variable: job]  [object] (ErrorException(code: 0): Undefined variable: job at POST /api/v1/jobs
 * API: [FIX] Added ImageEndpoint to openapi v3 specs
 * API: [FIX] fixed max execution time of 5min for watch stream requests
-
+* API: [FIX] Added reaOnly flags to openapi spec for readonly attributes (like created, changed, version)
+* API: [FIX] Exception middleware catches now throwables instead just exceptions only
 
 ## 1.0.0-beta1
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\

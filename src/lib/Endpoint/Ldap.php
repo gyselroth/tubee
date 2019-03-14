@@ -24,6 +24,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Ldap extends AbstractEndpoint
 {
+    use LoggerTrait;
+
     /**
      * Kind.
      */
@@ -189,10 +191,7 @@ class Ldap extends AbstractEndpoint
             unset($diff['entrydn']);
         }
 
-        $this->logger->info('update ldap object ['.$dn.'] on endpoint ['.$this->getIdentifier().'] with attributes [{attributes}]', [
-            'category' => get_class($this),
-            'attributes' => $diff,
-        ]);
+        $this->logChange($dn, $diff);
 
         if ($dn !== $endpoint_object['entrydn']) {
             $this->moveLdapObject($dn, $endpoint_object['entrydn'], $simulate);
@@ -219,9 +218,7 @@ class Ldap extends AbstractEndpoint
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         $dn = $this->getDn($object, $endpoint_object);
-        $this->logger->debug('delete ldap object ['.$dn.']', [
-            'category' => get_class($this),
-        ]);
+        $this->logDelete($dn);
 
         if ($simulate === false) {
             $this->ldap->delete($dn);
@@ -241,10 +238,7 @@ class Ldap extends AbstractEndpoint
             unset($object['entrydn']);
         }
 
-        $this->logger->info('create new ldap object ['.$dn.'] on endpoint ['.$this->getIdentifier().'] with attributes [{attributes}]', [
-            'category' => get_class($this),
-            'attributes' => $object,
-        ]);
+        $this->logCreate($object);
 
         if ($simulate === false) {
             $this->ldap->add($dn, $object);
@@ -260,21 +254,26 @@ class Ldap extends AbstractEndpoint
      */
     public function transformQuery(?array $query = null)
     {
-        $result = null;
+        $this->logger->debug(json_encode($this->filter_all));
+        $this->logger->debug(json_encode($this->getFilterAll()));
 
-        if ($this->filter_all !== null) {
-            $result = $this->filter_all;
+        if ($this->filter_all !== null && empty($query)) {
+            return QueryTransformer::transform($this->getFilterAll());
         }
-
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = QueryTransformer::transform($query);
-            } else {
-                $result = '(&'.$this->filter_all.QueryTransformer::transform($query).')';
+                return QueryTransformer::transform($query);
             }
+
+            return QueryTransformer::transform([
+                    '$and' => [
+                        $this->getFilterAll(),
+                        $query,
+                    ],
+                ]);
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -283,13 +282,11 @@ class Ldap extends AbstractEndpoint
     public function getAll(?array $query = null): Generator
     {
         $filter = $this->transformQuery($query);
-        $this->logger->debug('find all ldap objects with ldap filter ['.$filter.'] on endpoint ['.$this->name.']', [
-            'category' => get_class($this),
-        ]);
+        $this->logGetAll($filter);
 
         $i = 0;
         $result = $this->ldap->ldapSearch($this->basedn, $filter)->getEntries();
-	array_shift($result);
+        array_shift($result);
 
         foreach ($result as $object) {
             yield $this->build($object);
@@ -342,10 +339,8 @@ class Ldap extends AbstractEndpoint
      */
     public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
-        $filter = $this->getFilterOne($object);
-        $this->logger->debug('find ldap object with ldap filter ['.$filter.'] in ['.$this->basedn.'] on endpoint ['.$this->getIdentifier().']', [
-            'category' => get_class($this),
-        ]);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logGetOne($filter);
 
         $result = $this->ldap->ldapSearch($this->basedn, $filter, $attributes);
         $count = $result->countEntries();

@@ -23,6 +23,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Ucs extends AbstractEndpoint
 {
+    use LoggerTrait;
+
     /**
      * Kind.
      */
@@ -108,16 +110,15 @@ class Ucs extends AbstractEndpoint
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/remove';
-        $this->logger->info('delete ucs object from endpoint ['.$this->getIdentifier().'] using udm/remove to ['.$url.']', [
-            'category' => get_class($this),
-        ]);
+        $resource = $this->getResourceId($object, $endpoint_object);
+        $this->logDelete($resource);
 
         if ($simulate === false) {
             $result = $this->parse($this->client->post($url, $this->getRequestOptions([
                 'json' => [
                     'options' => [
                         [
-                            'object' => $this->getResourceId($object, $endpoint_object),
+                            'object' => $resource,
                             'options' => [
                                 'cleanup' => true,
                             ],
@@ -144,10 +145,7 @@ class Ucs extends AbstractEndpoint
         array_shift($dn);
         $container = implode(',', $dn);
         unset($object[self::ATTR_DN]);
-
-        $this->logger->info('create new ucs object in ['.$container.'] on endpoint ['.$this->getIdentifier().'] using udm/add to ['.$url.']', [
-            'category' => get_class($this),
-        ]);
+        $this->logCreate($object);
 
         if ($simulate === false) {
             $result = $this->parse($this->client->post($url, $this->getRequestOptions([
@@ -204,12 +202,8 @@ class Ucs extends AbstractEndpoint
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/put';
-
-        $this->logger->info('update ucs object on endpoint ['.$this->getIdentifier().'] using udm/put to ['.$url.']', [
-            'category' => get_class($this),
-        ]);
-
         $dn = $this->getResourceId($object, $endpoint_object);
+        $this->logChange($dn, $diff);
         $map_parent = substr($dn, strpos($dn, ',') + 1);
         $ep_parent = substr($endpoint_object[self::ATTR_DN], strpos($endpoint_object[self::ATTR_DN], ',') + 1);
 
@@ -240,20 +234,20 @@ class Ucs extends AbstractEndpoint
      */
     public function transformQuery(?array $query = null)
     {
-        $result = null;
-
         if ($this->filter_all !== null && empty($query)) {
-            $filter_all = json_decode(stripslashes($this->getFilterAll()), true);
-            if (!isset($filter_all['objectProperty']) || !isset($filter_all['objectPropertyValue'])) {
-                throw new UcsException\InvalidFilter('Either objectProperty or objectPropertyValue not set in filter_all');
+            $filter_all = $this->getFilterAll();
+            if ($filter_all === null || count($filter_all) > 1) {
+                throw new UcsException\InvalidFilter('Tubee\\Endpoint\\Ucs only accepts a single atttribute filter (ucs restriction)');
             }
 
-            return $filter_all;
+            return [
+                'objectProperty' => key($filter_all),
+                'objectPropertyValue' => reset($filter_all),
+            ];
         }
-
         if (!empty($query)) {
             if ($this->filter_all !== null) {
-                $this->logger->warning('this endpoint does not support combining queries, ignore filter_all configuration for this request', [
+                $this->logger->warning('Tubee\Endpoint\Ucs does not support combining queries, ignore filter_all configuration for this request', [
                     'category' => get_class($this),
                 ]);
             }
@@ -275,15 +269,14 @@ class Ucs extends AbstractEndpoint
     public function getAll(?array $query = null): Generator
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/query';
-        $this->logger->debug('find all ucs objects on endpoint ['.$this->getIdentifier().'] using udm/query to ['.$url.']', [
-            'category' => get_class($this),
-        ]);
 
-        $filter_all = $this->transformQuery($query);
-        $filter_all['objectType'] = $this->flavor;
+        $filter = $this->transformQuery($query);
+        $this->logGetAll($filter);
+
+        $filter['objectType'] = $this->flavor;
         $options = [
             'json' => [
-                'options' => $filter_all,
+                'options' => $filter,
             ],
         ];
 
@@ -304,13 +297,9 @@ class Ucs extends AbstractEndpoint
     public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/query';
-        $filter = $this->getFilterOne($object);
+        $query = $this->transformQuery($this->getFilterOne($object));
+        $this->logGetOne($query);
 
-        $this->logger->debug('find ucs object with filter ['.$filter.'] on endpoint ['.$this->getIdentifier().'] using udm/query to ['.$url.']', [
-            'category' => get_class($this),
-        ]);
-
-        $query = json_decode(stripslashes($filter), true);
         if (!isset($query['objectProperty']) || !isset($query['objectPropertyValue'])) {
             throw new UcsException\InvalidFilter('Either objectProperty or objectPropertyValue not set in filter_one');
         }
@@ -325,10 +314,10 @@ class Ucs extends AbstractEndpoint
         $result = $this->parse($this->client->post($url, $this->getRequestOptions($options)));
 
         if (count($result) > 1) {
-            throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
+            throw new Exception\ObjectMultipleFound('found more than one object with filter '.$this->filter_one);
         }
         if (count($result) === 0) {
-            throw new Exception\ObjectNotFound('no object found with filter '.$filter);
+            throw new Exception\ObjectNotFound('no object found with filter '.$this->filter_one);
         }
 
         $dn = $this->getResourceId(array_shift($result));

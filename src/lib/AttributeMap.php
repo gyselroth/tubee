@@ -227,8 +227,18 @@ class AttributeMap implements AttributeMapInterface
 
         try {
             if (isset($value['script'])) {
+                $this->logger->debug('attribute ['.$attr.'] is scripted [{script}]', [
+                    'category' => get_class($this),
+                    'script' => $value['script'],
+                ]);
+
                 $this->v8->executeString($value['script'], '', V8Js::FLAG_FORCE_ARRAY);
                 $result = $this->v8->getLastResult();
+
+                $this->logger->debug('script result of ['.$attr.'] core.result() is [{value}]', [
+                    'category' => get_class($this),
+                    'value' => $value,
+                ]);
             }
         } catch (\Exception $e) {
             $this->logger->warning('failed to execute script ['.$value['script'].'] of attribute ['.$attr.']', [

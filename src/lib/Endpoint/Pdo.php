@@ -42,6 +42,7 @@ class Pdo extends AbstractSqlDatabase
     public function getAll(?array $query = null): Generator
     {
         $filter = $this->transformQuery($query);
+        $this->logGetAll($filter);
 
         if ($filter === null) {
             $sql = 'SELECT * FROM '.$this->table;
@@ -65,7 +66,8 @@ class Pdo extends AbstractSqlDatabase
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        $filter = $this->getFilterOne($object);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logGetOne($filter);
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         $result = $this->socket->select($sql);
 
@@ -84,6 +86,7 @@ class Pdo extends AbstractSqlDatabase
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
+        $this->logCreate($object);
         $result = $this->prepareCreate($object, $simulate);
 
         if ($simulate === true) {

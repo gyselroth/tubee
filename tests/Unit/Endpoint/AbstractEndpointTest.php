@@ -28,7 +28,7 @@ class AbstractEndpointTest extends TestCase
             'foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
                 'data' => [
                     'options' => [
-                        'filter_one' => '{foobar={map.foo.bar}}',
+                        'filter_one' => json_encode(['foobar' => '{map.foo.bar}']),
                     ],
                 ],
             ],
@@ -44,7 +44,7 @@ class AbstractEndpointTest extends TestCase
         ];
 
         $result = $mock->getFilterOne($object);
-        $this->assertSame('{foobar=foo}', $result);
+        $this->assertSame(['foobar' => 'foo'], $result);
     }
 
     public function testResolveFilterOneMultipleValues()
@@ -53,7 +53,7 @@ class AbstractEndpointTest extends TestCase
             'foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
                 'data' => [
                     'options' => [
-                        'filter_one' => '{foobar={map.foo.bar}}-{map.foo.foo}',
+                        'filter_one' => json_encode(['foobar' => '{map.foo.bar}}-{map.foo.foo}']),
                     ],
                 ],
             ],
@@ -69,7 +69,7 @@ class AbstractEndpointTest extends TestCase
         ];
 
         $result = $mock->getFilterOne($object);
-        $this->assertSame('{foobar=foo}-bar', $result);
+        $this->assertSame(['foobar' => 'foo}-bar'], $result);
     }
 
     public function testResolveFilterOneAttributeNotFound()
@@ -79,7 +79,7 @@ class AbstractEndpointTest extends TestCase
             'foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
                 'data' => [
                     'options' => [
-                        'filter_one' => '{foobar={map.foo.bar}}',
+                        'filter_one' => json_encode(['foobar' => '{map.foo.bar}']),
                     ],
                 ],
             ],

@@ -61,13 +61,6 @@ class Collection extends AbstractResource implements CollectionInterface
     protected $logger;
 
     /**
-     * Endpoints.
-     *
-     * @var array
-     */
-    protected $endpoints = [];
-
-    /**
      * Dataobject factory.
      *
      * @var DataObjectFactory

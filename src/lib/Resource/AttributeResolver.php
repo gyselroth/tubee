@@ -55,7 +55,6 @@ class AttributeResolver
             'version' => isset($data['version']) ? $data['version'] : 0,
             'created' => isset($data['created']) ? $data['created']->toDateTime()->format('c') : null,
             'changed' => isset($data['changed']) ? $data['changed']->toDateTime()->format('c') : null,
-            'description' => isset($data['description']) ? $data['description'] : null,
             'secrets' => $resource->getSecrets(),
         ];
     }

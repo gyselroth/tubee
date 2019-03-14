@@ -21,6 +21,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 abstract class AbstractRest extends AbstractEndpoint
 {
+    use LoggerTrait;
+
     /**
      * Guzzle client.
      *
@@ -96,9 +98,7 @@ abstract class AbstractRest extends AbstractEndpoint
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object);
-        $this->logger->info('update rest object on endpoint ['.$this->getIdentifier().'] using [PATCH] to ['.$uri.']', [
-            'category' => get_class($this),
-        ]);
+        $this->logChange($uri, $diff);
 
         if ($simulate === false) {
             $result = $this->client->patch($uri, $this->getRequestOptions([
@@ -115,9 +115,7 @@ abstract class AbstractRest extends AbstractEndpoint
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object);
-        $this->logger->info('delete object from endpoint ['.$this->getIdentifier().'] using DELETE to ['.$uri.']', [
-            'category' => get_class($this),
-        ]);
+        $this->logDelete($uri);
 
         if ($simulate === false) {
             $response = $this->client->delete($uri, $this->getRequestOptions());
@@ -131,9 +129,7 @@ abstract class AbstractRest extends AbstractEndpoint
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
-        $this->logger->info('create new object on endpoint ['.$this->getIdentifier().'] using POST to ['.$this->client->getConfig('base_uri').']', [
-            'category' => get_class($this),
-        ]);
+        $this->logCreate($object);
 
         if ($simulate === false) {
             $result = $this->client->post('', $this->getRequestOptions([

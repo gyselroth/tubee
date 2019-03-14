@@ -68,6 +68,10 @@ class Factory
     public function getSchema(string $kind): Schema
     {
         if ($this->cache->has($kind)) {
+            $this->logger->debug('found resource kind ['.$kind.'] in cache', [
+                'category' => get_class($this),
+            ]);
+
             return $this->cache->get($kind);
         }
 
@@ -90,11 +94,21 @@ class Factory
      */
     public function validate(array $resource): array
     {
-        $this->logger->debug('validate resource ['.$resource['kind'].'] against schema', [
+        $this->logger->debug('validate resource [{resource}] against schema', [
             'category' => get_class($this),
+            'resource' => $resource,
         ]);
 
-        return $this->getSchema($resource['kind'])->validate($resource);
+        $resource = $this->getSchema($resource['kind'])->validate($resource, [
+            'request' => true,
+        ]);
+
+        $this->logger->debug('clean resource [{resource}]', [
+            'category' => get_class($this),
+            'resource' => $resource,
+        ]);
+
+        return $resource;
     }
 
     /**

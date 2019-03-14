@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use Generator;
+use Helmich\MongoMock\MockCollection;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
@@ -22,6 +23,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Json extends AbstractFile
 {
+    use LoggerTrait;
+
     /**
      * Kind.
      */
@@ -125,25 +128,18 @@ class Json extends AbstractFile
     public function getAll(?array $query = null): Generator
     {
         $filter = $this->transformQuery($query);
+        $this->logGetAll($filter);
         $i = 0;
 
         foreach ($this->files as $resource_key => $json) {
             foreach ($json['content'] as $object) {
-                if (!is_array($object)) {
-                    throw new JsonException\ArrayExpected('json must contain an array of objects');
+                $collection = new MockCollection();
+                $collection->documents[] = $object;
+
+                if ($collection->count($filter)) {
+                    yield $this->build($object);
+                    ++$i;
                 }
-
-                if (count(array_intersect_assoc($object, $filter)) !== count($filter)) {
-                    $this->logger->debug('json object does not match filter [{filter}], skip it', [
-                        'category' => get_class($this),
-                        'filter' => $filter,
-                    ]);
-
-                    continue;
-                }
-
-                yield $this->build($object);
-                ++$i;
             }
         }
 
@@ -155,6 +151,8 @@ class Json extends AbstractFile
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
+        $this->logCreate($object);
+
         foreach ($this->files as $resource_key => $xml) {
             $this->files[$resource_key]['content'][] = $object;
 
@@ -197,30 +195,13 @@ class Json extends AbstractFile
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
         $elements = [];
-        $filter = json_decode($this->getFilterOne($object), true);
+        $filter = $this->getFilterOne($object);
+        $this->logGetOne($filter);
 
-        foreach ($this->files as $json) {
-            if (isset($json['content'])) {
-                foreach ($json['content'] as $object) {
-                    if (!is_array($object)) {
-                        throw new JsonException\ArrayExpected('json must contain an array of objects');
-                    }
-
-                    if (count(array_intersect_assoc($object, $filter)) !== count($filter)) {
-                        continue;
-                    }
-                    $elements[] = $object;
-                }
-            }
-
-            if (count($elements) > 1) {
-                throw new Exception\ObjectMultipleFound('found more than one object with filter '.json_encode($filter));
-            }
-            if (count($elements) === 0) {
-                throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
-            }
-
-            return $this->build(array_shift($elements));
+        foreach ($this->getAll($filter) as $object) {
+            return $this->build($object);
         }
+
+        throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
     }
 }

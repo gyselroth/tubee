@@ -27,6 +27,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Xml extends AbstractFile
 {
+    use LoggerTrait;
+
     /**
      * Kind.
      */
@@ -179,27 +181,23 @@ class Xml extends AbstractFile
      */
     public function transformQuery(?array $query = null)
     {
-        $result = null;
-
-        if ($this->filter_all !== null) {
-            $result = $this->filter_all;
+        if ($this->filter_all !== null && empty($query)) {
+            return '//*['.QueryTransformer::transform($this->filter_all).']';
         }
-
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = '//*['.QueryTransformer::transform($query).']';
-            } else {
-                if (preg_match('#\[([^)]+)\]#', $this->filter_all, $match)) {
-                    $new = '['.$match[1].' and '.QueryTransformer::transform($query).']';
-
-                    return str_replace($match[0], $new, $this->filter_all);
-                }
-
-                $result = $this->filter_all.'['.QueryTransformer::transform($query).']';
+                return '//*['.QueryTransformer::transform($query).']';
             }
+
+            return '//*['.QueryTransformer::transform([
+                    '$and' => [
+                        $this->getFilterAll(),
+                        $query,
+                    ],
+                ]).']';
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -209,9 +207,10 @@ class Xml extends AbstractFile
     {
         $filter = $this->transformQuery($query);
         $i = 0;
+        $this->logGetAll($filter);
 
         foreach ($this->files as $xml) {
-            $this->logger->debug('find xml nodes with xpath ['.$filter.'] in ['.$xml['path'].'] on endpoint ['.$this->getIdentifier().']', [
+            $this->logger->debug('find xml nodes with xpath ['.$filter.'] in ['.$xml['path'].']', [
                 'category' => get_class($this),
             ]);
 
@@ -248,10 +247,7 @@ class Xml extends AbstractFile
             }
         }
 
-        $this->logger->debug('create new xml object on endpoint ['.$this->name.'] with values [{values}]', [
-            'category' => get_class($this),
-            'values' => $object,
-        ]);
+        $this->logCreate($object);
 
         return null;
     }
@@ -271,7 +267,8 @@ class Xml extends AbstractFile
     {
         $xml = $this->files[0];
         $attrs = [];
-        $filter = $this->getFilterOne($object);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logChange($filter, $diff);
         $xpath = new \DOMXPath($xml['dom']);
         $node = $xpath->query($filter);
         $node = $node[0];
@@ -315,7 +312,8 @@ class Xml extends AbstractFile
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
         $xml = $this->files[0];
-        $filter = $this->getFilterOne($object);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logDelete($filter);
         $xpath = new \DOMXPath($xml['dom']);
         $node = $xpath->query($filter);
         $node = $node[0];
@@ -329,10 +327,11 @@ class Xml extends AbstractFile
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        $filter = $this->getFilterOne($object);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logGetOne($filter);
 
         foreach ($this->files as $xml) {
-            $this->logger->debug('find xml node with xpath ['.$filter.'] in ['.$xml['path'].'] on endpoint ['.$this->getIdentifier().']', [
+            $this->logger->debug('find xml node with xpath ['.$filter.'] in ['.$xml['path'].']', [
                 'category' => get_class($this),
             ]);
 

@@ -22,6 +22,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Mongodb extends AbstractEndpoint
 {
+    use LoggerTrait;
+
     /**
      * Kind.
      */
@@ -49,7 +51,22 @@ class Mongodb extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        return $this->build($this->get($object, $attributes));
+        $result = [];
+        $filter = $this->getFilterOne($object);
+        $this->logGetOne($filter);
+
+        foreach ($this->pool->find($filter) as $data) {
+            $result[] = $data;
+        }
+
+        if (count($result) > 1) {
+            throw new Exception\ObjectMultipleFound('found more than one object with filter '.json_encode($filter));
+        }
+        if (count($result) === 0) {
+            throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
+        }
+
+        return $this->build(array_shift($result));
     }
 
     /**
@@ -57,25 +74,23 @@ class Mongodb extends AbstractEndpoint
      */
     public function transformQuery(?array $query = null)
     {
-        $result = null;
-        if ($this->filter_all !== null) {
-            $result = json_decode(stripslashes($this->filter_all), true);
+        if ($this->filter_all !== null && empty($query)) {
+            return $this->getFilterAll();
         }
-
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = $query;
-            } else {
-                $result = [
+                return $query;
+            }
+
+            return [
                     '$and' => [
-                        json_decode(stripslashes($this->filter_all), true),
+                        $this->getFilterAll(),
                         $query,
                     ],
                 ];
-            }
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -83,6 +98,9 @@ class Mongodb extends AbstractEndpoint
      */
     public function getAll(?array $query = null): Generator
     {
+        $filter = $this->transformQuery($query);
+        $this->logGetAll($filter);
+
         $i = 0;
         foreach ($this->pool->find($this->transformQuery($query)) as $data) {
             yield $this->build($data);
@@ -97,10 +115,7 @@ class Mongodb extends AbstractEndpoint
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
-        $this->logger->debug('create new mongodb object on endpoint ['.$this->name.'] with values [{values}]', [
-            'category' => get_class($this),
-            'values' => $object,
-        ]);
+        $this->logCreate($object);
 
         if ($simulate === false) {
             return (string) $this->pool->insertOne($object);
@@ -114,10 +129,8 @@ class Mongodb extends AbstractEndpoint
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
-        $filter = $this->getFilterOne($object);
-        $this->logger->info('update mongodb object on endpoint ['.$this->getIdentifier().']', [
-            'category' => get_class($this),
-        ]);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logChange($filter, $diff);
 
         if ($simulate === false) {
             $this->pool->updateOne($filter, $diff);
@@ -159,11 +172,8 @@ class Mongodb extends AbstractEndpoint
      */
     public function delete(AttributeMapInterface $map, array $object, ?array $endpoint_object = null, bool $simulate = false): bool
     {
-        $filter = $this->getFilterOne($object);
-
-        $this->logger->info('delete mongodb object on endpoint ['.$this->name.'] with filter ['.json_encode($filter).']', [
-            'category' => get_class($this),
-        ]);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logDelete($filter);
 
         if ($simulate === false) {
             $this->pool->deleteOne($filter);
