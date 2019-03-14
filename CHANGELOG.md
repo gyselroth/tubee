@@ -30,6 +30,7 @@
 * CORE: [FEATURE] filter_one and filter_all can now be used for Csv and Json endpoints (Note that performance is not optimal since those formats do not have a propper query language and neither now indexing)
 * CORE: [CHANGE] Added Endpoint\LoggerTrait to apply generic endpoint operation logging
 * CORE: [FIX] readOnly attributes get stripped out from request
+* CORE: [FIX] binary values in Endpoint\Ldap get base64 encoded
 * API: [FIX] uncaught exception: Argument 4 passed to Tubee\Rest\v1\Processes::delete() must implement interface MongoDB\BSON\ObjectIdInterface
 * API: [FIX] uncaught exception: Argument 1 passed to Tubee\Secret\Factory::getOne() must implement interface Tubee\ResourceNamespace\ResourceNamespaceInterface, string given at POST /api/v1/secrets
 * API: [FIX] uncaught exception: Undefined variable: job]  [object] (ErrorException(code: 0): Undefined variable: job at POST /api/v1/jobs

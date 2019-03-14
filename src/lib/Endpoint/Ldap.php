@@ -254,9 +254,6 @@ class Ldap extends AbstractEndpoint
      */
     public function transformQuery(?array $query = null)
     {
-        $this->logger->debug(json_encode($this->filter_all));
-        $this->logger->debug(json_encode($this->getFilterAll()));
-
         if ($this->filter_all !== null && empty($query)) {
             return QueryTransformer::transform($this->getFilterAll());
         }
@@ -289,7 +286,7 @@ class Ldap extends AbstractEndpoint
         array_shift($result);
 
         foreach ($result as $object) {
-            yield $this->build($object);
+            yield $this->build($this->prepareRawObject($object));
         }
 
         return $i;
@@ -362,15 +359,29 @@ class Ldap extends AbstractEndpoint
     {
         $object = [];
         foreach ($result as $key => $attr) {
+            if ($key === 'count') {
+                continue;
+            }
             if ($key === 'dn') {
                 $object['entrydn'] = $attr;
             } elseif (!is_int($key)) {
                 if ($attr['count'] === 1) {
-                    $object[$key] = $attr[0];
+                    if (preg_match('~[^\x20-\x7E\t\r\n]~', $attr[0]) > 0) {
+                        $object[$key] = base64_encode($attr[0]);
+                    } else {
+                        $object[$key] = $attr[0];
+                    }
                 } else {
                     $val = $attr;
                     unset($val['count']);
-                    $object[$key] = $val;
+
+                    foreach ($val as $v) {
+                        if (preg_match('~[^\x20-\x7E\t\r\n]~', $v) > 0) {
+                            $object[$key][] = base64_encode($v);
+                        } else {
+                            $object[$key][] = $v;
+                        }
+                    }
                 }
             }
         }
