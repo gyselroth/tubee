@@ -1,6 +1,6 @@
 ## 1.0.0-beta2
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Fri Jan 25 17:14:01 CET 2019\
+**Date**: Fri Mar 15 15:14:01 CET 2019\
 
 * TESTING: [CHANGE] Added new xml endpoint unit tests
 * PACKAGING: [CHANGE] Dev docker container now sets TUBEE_SECRET_KEY
