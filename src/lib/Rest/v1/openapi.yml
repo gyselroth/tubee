@@ -5192,6 +5192,10 @@ components:
               - exists
               - last
               - absent
+            context:
+              type: array
+              items:
+                type: string
         required:
           description: "Attribute must exists."
           type: boolean

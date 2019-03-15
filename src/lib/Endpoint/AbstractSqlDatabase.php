@@ -131,7 +131,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     public function transformQuery(?array $query = null)
     {
         if ($this->filter_all !== null && empty($query)) {
-            return $this->getFilterAll();
+            return QueryTransformer::transform($this->getFilterAll());
         }
         if (!empty($query)) {
             if ($this->filter_all === null) {

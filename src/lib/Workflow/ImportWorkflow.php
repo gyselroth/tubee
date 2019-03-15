@@ -143,7 +143,7 @@ class ImportWorkflow extends Workflow
         foreach ($this->attribute_map->getMap() as $definition) {
             if ($definition['skip'] === true) {
                 $this->logger->debug('do not store attribute ['.$definition['name'].']', [
-                    'class' => get_class($this),
+                    'category' => get_class($this),
                 ]);
 
                 unset($data[$definition['name']]);
@@ -192,6 +192,7 @@ class ImportWorkflow extends Workflow
             switch ($definition['map']['ensure']) {
                 case WorkflowInterface::ENSURE_EXISTS:
                 case WorkflowInterface::ENSURE_LAST:
+                    $context = array_intersect_key($data, array_flip($definition['map']['context']));
                     $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
                     $collection = $this->endpoint->getCollection()->getName();
                     $ep = $this->endpoint->getName();
@@ -200,7 +201,7 @@ class ImportWorkflow extends Workflow
                         join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
                     ];
 
-                    $object->createOrUpdateRelation($relative, [], $simulate, $endpoints);
+                    $object->createOrUpdateRelation($relative, $context, $simulate, $endpoints);
 
                 break;
                 default:
