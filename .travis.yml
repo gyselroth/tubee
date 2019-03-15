@@ -47,14 +47,12 @@ after_deploy:
 - test "$TRAVIS_TAG" != "" && version=${TRAVIS_TAG:1};
 - test "$TRAVIS_TAG" != "" && docker build -t gyselroth/tubee:$version .
 - test "$TRAVIS_TAG" != "" && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-- test "$TRAVIS_TAG" != "" && docker tag gyselroth/tubee:$version
-- test "$TRAVIS_TAG" != "" && docker tag gyselroth/tubee:$docker_tag
+- test "$TRAVIS_TAG" != "" && docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
 - test "$TRAVIS_TAG" != "" && docker push gyselroth/tubee:$version
 - test "$TRAVIS_TAG" != "" && docker push gyselroth/tubee:$docker_tag
 - ! 'if [ "$TRAVIS_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
   -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
-  token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master",
-  "config":{"env":{"REPOSITORY": "''"$deb_distribution"''", "VERSION":"''"$version"''"}}}}''
+  token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
   "https://api.travis-ci.org/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 env:
   global:

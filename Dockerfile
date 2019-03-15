@@ -85,7 +85,6 @@ RUN mkdir /etc/ssl/tubee \
 RUN mkdir /usr/share/tubee && mkdir /usr/share/tubee/bin/console -p && mkdir /etc/tubee
 COPY packaging/nginx.conf /etc/nginx/conf.d/tubee.conf
 COPY src/lib /usr/share/tubee/src/lib
-COPY src/app /usr/share/tubee/src/app
 COPY vendor /usr/share/tubee/vendor
 COPY src/.container.config.php /usr/share/tubee/src
 COPY src/cgi-bin/cli.php /usr/share/tubee/bin/console/tubeecli
@@ -102,6 +101,4 @@ ENV TUBEE_PATH /usr/share/tubee
 ENV TUBEE_DIR_CONFIG /etc/tubee
 
 EXPOSE 443 9000
-CMD make -C /srv/www/tubee deps; \
-  php /srv/www/tubee/src/cgi-bin/cli.php upgrade -i; \
-  service nginx start && php-fpm
+CMD nohup tubeecli jobs listen -vv && service nginx start && php-fpm;
