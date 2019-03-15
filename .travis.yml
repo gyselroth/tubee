@@ -48,7 +48,7 @@ after_deploy:
   -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
   token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master",
   "config":{"env":{"REPOSITORY": "''"$deb_distribution"''", "VERSION":"''"$version"''"}}}}''
-  "https://api.travis-ci.org/repo/gyselroth%2Ftubee-docker/requests"; fi'
+  "https://api.travis-ci.org/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 env:
   global:
     secure: GU/a6BkXLtSoLyxhKsOD1xuA62/665wVry6cg7IbQQH9TL7F7vaRhkN/I/iiOOW7TkKmdJ56tkkOKm8BXlgzo4Fectxfv8Xu2OQ2+wQSRg2ESuzdfbHS7nGbZOdv/lhcAlMILlIsqcoz1Q7T2vZ3+ScPOAEfr7y07xULKDTPxisw/zClO3EqrmTbIR5/tdVksbsFvEk3swJEjY1UoYr6dwQsnD1zS5EFhWIMx0W7Tva/kenkC0pAj5Ar815vGa+caBi91pxpOjrGzWQmXPkjIt7ZyFBZynNVqmJkSe6nuVG4bRpVUmT6ipZOk1CqMjRa/RVI9D/wxLPwQrPpfx+pt8P5Pb6ykvVhxw7pW81oEVEPJrpqlTBhKaWl9IteikbSTPcx+QWVE6EAuXWzwHmmc+pTZygVXA+zqOepbXFG37DwO0I4jkP04Ji9FUkxnPEfTVElWXp20FUD+XifrJaJjKnsVGS89EAswRcx4+DUPtjktpfMuP88xT1a4VZMAsud1MGc8oKAx5Fzw5URuQldVVK2I0aqyqGb2zkl4p2mnteP5hTvGI3Meh/dijpEapv2amucK4gOutdCqRtnJlvixVMlfyNEUIqn7yL8fOHa3r/9Rp21nnmVkVi7SvqyPKmhbHSC7tVIxMx/X2MLN/Jbp1VDa2sPhUadktlSFtU420o=
