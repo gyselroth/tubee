@@ -83,6 +83,7 @@ RUN mkdir /etc/ssl/tubee \
   && mv chain.pem /etc/ssl/tubee/
 
 RUN mkdir /usr/share/tubee && mkdir /usr/share/tubee/bin/console -p && mkdir /etc/tubee
+COPY packaging/nginx.conf /etc/nginx/conf.d/tubee.conf
 COPY src/lib /usr/share/tubee/src/lib
 COPY src/app /usr/share/tubee/src/app
 COPY vendor /usr/share/tubee/vendor
