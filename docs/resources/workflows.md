@@ -50,7 +50,7 @@ tubectl create -f spec.yaml
 Check the just created resource:
 
 ```sh
-tubectl get wf accounts ldap create-updat -n playground -o yaml
+tubectl get wf accounts ldap create-update -n playground -o yaml
 ```
 
 ## Ensure
@@ -105,6 +105,8 @@ The mapping is defined within `map` and contains a list of attribute mappings. E
 | type | `<same type as value>` | Convert the value to another type. |
 | rewrite | `null` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
 | unwind | `null`  | Unwind a list and operate attribute options on each list element. |
+| skip | `false` | If true the attribute gets ignored. This may be useful if an attribute is only used for an object relation creation or relation context. |
+| map | <object> | Define an object relation mapping to another collection. Automatically create DataObjectReations. |
 
 ### Name
 
@@ -116,7 +118,7 @@ For example, lets define an attribute from an active directory source endpoint a
 ```yaml
 map:
 - name: data.username
-- from: samAccountName
+  from: samAccountName
 ```
 
 The `data.` prefix is required since a DataObjects data is placed within a data container. See an example of a DataObject [here](resources/data-objects.md).
@@ -145,7 +147,6 @@ Instead using a value from an object, you may define a static value for an attri
 
 #### Script
 Defines mighty scipted attributes. The engine executes JavaScript and used the result of `core.result()` as the value for the attribute.
-
 
 ### Type
 
@@ -216,3 +217,43 @@ map:
 ```
 
 The same is achievable using scripted attributes, but like rewrite rules, unwinding may be the preferrable solution.
+
+ ### Map
+
+Map is particulary useful to automatically create DataObjectRelations between DataObjects. DataObjectRelations represent a relationship between two (or more) DataObjects.
+Those DataObject may be from different collections and/or namespaces.
+
+Lets asume we have a collection named `accounts` and one named `groups`.
+We would like to import LDAP objects into both of them. Into accounts we import person objects and into group group objects.
+While importing we'd like to automatically create tubee DataObjectRelations between group and group members. 
+Lets asume those LDAP group objects have an attribute `member` which is a list of user distinguished names.
+To automatically create a relationship we need to specify the `map` keyword and pointing the destination collection to `accounts` and
+the key which gets used to identify the destination account object to `data.dn` (data.dn will hold the account dn).
+
+Optionally we set an attribute `ou` as context.
+
+Example:
+```yaml
+map:
+- name: data.member
+  from: member
+  map:
+    collection: accounts
+    to: data.dn
+    context:
+    - ou
+  skip: true
+- name: data.ou
+  from: ou
+  skip: true
+```
+
+This mapping will automatically try to create DataObjectRelations between those two collections.
+
+| Option      | Default | Description  |
+| ------------- | -------------- |--------------|
+| collection | `<required>` | The name of the destination collection.  |
+| to | `<required>` | The name of the DataObject in the destination collection to use as relationship reference. (Usually you will ned to specify the attribute within data. (for example data.id)).  |
+| ensure | `last` | By default the relationship gets created and updated. You may set ensure to `exists` or `absent` while on exists the relation will not get updated (for example if context data gets changed). If absent the relation gets removed.  |
+| context | `<empty list>` | A list of attributes to use as context attributes. (Note that you can also use attributes which have `skip: true` set.)  |
+

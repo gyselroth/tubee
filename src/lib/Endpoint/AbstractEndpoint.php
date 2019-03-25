@@ -137,12 +137,8 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * Set options.
      */
-    public function setOptions(?array $config = null): EndpointInterface
+    public function setOptions(array $config = []): EndpointInterface
     {
-        if ($config === null) {
-            return $this;
-        }
-
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'flush':
@@ -308,17 +304,25 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * {@inheritdoc}
      */
-    public function getFilterOne(array $object)
+    public function getFilterOne(array $object): ?array
     {
-        return $this->parseAttribute($this->filter_one, $object);
+        if ($this->filter_one === null) {
+            return null;
+        }
+
+        return json_decode(stripslashes($this->parseAttribute($this->filter_one, $object)), true);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getFilterAll()
+    public function getFilterAll(): ?array
     {
-        return $this->filter_all;
+        if ($this->filter_all === null) {
+            return null;
+        }
+
+        return json_decode(stripslashes($this->filter_all), true);
     }
 
     /**

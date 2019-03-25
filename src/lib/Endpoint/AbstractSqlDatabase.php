@@ -17,6 +17,8 @@ use Tubee\Endpoint\Pdo\QueryTransformer;
 
 abstract class AbstractSqlDatabase extends AbstractEndpoint
 {
+    use LoggerTrait;
+
     /**
      * Resource.
      *
@@ -92,10 +94,11 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, Iterable $diff, Iterable $object, Iterable $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $values = array_intersect_key($object, $diff);
         $filter = $this->getFilterOne($object);
+        $this->logChange($filter, $diff);
         $query = 'UPDATE '.$this->table.' SET '.implode(',', $diff).' WHERE '.$filter;
 
         if ($simulate === false) {
@@ -108,9 +111,11 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, Iterable $object, Iterable $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $filter = $this->getFilterOne($object);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logDelete($filter);
+
         $sql = 'DELETE FROM '.$this->table.' WHERE '.$filter;
 
         if ($simulate === false) {
@@ -125,26 +130,29 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
      */
     public function transformQuery(?array $query = null)
     {
-        $result = null;
-        if ($this->filter_all !== null) {
-            $result = $this->filter_all;
+        if ($this->filter_all !== null && empty($query)) {
+            return QueryTransformer::transform($this->getFilterAll());
         }
-
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = QueryTransformer::transform($query);
-            } else {
-                $result = '('.$this->filter_all.') AND ('.QueryTransformer::transform($query).')';
+                return QueryTransformer::transform($query);
             }
+
+            return QueryTransformer::transform([
+                    '$and' => [
+                        $this->getFilterAll(),
+                        $query,
+                    ],
+                ]);
         }
 
-        return $result;
+        return null;
     }
 
     /**
      * Prepare.
      */
-    protected function prepareCreate(Iterable $object, bool $simulate = false)
+    protected function prepareCreate(array $object, bool $simulate = false)
     {
         $columns = [];
         $values = [];
@@ -167,34 +175,5 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         }
 
         return null;
-    }
-
-    /**
-     * Build filter.
-     */
-    protected function buildFilter($filter): ?string
-    {
-        if (is_iterable($filter)) {
-            if (count($filter) > 0) {
-                $request = '';
-                $i = 0;
-                foreach ($filter as $attr => $value) {
-                    if ($i !== 0) {
-                        $request .= 'AND ';
-                    }
-                    $request .= $attr.'=\''.$value.'\'';
-                    ++$i;
-                }
-
-                return $request;
-            }
-
-            return null;
-        }
-        if ($filter === null) {
-            return null;
-        }
-
-        return $filter;
     }
 }

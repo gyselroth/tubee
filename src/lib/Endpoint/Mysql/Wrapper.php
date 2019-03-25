@@ -84,7 +84,7 @@ class Wrapper extends mysqli
     /**
      * construct.
      */
-    public function __construct(string $host, LoggerInterface $logger, ?string $username = null, ?string $passwd = null, ?string $dbname = null, ?int $port = 3306, ?string $socket = null)
+    public function __construct(string $host, LoggerInterface $logger, ?string $username = null, ?string $passwd = null, ?string $dbname = null, ?int $port = 3306, ?string $socket = null, ?array $options = [])
     {
         $this->logger = $logger;
         $this->host = $host;
@@ -93,6 +93,7 @@ class Wrapper extends mysqli
         $this->port = $port;
         $this->dbname = $dbname;
         $this->socket = $socket;
+        $this->options = $options;
     }
 
     /**

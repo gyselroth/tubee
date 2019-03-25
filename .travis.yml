@@ -17,8 +17,8 @@ script: make VERSION=$version
 notifications:
   email: false
 before_deploy:
-- if [[ "$version" == *"-"* ]]; then export deb_distribution=unstable; else export
-  deb_distribution=stable; fi;
+- if [[ "$version" == *"-"* ]]; then export deb_distribution=unstable; docker_tag=latest-unstable; else export
+  deb_distribution=stable; docker_tag=latest; fi;
 - if [[ "$TRAVIS_BRANCH" == "master" ]]; then export deb_distribution=nightly; fi;
 - export date=$(date +%Y-%m-%d)
 - cp packaging/debian/bintray.json bintray.json
@@ -44,11 +44,16 @@ deploy:
   key:
     secure: "CADXObc5llqSeFjGsN6LVYzW4JvtNXX2qXsCbGn+5aMaMbK3KRhKzO3cM/YvrQayy9GKvvBuW4hkcQY2afiyYRquqxcXke7VhAz+rO0dLkUp0eAvxWEWhb6Z8wLaNEGH2fjuMfVZWM3c7gm6U7YfwYCaeEULzqKiUz35kKQy7Z1/uqWt3KBr+zxVLPd9uNWbMEKtbgBRlxvZ0eIXR4VqrKnVbT4KNz1qJCvNRn4AxGRqAY1Zo8UDMQ0+d4OGMNkMgwn3zqZCZqnfE5Y4OqY7PMSTeYVZlu11921zW/iS0alVWI0JXTUqth9kPN1EIiUtz1qCKaeE/Bhc+MhAFJelpV7ThIjDhpJM7rE0cn1oLqX9VEBSO+4MeqrDxxOesSHFIQs9KKt/h8OLtnbBKEeUi3m7sRkAEGaaV3Di/dx2u9NHoYRyPD0WBIz21MqYJiJKH7VKex4W9vOFVy9G86Pv6jppmNLTQVrKrEIUSM8QoyeeuGq+okRvxtARZ4X+he/ZXfMCDD6rfY4bGlivd6GDRTGafX8a0JMBlj7a0NHe80A6ebAkcs/zoI1ht4CAMWhoKMzmF9rETXzKpP+ZMy8wLdmZ3Pjlzo9R2Gs7x5HAGQ9JMqFuqKupU4gxidnapjrIsf2b3pdjwZfufeUqPfL/uCB4F513UWL+SaesgtpJLe8="
 after_deploy:
+- test "$TRAVIS_TAG" != "" && version=${TRAVIS_TAG:1};
+- test "$TRAVIS_TAG" != "" && docker build -t gyselroth/tubee:$version .
+- test "$TRAVIS_TAG" != "" && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+- test "$TRAVIS_TAG" != "" && docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
+- test "$TRAVIS_TAG" != "" && docker push gyselroth/tubee:$version
+- test "$TRAVIS_TAG" != "" && docker push gyselroth/tubee:$docker_tag
 - ! 'if [ "$TRAVIS_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
   -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
-  token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master",
-  "config":{"env":{"REPOSITORY": "''"$deb_distribution"''", "VERSION":"''"$version"''"}}}}''
-  "https://api.travis-ci.org/repo/gyselroth%2Ftubee-docker/requests"; fi'
+  token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
+  "https://api.travis-ci.org/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 env:
   global:
     secure: GU/a6BkXLtSoLyxhKsOD1xuA62/665wVry6cg7IbQQH9TL7F7vaRhkN/I/iiOOW7TkKmdJ56tkkOKm8BXlgzo4Fectxfv8Xu2OQ2+wQSRg2ESuzdfbHS7nGbZOdv/lhcAlMILlIsqcoz1Q7T2vZ3+ScPOAEfr7y07xULKDTPxisw/zClO3EqrmTbIR5/tdVksbsFvEk3swJEjY1UoYr6dwQsnD1zS5EFhWIMx0W7Tva/kenkC0pAj5Ar815vGa+caBi91pxpOjrGzWQmXPkjIt7ZyFBZynNVqmJkSe6nuVG4bRpVUmT6ipZOk1CqMjRa/RVI9D/wxLPwQrPpfx+pt8P5Pb6ykvVhxw7pW81oEVEPJrpqlTBhKaWl9IteikbSTPcx+QWVE6EAuXWzwHmmc+pTZygVXA+zqOepbXFG37DwO0I4jkP04Ji9FUkxnPEfTVElWXp20FUD+XifrJaJjKnsVGS89EAswRcx4+DUPtjktpfMuP88xT1a4VZMAsud1MGc8oKAx5Fzw5URuQldVVK2I0aqyqGb2zkl4p2mnteP5hTvGI3Meh/dijpEapv2amucK4gOutdCqRtnJlvixVMlfyNEUIqn7yL8fOHa3r/9Rp21nnmVkVi7SvqyPKmhbHSC7tVIxMx/X2MLN/Jbp1VDa2sPhUadktlSFtU420o=

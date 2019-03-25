@@ -84,7 +84,7 @@ data:
     flush: false
     import:
       - guid
-    filter_one: 'guid="{data.guid}"'
+    filter_one: '{\"guid\":\"{data.guid}\"}'
     filter_all: null
   file: /tmp/news.xml
 ---
@@ -322,7 +322,7 @@ data:
   type: destination
   options:
     flush: false
-    filter_one: '{\"objectProperty\": \"name\", \"objectPropertyValue\": \"{username}\"}'
+    filter_one: '{\"name\":\"{username}\"}'
     filter_all: null
 secrets:
 - secret: ucs
@@ -449,7 +449,7 @@ data:
   type: destination
   options:
     flush: false
-    filter_one: '{\"objectProperty\": \"name\", \"objectPropertyValue\": \"{name}\"}'
+    filter_one: '{\"name\":\"{name}\"}'
     filter_all: null
 secrets:
 - secret: ucs

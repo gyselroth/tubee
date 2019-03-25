@@ -1,10 +1,12 @@
 ## 1.0.0-beta2
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Fri Jan 25 17:14:01 CET 2019\
+**Date**: Mon Mar 25 15:14:01 CET 2019\
 
 * TESTING: [CHANGE] Added new xml endpoint unit tests
-* PACKAGING: [CHANGE] Dev docker container now sets TUBEE_SECRET_KEY, Cache adapter to void and log level to debug (100)
+* PACKAGING: [CHANGE] Dev docker container now sets TUBEE_SECRET_KEY
 * PACKAGING: [FIX] fixes no make dep npm
+* PACKAGING: [CHANGE] Dockerfile and Dockerfile-dev are no part of the server repo itself
+* PACKAGING: [CHANGE] docker images now inherits from gyselroth/tubee:php7.2-fpm-v8js which already includes v8js
 * DOCS: [CHANGE] Various fixes
 * CORE: [FIX] Do not block GET /logs requests if log response from MongoDB is empty (do not use natural sorting)
 * CORE: [FIX] Xml, Csv validators merge defaults before validation
@@ -24,10 +26,21 @@
 * CORE: [CHANGE] Added TUBEE_CACHE_ADAPTER and TUBEE_LOG_LEVEL env variables to default container config
 * CORE: [CHANGE] All resource factories now depend on Resource\Factory which itself uses a Psr cache for resource validation
 * CORE: [FIX] flush: true results in "TypeError: Argument 1 passed to Tubee\DataObject\Factory::deleteAll() must implement interface Tubee\Collection\CollectionInterface, boolean given"
+* CORE: [FEATURE] Added -f to cli jobs (flush queue)
+* CORE: [FEATURE] Added (bool)`skip` to attribute mapping to skip attributes to map
+* CORE: [CHANGE] endpoint filter_all and filter_one use the tubee (mongodb) dql now instead filters in endpoint specific formats
+* CORE: [FEATURE] filter_one and filter_all can now be used for Csv and Json endpoints (Note that performance is not optimal since those formats do not have a propper query language and neither now indexing)
+* CORE: [CHANGE] Added Endpoint\LoggerTrait to apply generic endpoint operation logging
+* CORE: [FIX] readOnly attributes get stripped out from request
+* CORE: [FIX] binary values in Endpoint\Ldap get base64 encoded
+* CORE: [FEATURE] Possibility to set context data within `map` definition in worklow
+* API: [FIX] uncaught exception: Argument 4 passed to Tubee\Rest\v1\Processes::delete() must implement interface MongoDB\BSON\ObjectIdInterface
 * API: [FIX] uncaught exception: Argument 1 passed to Tubee\Secret\Factory::getOne() must implement interface Tubee\ResourceNamespace\ResourceNamespaceInterface, string given at POST /api/v1/secrets
 * API: [FIX] uncaught exception: Undefined variable: job]  [object] (ErrorException(code: 0): Undefined variable: job at POST /api/v1/jobs
 * API: [FIX] Added ImageEndpoint to openapi v3 specs
-
+* API: [FIX] fixed max execution time of 5min for watch stream requests
+* API: [FIX] Added reaOnly flags to openapi spec for readonly attributes (like created, changed, version)
+* API: [FIX] Exception middleware catches now throwables instead just exceptions only
 
 ## 1.0.0-beta1
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\

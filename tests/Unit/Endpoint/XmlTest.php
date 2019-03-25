@@ -99,7 +99,9 @@ class XmlTest extends TestCase
             }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_SOURCE, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => "//node[//node/foo = '{foo}']"]],
+            'data' => ['options' => [
+                'filter_one' => json_encode(['foo' => '{foo}']),
+            ]],
         ]);
 
         $xml->setup();
@@ -122,7 +124,9 @@ class XmlTest extends TestCase
             }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_SOURCE, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => "//node[//node/bar = '{foo}']"]],
+            'data' => ['options' => [
+                'filter_one' => json_encode(['bar' => '{foo}']),
+            ]],
         ]);
 
         $xml->setup();
@@ -142,7 +146,9 @@ class XmlTest extends TestCase
             }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_SOURCE, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => "//node[//node/foo = '{foo}']"]],
+            'data' => ['options' => [
+                'filter_one' => json_encode(['foo' => '{foo}']),
+            ]],
         ]);
 
         $xml->setup();
@@ -161,7 +167,9 @@ class XmlTest extends TestCase
             }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_SOURCE, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => "//node[//node/foo = '{foo}']"]],
+            'data' => ['options' => [
+                'filter_one' => json_encode(['foo' => '{foo}']),
+            ]],
         ]);
 
         $xml->setup();
@@ -351,7 +359,7 @@ EOT;
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $this->createMock(StorageInterface::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => [
                 'options' => [
-                    'filter_all' => '/foobar',
+                    'filter_all' => json_encode(['bar' => 'foo']),
                 ],
             ],
         ]);
@@ -360,7 +368,7 @@ EOT;
             'foo' => 'bar',
         ];
 
-        $expected = "/foobar[(foo='bar')]";
+        $expected = "//*[((bar='foo') and (foo='bar'))]";
         $result = $xml->transformQuery($query);
         $this->assertSame($expected, $result);
     }
@@ -370,7 +378,7 @@ EOT;
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $this->createMock(StorageInterface::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => [
                 'options' => [
-                    'filter_all' => "//foobar[bar='bar']",
+                    'filter_all' => json_encode(['bar' => 'bar']),
                 ],
             ],
         ]);
@@ -379,7 +387,7 @@ EOT;
             'foo' => 'bar',
         ];
 
-        $expected = "//foobar[bar='bar' and (foo='bar')]";
+        $expected = "//*[((bar='bar') and (foo='bar'))]";
         $result = $xml->transformQuery($query);
         $this->assertSame($expected, $result);
     }
@@ -493,7 +501,7 @@ EOT;
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => [
                 'options' => [
-                    'filter_one' => "//row[bar='{foo}']",
+                    'filter_one' => json_encode(['bar' => '{foo}']),
                 ],
             ],
         ]);
@@ -531,7 +539,7 @@ EOT;
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => [
                 'options' => [
-                    'filter_one' => "//row[bar='{foo}']",
+                    'filter_one' => json_encode(['bar' => '{foo}']),
                 ],
             ],
         ]);

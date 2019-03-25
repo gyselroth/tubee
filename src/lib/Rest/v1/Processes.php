@@ -15,7 +15,6 @@ use Fig\Http\Message\StatusCodeInterface;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Micro\Auth\Identity;
 use MongoDB\BSON\ObjectId;
-use MongoDB\BSON\ObjectIdInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Tubee\Acl;
@@ -122,7 +121,7 @@ class Processes
     /**
      * Stop process.
      */
-    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, ObjectIdInterface $process): ResponseInterface
+    public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, ObjectId $process): ResponseInterface
     {
         $namespace = $this->namespace_factory->getOne($namespace);
         $this->process_factory->deleteOne($namespace, $process);

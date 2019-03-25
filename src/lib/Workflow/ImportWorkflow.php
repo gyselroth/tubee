@@ -108,7 +108,7 @@ class ImportWorkflow extends Workflow
                     ],
                 ];
 
-                $id = $collection->createObject(Helper::pathArrayToAssociative($map), $simulate, $endpoints);
+                $id = $collection->createObject(Helper::pathArrayToAssociative($this->removeMapAttributes($map)), $simulate, $endpoints);
                 $this->importRelations($collection->getObject(['_id' => $id]), $map, $simulate, $endpoints);
 
                 return true;
@@ -116,7 +116,7 @@ class ImportWorkflow extends Workflow
             break;
             default:
             case WorkflowInterface::ENSURE_LAST:
-                $object = Map::map($this->attribute_map, $map, ['data' => $exists->getData()], $ts);
+                $object = Map::map($this->attribute_map, $this->removeMapAttributes($map), ['data' => $exists->getData()], $ts);
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
@@ -133,6 +133,24 @@ class ImportWorkflow extends Workflow
         }
 
         return false;
+    }
+
+    /**
+     * Remove map attributes (if skip=true).
+     */
+    protected function removeMapAttributes(array $data): array
+    {
+        foreach ($this->attribute_map->getMap() as $definition) {
+            if ($definition['skip'] === true) {
+                $this->logger->debug('do not store attribute ['.$definition['name'].']', [
+                    'category' => get_class($this),
+                ]);
+
+                unset($data[$definition['name']]);
+            }
+        }
+
+        return $data;
     }
 
     /**
@@ -174,6 +192,7 @@ class ImportWorkflow extends Workflow
             switch ($definition['map']['ensure']) {
                 case WorkflowInterface::ENSURE_EXISTS:
                 case WorkflowInterface::ENSURE_LAST:
+                    $context = array_intersect_key($data, array_flip($definition['map']['context']));
                     $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
                     $collection = $this->endpoint->getCollection()->getName();
                     $ep = $this->endpoint->getName();
@@ -182,7 +201,7 @@ class ImportWorkflow extends Workflow
                         join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
                     ];
 
-                    $object->createOrUpdateRelation($relative, [], $simulate, $endpoints);
+                    $object->createOrUpdateRelation($relative, $context, $simulate, $endpoints);
 
                 break;
                 default:

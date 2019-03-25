@@ -41,21 +41,23 @@ class OdataRest extends AbstractRest
      */
     public function transformQuery(?array $query = null)
     {
-        $result = null;
-
         if ($this->filter_all !== null) {
-            $result = $this->filter_all;
+            return QueryTransformer::transform($this->getFilterAll());
         }
-
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = QueryTransformer::transform($query);
-            } else {
-                $result = $this->filter_all.' and '.QueryTransformer::transform($query);
+                return QueryTransformer::transform($query);
             }
+
+            return QueryTransformer::transform([
+                    '$and' => [
+                        $this->getFilterAll(),
+                        $query,
+                    ],
+                ]);
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -63,12 +65,9 @@ class OdataRest extends AbstractRest
      */
     public function getAll(?array $query = null): Generator
     {
-        $this->logger->debug('find all balloon objects using ['.$this->client->getConfig('base_uri').']', [
-            'category' => get_class($this),
-        ]);
-
         $options = $this->getRequestOptions();
         $query = $this->transformQuery($query);
+        $this->logGetAll($query);
 
         if ($query !== null) {
             $options['query']['$filter'] = $query;
@@ -90,10 +89,8 @@ class OdataRest extends AbstractRest
      */
     public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
-        $filter = $this->getFilterOne($object);
-        $this->logger->debug('find rest resource with filter ['.$filter.'] in endpoint ['.$this->getIdentifier().']', [
-            'category' => get_class($this),
-        ]);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logGetOne($filter);
 
         $options = $this->getRequestOptions();
         $options['query']['$filter'] = $filter;

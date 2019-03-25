@@ -160,8 +160,7 @@ class UcsTest extends TestCase
 
         $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => ['options' => ['filter_one' => json_encode([
-                'objectProperty' => 'bar',
-                'objectPropertyValue' => 'bar',
+                'bar' => 'bar',
             ])]],
         ]);
 
@@ -201,8 +200,7 @@ class UcsTest extends TestCase
 
         $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => ['options' => ['filter_one' => json_encode([
-                'objectProperty' => 'bar',
-                'objectPropertyValue' => 'bar',
+                'bar' => 'bar',
             ])]],
         ]);
 
@@ -477,8 +475,7 @@ class UcsTest extends TestCase
             'data' => [
                 'options' => [
                     'filter_all' => json_encode([
-                        'objectProperty' => 'foo',
-                        'objectPropertyValue' => 'bar',
+                        'foo' => 'bar',
                     ]),
                 ],
             ],
@@ -540,7 +537,7 @@ class UcsTest extends TestCase
             );
         $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $object = [
-            'entrydn' => 'uid=foo,ou=bar',
+            '$dn$' => 'uid=foo,ou=bar',
             'foo' => 'bar',
         ];
 

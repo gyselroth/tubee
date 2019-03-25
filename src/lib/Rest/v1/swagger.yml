@@ -1707,6 +1707,11 @@ paths:
         required: false
         type: "string"
       - in: "query"
+        name: "stream"
+        description: "Stream resources. There is no limit by default."
+        required: false
+        type: "boolean"
+      - in: "query"
         name: "watch"
         description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
         required: false

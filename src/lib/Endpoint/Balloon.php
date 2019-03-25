@@ -40,20 +40,18 @@ class Balloon extends AbstractRest
      */
     public function transformQuery(?array $query = null)
     {
-        $result = null;
-        if ($this->filter_all !== null) {
-            $result = stripslashes($this->filter_all);
+        if ($this->filter_all !== null && empty($query)) {
+            return stripslashes($this->filter_all);
         }
-
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                $result = json_encode($query);
-            } else {
-                $result = '{"$and":['.stripslashes($this->filter_all).', '.json_encode($query).']}';
+                return json_encode($query);
             }
+
+            return '{"$and":['.stripslashes($this->filter_all).', '.json_encode($query).']}';
         }
 
-        return $result;
+        return null;
     }
 
     /**
@@ -61,13 +59,12 @@ class Balloon extends AbstractRest
      */
     public function getAll(?array $query = null): Generator
     {
-        $this->logger->debug('find all balloon objects using ['.$this->client->getConfig('base_uri').']', [
-            'category' => get_class($this),
-        ]);
+        $query = $this->transformQuery($query);
+        $this->logGetAll($query);
 
         $options = $this->getRequestOptions();
         $options['query'] = [
-            'query' => $this->transformQuery($query),
+            'query' => $query,
         ];
 
         $i = 0;
@@ -86,10 +83,8 @@ class Balloon extends AbstractRest
      */
     public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
-        $filter = $this->getFilterOne($object);
-        $this->logger->debug('find rest resource with filter ['.$filter.'] in endpoint ['.$this->getIdentifier().']', [
-            'category' => get_class($this),
-        ]);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logGetOne($filter);
 
         $options = $this->getRequestOptions();
         $options['query'] = [

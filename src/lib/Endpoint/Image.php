@@ -23,6 +23,8 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Image extends AbstractFile
 {
+    use LoggerTrait;
+
     /**
      * Kind.
      */
@@ -64,12 +66,8 @@ class Image extends AbstractFile
     /**
      * Set image options.
      */
-    public function setImageOptions(?array $config = null): EndpointInterface
+    public function setImageOptions(array $config = []): EndpointInterface
     {
-        if ($config === null) {
-            return $this;
-        }
-
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'format':
@@ -116,8 +114,10 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function getAll($filter = []): Generator
+    public function getAll(?array $query = null): Generator
     {
+        $this->logGetAll($query);
+
         $i = 0;
         foreach ($this->storage->openReadStreams($this->file) as $name => $stream) {
             yield $this->build([

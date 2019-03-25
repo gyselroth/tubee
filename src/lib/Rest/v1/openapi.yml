@@ -1896,6 +1896,12 @@ paths:
           schema:
             type: string
         - in: query
+          name: stream
+          description: Stream resources. There is no limit by default.
+          required: false
+          schema:
+            type: boolean
+        - in: query
           name: watch
           description: Watch resources. By default a stream and useful to retrieve UPDATE,
             DELETE and ADD updates.
@@ -3694,6 +3700,7 @@ components:
       properties:
         href:
           type: string
+          readOnly: true
     List:
       type: object
       properties:
@@ -3703,14 +3710,17 @@ components:
           description: The resource type, always List.
           type: string
           default: List
+          readOnly: true
         count:
           description: Holds the number of items in the current list response.
           type: number
+          readOnly: true
         total:
           description: Holds the number of total available items on the server. Note that a
             List resource is always paged. You need to traverse with offset and
             limit to request further resources in the list.
           type: number
+          readOnly: true
     Resource:
       type: object
       properties:
@@ -3727,16 +3737,20 @@ components:
             verify that a given resource was completely recreated. An ID is
             immutable and will be created on the server.
           type: string
+          readOnly: true
         version:
           description: The version of the resource. A version gets increased once the
             resource have been modified.
           type: number
+          readOnly: true
         created:
           description: ISO 8601 timestamp when the resource was created.
           type: string
+          readOnly: true
         changed:
           description: ISO 8601 timestamp when the resource was changed.
           type: string
+          readOnly: true
         secrets:
           default: []
           description: Injected secrets in this resource.
@@ -3800,7 +3814,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/Resource"
         - type: object
-          required: 
+          required:
           - data
           properties:
             kind:
@@ -3827,7 +3841,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/Resource"
         - type: object
-          required: 
+          required:
           - data
           properties:
             kind:
@@ -3930,7 +3944,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/Resource"
         - type: object
-          default: 
+          default:
             data:
               selectors: []
           properties:
@@ -3940,7 +3954,7 @@ components:
               default: AccessRole
             data:
               type: object
-              default: 
+              default:
                 selectors: []
               properties:
                 selectors:
@@ -4027,7 +4041,7 @@ components:
               properties:
                 notification:
                   type: object
-                  default: 
+                  default:
                     enabled: false
                     receiver: []
                   properties:
@@ -4065,7 +4079,7 @@ components:
                     []
                 filter:
                   description: Data object filter.
-                  default: []           
+                  default: []
                   type: object
                 ignore:
                   description: If enabled the server does ignores any sync errors and
@@ -4193,7 +4207,7 @@ components:
                 schema:
                   default: {}
                   type: object
-                  additionalProperties: 
+                  additionalProperties:
                     type: object
                     properties:
                       label:
@@ -4230,7 +4244,7 @@ components:
     StreamStorage:
       description: Use a streaming endpoint to fetch data. Usually used for a http url.
       type: object
-      required: 
+      required:
       - kind
       properties:
         kind:
@@ -4335,7 +4349,7 @@ components:
       allOf:
         - $ref: "#/components/schemas/Resource"
         - type: object
-          required: 
+          required:
           - endpoint
           - data
           properties:
@@ -4368,7 +4382,7 @@ components:
                     - destination
                 options:
                   type: object
-                  default: 
+                  default:
                     identifier: null
                     import: []
                     flush: false
@@ -4418,7 +4432,7 @@ components:
               default: PdoEndpoint
             data:
               type: object
-              required: 
+              required:
               - table
               - resource
               properties:
@@ -4428,7 +4442,7 @@ components:
                 resource:
                   description: Holds the relevant options of how to connect to the endpoint.
                   type: object
-                  required: 
+                  required:
                   - dsn
                   properties:
                     dsn:
@@ -4471,7 +4485,7 @@ components:
                 resource:
                   description: Holds the relevant options of how to connect to the endpoint.
                   type: object
-                  required: 
+                  required:
                   - host
                   properties:
                     host:
@@ -4497,6 +4511,10 @@ components:
                       type: string
                       nullable: true
                       default: null
+                    options:
+                      description: MySQL driver options. See http://php.net/manual/de/mysqli.options.php for possible options.
+                      type: object
+                      default: {}
     LdapEndpoint:
       description: LDAP (OpenLDAP, Microsoft AD and other LDAP compatible Server) endpoint
       allOf:
@@ -4509,7 +4527,7 @@ components:
               default: LdapEndpoint
             data:
               type: object
-              required: 
+              required:
               - resource
               properties:
                 resource:
@@ -4565,7 +4583,7 @@ components:
                 resource:
                   description: Holds the relevant options of how to connect to the endpoint.
                   type: object
-                  required: 
+                  required:
                   - base_uri
                   properties:
                     base_uri:
@@ -4652,9 +4670,9 @@ components:
               - file
               properties:
                 storage:
-                  default: 
+                  default:
                     kind: StreamStorage
-                  oneOf: 
+                  oneOf:
                   - $ref: "#/components/schemas/StreamStorage"
                   - $ref: "#/components/schemas/SmbStorage"
                   - $ref: "#/components/schemas/BalloonStorage"
@@ -4667,7 +4685,7 @@ components:
                 resource:
                   description: Image (formatting) options.
                   type: object
-                  default: 
+                  default:
                     format: null
                     max_width: 0
                     max_height: 0
@@ -4704,7 +4722,7 @@ components:
                 resource:
                   description: Holds the relevant options of how to connect to the endpoint.
                   type: object
-                  required: 
+                  required:
                   - base_uri
                   - flavor
                   properties:
@@ -4774,7 +4792,7 @@ components:
                       default:
                         {}
                     driver_options:
-                      description: Advanced Driver options
+                      description: Advanced Driver options. See https://docs.mongodb.com/php-library/v1.2/reference/method/MongoDBClient__construct/#definition for possible options.
                       type: object
                       default:
                         {}
@@ -4883,13 +4901,13 @@ components:
             data:
               type: object
               required:
-              - file 
-              - storage 
+              - file
+              - storage
               properties:
                 storage:
-                  default: 
+                  default:
                     kind: StreamStorage
-                  oneOf: 
+                  oneOf:
                   - $ref: "#/components/schemas/StreamStorage"
                   - $ref: "#/components/schemas/SmbStorage"
                   - $ref: "#/components/schemas/BalloonStorage"
@@ -4935,9 +4953,9 @@ components:
               - file
               properties:
                 storage:
-                  default: 
+                  default:
                     kind: StreamStorage
-                  oneOf: 
+                  oneOf:
                   - $ref: "#/components/schemas/StreamStorage"
                   - $ref: "#/components/schemas/SmbStorage"
                   - $ref: "#/components/schemas/BalloonStorage"
@@ -4950,7 +4968,7 @@ components:
                 resource:
                   description: CSV parse options.
                   type: object
-                  default: 
+                  default:
                     root_name: data
                     node_name: row
                     pretty: true
@@ -4990,9 +5008,9 @@ components:
               - file
               properties:
                 storage:
-                  default: 
+                  default:
                     kind: StreamStorage
-                  oneOf: 
+                  oneOf:
                   - $ref: "#/components/schemas/StreamStorage"
                   - $ref: "#/components/schemas/SmbStorage"
                   - $ref: "#/components/schemas/BalloonStorage"
@@ -5044,7 +5062,7 @@ components:
               - Workflow
             data:
               type: object
-              required: 
+              required:
               - map
               properties:
                 priority:
@@ -5090,7 +5108,7 @@ components:
               - Workflow
             data:
               type: object
-              required: 
+              required:
               - map
               properties:
                 priority:
@@ -5147,6 +5165,10 @@ components:
           - bool
           - array
           - binary
+        skip:
+          description: "If tru the attribute does not get stored in the resource object itself. This might be useful if an attribute meant only be used to create resource relations."
+          type: boolean
+          default: false
         map:
           description: "Map object to another object. Automatically generate DataObjectRelation resource."
           type: object
@@ -5170,6 +5192,10 @@ components:
               - exists
               - last
               - absent
+            context:
+              type: array
+              items:
+                type: string
         required:
           description: "Attribute must exists."
           type: boolean
@@ -5196,9 +5222,9 @@ components:
                 description: "Static from matcher. If from = value rewrite to the value of to."
                 type: string
                 nullable: true
-                default: null                
+                default: null
               to:
-                type: string   
+                type: string
                 description: "The destination value. You may use variables ($1, $2,...) from regex subsets if match has been used."
     EndpointObjects:
       description: A list of endpoint objects.
@@ -5290,7 +5316,7 @@ components:
                   maxItems: 2
                   items:
                     type: object
-                    required: 
+                    required:
                     - namespace
                     - collection
                     - object

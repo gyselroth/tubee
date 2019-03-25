@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\Rest\Middlewares;
 
-use Exception;
 use Garden\Schema\ValidationException;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
 use Psr\Http\Message\ResponseInterface;
@@ -19,6 +18,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
+use Throwable;
 use Tubee\Rest\Exception\ExceptionInterface;
 use Zend\Diactoros\Response;
 
@@ -54,7 +54,7 @@ class ExceptionHandler implements MiddlewareInterface
     {
         try {
             return $handler->handle($request);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             return $this->sendException($e);
         }
     }
@@ -62,7 +62,7 @@ class ExceptionHandler implements MiddlewareInterface
     /**
      * Sends a exception response to the client.
      */
-    public function sendException(Exception $exception): ResponseInterface
+    public function sendException(Throwable $exception): ResponseInterface
     {
         $message = $exception->getMessage();
         $class = get_class($exception);
@@ -81,6 +81,7 @@ class ExceptionHandler implements MiddlewareInterface
         }
 
         if ($exception instanceof ValidationException) {
+            $http_code = 422;
             $body['code'] = 422;
             $body['more'] = $exception->getValidation()->getErrors();
         }
