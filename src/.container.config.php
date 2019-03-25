@@ -157,10 +157,6 @@ return [
                 'method' => 'pushHandler',
                 'arguments' => ['handler' => '{mongodb}']
             ],
-            'file' => [
-                'method' => 'pushHandler',
-                'arguments' => ['handler' => '{file}']
-            ],
             'stderr' => [
                 'method' => 'pushHandler',
                 'arguments' => ['handler' => '{stderr}']
@@ -188,18 +184,6 @@ return [
                     'database' => 'tubee',
                     'collection' => 'logs',
                     'level' => 1000,
-                ]
-            ],
-            'file' => [
-                'use' => Monolog\Handler\StreamHandler::class,
-                'arguments' => [
-                    'stream' => '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log',
-                    'level' => 100
-                 ],
-                'calls' => [
-                    'formatter' => [
-                        'method' => 'setFormatter'
-                    ]
                 ]
             ],
             'stderr' => [

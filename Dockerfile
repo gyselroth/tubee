@@ -1,4 +1,4 @@
-FROM php:7.2-fpm
+FROM gyselroth/tubee:php7.2-fpm-v8js
 
 RUN mkdir -p /usr/share/man/man1/ && echo TLS_REQCERT never > /etc/ldap/ldap.conf
 
@@ -46,20 +46,6 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
-RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /tmp/depot_tools && \
-    export PATH="$PATH:/tmp/depot_tools" && \
-    \
-    cd /usr/local/src && fetch v8 && cd v8 && \
-    git checkout 5.4.500.40 && gclient sync && \
-    export GYPFLAGS="-Dv8_use_external_startup_data=0" && \
-    export GYPFLAGS="${GYPFLAGS} -Dlinux_use_bundled_gold=0" && \
-    make native library=shared snapshot=on -j4 && \
-    \
-    mkdir -p /usr/local/lib && \
-    cp /usr/local/src/v8/out/native/lib.target/lib*.so /usr/local/lib && \
-    echo "create /usr/local/lib/libv8_libplatform.a\naddlib out/native/obj.target/src/libv8_libplatform.a\nsave\nend" | ar -M && \
-    cp -R /usr/local/src/v8/include /usr/local && chrpath -r '$ORIGIN' /usr/local/lib/libv8.so
-
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so
 RUN docker-php-ext-install ldap xml opcache curl zip intl sockets pcntl sysvmsg mysqli
 
@@ -68,9 +54,8 @@ RUN pecl install mongodb \
     && pecl install imagick \
     && pecl install smbclient \
     && pecl install sqlsrv \
-    && pecl install v8js \
     && pecl install pdo_sqlsrv \
-    && docker-php-ext-enable mongodb apcu imagick smbclient pcntl sqlsrv pdo_sqlsrv v8js mysqli
+    && docker-php-ext-enable mongodb apcu imagick smbclient pcntl sqlsrv pdo_sqlsrv mysqli
 
 RUN mkdir /etc/ssl/tubee \
   && openssl genrsa -des3 -passout pass:x12345 -out server.pass.key 2048 \
@@ -101,4 +86,4 @@ ENV TUBEE_PATH /usr/share/tubee
 ENV TUBEE_DIR_CONFIG /etc/tubee
 
 EXPOSE 443 9000
-CMD nohup tubeecli jobs listen -vv && service nginx start && php-fpm;
+CMD service nginx start && php-fpm;

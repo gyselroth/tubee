@@ -1,11 +1,12 @@
 ## 1.0.0-beta2
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Fri Mar 15 15:14:01 CET 2019\
+**Date**: Mon Mar 25 15:14:01 CET 2019\
 
 * TESTING: [CHANGE] Added new xml endpoint unit tests
 * PACKAGING: [CHANGE] Dev docker container now sets TUBEE_SECRET_KEY
 * PACKAGING: [FIX] fixes no make dep npm
 * PACKAGING: [CHANGE] Dockerfile and Dockerfile-dev are no part of the server repo itself
+* PACKAGING: [CHANGE] docker images now inherits from gyselroth/tubee:php7.2-fpm-v8js which already includes v8js
 * DOCS: [CHANGE] Various fixes
 * CORE: [FIX] Do not block GET /logs requests if log response from MongoDB is empty (do not use natural sorting)
 * CORE: [FIX] Xml, Csv validators merge defaults before validation
