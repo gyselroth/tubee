@@ -60,10 +60,10 @@ services:
     links:
       - balloon
   tubee-dev:
-    image: gyselroth/tubee-development:latest
+    image: gyselroth/tubee:latest-dev
     ports:
       - "8090:443"
-    entrypoint: sh -c "echo TLS_REQCERT never > /etc/ldap/ldap.conf && make -C /srv/www/tubee deps; php /srv/www/tubee/src/cgi-bin/cli.php upgrade -i; service nginx start && php-fpm"
+    entrypoint: sh -c "make -C /srv/www/tubee deps; php /srv/www/tubee/src/cgi-bin/cli.php upgrade -i; service nginx start && php-fpm"
     volumes:
       - .:/srv/www/tubee
     links:

@@ -1,3 +1,10 @@
+## 1.0.0
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: \
+
+* API: [FIX] Added route /api to /api/v1
+
+
 ## 1.0.0-beta2
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Mar 25 15:14:01 CET 2019\
