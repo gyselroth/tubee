@@ -73,6 +73,11 @@ class Acl
             $names[] = $role->getName();
         }
 
+        $this->logger->debug('selected access-roles {access-roles}', [
+            'category' => get_class($this),
+            'access-roles' => $names,
+        ]);
+
         if ($names === []) {
             $this->logger->info('no matching access roles for ['.$user->getIdentifier().']', [
                 'category' => get_class($this),
@@ -87,6 +92,13 @@ class Acl
 
         $method = $request->getMethod();
         $attributes = $request->getAttributes();
+
+        $this->logger->debug('verify access for http request {method}:{uri} using {attributes}', [
+            'category' => get_class($this),
+            'uri' => $request->getUri(),
+            'method' => $method,
+            'attributes' => $attributes,
+        ]);
 
         foreach ($rules as $rule) {
             $data = $rule->getData();

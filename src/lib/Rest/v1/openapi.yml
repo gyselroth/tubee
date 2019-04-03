@@ -4654,6 +4654,16 @@ components:
                           type: string
                           nullable: true
                           default: null
+                options:
+                  type: object
+                  default:
+                    identifier: id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: id
+                      description: Endpoint resource identifier.
+                      type: string
     ImageEndpoint:
       description: Images (Files)
       allOf:
@@ -4796,6 +4806,16 @@ components:
                       type: object
                       default:
                         {}
+                options:
+                  type: object
+                  default:
+                    identifier: _id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: _id
+                      description: Endpoint resource identifier.
+                      type: string
     BalloonEndpoint:
       description: Balloon cloud server endpoint
       allOf:
@@ -4888,6 +4908,16 @@ components:
                           nullable: true
                           default: null
                           type: string
+                options:
+                  type: object
+                  default:
+                    identifier: id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: id
+                      description: Endpoint resource identifier.
+                      type: string
     CsvEndpoint:
       description: CSV data format endpoint
       allOf:

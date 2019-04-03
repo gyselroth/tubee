@@ -31,7 +31,6 @@ class OdataRest extends AbstractRest
      */
     public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->identifier = 'id';
         $this->container = 'value';
         parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }

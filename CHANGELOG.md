@@ -1,8 +1,13 @@
-## 1.0.0
+## 1.0.0-beta3
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: \
+**Date**: Wed Apr 03 16:01:01 CEST 2019
 
 * API: [FIX] Added route /api to /api/v1
+* CORE: [FIX] Fixed route/acl middleware order
+* CORE: [CHANGE] upgraded micro-auth to latest alpha which fixes Adapter\Basic\Ldap identifier issue
+* CORE: [FIX] user password can now be changed correctly
+* CORE: [CHANGE] Invalid secret key now responds with Tubee\Secret\Exception\SecretNotResolvable instead Tubee\Exception
+* API: [CHANGE] Endpoints with default identifiers specify those now in the openapi specs
 
 
 ## 1.0.0-beta2

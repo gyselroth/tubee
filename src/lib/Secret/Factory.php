@@ -139,9 +139,13 @@ class Factory
             ]);
 
             foreach ($resource['secrets'] as $secret) {
-                $blob = $this->getOne($namespace, $secret['secret'])->getData();
-                $data = base64_decode(Helper::getArrayValue($blob, $secret['key']));
-                $resource = Helper::setArrayValue($resource, $secret['to'], $data);
+                try {
+                    $blob = $this->getOne($namespace, $secret['secret'])->getData();
+                    $data = base64_decode(Helper::getArrayValue($blob, $secret['key']));
+                    $resource = Helper::setArrayValue($resource, $secret['to'], $data);
+                } catch (\Exception $e) {
+                    throw new Exception\SecretNotResolvable('secret key '.$secret['key'].' is not resolveable');
+                }
             }
         }
 

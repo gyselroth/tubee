@@ -49,10 +49,10 @@ return [
                 '{'.ExceptionHandler::class.'}',
                 '{'.JsonPayload::class.'}',
                 '{'.QueryDecoder::class.'}',
+                '{'.FastRoute::class.'}',
                 '{'.AuthMiddleware::class.'}',
                 '{'.AclMiddleware::class.'}',
                 '{'.TrailingSlash::class.'}',
-                '{'.FastRoute::class.'}',
                 '{'.RequestHandler::class.'}',
             ],
             'resolver' => '{'.ContainerResolver::class.'}'

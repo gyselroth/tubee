@@ -77,12 +77,10 @@ class RequestHandler implements MiddlewareInterface
             return call_user_func_array($requestHandler, $args);
         }
         if (is_callable($requestHandler)) {
-            return call_user_func_array($requestHandler, [$request,
-$handler, ]);
+            return call_user_func_array($requestHandler, [$request, $handler]);
         }
 
-        throw new RuntimeException(sprintf('Invalid request handler:
-%s', gettype($requestHandler)));
+        throw new RuntimeException(sprintf('Invalid request handler: %s', gettype($requestHandler)));
     }
 
     /**
@@ -93,7 +91,6 @@ $handler, ]);
         try {
             $return = [];
             $meta = new ReflectionMethod($handle[0], $handle[1]);
-            //$meta = new ReflectionMethod(get_class($handle[0]), $handle[1]);
             $params = $meta->getParameters();
             $request_params = $request->getAttributes();
 
@@ -101,8 +98,7 @@ $handler, ]);
                 $type = (string) $param->getType();
                 $optional = $param->isOptional();
 
-                if (isset($request_params[$param->name]) && '' !==
-$request_params[$param->name]) {
+                if (isset($request_params[$param->name]) && '' !== $request_params[$param->name]) {
                     $param_value = $request_params[$param->name];
                 } elseif (true === $optional) {
                     $return[$param->name] = $param->getDefaultValue();
@@ -112,23 +108,20 @@ $request_params[$param->name]) {
                     $param_value = null;
                 }
 
-                if ($param->getClass() !== null &&
-$param->getClass()->getName() === ServerRequestInterface::class) {
+                if ($param->getClass() !== null && $param->getClass()->getName() === ServerRequestInterface::class) {
                     $return[$param->name] = $request;
 
                     continue;
                 }
 
-                if (null !== $param->getClass() && null === $param_value
-&& null !== $this->container) {
+                if (null !== $param->getClass() && null === $param_value && null !== $this->container) {
                     $return[$param->name] = $this->container->get($type);
 
                     continue;
                 }
 
                 if (null === $param_value && false === $optional) {
-                    throw new InvalidArgumentException('misssing
-required input parameter '.$param->name);
+                    throw new InvalidArgumentException('misssing required input parameter '.$param->name);
                 }
 
                 $return[$param->name] = $this->convertParam(
@@ -139,8 +132,7 @@ required input parameter '.$param->name);
 
             return $return;
         } catch (ReflectionException $e) {
-            throw new InvalidArgumentException('misssing or
-invalid required request parameter');
+            throw new InvalidArgumentException('misssing or invalid required request parameter');
         }
     }
 

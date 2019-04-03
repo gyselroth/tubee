@@ -142,7 +142,12 @@ class Factory
         $data['name'] = $resource->getName();
         $data['kind'] = $resource->getKind();
         $data = $this->resource_factory->validate($data);
-        $data = Validator::validatePolicy($data, $this->password_policy);
+
+        if (isset($data['data']['password'])) {
+            $data = Validator::validatePolicy($data, $this->password_policy);
+            $data['hash'] = password_hash($data['data']['password'], $this->password_hash);
+            unset($data['data']['password']);
+        }
 
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
