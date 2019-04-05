@@ -1,6 +1,6 @@
 ## 1.0.0-beta4
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Wed Apr 03 16:01:01 CEST 2019
+**Date**: Fri Apr 05 16:51:01 CEST 2019
 
 * PACKAGING: [FIX] fixed TUBEE_CONFIG_DIR in docker image to /etc/tubee
 * API: [FIX] Argument 5 passed to Tubee\DataObject\Factory::watch() must be of the type integer or null, boolean given
