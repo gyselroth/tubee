@@ -14,6 +14,20 @@ namespace Tubee;
 class Helper
 {
     /**
+     * Propper json_decode.
+     */
+    public static function jsonDecode($data, $options)
+    {
+        $result = json_decode($data, $options);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new Exception\InvalidJson('failed to decode json; error '.json_last_error());
+        }
+
+        return $result;
+    }
+
+    /**
      * Get array value by string path.
      */
     public static function getArrayValue(Iterable $array, string $path, string $separator = '.')

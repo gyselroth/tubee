@@ -310,7 +310,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
             return null;
         }
 
-        return json_decode(stripslashes($this->parseAttribute($this->filter_one, $object)), true);
+        return Helper::jsonDecode(stripslashes($this->parseAttribute($this->filter_one, $object)), true);
     }
 
     /**
@@ -322,7 +322,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
             return null;
         }
 
-        return json_decode(stripslashes($this->filter_all), true);
+        return Helper::jsonDecode(stripslashes($this->filter_all), true);
     }
 
     /**

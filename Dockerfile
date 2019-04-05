@@ -83,7 +83,7 @@ RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \
   && sed 's/unix:\/run\/php\/php7.2-fpm.sock/127.0.0.1:9000/g' -i /etc/nginx/conf.d/tubee.conf
 
 ENV TUBEE_PATH /usr/share/tubee
-ENV TUBEE_DIR_CONFIG /etc/tubee
+ENV TUBEE_CONFIG_DIR /etc/tubee
 
 EXPOSE 443 9000
 CMD service nginx start && php-fpm;

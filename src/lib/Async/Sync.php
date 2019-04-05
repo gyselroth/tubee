@@ -254,7 +254,7 @@ class Sync extends AbstractJob
 
             foreach ($endpoints as $ep) {
                 $identifier = $ep->getIdentifier();
-                $this->logger->info('start expot to destination endpoint ['.$identifier.']', [
+                $this->logger->info('start export to destination endpoint ['.$identifier.']', [
                     'category' => get_class($this),
                 ]);
 

@@ -89,7 +89,7 @@ class Objects
         $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
 
         if (isset($query['watch'])) {
-            $cursor = $this->object_factory->watch($collection, null, true, $query['query'], false, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            $cursor = $this->object_factory->watch($collection, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }

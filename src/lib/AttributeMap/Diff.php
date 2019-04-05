@@ -25,7 +25,7 @@ class Diff
             $attr = $value['name'];
             $exists = isset($endpoint_object[$attr]);
 
-            if ($value['ensure'] === AttributeMapInterface::ENSURE_EXISTS && ($exists === true || !isset($object[$attr]))) {
+            if ($value['writeonly'] === true || $value['ensure'] === AttributeMapInterface::ENSURE_EXISTS && ($exists === true || !isset($object[$attr]))) {
                 continue;
             }
             if (($value['ensure'] === AttributeMapInterface::ENSURE_LAST || $value['ensure'] === AttributeMapInterface::ENSURE_EXISTS) && isset($object[$attr])) {

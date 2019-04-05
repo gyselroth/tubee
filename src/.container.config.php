@@ -115,6 +115,10 @@ return [
         'calls' => [
             [
                 'method' => 'injectDelta',
+                'arguments' => ['delta' => '{'.Migration\AddWriteableAttributeMap::class.'}']
+            ],
+            [
+                'method' => 'injectDelta',
                 'arguments' => ['delta' => '{'.Migration\CoreInstallation::class.'}']
             ],
         ]

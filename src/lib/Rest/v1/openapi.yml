@@ -5196,7 +5196,11 @@ components:
           - array
           - binary
         skip:
-          description: "If tru the attribute does not get stored in the resource object itself. This might be useful if an attribute meant only be used to create resource relations."
+          description: "If true the attribute does not get stored in the resource object itself. This might be useful if an attribute meant to be only to create resource relations."
+          type: boolean
+          default: false
+        writeonly:
+          description: "If true the attribute gets only written intially. Some endpoints might not deliver some attributes like passwords."
           type: boolean
           default: false
         map:
@@ -5224,6 +5228,7 @@ components:
               - absent
             context:
               type: array
+              default: []
               items:
                 type: string
         required:

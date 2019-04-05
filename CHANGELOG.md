@@ -1,3 +1,16 @@
+## 1.0.0-beta4
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Apr 03 16:01:01 CEST 2019
+
+* PACKAGING: [FIX] fixed TUBEE_CONFIG_DIR in docker image to /etc/tubee
+* API: [FIX] Argument 5 passed to Tubee\DataObject\Factory::watch() must be of the type integer or null, boolean given
+* API: [FIX] Argument 2 passed to Tubee\DataObjectRelation\Factory::watch() must implement interface MongoDB\BSON\ObjectIdInterface or be null, array given
+* API: [FIX] Argument 6 passed to Tubee\Resource\Factory::watchFrom() must be of the type integer or null, object given,
+* API: [FIX] Added default empty array to Workflow map.context
+* CORE: [FIX] Invalid json (especially filter_one and filter_all) results now in Exception\InvalidJson
+* CORE: [FEATURE] Added new attribute map option `writeonly` to only apply attributes initially if true
+
+
 ## 1.0.0-beta3
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Apr 03 16:01:01 CEST 2019

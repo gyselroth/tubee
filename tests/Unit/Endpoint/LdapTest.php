@@ -21,6 +21,7 @@ use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception;
 use Tubee\Endpoint\Ldap;
 use Tubee\Endpoint\Ldap\Exception as LdapException;
+use Tubee\Exception\InvalidJson as InvalidJsonException;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class LdapTest extends TestCase
@@ -96,7 +97,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => '(uid={uid)']],
+            'data' => ['options' => ['filter_one' => '{"uid":"test"}']],
         ]);
 
         $result = $ldap->getOne([])->getData();
@@ -105,7 +106,7 @@ class LdapTest extends TestCase
 
     public function testGetOneMultipleFound()
     {
-        $this->expectException(Exception\ObjectMultipleFound::class);
+        $this->expectException(InvalidJsonException::class);
         $search = $this->createMock(LdapResult::class);
         $search->method('countEntries')->willReturn(2);
 
@@ -129,7 +130,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => '(uid={uid)']],
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
         ]);
 
         $result = $ldap->getOne([])->getData();
