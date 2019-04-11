@@ -187,10 +187,6 @@ class Ldap extends AbstractEndpoint
         $object = array_change_key_case($object);
         $dn = $this->getDn($object, $endpoint_object);
 
-        if (isset($diff['entrydn'])) {
-            unset($diff['entrydn']);
-        }
-
         $this->logChange($dn, $diff);
 
         if ($dn !== $endpoint_object['entrydn']) {
@@ -299,6 +295,10 @@ class Ldap extends AbstractEndpoint
     {
         $result = [];
         foreach ($diff as $attribute => $update) {
+            if ($attribute === 'entrydn') {
+                continue;
+            }
+
             switch ($update['action']) {
                 case AttributeMapInterface::ACTION_REPLACE:
                     $result[] = [
@@ -363,7 +363,7 @@ class Ldap extends AbstractEndpoint
                 continue;
             }
             if ($key === 'dn') {
-                $object['entrydn'] = $attr;
+                $object['entrydn'] = strtolower($attr);
             } elseif (!is_int($key)) {
                 if ($attr['count'] === 1) {
                     if (preg_match('~[^\x20-\x7E\t\r\n]~', $attr[0]) > 0) {

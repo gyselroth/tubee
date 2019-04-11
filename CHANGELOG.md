@@ -1,3 +1,14 @@
+## 1.0.0-beta5
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Apr 11 10:51:01 CEST 2019
+
+* CORE: [CHANGE] log endpoint object during import/export workflows
+* CORE: [FIX] ODataRest endpoint does not required specific declaration of the id
+* CORE: [FIX] LdapEndpoint entrydn is now always lowercase
+* CORE: [FIX] ignore ldap entrydn in diff
+* CORE: [FEATURE] new option `active` for jobs. jobs may be enabled/disabled.
+
+
 ## 1.0.0-beta4
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Apr 05 16:51:01 CEST 2019

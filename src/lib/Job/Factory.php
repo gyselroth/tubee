@@ -14,6 +14,7 @@ namespace Tubee\Job;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
+use Psr\Log\LoggerInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Async\Sync;
 use Tubee\Job;
@@ -65,15 +66,23 @@ class Factory
     protected $log_factory;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, ResourceFactory $resource_factory, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory)
+    public function __construct(Database $db, ResourceFactory $resource_factory, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->resource_factory = $resource_factory;
         $this->scheduler = $scheduler;
         $this->process_factory = $process_factory;
         $this->log_factory = $log_factory;
+        $this->logger = $logger;
     }
 
     /**
@@ -114,6 +123,11 @@ class Factory
             try {
                 $this->scheduler->cancelJob($task['_id']);
             } catch (\Exception $e) {
+                $this->logger->error('failed to cancel job [{job}]', [
+                    'category' => get_class($this),
+                    'exception' => $e,
+                    'job' => $task['_id'],
+                ]);
             }
         }
 
@@ -160,7 +174,9 @@ class Factory
             'job' => $resource['name'],
         ];
 
-        $this->scheduler->addJob(Sync::class, $resource['data'], $resource['data']['options']);
+        if ($resource['data']['active'] === true) {
+            $this->scheduler->addJob(Sync::class, $resource['data'], $resource['data']['options']);
+        }
 
         return $result;
     }
@@ -192,7 +208,26 @@ class Factory
             'namespace' => $resource->getResourceNamespace()->getName(),
         ];
 
-        $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
+        if ($task['data']['active'] === true) {
+            $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
+        } else {
+            $tasks = $this->scheduler->getJobs([
+                'data.namespace' => $resource->getResourceNamespace()->getName(),
+                'data.job' => $resource->getName(),
+            ]);
+
+            foreach ($tasks as $task) {
+                try {
+                    $this->scheduler->cancelJob($task['_id']);
+                } catch (\Exception $e) {
+                    $this->logger->error('failed to cancel job [{job}]', [
+                        'category' => get_class($this),
+                        'exception' => $e,
+                        'job' => $task['_id'],
+                    ]);
+                }
+            }
+        }
 
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }

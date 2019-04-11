@@ -4031,6 +4031,7 @@ components:
                 filter: []
                 ignore: true
                 simulate: false
+                active: false
                 log_level: error
                 options:
                   at: 0
@@ -4086,6 +4087,10 @@ components:
                     continue with the process.
                   type: boolean
                   default: true
+                active:
+                  description: If true the job gets queued and executed. By default jobs are disabled initially.
+                  type: boolean
+                  default: false
                 simulate:
                   description: Dry run mode. Job runs normally but does not do any changes.
                   type: boolean

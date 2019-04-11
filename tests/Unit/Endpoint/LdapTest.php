@@ -230,6 +230,22 @@ class LdapTest extends TestCase
         $this->assertSame($expected, $result);
     }
 
+    public function testGetDiffIgnoreEntrydn()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $diff = [
+            'entrydn' => [
+                'action' => AttributeMapInterface::ACTION_REPLACE,
+                'value' => 'foo',
+            ],
+        ];
+
+        $result = $ldap->getDiff($this->createMock(AttributeMapInterface::class), $diff);
+        $expected = [];
+
+        $this->assertSame($expected, $result);
+    }
+
     public function testCreateObject()
     {
         $client = $this->createMock(LdapClient::class);

@@ -132,8 +132,9 @@ class ExportWorkflow extends Workflow
      */
     protected function ensureExists(DataObjectInterface $object, array $map, UTCDateTimeInterface $ts, bool $simulate = false)
     {
-        $this->logger->info('create new object on endpoint ['.$this->endpoint->getIdentifier().']', [
+        $this->logger->info('create new object {object} on endpoint ['.$this->endpoint->getIdentifier().']', [
             'category' => get_class($this),
+            'object' => $map,
         ]);
 
         $result = $this->endpoint->create($this->attribute_map, $map, $simulate);
@@ -184,13 +185,14 @@ class ExportWorkflow extends Workflow
     {
         try {
             if ($this->endpoint->flushRequired()) {
-                $exists = null;
-            } else {
-                $exists = $this->endpoint->getOne($map, $this->attribute_map->getAttributes());
+                return null;
             }
 
-            $this->logger->debug('found existing object on destination endpoint with provided filter_one', [
+            $exists = $this->endpoint->getOne($map, $this->attribute_map->getAttributes());
+
+            $this->logger->debug('found existing object {object} on destination endpoint with provided filter_one', [
                 'category' => get_class($this),
+                'object' => $exists->getData(),
             ]);
 
             return $exists;

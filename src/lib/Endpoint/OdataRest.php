@@ -93,8 +93,10 @@ class OdataRest extends AbstractRest
 
         $options = $this->getRequestOptions();
         $options['query']['$filter'] = $filter;
+        $attributes[] = $this->identifier;
         $options['query']['$select'] = join(',', $attributes);
         $result = $this->client->get('', $options);
+
         $data = $this->getResponse($result);
 
         if (count($data) > 1) {
