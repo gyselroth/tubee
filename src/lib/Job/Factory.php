@@ -121,12 +121,12 @@ class Factory
 
         foreach ($tasks as $task) {
             try {
-                $this->scheduler->cancelJob($task['_id']);
+                $this->scheduler->cancelJob($task->getId());
             } catch (\Exception $e) {
                 $this->logger->error('failed to cancel job [{job}]', [
                     'category' => get_class($this),
                     'exception' => $e,
-                    'job' => $task['_id'],
+                    'job' => $task->getId(),
                 ]);
             }
         }
@@ -211,19 +211,19 @@ class Factory
         if ($data['data']['active'] === true) {
             $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
         } else {
-            $tasks = $this->scheduler->getJobs([
+            $procs = $this->scheduler->getJobs([
                 'data.namespace' => $resource->getResourceNamespace()->getName(),
                 'data.job' => $resource->getName(),
             ]);
 
-            foreach ($tasks as $task) {
+            foreach ($procs as $proc) {
                 try {
-                    $this->scheduler->cancelJob($task['_id']);
+                    $this->scheduler->cancelJob($proc->getId());
                 } catch (\Exception $e) {
                     $this->logger->error('failed to cancel job [{job}]', [
                         'category' => get_class($this),
                         'exception' => $e,
-                        'job' => $task['_id'],
+                        'job' => $proc->getId(),
                     ]);
                 }
             }

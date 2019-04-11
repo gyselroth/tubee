@@ -151,6 +151,10 @@ class AttributeMap implements AttributeMapInterface
                 }
             }
 
+            if (isset($value['type']) && $value['type'] === AttributeMapInterface::TYPE_ARRAY) {
+                $unwind = array_values($unwind);
+            }
+
             $attrv = $unwind;
         }
 

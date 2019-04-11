@@ -1,3 +1,11 @@
+## 1.0.0-beta7
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Apr 11 17:11:01 CEST 2019
+
+* CORE: [FIX] attributes of type array and unwind will now be properly converted to a list
+* CORE: [FIX] fixed cancel process after setting job active to false
+
+
 ## 1.0.0-beta6
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Apr 11 15:51:01 CEST 2019
