@@ -1,3 +1,12 @@
+## 1.0.0-beta6
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Apr 11 15:51:01 CEST 2019
+
+* CORE: [CHANGE] attribute map type array converts to real numeric array
+* CORE: [FIX] Undefined index: data in PATCH update job
+* CORE: [CHANGE] creating dataobject relations on thy fly may now match multiple objects to create relations to
+
+
 ## 1.0.0-beta5
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Apr 11 10:51:01 CEST 2019

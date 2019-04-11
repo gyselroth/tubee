@@ -134,7 +134,6 @@ class ExportWorkflow extends Workflow
     {
         $this->logger->info('create new object {object} on endpoint ['.$this->endpoint->getIdentifier().']', [
             'category' => get_class($this),
-            'object' => $map,
         ]);
 
         $result = $this->endpoint->create($this->attribute_map, $map, $simulate);

@@ -208,7 +208,7 @@ class Factory
             'namespace' => $resource->getResourceNamespace()->getName(),
         ];
 
-        if ($task['data']['active'] === true) {
+        if ($data['data']['active'] === true) {
             $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
         } else {
             $tasks = $this->scheduler->getJobs([

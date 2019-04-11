@@ -181,30 +181,32 @@ class ImportWorkflow extends Workflow
 
             $namespace = $this->endpoint->getCollection()->getResourceNamespace();
             $collection = $namespace->getCollection($definition['map']['collection']);
-            $relative = $collection->getObject([
+            $relatives = $collection->getObjects([
                 $definition['map']['to'] => $data[$definition['name']],
             ]);
 
-            $this->logger->debug('ensure relation state ['.$definition['map']['ensure'].'] for relation to ['.$relative->getId().']', [
-                'category' => get_class($this),
-            ]);
+            foreach ($relatives as $relative) {
+                $this->logger->debug('ensure relation state ['.$definition['map']['ensure'].'] for relation to ['.$relative->getId().']', [
+                    'category' => get_class($this),
+                ]);
 
-            switch ($definition['map']['ensure']) {
-                case WorkflowInterface::ENSURE_EXISTS:
-                case WorkflowInterface::ENSURE_LAST:
-                    $context = array_intersect_key($data, array_flip($definition['map']['context']));
-                    $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
-                    $collection = $this->endpoint->getCollection()->getName();
-                    $ep = $this->endpoint->getName();
+                switch ($definition['map']['ensure']) {
+                    case WorkflowInterface::ENSURE_EXISTS:
+                    case WorkflowInterface::ENSURE_LAST:
+                        $context = array_intersect_key($data, array_flip($definition['map']['context']));
+                        $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
+                        $collection = $this->endpoint->getCollection()->getName();
+                        $ep = $this->endpoint->getName();
 
-                    $endpoints = [
-                        join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
-                    ];
+                        $endpoints = [
+                            join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
+                        ];
 
-                    $object->createOrUpdateRelation($relative, $context, $simulate, $endpoints);
+                        $object->createOrUpdateRelation($relative, $context, $simulate, $endpoints);
 
-                break;
-                default:
+                    break;
+                    default:
+                }
             }
         }
 
