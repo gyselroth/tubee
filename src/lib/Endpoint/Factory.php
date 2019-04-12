@@ -164,7 +164,7 @@ class Factory
         try {
             $endpoint->transformQuery();
         } catch (\Throwable $e) {
-            throw new Exception\InvalidFilter('filters must be tubee (MongoDb) compatible dql');
+            throw new Exception\InvalidFilter('filters must be tubee (MongoDB) compatible dql');
         }
 
         $endpoint->setup();
@@ -190,6 +190,10 @@ class Factory
         $data = $this->secret_factory->resolve($resource->getCollection()->getResourceNamespace(), $data);
         $data = $this->resource_factory->validate($data);
         $data = Validator::validate($data);
+
+        if ($data['data']['type'] === EndpointInterface::TYPE_SOURCE) {
+            $this->ensureIndex($resource->getCollection(), $data['data']['options']['import']);
+        }
 
         foreach ($data['secrets'] as $secret) {
             $data = Helper::deleteArrayValue($data, $secret['to']);

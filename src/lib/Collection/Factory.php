@@ -152,7 +152,10 @@ class Factory
 
         $resource['namespace'] = $namespace->getName();
 
-        return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        $id = $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
+        $this->ensureIndex($this->getOne($namespace, $resource['name']), ['name'], ['unique' => true]);
+
+        return $id;
     }
 
     /**
@@ -187,5 +190,37 @@ class Factory
         $schema = new Schema($resource['data']['schema'], $this->logger);
 
         return $this->resource_factory->initResource(new Collection($resource['name'], $namespace, $this->endpoint_factory, $this->object_factory, $schema, $this->logger, $resource));
+    }
+
+    /**
+     * Ensure indexes.
+     */
+    protected function ensureIndex(CollectionInterface $collection, array $fields, array $options = []): string
+    {
+        $list = iterator_to_array($this->db->{$collection->getCollection()}->listIndexes());
+        $keys = array_fill_keys($fields, 1);
+
+        $this->logger->debug('verify if mongodb index exists for fields [{import}]:[{options}]', [
+            'category' => get_class($this),
+            'import' => $keys,
+            'options' => $options,
+        ]);
+
+        foreach ($list as $index) {
+            if ($index['key'] === $keys) {
+                $this->logger->debug('found existing mongodb index ['.$index['name'].']', [
+                    'category' => get_class($this),
+                    'fields' => $keys,
+                ]);
+
+                return $index['name'];
+            }
+        }
+
+        $this->logger->info('create new mongodb index', [
+            'category' => get_class($this),
+        ]);
+
+        return $this->db->{$collection->getCollection()}->createIndex($keys, $options);
     }
 }

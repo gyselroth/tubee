@@ -16,6 +16,7 @@ use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObject\Exception\NotFound;
 use Tubee\DataObjectRelation;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
@@ -151,9 +152,18 @@ class Factory
                 $related = $object_2;
             }
 
-            $related = $object->getCollection()->getResourceNamespace()->switch($related['namespace'])->getCollection($related['collection'])->getObject(['name' => $related['object']]);
+            try {
+                $related = $object->getCollection()->getResourceNamespace()->switch($related['namespace'])->getCollection($related['collection'])->getObject(['name' => $related['object']]);
 
-            return $that->build($resource, $related);
+                return $that->build($resource, $related);
+            } catch (NotFound $e) {
+                $that->logger->error('could not resolve related dataobject, drop relation', [
+                    'category' => get_class($this),
+                    'exception' => $e,
+                ]);
+
+                $that->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource['_id']);
+            }
         });
     }
 
@@ -278,6 +288,9 @@ class Factory
         return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
+    /**
+     * Update.
+     */
     public function update(DataObjectRelationInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
@@ -287,6 +300,9 @@ class Factory
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
+    /**
+     * Delete one.
+     */
     public function deleteOne(DataObjectRelationInterface $relation, bool $simulate = false): bool
     {
         $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $relation->getId());

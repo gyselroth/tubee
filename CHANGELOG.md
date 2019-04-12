@@ -1,5 +1,17 @@
 ## 1.0.0-beta7
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Apr 11 17:11:01 CEST 2019
+
+* CORE: [FIX] automatically drop unresolvable relations and do not throw exception if such events occur during relation resolving
+* CORE: [CHANGE] Add index for field name during collection creation
+* CORE: [CHANGE] ensure index for import fields after updating endpoint
+* CORE: [FIX] workflow priority ordner, 0 first
+* CORE: [FIX] fixed getAll during ldap query if filter_all is null
+* CORE: [FIX] fixed ldap endpoint non utf-8 data encoding
+
+
+## 1.0.0-beta7
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Apr 11 17:11:01 CEST 2019
 
 * CORE: [FIX] attributes of type array and unwind will now be properly converted to a list

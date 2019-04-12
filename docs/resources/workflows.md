@@ -87,7 +87,7 @@ This workflow only gets executed if the object has a property `disabled` with a 
 
 Besides a condition and the ensure type there is possibility to set a priority in which order the workflows get tested.
 By default each workflow has the priority `0`.
-`0` is the highest priority. A workflow with the priority `0` gets tested before a worklfow with the priority `2`.
+`0` is the highest priority. A workflow with the priority `0` gets executed before a worklfow with the priority `2`.
 
 ## Mapping
 
