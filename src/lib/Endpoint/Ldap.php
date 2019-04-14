@@ -355,6 +355,22 @@ class Ldap extends AbstractEndpoint
     }
 
     /**
+     * Normalize dn.
+     */
+    protected function normalizeDn(string $dn): string
+    {
+        $parts = explode(',', $dn);
+        $normalized = [];
+
+        foreach ($parts as $part) {
+            $subs = explode('=', $part);
+            $normalized[] = strtolower($subs[0]).'='.$subs[1];
+        }
+
+        return join(',', $normalized);
+    }
+
+    /**
      * Prepare object.
      */
     protected function prepareRawObject(array $result): array
@@ -366,7 +382,7 @@ class Ldap extends AbstractEndpoint
             }
 
             if ($key === 'dn') {
-                $object['entrydn'] = strtolower($attr);
+                $object['entrydn'] = $this->normalizeDn($attr);
             } elseif (!is_int($key)) {
                 if ($attr['count'] === 1) {
                     if (json_encode($attr[0]) === false) {

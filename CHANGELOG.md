@@ -1,6 +1,6 @@
 ## 1.0.0-beta7
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Fri Apr 11 17:11:01 CEST 2019
+**Date**: Sub Apr 14 15:04:01 CEST 2019
 
 * CORE: [FIX] automatically drop unresolvable relations and do not throw exception if such events occur during relation resolving
 * CORE: [CHANGE] Add index for field name during collection creation
@@ -8,6 +8,7 @@
 * CORE: [FIX] workflow priority ordner, 0 first
 * CORE: [FIX] fixed getAll during ldap query if filter_all is null
 * CORE: [FIX] fixed ldap endpoint non utf-8 data encoding
+* CORE: [FIX] normalize ldap dn (ignore case of dn attribute parts)
 
 
 ## 1.0.0-beta7

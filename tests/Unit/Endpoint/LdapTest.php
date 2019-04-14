@@ -104,6 +104,29 @@ class LdapTest extends TestCase
         $this->assertSame(['uid' => 'foo'], $result);
     }
 
+    public function testGetOneBinaryAttributeBase64()
+    {
+        $string = openssl_random_pseudo_bytes(10);
+        $search = $this->createMock(LdapResult::class);
+        $search->method('countEntries')->willReturn(1);
+        $search->method('getEntries')->willReturn([
+            ['foo' => [
+                'count' => 1,
+                0 => $string,
+            ]],
+        ]);
+
+        $client = $this->createMock(LdapClient::class);
+        $client->method('ldapSearch')->willReturn($search);
+
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"test"}']],
+        ]);
+
+        $result = $ldap->getOne([])->getData();
+        $this->assertSame(['foo' => base64_encode($string)], $result);
+    }
+
     public function testGetOneMultipleFound()
     {
         $this->expectException(InvalidJsonException::class);
@@ -509,6 +532,32 @@ class LdapTest extends TestCase
             'entrydn' => 'uid=foo,ou=foo',
             'foo' => 'foo',
         ];
+
+        $diff = [];
+
+        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+        $this->assertSame('uid=foo,ou=bar', $result);
+    }
+
+    public function testDontMoveObjectIfCaseNotMatch()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->never())->method('rename');
+
+        $search = $this->createMock(LdapResult::class);
+        $search->method('countEntries')->willReturn(1);
+        $search->method('getEntries')->willReturn([
+            ['dn' => 'UID=foo,OU=bar'],
+        ]);
+
+        $client->method('ldapSearch')->willReturn($search);
+
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+        ];
+
+        $ep_object = $ldap->getOne([])->getData();
 
         $diff = [];
 
