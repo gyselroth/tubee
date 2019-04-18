@@ -83,7 +83,7 @@ class Acl
                 'category' => get_class($this),
             ]);
 
-            throw new Exception\NotAllowed('Not allowed to call this resource');
+            throw new Exception\NotAllowed('not allowed to call this resource');
         }
 
         $rules = $this->rule_factory->getAll([
@@ -131,7 +131,7 @@ class Acl
             'roles' => $names,
         ]);
 
-        throw new Exception\NotAllowed('Not allowed to call this resource');
+        throw new Exception\NotAllowed('not allowed to call this resource');
     }
 
     /**

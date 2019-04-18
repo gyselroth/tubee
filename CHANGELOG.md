@@ -1,4 +1,12 @@
-## 1.0.0-beta7
+## 1.0.0-beta9
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Sub Apr 18 11:34:01 CEST 2019
+
+* CORE: [FIX] Ldap auth adapter dremscape dependency is no correctly recreated for every ldap auth adapter
+* CORE: [FIX] Allow calls to /api and /api/v1 for everyone if authenticated
+
+
+## 1.0.0-beta8
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Sub Apr 14 15:04:01 CEST 2019
 

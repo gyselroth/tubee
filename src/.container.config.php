@@ -39,8 +39,12 @@ use Tubee\V8\Engine as V8Engine;
 use Psr\SimpleCache\CacheInterface;
 use Cache\Adapter\Void\VoidCachePool;
 use Cache\Adapter\Apcu\ApcuCachePool;
+use Dreamscapes\Ldap\Core\Ldap as DreamscapesLdap;
 
 return [
+    DreamscapesLdap::class => [
+        'singleton' => false
+    ],
     Dispatcher::class => [
         'arguments' => [
             'stack' => [
