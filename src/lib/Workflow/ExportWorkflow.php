@@ -63,7 +63,7 @@ class ExportWorkflow extends Workflow
 
         switch ($ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                return $this->ensureAbsent($exists, $map, $simulate);
+                return $this->ensureAbsent($object, $exists, $map, $simulate);
             case WorkflowInterface::ENSURE_EXISTS:
                 return $this->ensureExists($object, $map, $ts, $simulate);
             default:
@@ -153,13 +153,21 @@ class ExportWorkflow extends Workflow
     /**
      * Remove object from endpoint.
      */
-    protected function ensureAbsent(EndpointObjectInterface $exists, array $map, bool $simulate = false)
+    protected function ensureAbsent(DataObjectInterface $object, EndpointObjectInterface $exists, array $map, bool $simulate = false)
     {
         $this->logger->info('delete existing object from endpoint ['.$this->endpoint->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
         $this->endpoint->delete($this->attribute_map, $map, $exists->getData(), $simulate);
+
+        $endpoints = [
+            $this->endpoint->getName() => [
+                'garbage' => true,
+            ],
+        ];
+
+        $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
 
         return true;
     }
