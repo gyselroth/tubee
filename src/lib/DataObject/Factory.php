@@ -72,6 +72,9 @@ class Factory
         ]) > 0;
     }
 
+    /**
+     * Get object history.
+     */
     public function getObjectHistory(CollectionInterface $collection, ObjectIdInterface $id, ?array $filter = null, ?int $offset = null, ?int $limit = null): Generator
     {
         $pipeline = [
@@ -101,10 +104,13 @@ class Factory
         }
 
         $count[] = ['$count' => 'count'];
-        //return $this->db->{$collection->getCollection()}->aggregate($count)['count'];
+
         return 1;
     }
 
+    /**
+     * Get one.
+     */
     public function getOne(CollectionInterface $collection, array $filter, bool $include_dataset = true, int $version = 0): DataObjectInterface
     {
         $this->logger->debug('find one object with query [{query}] from ['.$collection->getCollection().']', [
@@ -128,6 +134,9 @@ class Factory
         return $this->build(array_shift($objects), $collection);
     }
 
+    /**
+     * Get all.
+     */
     public function getAll(CollectionInterface $collection, ?array $query = null, bool $include_dataset = true, ?int $offset = 0, ?int $limit = 0, ?array $sort = ['$natural' => -1]): Generator
     {
         $that = $this;
@@ -137,6 +146,9 @@ class Factory
         });
     }
 
+    /**
+     * Create.
+     */
     public function create(CollectionInterface $collection, array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $collection->getSchema()->validate((array) $object['data']);
@@ -161,6 +173,9 @@ class Factory
         return $this->resource_factory->addTo($this->db->{$collection->getCollection()}, $object, $simulate);
     }
 
+    /**
+     * Update.
+     */
     public function update(CollectionInterface $collection, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
     {
         $collection->getSchema()->validate((array) $data['data']);
@@ -173,6 +188,9 @@ class Factory
         return $this->resource_factory->updateIn($this->db->{$collection->getCollection()}, $object, $data, $simulate);
     }
 
+    /**
+     * Delete one.
+     */
     public function deleteOne(CollectionInterface $collection, string $name, bool $simulate = false): bool
     {
         $resource = $this->getOne($collection, ['name' => $name]);
@@ -180,6 +198,9 @@ class Factory
         return $this->resource_factory->deleteFrom($this->db->{$collection->getCollection()}, $resource->getId(), $simulate);
     }
 
+    /**
+     * Delete all.
+     */
     public function deleteAll(CollectionInterface $collection, bool $simulate = false): bool
     {
         $this->logger->info('flush collection ['.$collection->getIdentifier().']', [

@@ -1,6 +1,14 @@
+## 1.0.0-beta10
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue May 07 12:06:12 CEST 2019
+
+* CORE: [FIX] Undefined property: Tubee\DataObjectRelation\Factory::$logger in /usr/share/tubee/src/lib/DataObjectRelation/Factory.php:160
+* CORE: [FIX] nullable endpoint result after a seccond sync
+
+
 ## 1.0.0-beta9
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Sub Apr 18 11:34:01 CEST 2019
+**Date**: Sun Apr 18 11:34:01 CEST 2019
 
 * CORE: [FIX] Ldap auth adapter dremscape dependency is no correctly recreated for every ldap auth adapter
 * CORE: [FIX] Allow calls to /api and /api/v1 for everyone if authenticated

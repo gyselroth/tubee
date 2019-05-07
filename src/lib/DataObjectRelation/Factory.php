@@ -15,6 +15,7 @@ use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
+use Psr\Log\LoggerInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Exception\NotFound;
 use Tubee\DataObjectRelation;
@@ -43,12 +44,20 @@ class Factory
     protected $resource_factory;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, ResourceFactory $resource_factory)
+    public function __construct(Database $db, ResourceFactory $resource_factory, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->resource_factory = $resource_factory;
+        $this->logger = $logger;
     }
 
     /**
@@ -157,7 +166,7 @@ class Factory
 
                 return $that->build($resource, $related);
             } catch (NotFound $e) {
-                $that->logger->error('could not resolve related dataobject, drop relation', [
+                $that->logger->error('could not resolve related data object, drop relation', [
                     'category' => get_class($this),
                     'exception' => $e,
                 ]);

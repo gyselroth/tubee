@@ -85,10 +85,9 @@ class ExportWorkflow extends Workflow
 
         $diff = $this->attribute_map->getDiff($map, $exists->getData());
 
-        $endpoints = [$this->endpoint->getName() => [
-            'last_sync' => $ts,
-            'garbage' => false,
-        ]];
+        $endpoints = $object->getEndpoints();
+        $endpoints[$this->endpoint->getName()]['last_sync'] = $ts;
+        $endpoints[$this->endpoint->getName()]['garbage'] = false;
 
         if (count($diff) > 0) {
             $this->logger->info('update object on endpoint ['.$this->endpoint->getIdentifier().'] with attributes [{attributes}]', [
