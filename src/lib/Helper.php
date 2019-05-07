@@ -30,7 +30,7 @@ class Helper
     /**
      * Get array value by string path.
      */
-    public static function getArrayValue(Iterable $array, string $path, string $separator = '.')
+    public static function getArrayValue(iterable $array, string $path, string $separator = '.')
     {
         if (isset($array[$path])) {
             return $array[$path];
@@ -73,7 +73,7 @@ class Helper
     /**
      * Set array value via string path.
      */
-    public static function setArrayValue(Iterable $array, string $path, $value, string $separator = '.')
+    public static function setArrayValue(iterable $array, string $path, $value, string $separator = '.')
     {
         $result = self::pathArrayToAssociative([$path => $value], $separator);
 
@@ -83,7 +83,7 @@ class Helper
     /**
      * Convert assoc array to single array.
      */
-    public static function associativeArrayToPath(Iterable $arr, Iterable $narr = [], $nkey = ''): array
+    public static function associativeArrayToPath(iterable $arr, iterable $narr = [], $nkey = ''): array
     {
         /*if ($nkey !== '') {
             $narr[substr($nkey, 0, -1)] = $arr;
@@ -103,7 +103,7 @@ class Helper
     /**
      * Convert array with keys like a.b to associative array.
      */
-    public static function pathArrayToAssociative(Iterable $array, string $separator = '.'): array
+    public static function pathArrayToAssociative(iterable $array, string $separator = '.'): array
     {
         $out = [];
         foreach ($array as $key => $val) {

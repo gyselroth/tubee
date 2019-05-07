@@ -261,7 +261,7 @@ class AttributeMap implements AttributeMapInterface
     /**
      * Shift first array element.
      */
-    protected function firstArrayElement(Iterable $value, string $attribute)
+    protected function firstArrayElement(iterable $value, string $attribute)
     {
         if (empty($value)) {
             return $value;

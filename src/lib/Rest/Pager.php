@@ -21,7 +21,7 @@ class Pager
     /**
      * Pager.
      */
-    public static function fromRequest(Iterable $data, ServerRequestInterface $request): array
+    public static function fromRequest(iterable $data, ServerRequestInterface $request): array
     {
         $query = array_merge([
             'offset' => 0,

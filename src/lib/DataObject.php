@@ -81,7 +81,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * {@inheritdoc}
      */
-    public function getHistory(?array $query = null, ?int $offset = null, ?int $limit = null): Iterable
+    public function getHistory(?array $query = null, ?int $offset = null, ?int $limit = null): iterable
     {
         return $this->collection->getObjectHistory($this->getId(), $query, $offset, $limit);
     }
