@@ -203,13 +203,13 @@ class Sync extends AbstractJob
     /**
      * Decode filter.
      */
-    protected function getFilter(): ?string
+    protected function getFilter(): array
     {
         if ($this->data['filter'] === null) {
-            return null;
+            return [];
         }
 
-        return json_decode($this->data['filter']);
+        return (array) json_decode($this->data['filter']);
     }
 
     /**

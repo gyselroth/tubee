@@ -1,3 +1,10 @@
+## 1.0.0-beta12
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed May 08 17:06:12 CEST 2019
+
+* CORE: [FIX] TypeError: Argument 2 passed to Tubee\Async\Sync::export() must be of the type array, null given
+
+
 ## 1.0.0-beta11
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed May 08 15:06:12 CEST 2019
