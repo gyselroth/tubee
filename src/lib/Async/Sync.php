@@ -188,9 +188,9 @@ class Sync extends AbstractJob
         ]);
 
         if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
-            $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+            $this->import($collection, $this->getFilter(), ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
         } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-            $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+            $this->export($collection, $this->getFilter(), ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
         } else {
             $this->logger->warning('skip endpoint ['.$endpoint->getIdentifier().'], endpoint type is neither source nor destination', [
                 'category' => get_class($this),
@@ -198,6 +198,18 @@ class Sync extends AbstractJob
         }
 
         $this->logger->popProcessor();
+    }
+
+    /**
+     * Decode filter.
+     */
+    protected function getFilter(): ?string
+    {
+        if ($this->data['filter'] === null) {
+            return null;
+        }
+
+        return json_decode($this->data['filter']);
     }
 
     /**
@@ -387,7 +399,14 @@ class Sync extends AbstractJob
                 }
             }
 
-            $this->garbageCollector($collection, $ep, $simulate, $ignore);
+            if (empty($filter)) {
+                $this->garbageCollector($collection, $ep, $simulate, $ignore);
+            } else {
+                $this->logger->info('skip garbage collection, a query has been issued for import', [
+                    'category' => get_class($this),
+                ]);
+            }
+
             $ep->shutdown($simulate);
         }
 

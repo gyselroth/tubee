@@ -4028,7 +4028,7 @@ components:
                   receiver: []
                 collections: []
                 endpoints: []
-                filter: []
+                filter: null
                 ignore: true
                 simulate: false
                 active: false
@@ -4079,9 +4079,10 @@ components:
                   default:
                     []
                 filter:
-                  description: Data object filter.
-                  default: []
-                  type: object
+                  description: JSON encoded data object filter.
+                  default: null
+                  nullable: true
+                  type: string
                 ignore:
                   description: If enabled the server does ignores any sync errors and
                     continue with the process.
