@@ -72,6 +72,7 @@ class Factory
         $filter = [
             'status' => ['$exists' => true],
             'data.namespace' => $namespace->getName(),
+            'class' => ['$ne' => 'dummy'],
         ];
 
         if (!empty($query)) {

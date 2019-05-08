@@ -2,6 +2,9 @@ site_name: tubee
 theme: readthedocs
 extra_css:
  - css/extra.css
+markdown_extensions:
+- markdown_include.include:
+    base_path: .
 nav:
  - Home: index.md
  - Overwiew: overview.md
@@ -23,7 +26,8 @@ nav:
     - Jobs: resources/jobs.md
  - Installation:
     - Server: installation/server.md
- - AdvancedTopics:
+ - Advanced:
+    - tubectl config: advanced/tubectl-config.md
     - Best Practics: advanced/best-practics.md
     - Scripting: advanced/scripting.md
  - Development:

@@ -57,7 +57,7 @@ tubee is a data management engine with proxy capabilities for other services and
 Visit [https://tubee.readthedocs.io](https://tubee.readthedocs.io) to get started!
 
 ## Changelog
-A changelog is available [here](https://github.com/gyselroth/tubee/CHANGELOG.md).
+A changelog is available [here](https://github.com/gyselroth/tubee/blob/master/CHANGELOG.md).
 
 ## Contribute
 We are glad that you would like to contribute to this project. Please follow the given [terms](https://github.com/gyselroth/tubee/blob/master/CONTRIBUTING.md).

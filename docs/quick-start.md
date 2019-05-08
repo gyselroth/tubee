@@ -56,7 +56,9 @@ tubectl
 
   Options:
 
-    -c, --config <file>  Specify the config for the client (If different than ~/.tubee/config)
+    -f, --config <file>   Specify the config for the client (If different than ~/.tubee/config)
+    -c, --context <name>  Specify a tubee context (Using a different tubee environement)
+    -d, --debug           Print request in verbose mode)
 
 
   Commands:

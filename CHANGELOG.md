@@ -7,6 +7,8 @@
 * CORE: [FIX] MongoDB\Driver\Exception\BulkWriteException: WiredTigerIndex::insert: key too large to index, failing 1134
 * CORE: [CHANE] throw Tubee\Workflow\Exception\ImportConditionNotMet if source data objects are not unique
 * CORE: [FIX] sort operation does not work for sorting data object, endpoint, collection resources
+* CORE: [FIX] Method `StreamIterator\StreamIterator::__toString()` must not throw an exception, caught ErrorException: Undefined index: created in
+* API: [CHANGE] If authentication failed a 401 gets returned instead of a 500
 
 
 ## 1.0.0-beta10

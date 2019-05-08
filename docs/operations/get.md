@@ -134,10 +134,7 @@ For example to query all collections in the namespace foo:
 tubectl get co -n foo
 ```
 
-You may configure a different namespace by using tubectl config.
-```
-tubectl edit config defaultNamespace foo
-```
+You may configure a different default namespace by using `tubectl edit config`.
 
 ## Tail resources
 By default tubecli lists the latest 20 resources ordered by created date/time. Meaning the first record is the newest one and the last the oldest (If not more than 20 resources of the requested type are available). By using `-t` or `--tail` accordingly the output is reversed. Meaning the last record is the newest and the first the oldest (Again, if there are not more than 20 resources available of that type.)
