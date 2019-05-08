@@ -2,7 +2,7 @@
 
 `tubectl get` knows various different options to request the resources you actually want. 
 First you need to specify the type of resource you want to query (`tubectl get <resource> [name]`). 
-This will list the latest 100 resources of the requested type in a pretty table. By default the tubee server orders its resource by the created date/time of the resource.
+This will list the latest 20 resources of the requested type in a pretty table. By default the tubee server orders its resource by the created date/time of the resource.
 
 ```
 tubectl get ns
@@ -71,14 +71,14 @@ which results in a yaml style output:
 kind: List
 _links:
   self:
-    href: 'https://localhost:8090/api/v1/namespaces?offset=0&limit=100'
+    href: 'https://localhost:8090/api/v1/namespaces?offset=0&limit=20'
 count: 1
 total: 1
 data:
   - _links:
       self:
         href: >-
-          https://localhost:8090/api/v1/namespaces?query=%7B%7D&offset=NaN&limit=100&sort=%7B%7D
+          https://localhost:8090/api/v1/namespaces?query=%7B%7D&offset=NaN&limit=20&sort=%7B%7D
     kind: Namespace
     id: 5bd1a94b035418001a337722
     name: foo
@@ -104,7 +104,7 @@ tubectl get ep playground foo -o cc="Name:name,Endpoint Type:data.type"
 ```
 
 ## Query & search resources
-Usually the latest 100 resources are not enaugh to work with. By using the option `-q` or `--field-selector` you may find the needed resource.
+Usually the latest 20 resources are not enaugh to work with. By using the option `-q` or `--field-selector` you may find the needed resource.
 Like the sort operation a query works in the format key=value and may be delimited by `,`. Keep in mind that delimiting will work as `AND` queries. However it is possible to specify `-q` or `--field-selector` multiple times which will result in `OR` queries.
 
 >**Note** There may be endpoints which do not accept such complex queries (Like the Ucs endpoint).
@@ -140,7 +140,7 @@ tubectl edit config defaultNamespace foo
 ```
 
 ## Tail resources
-By default the server returns the latest 100 resources ordered by created date/time. Meaning the first record is the newest one and the last the oldest (If not more than 100 resources of the requested type are available). By using `-t` or `--tail` accordingly the output is reversed. Meaning the last record is the newest and the first the oldest (Again, if there are not more than 100 resources available of that type.)
+By default tubecli lists the latest 20 resources ordered by created date/time. Meaning the first record is the newest one and the last the oldest (If not more than 20 resources of the requested type are available). By using `-t` or `--tail` accordingly the output is reversed. Meaning the last record is the newest and the first the oldest (Again, if there are not more than 20 resources available of that type.)
 
 ### Resource history & diff
 Each modification on a resource will result in an incrision of the resource version and the old version gets stored safely. You can find the resource version in the default output on most resource types or by specifying a custom output such as yaml. The resources history can be requested if `-v` or `--history` accordingly is specified. Note that if this option is requested a resource name must be specified. You can not request the history on a List response (Multiple resources).
@@ -163,7 +163,7 @@ DIFFTOOL=vimdiff tubectl get ns foo --diff 1
 ```
 
 ## Limit resources in lists
-By default you get the newest 100 resources. You may lower this limit by using `-L` or `--limit` accordingly.
+By default you get the newest 20 resources. You may lower this limit by using `-L` or `--limit` accordingly or increase to a maximum of 100 resources.
 ```
 tubectl get ns --limit 2
 ```

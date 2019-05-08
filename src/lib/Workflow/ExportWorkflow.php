@@ -198,7 +198,7 @@ class ExportWorkflow extends Workflow
 
             $this->logger->debug('found existing object {object} on destination endpoint with provided filter_one', [
                 'category' => get_class($this),
-                'object' => $exists->getData(),
+                'resource' => $exists->getData(),
             ]);
 
             return $exists;

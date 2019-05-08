@@ -434,7 +434,7 @@ class Ldap extends AbstractEndpoint
     protected function getDn(array $object, array $endpoint_object = []): string
     {
         if (isset($object['entrydn'])) {
-            return $object['entrydn'];
+            return $this->normalizeDn($object['entrydn']);
         }
         if (isset($endpoint_object['entrydn'])) {
             return $endpoint_object['entrydn'];

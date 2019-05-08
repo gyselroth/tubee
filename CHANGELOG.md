@@ -3,6 +3,10 @@
 **Date**: Tue May 07 12:06:12 CEST 2019
 
 * CORE: [CHANGE] Set garbage endpoint flag to `true` if object gets removed from endpoint during export absent workflow
+* CORE: [CHANGE] ldap entrydn from mapping gets normalized as well (all lowercase)
+* CORE: [FIX] MongoDB\Driver\Exception\BulkWriteException: WiredTigerIndex::insert: key too large to index, failing 1134
+* CORE: [CHANE] throw Tubee\Workflow\Exception\ImportConditionNotMet if source data objects are not unique
+* CORE: [FIX] sort operation does not work for sorting data object, endpoint, collection resources
 
 
 ## 1.0.0-beta10

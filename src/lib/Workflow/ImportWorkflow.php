@@ -219,7 +219,9 @@ class ImportWorkflow extends Workflow
     protected function getImportObject(CollectionInterface $collection, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
-        //TODO: debug import line here
+        $this->logger->debug('try to match source object in collection with [{filter}]', [
+            'filter' => $filter,
+        ]);
 
         if (empty($filter) || count($filter) !== count($this->endpoint->getImport())) {
             throw new Exception\ImportConditionNotMet('import condition attributes are not available from mapping');
@@ -233,12 +235,12 @@ class ImportWorkflow extends Workflow
             return null;
         }
 
-        /*$endpoints = $exists->getEndpoints();
+        $endpoints = $exists->getEndpoints();
 
-        if ($exists !== false && isset($endpoints[$this->endpoint->getName()])
+        if (isset($endpoints[$this->endpoint->getName()])
         && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
-            throw new Exception\ImportConditionNotMet('import filter matched multiple source objects');
-        }*/
+            throw new Exception\ImportConditionNotMet('source object with given import filter is not unique');
+        }
 
         return $exists;
     }
