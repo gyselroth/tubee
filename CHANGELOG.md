@@ -1,6 +1,6 @@
 ## 1.0.0-beta11
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Tue May 07 12:06:12 CEST 2019
+**Date**: Wed May 08 15:06:12 CEST 2019
 
 * CORE: [CHANGE] Set garbage endpoint flag to `true` if object gets removed from endpoint during export absent workflow
 * CORE: [CHANGE] ldap entrydn from mapping gets normalized as well (all lowercase)
