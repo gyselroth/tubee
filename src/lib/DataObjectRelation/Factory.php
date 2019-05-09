@@ -152,8 +152,9 @@ class Factory
 
         $that = $this;
         $logger = $this->logger;
+        $resource_factory = $this->resource_factory;
 
-        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation, $logger, $that) {
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation, $logger, $resource_factory, $that) {
             $object_1 = $resource['data']['relation'][0];
             $object_2 = $resource['data']['relation'][1];
             $related = $object_1;
@@ -172,7 +173,7 @@ class Factory
                     'exception' => $e,
                 ]);
 
-                $that->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource['_id']);
+                $resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource['_id']);
             }
         });
     }

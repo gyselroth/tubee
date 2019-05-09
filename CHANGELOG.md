@@ -1,8 +1,9 @@
 ## 1.0.0-beta13
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Thu May 09 13:51:14 CEST 2019
+**Date**: Thu May 09 15:51:14 CEST 2019
 
 * CORE: [FIX] Error: Cannot access protected property Tubee\DataObjectRelation\Factory::$logger
+* CORE: [FIX] Error: Cannot access protected property Tubee\DataObjectRelation\Factory::$resource_factory
 
 
 ## 1.0.0-beta12
