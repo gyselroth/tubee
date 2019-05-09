@@ -220,7 +220,7 @@ class ImportWorkflow extends Workflow
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
         $this->logger->debug('try to match source object in collection with [{filter}]', [
-            'filter' => $filter,
+            'filter' => json_encode($filter),
         ]);
 
         if (empty($filter) || count($filter) !== count($this->endpoint->getImport())) {

@@ -4,6 +4,7 @@
 
 * CORE: [FIX] Error: Cannot access protected property Tubee\DataObjectRelation\Factory::$logger
 * CORE: [FIX] Error: Cannot access protected property Tubee\DataObjectRelation\Factory::$resource_factory
+* CORE: [FIX] MongoDB\Driver\Exception\InvalidArgumentException: invalid document for insert: keys cannot contain ".":
 
 
 ## 1.0.0-beta12
