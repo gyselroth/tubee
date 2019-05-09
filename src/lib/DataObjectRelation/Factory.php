@@ -151,8 +151,9 @@ class Factory
         }
 
         $that = $this;
+        $logger = $this->logger;
 
-        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation, $that) {
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation, $logger, $that) {
             $object_1 = $resource['data']['relation'][0];
             $object_2 = $resource['data']['relation'][1];
             $related = $object_1;
@@ -166,7 +167,7 @@ class Factory
 
                 return $that->build($resource, $related);
             } catch (NotFound $e) {
-                $that->logger->error('could not resolve related data object, drop relation', [
+                $logger->error('could not resolve related data object, drop relation', [
                     'category' => get_class($this),
                     'exception' => $e,
                 ]);
