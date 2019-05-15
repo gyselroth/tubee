@@ -173,7 +173,7 @@ class Factory
                     'exception' => $e,
                 ]);
 
-                $resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $resource['_id']);
+                $resource_factory->deleteFrom($this->db->{Factory::COLLECTION_NAME}, $resource['_id']);
             }
         });
     }

@@ -1,3 +1,10 @@
+## 1.0.0-beta14
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed May 15 12:26:12 CEST 2019
+
+* CORE: [FIX] undefined class constant self::COLLECTION_NAM in Tubee\DataObjectRelation\Factory
+
+
 ## 1.0.0-beta13
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Thu May 09 15:51:14 CEST 2019
