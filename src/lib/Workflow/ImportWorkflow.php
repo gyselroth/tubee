@@ -124,8 +124,17 @@ class ImportWorkflow extends Workflow
                     ],
                 ];
 
-                $collection->changeObject($exists, $object, $simulate, $endpoints);
                 $this->importRelations($exists, $map, $simulate, $endpoints);
+                $endpoints = $exists->getEndpoints();
+
+                if (isset($endpoints[$this->endpoint->getName()])
+                    && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
+                    $this->logger->warning('source object with given import filter is not unique (multiple data objects found), skip update resource', [
+                        'category' => get_class($this),
+                    ]);
+                }
+
+                $collection->changeObject($exists, $object, $simulate, $endpoints);
 
                 return true;
 
@@ -233,13 +242,6 @@ class ImportWorkflow extends Workflow
             throw $e;
         } catch (DataObjectException\NotFound $e) {
             return null;
-        }
-
-        $endpoints = $exists->getEndpoints();
-
-        if (isset($endpoints[$this->endpoint->getName()])
-        && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
-            throw new Exception\ImportConditionNotMet('source object with given import filter is not unique');
         }
 
         return $exists;

@@ -1,8 +1,15 @@
+## 1.0.0-beta15
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed May 22 12:26:12 CEST 2019
+
+* CORE: [FIX] do not throw Exception\ImportConditionNotMet if multiple data objects were found, sync relations first and log a warning instead 
+
+
 ## 1.0.0-beta14
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed May 15 12:26:12 CEST 2019
 
-* CORE: [FIX] undefined class constant self::COLLECTION_NAM in Tubee\DataObjectRelation\Factory
+* CORE: [FIX] undefined class constant self::COLLECTION_NAME in Tubee\DataObjectRelation\Factory
 
 
 ## 1.0.0-beta13
