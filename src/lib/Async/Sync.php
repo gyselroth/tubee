@@ -356,7 +356,7 @@ class Sync extends AbstractJob
             $i = 0;
             foreach ($ep->getAll($filter) as $id => $object) {
                 ++$i;
-                $this->logger->debug('process ['.$i.'] import for object ['.$id.'] into data type ['.$collection->getIdentifier().']', [
+                $this->logger->debug('process object ['.$i.'] import for object ['.$object->getId().'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
                     'attributes' => $object,
                 ]);
@@ -368,13 +368,13 @@ class Sync extends AbstractJob
                         ]);
 
                         if ($workflow->import($collection, $object, $this->timestamp, $simulate) === true) {
-                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $id.'], skip any further workflows for the current data object', [
+                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $object->getId().'], skip any further workflows for the current data object', [
                                 'category' => get_class($this),
                             ]);
 
                             continue 2;
                         }
-                        $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $id.'], condition does not match or unusable ensure', [
+                        $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $object->getId().'], condition does not match or unusable ensure', [
                                 'category' => get_class($this),
                             ]);
                     }

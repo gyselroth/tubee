@@ -3,6 +3,7 @@
 **Date**: Wed May 22 12:26:12 CEST 2019
 
 * CORE: [FIX] do not throw Exception\ImportConditionNotMet if multiple data objects were found, sync relations first and log a warning instead 
+* CORE: [FIX] Wrong debug log: total counter is less than the current DataObject #40
 
 
 ## 1.0.0-beta14
