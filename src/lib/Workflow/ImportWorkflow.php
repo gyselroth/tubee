@@ -132,6 +132,8 @@ class ImportWorkflow extends Workflow
                     $this->logger->warning('source object with given import filter is not unique (multiple data objects found), skip update resource', [
                         'category' => get_class($this),
                     ]);
+
+                    return true;
                 }
 
                 $collection->changeObject($exists, $object, $simulate, $endpoints);
