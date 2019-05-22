@@ -5,6 +5,7 @@
 * CORE: [FIX] do not throw Exception\ImportConditionNotMet if multiple data objects were found, sync relations first and log a warning instead 
 * CORE: [FIX] Wrong debug log: total counter is less than the current DataObject #40
 * CORE: [FIX] pdo endpoint (mssql) generates wrong filter #39
+* CORE: [FIX] Do not throw an exception during query for an non existing mssql field #38
 
 
 ## 1.0.0-beta14

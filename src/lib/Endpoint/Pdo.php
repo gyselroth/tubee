@@ -15,6 +15,7 @@ use Generator;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
+use Tubee\Endpoint\Pdo\Exception\InvalidQuery;
 use Tubee\Endpoint\Pdo\Wrapper as PdoWrapper;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -50,7 +51,16 @@ class Pdo extends AbstractSqlDatabase
             $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         }
 
-        $result = $this->socket->select($sql);
+        try {
+            $result = $this->socket->select($sql);
+        } catch (InvalidQuery $e) {
+            $this->logger->error('failed to fetch resources from endpoint', [
+                'class' => get_class($this),
+                'exception' => $e,
+            ]);
+
+            return 0;
+        }
 
         $i = 0;
         while ($row = $result->fetch(\PDO::FETCH_ASSOC)) {
