@@ -1,3 +1,11 @@
+## 1.0.0-beta16
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu May 23 10:26:12 CEST 2019
+
+* CORE: [FIX] encode found export object, fixes MongoDB\Driver\Exception\InvalidArgumentException: invalid document for insert: keys cannot begin with "$"
+* CORE: [FIX] added missing simulate field to Job resource in swagger specs 
+
+
 ## 1.0.0-beta15
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed May 22 12:26:12 CEST 2019

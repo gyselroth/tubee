@@ -3482,7 +3482,7 @@ definitions:
             description: "The resource type, always Process."
             type: "string"
             default: "Process"
-          namespace: 
+          namespace:
             description: "The resource namespace"
             type: "string"
           status:
@@ -3512,7 +3512,7 @@ definitions:
             description: "The resource type, always Job."
             type: "string"
             default: "Job"
-          namespace: 
+          namespace:
             description: "The resource namespace"
             type: "string"
           data:
@@ -3544,10 +3544,14 @@ definitions:
                   type: string
                 default: []
               filter:
-                description: "Data object filter."
-                type: object
+                description: "Data object filter (JSON encoded)."
+                type: string
               ignore:
                 description: "If enabled the server does ignores any sync errors and continue with the process."
+                type: boolean
+                default: false
+              simulate:
+                description: "Simulate sync (Do not apply any changes)"
                 type: boolean
                 default: false
               log_level:
@@ -3638,7 +3642,7 @@ definitions:
             description: "The resource type, always Collection."
             type: "string"
             default: "Collection"
-          namespace: 
+          namespace:
             description: "The resource namespace"
             type: "string"
           data:
@@ -3954,7 +3958,7 @@ definitions:
               resource:
                 description: "Holds the relevant options of how to connect to the endpoint."
                 type: "object"
-                required: 
+                required:
                 - base_uri
                 properties:
                   base_uri:
@@ -3974,7 +3978,7 @@ definitions:
                   basic:
                     description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
                     type: object
-                    default: 
+                    default:
                       username: null
                       password: null
                     properties:
@@ -4235,10 +4239,10 @@ definitions:
                   properties:
                     namespace:
                       description: "Name of the objects namespace"
-                      type: "string"                 
+                      type: "string"
                     collection:
                       description: "Name of the objects collection"
-                      type: "string"                 
+                      type: "string"
                     object:
                       description: "Name of the object"
-                      type: "string"                 
+                      type: "string"
