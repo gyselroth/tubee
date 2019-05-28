@@ -1,3 +1,10 @@
+## 1.0.0-beta17
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu May 28 16:49:12 CEST 2019
+
+* CORE: [FIX] Trying to get property 'relations' of non-object
+
+
 ## 1.0.0-beta16
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Thu May 23 10:26:12 CEST 2019
