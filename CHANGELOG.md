@@ -1,6 +1,13 @@
+## 1.0.0-beta18
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed May 29 11:50:12 CEST 2019
+
+* CORE: [FIX] Skip objects if build() returns null
+
+
 ## 1.0.0-beta17
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Thu May 28 16:49:12 CEST 2019
+**Date**: Tue May 28 16:49:12 CEST 2019
 
 * CORE: [FIX] Trying to get property 'relations' of non-object
 

@@ -5160,6 +5160,8 @@ components:
                   default: last
     MapAttribute:
       type: object
+      required:
+      - name
       properties:
         name:
           type: string

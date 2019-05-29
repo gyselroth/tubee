@@ -175,6 +175,8 @@ class Factory
                 ]);
 
                 $resource_factory->deleteFrom($db->{Factory::COLLECTION_NAME}, $resource['_id']);
+
+                return null;
             }
         });
     }

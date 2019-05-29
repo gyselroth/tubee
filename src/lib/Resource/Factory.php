@@ -223,7 +223,10 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['_id'] => $build->call($this, $resource);
+            $result = $build->call($this, $resource);
+            if ($result !== null) {
+                yield (string) $resource['_id'] => $result;
+            }
         }
 
         return $total;
