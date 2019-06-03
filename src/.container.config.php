@@ -40,6 +40,7 @@ use Psr\SimpleCache\CacheInterface;
 use Cache\Adapter\Void\VoidCachePool;
 use Cache\Adapter\Apcu\ApcuCachePool;
 use Dreamscapes\Ldap\Core\Ldap as DreamscapesLdap;
+use Tubee\Log\MongoDBFormatter as MongoDBFormatter;
 
 return [
     DreamscapesLdap::class => [
@@ -192,7 +193,15 @@ return [
                     'database' => 'tubee',
                     'collection' => 'logs',
                     'level' => 1000,
-                ]
+                ],
+                'calls' => [
+                    'formatter' => [
+                        'method' => 'setFormatter',
+                        'arguments' => [
+                            'formatter' => '{'.MongoDBFormatter::class.'}'
+                        ]
+                    ]
+                ],
             ],
             'stderr' => [
                 'use' => Monolog\Handler\StreamHandler::class,

@@ -20,6 +20,7 @@ use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Log\MongoDBFormatter;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Zend\Mail\Message;
@@ -224,6 +225,7 @@ class Sync extends AbstractJob
         foreach ($this->logger->getHandlers() as $handler) {
             if ($handler instanceof MongoDBHandler) {
                 $handler->setLevel($level);
+                $handler->setFormatter(new MongoDBFormatter());
 
                 $this->logger->pushProcessor(function ($record) use ($context) {
                     $record['context'] = array_merge($record['context'], $context);

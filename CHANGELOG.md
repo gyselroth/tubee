@@ -1,3 +1,10 @@
+## 1.0.0-beta20
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jun 03 15:50:12 CEST 2019
+
+* CORE: [FIX] Using own log formatter for mongodb to encode most context as json since context may contain invalid mongodb field names ($ prefix or .)
+
+
 ## 1.0.0-beta19
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jun 03 13:50:11 CEST 2019
