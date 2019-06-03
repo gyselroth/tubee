@@ -75,13 +75,8 @@ class MongoDBFormatter implements FormatterInterface
             'message' => $exception->getMessage(),
             'code' => $exception->getCode(),
             'file' => $exception->getFile().':'.$exception->getLine(),
+            'trace' => $exception->getTraceAsString(),
         ];
-
-        if ($this->exceptionTraceAsString === true) {
-            $formattedException['trace'] = $exception->getTraceAsString();
-        } else {
-            $formattedException['trace'] = $exception->getTrace();
-        }
 
         return $this->formatArray($formattedException);
     }
