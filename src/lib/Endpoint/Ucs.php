@@ -203,6 +203,8 @@ class Ucs extends AbstractEndpoint
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/put';
         $dn = $this->getResourceId($object, $endpoint_object);
+        $diff[self::ATTR_DN] = $dn;
+
         $this->logChange($dn, $diff);
         $map_parent = substr($dn, strpos($dn, ',') + 1);
         $ep_parent = substr($endpoint_object[self::ATTR_DN], strpos($endpoint_object[self::ATTR_DN], ',') + 1);

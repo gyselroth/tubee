@@ -264,9 +264,15 @@ class Factory
             ]);
 
             foreach ($result as $resource) {
+                $bound = $build->call($this, $resource);
+
+                if ($bound === null) {
+                    continue;
+                }
+
                 yield (string) $resource['_id'] => [
                     'insert',
-                    $build->call($this, $resource),
+                    $bound,
                 ];
             }
         }
@@ -277,9 +283,15 @@ class Factory
             }
 
             $event = $stream->current();
+            $bound = $build->call($this, $event['fullDocument']);
+
+            if ($bound === null) {
+                continue;
+            }
+
             yield (string) $event['fullDocument']['_id'] => [
                 $event['operationType'],
-                $build->call($this, $event['fullDocument']),
+                $bound,
             ];
         }
     }

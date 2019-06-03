@@ -1,3 +1,11 @@
+## 1.0.0-beta19
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jun 03 13:50:11 CEST 2019
+
+* CORE: [FIX] Always include $dn$ in Ucs change()
+* CORE: [FIX] factories watch() include default filter like getAll()
+
+
 ## 1.0.0-beta18
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed May 29 11:50:12 CEST 2019

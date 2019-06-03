@@ -93,17 +93,7 @@ class Factory
      */
     public function getAll(CollectionInterface $collection, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $filter = [
-            'namespace' => $collection->getResourceNamespace()->getName(),
-            'collection' => $collection->getName(),
-        ];
-
-        if (!empty($query)) {
-            $filter = [
-                '$and' => [$filter, $query],
-            ];
-        }
-
+        $filter = $this->prepareQuery($collection, $query);
         $that = $this;
 
         return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($collection, $that) {
@@ -219,9 +209,10 @@ class Factory
      */
     public function watch(CollectionInterface $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        $filter = $this->prepareQuery($collection, $query);
         $that = $this;
 
-        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($collection, $that) {
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $filter, function (array $resource) use ($collection, $that) {
             return $that->build($resource, $collection);
         }, $offset, $limit, $sort);
     }
@@ -235,6 +226,25 @@ class Factory
         $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
 
         return $this->resource_factory->initResource($factory::build($resource, $collection, $this->workflow_factory, $this->logger));
+    }
+
+    /**
+     * Prepare query.
+     */
+    protected function prepareQuery(CollectionInterface $collection, ?array $query = null): array
+    {
+        $filter = [
+            'namespace' => $collection->getResourceNamespace()->getName(),
+            'collection' => $collection->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $filter;
     }
 
     /**
