@@ -3,6 +3,7 @@
 **Date**: Fri Jun 07 09:01:12 CEST 2019
 
 * CORE: [FIX] Add workflow with no data ends in Undefined index exception #44
+* API: [CHANGE] Added core.v1 prefix to all requests and resources in openapi/swagger schemas
 
 
 ## 1.0.0-beta20

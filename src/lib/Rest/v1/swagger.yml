@@ -16,7 +16,7 @@ paths:
   /api:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get api entrypoint"
       operationId: "getApi"
       produces:
@@ -29,7 +29,7 @@ paths:
   /api/v1:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get api entrypoint"
       operationId: "getV1"
       produces:
@@ -42,7 +42,7 @@ paths:
   /api/v1/namespaces:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get namespaces"
       description: "A namespace is a logical group of collections"
       operationId: "getNamespaces"
@@ -90,12 +90,12 @@ paths:
         200:
           description: "List of namespaces"
           schema:
-            $ref: "#/definitions/Namespaces"
+            $ref: "#/definitions/core.v1.Namespaces"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Add namespace"
       operationId: "addNamespace"
       produces:
@@ -104,18 +104,18 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Namespace"
+          $ref: "#/definitions/core.v1.Namespace"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Namespace"
+            $ref: "#/definitions/core.v1.Namespace"
         403:
           description: "Access denied"
   /api/v1/namespaces/{namespace}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get specific namespace"
       description: "A namespace is a logical group of collections"
       operationId: "getNamespace"
@@ -138,14 +138,14 @@ paths:
         200:
           description: "Namespace"
           schema:
-            $ref: "#/definitions/Namespace"
+            $ref: "#/definitions/core.v1.Namespace"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete specific namespace"
       operationId: "deleteNamespace"
       produces:
@@ -165,7 +165,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace namespace"
       operationId: "replaceNamespace"
       produces:
@@ -179,21 +179,21 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Namespace"
+          $ref: "#/definitions/core.v1.Namespace"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/Namespace"
+            $ref: "#/definitions/core.v1.Namespace"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Namespace"
+            $ref: "#/definitions/core.v1.Namespace"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch namespace as rfc6902 request"
       operationId: "updateNamespace"
       description: "Update specific attributes of a namespace"
@@ -211,12 +211,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Namespace"
           schema:
-            $ref: "#/definitions/Namespace"
+            $ref: "#/definitions/core.v1.Namespace"
         404:
           description: "Resource does not exists"
         403:
@@ -224,7 +224,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get collections"
       description: "A collection is collection of data objects of a specific type"
       operationId: "getCollections"
@@ -277,14 +277,14 @@ paths:
         200:
           description: "List of collections"
           schema:
-            $ref: "#/definitions/Collections"
+            $ref: "#/definitions/core.v1.Collections"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Add collection"
       operationId: "addCollection"
       produces:
@@ -298,12 +298,12 @@ paths:
       - in: body
         name: data
         schema:
-           $ref: "#/definitions/Collection"
+           $ref: "#/definitions/core.v1.Collection"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Collection"
+            $ref: "#/definitions/core.v1.Collection"
         403:
           description: "Access denied"
         404:
@@ -311,7 +311,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get specific collection"
       description: "A collection is collection of dataobjects of a specific type"
       operationId: "getCollection"
@@ -339,14 +339,14 @@ paths:
         200:
           description: "Collection"
           schema:
-            $ref: "#/definitions/Collection"
+            $ref: "#/definitions/core.v1.Collection"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete specific collection"
       operationId: "deleteCollection"
       produces:
@@ -371,7 +371,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace collection"
       operationId: "replaceCollection"
       produces:
@@ -390,21 +390,21 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Collection"
+          $ref: "#/definitions/core.v1.Collection"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/Collection"
+            $ref: "#/definitions/core.v1.Collection"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Collection"
+            $ref: "#/definitions/core.v1.Collection"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch collection as rfc6902 request"
       description: "Update specific attributes of a collection"
       operationId: "updateCollection"
@@ -427,12 +427,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Collection"
           schema:
-            $ref: "#/definitions/Collection"
+            $ref: "#/definitions/core.v1.Collection"
         404:
           description: "Resource does not exists"
         403:
@@ -440,7 +440,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/logs:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get logs of a collection"
       operationId: "getCollectionLogs"
       produces:
@@ -497,7 +497,7 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -505,7 +505,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/logs/{log}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get a single collection log"
       operationId: "getCollectionLog"
       produces:
@@ -530,7 +530,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -538,7 +538,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get endpoints"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoints"
@@ -596,14 +596,14 @@ paths:
         200:
           description: "List of endpoints"
           schema:
-            $ref: "#/definitions/Endpoints"
+            $ref: "#/definitions/core.v1.Endpoints"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Add Endpoint"
       operationId: "addEndpoint"
       produces:
@@ -627,7 +627,7 @@ paths:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Endpoint"
+            $ref: "#/definitions/core.v1.Endpoint"
         403:
           description: "Access denied"
         404:
@@ -635,7 +635,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get specific endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoint"
@@ -668,14 +668,14 @@ paths:
         200:
           description: "Endpoint"
           schema:
-            $ref: "#/definitions/Endpoint"
+            $ref: "#/definitions/core.v1.Endpoint"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete specific endpoint"
       operationId: "deleteEndpoint"
       produces:
@@ -705,7 +705,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace endppoint"
       operationId: "replaceEndpoint"
       produces:
@@ -729,21 +729,21 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Endpoint"
+          $ref: "#/definitions/core.v1.Endpoint"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/Endpoint"
+            $ref: "#/definitions/core.v1.Endpoint"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Endpoint"
+            $ref: "#/definitions/core.v1.Endpoint"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch collection as rfc6902 request"
       description: "Update specific attributes of a endpoint"
       operationId: "updateEndpoint"
@@ -771,12 +771,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Endpoint"
           schema:
-            $ref: "#/definitions/Endpoint"
+            $ref: "#/definitions/core.v1.Endpoint"
         404:
           description: "Resource does not exists"
         403:
@@ -784,7 +784,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get logs of an endpoint"
       operationId: "getEndpointLogs"
       produces:
@@ -846,7 +846,7 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -854,7 +854,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get a single endpoint log"
       operationId: "getEndpointLog"
       produces:
@@ -884,7 +884,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -892,7 +892,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get endpoint workflows"
       description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflows"
@@ -955,12 +955,12 @@ paths:
         200:
           description: "List of workflows"
           schema:
-            $ref: "#/definitions/Workflows"
+            $ref: "#/definitions/core.v1.Workflows"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Add worfklow to endpoint"
       operationId: "addWorkflow"
       produces:
@@ -984,12 +984,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Workflow"
+          $ref: "#/definitions/core.v1.Workflow"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Workflow"
+            $ref: "#/definitions/core.v1.Workflow"
         403:
           description: "Access denied"
         404:
@@ -997,7 +997,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get specifc endpoint workflow"
       description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflow"
@@ -1035,14 +1035,14 @@ paths:
         200:
           description: "Workflow"
           schema:
-            $ref: "#/definitions/Workflow"
+            $ref: "#/definitions/core.v1.Workflow"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete specific workflow from"
       operationId: "deleteWorkflow"
       produces:
@@ -1077,7 +1077,7 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace workflow"
       operationId: "replaceWorkflow"
       produces:
@@ -1106,21 +1106,21 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Workflow"
+          $ref: "#/definitions/core.v1.Workflow"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/Workflow"
+            $ref: "#/definitions/core.v1.Workflow"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/Workflow"
+            $ref: "#/definitions/core.v1.Workflow"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch workflow as rfc6902 request"
       description: "Update specific attributes of a workflow"
       operationId: "updateWorkflow"
@@ -1153,12 +1153,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Workflow"
           schema:
-            $ref: "#/definitions/Workflow"
+            $ref: "#/definitions/core.v1.Workflow"
         404:
           description: "Resource does not exists"
         403:
@@ -1166,7 +1166,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get specific object"
       description: "Get an object of a specific collection"
       operationId: "getObject"
@@ -1204,7 +1204,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch object as rfc6902 request"
       description: "Update specific attributes of an object"
       operationId: "updateObject"
@@ -1234,23 +1234,23 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/DataObject"
+            $ref: "#/definitions/core.v1.DataObject"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/Job"
+            $ref: "#/definitions/core.v1.Job"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Replace or create object"
       description: "Replace all data attributes of an object (Or create one if not exists)"
       operationId: "replaceObject"
@@ -1282,27 +1282,27 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/DataObject"
+          $ref: "#/definitions/core.v1.DataObject"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/DataObject"
+            $ref: "#/definitions/core.v1.DataObject"
         201:
           description: "If successful and the object was newly created the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/DataObject"
+            $ref: "#/definitions/core.v1.DataObject"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/Job"
+            $ref: "#/definitions/core.v1.Job"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete object"
       description: "Delete a specific object"
       operationId: "deleteObject"
@@ -1330,7 +1330,7 @@ paths:
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/Job"
+            $ref: "#/definitions/core.v1.Job"
         204:
           description: "If successful the server will respond with 204 No Content"
         404:
@@ -1340,7 +1340,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get relative objects of an object"
       description: "Get all objects the object is related to"
       operationId: "getObjectRelations"
@@ -1403,7 +1403,7 @@ paths:
         200:
           description: "Object relatives"
           schema:
-            $ref: "#/definitions/ObjectRelations"
+            $ref: "#/definitions/core.v1.ObjectRelations"
         403:
           description: "Access denied"
         404:
@@ -1411,7 +1411,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get single relative object of an object"
       operationId: "getObjectRelation"
       produces:
@@ -1441,7 +1441,7 @@ paths:
         200:
           description: "Object relation"
           schema:
-            $ref: "#/definitions/ObjectRelation"
+            $ref: "#/definitions/core.v1.ObjectRelation"
         403:
           description: "Access denied"
         404:
@@ -1449,7 +1449,7 @@ paths:
   /api/v1/namespaces/{namespace}/relations:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get data object relations"
       description: "Get data object relations"
       operationId: "getRelations"
@@ -1502,14 +1502,14 @@ paths:
         200:
           description: "Object relatives"
           schema:
-            $ref: "#/definitions/ObjectRelations"
+            $ref: "#/definitions/core.v1.ObjectRelations"
         403:
           description: "Access denied"
         404:
           description: "Resource not found"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Add new object relation"
       operationId: "addRelation"
       produces:
@@ -1523,12 +1523,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/ObjectRelation"
+          $ref: "#/definitions/core.v1.ObjectRelation"
       responses:
         200:
           description: "Object relation"
           schema:
-            $ref: "#/definitions/ObjectRelation"
+            $ref: "#/definitions/core.v1.ObjectRelation"
         403:
           description: "Access denied"
         404:
@@ -1536,7 +1536,7 @@ paths:
   /api/v1/namespaces/{namespace}/relations/{relation}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get single relation"
       operationId: "getRelation"
       produces:
@@ -1556,14 +1556,14 @@ paths:
         200:
           description: "Object relation"
           schema:
-            $ref: "#/definitions/ObjectRelation"
+            $ref: "#/definitions/core.v1.ObjectRelation"
         403:
           description: "Access denied"
         404:
           description: "Resource not found"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch relation as rfc6902 request"
       description: "Update specific attributes of a relation"
       operationId: "updateRelation"
@@ -1588,19 +1588,19 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/ObjectRelation"
+            $ref: "#/definitions/core.v1.ObjectRelation"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Replace object relation"
       operationId: "replaceRelation"
       produces:
@@ -1619,19 +1619,19 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/ObjectRelation"
+          $ref: "#/definitions/core.v1.ObjectRelation"
       responses:
         200:
           description: "Object relation"
           schema:
-            $ref: "#/definitions/ObjectRelation"
+            $ref: "#/definitions/core.v1.ObjectRelation"
         403:
           description: "Access denied"
         404:
           description: "Resource not found"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete object relation"
       operationId: "deleteObjectRelation"
       produces:
@@ -1657,7 +1657,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get objects from endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpointObjects"
@@ -1720,7 +1720,7 @@ paths:
         200:
           description: "List of objects"
           schema:
-            $ref: "#/definitions/EndpointObjects"
+            $ref: "#/definitions/core.v1.EndpointObjects"
         404:
           description: "Resource does not exists"
         403:
@@ -1728,7 +1728,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/history:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get object history"
       description: "Get the history of all modifications from a specific object"
       operationId: "getObjectHistory"
@@ -1791,7 +1791,7 @@ paths:
         200:
           description: "Object history"
           schema:
-            $ref: "#/definitions/DataObjects"
+            $ref: "#/definitions/core.v1.DataObjects"
         404:
           description: "Resource does not exists"
         403:
@@ -1799,7 +1799,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get logs of an object"
       operationId: "getObjectLogs"
       produces:
@@ -1861,7 +1861,7 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -1869,7 +1869,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get a single object log"
       operationId: "getObjectLog"
       produces:
@@ -1899,7 +1899,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -1907,7 +1907,7 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get objects of a specific collection"
       description: "A object is a data object from a specifc collection"
       operationId: "getObjects"
@@ -1965,14 +1965,14 @@ paths:
         200:
           description: "List of objects"
           schema:
-            $ref: "#/definitions/DataObjects"
+            $ref: "#/definitions/core.v1.DataObjects"
         404:
           description: "Resource does not exists"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Add a new object of a specifc collection"
       operationId: "addObject"
       consumes:
@@ -1993,16 +1993,16 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/DataObject"
+          $ref: "#/definitions/core.v1.DataObject"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
           schema:
-            $ref: "#/definitions/DataObject"
+            $ref: "#/definitions/core.v1.DataObject"
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
           schema:
-            $ref: "#/definitions/Job"
+            $ref: "#/definitions/core.v1.Job"
         404:
           description: "Resource does not exists"
         403:
@@ -2010,7 +2010,7 @@ paths:
   /api/v1/namespaces/{namespace}/secrets:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get secrets"
       description: "An secret holds secret data which should not get exposed and is specially encrypted on the server. A secret can be injected into other resources."
       operationId: "getSecrets"
@@ -2063,12 +2063,12 @@ paths:
         200:
           description: "List of secrets"
           schema:
-            $ref: "#/definitions/Secrets"
+            $ref: "#/definitions/core.v1.Secrets"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create a new secret"
       operationId: "addSecret"
       produces:
@@ -2082,18 +2082,18 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Secret"
+          $ref: "#/definitions/core.v1.Secret"
       responses:
         201:
           description: "The created secret"
           schema:
-            $ref: "#/definitions/Secret"
+            $ref: "#/definitions/core.v1.Secret"
         403:
           description: "Access denied"
   /api/v1/namespaces/{namespace}/secrets/{secret}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get secret by name"
       operationId: "getSecret"
       produces:
@@ -2113,14 +2113,14 @@ paths:
         200:
           description: "secret"
           schema:
-            $ref: "#/definitions/Secret"
+            $ref: "#/definitions/core.v1.Secret"
         404:
           description: "secret does not exists"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch secret as rfc6902 request"
       operationId: "updateSecret"
       consumes:
@@ -2144,17 +2144,17 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated secret"
           schema:
-            $ref: "#/definitions/Secret"
+            $ref: "#/definitions/core.v1.Secret"
         403:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace an secret"
       operationId: "replaceSecret"
       produces:
@@ -2173,17 +2173,17 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Secret"
+          $ref: "#/definitions/core.v1.Secret"
       responses:
         201:
           description: "The created secret"
           schema:
-            $ref: "#/definitions/Secret"
+            $ref: "#/definitions/core.v1.Secret"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete secret by name"
       operationId: "deleteSecret"
       produces:
@@ -2209,7 +2209,7 @@ paths:
   /api/v1/users:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get users"
       description: "An User defines what role is granted access to what resource"
       operationId: "getUsers"
@@ -2257,12 +2257,12 @@ paths:
         200:
           description: "List of users"
           schema:
-            $ref: "#/definitions/Users"
+            $ref: "#/definitions/core.v1.Users"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create a new User"
       operationId: "addUser"
       produces:
@@ -2271,18 +2271,18 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/core.v1.User"
       responses:
         201:
           description: "The created User"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/core.v1.User"
         403:
           description: "Access denied"
   /api/v1/users/{User}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get User by name"
       operationId: "getUser"
       produces:
@@ -2297,14 +2297,14 @@ paths:
         200:
           description: "User"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/core.v1.User"
         404:
           description: "User does not exists"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch User as rfc6902 request"
       operationId: "updateUser"
       consumes:
@@ -2323,17 +2323,17 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated User"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/core.v1.User"
         403:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace an User"
       operationId: "replaceUser"
       produces:
@@ -2347,17 +2347,17 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/User"
+          $ref: "#/definitions/core.v1.User"
       responses:
         201:
           description: "The created User"
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/core.v1.User"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete User by name"
       operationId: "deleteUser"
       produces:
@@ -2378,7 +2378,7 @@ paths:
   /api/v1/access-rules:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get access rules"
       description: "An access rule defines what role is granted access to what resource"
       operationId: "getAccessRules"
@@ -2426,12 +2426,12 @@ paths:
         200:
           description: "List of access rules"
           schema:
-            $ref: "#/definitions/AccessRules"
+            $ref: "#/definitions/core.v1.AccessRules"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create a new access rule"
       operationId: "addAccessRule"
       produces:
@@ -2440,18 +2440,18 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/AccessRule"
+          $ref: "#/definitions/core.v1.AccessRule"
       responses:
         201:
           description: "The created access rule"
           schema:
-            $ref: "#/definitions/AccessRule"
+            $ref: "#/definitions/core.v1.AccessRule"
         403:
           description: "Access denied"
   /api/v1/access-rules/{access-rule}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get access rule by name"
       operationId: "getAccessRule"
       produces:
@@ -2466,14 +2466,14 @@ paths:
         200:
           description: "Acccess rule"
           schema:
-            $ref: "#/definitions/AccessRule"
+            $ref: "#/definitions/core.v1.AccessRule"
         404:
           description: "access rule does not exists"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch access rule as rfc6902 request"
       operationId: "updateAccessRule"
       consumes:
@@ -2492,17 +2492,17 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated access rule"
           schema:
-            $ref: "#/definitions/AccessRule"
+            $ref: "#/definitions/core.v1.AccessRule"
         403:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace an access rule"
       operationId: "replaceAccessRule"
       produces:
@@ -2516,17 +2516,17 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/AccessRule"
+          $ref: "#/definitions/core.v1.AccessRule"
       responses:
         201:
           description: "The created access rule"
           schema:
-            $ref: "#/definitions/AccessRule"
+            $ref: "#/definitions/core.v1.AccessRule"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete access-rule by name"
       operationId: "deleteAccessRule"
       produces:
@@ -2547,7 +2547,7 @@ paths:
   /api/v1/access-roles:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get access roles"
       description: "An access role defines what role is granted access to what resource"
       operationId: "getAccessRoles"
@@ -2595,12 +2595,12 @@ paths:
         200:
           description: "List of access roles"
           schema:
-            $ref: "#/definitions/AccessRoles"
+            $ref: "#/definitions/core.v1.AccessRoles"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create a new access role"
       operationId: "addAccessRole"
       produces:
@@ -2609,18 +2609,18 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/AccessRole"
+          $ref: "#/definitions/core.v1.AccessRole"
       responses:
         201:
           description: "The created access role"
           schema:
-            $ref: "#/definitions/AccessRole"
+            $ref: "#/definitions/core.v1.AccessRole"
         403:
           description: "Access denied"
   /api/v1/access-roles/{access-role}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get access role by name"
       operationId: "getAccessRole"
       produces:
@@ -2635,14 +2635,14 @@ paths:
         200:
           description: "Acccess role"
           schema:
-            $ref: "#/definitions/AccessRole"
+            $ref: "#/definitions/core.v1.AccessRole"
         404:
           description: "access role does not exists"
         403:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch access role as rfc6902 request"
       operationId: "updateAccessRole"
       consumes:
@@ -2661,17 +2661,17 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated access role"
           schema:
-            $ref: "#/definitions/AccessRole"
+            $ref: "#/definitions/core.v1.AccessRole"
         403:
           description: "Access denied"
     put:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create or replace an access role"
       operationId: "replaceAccessRole"
       consumes:
@@ -2687,21 +2687,21 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/AccessRole"
+          $ref: "#/definitions/core.v1.AccessRole"
       responses:
         200:
           description: "The updated access role"
           schema:
-            $ref: "#/definitions/AccessRole"
+            $ref: "#/definitions/core.v1.AccessRole"
         201:
           description: "The created access role if it did not exists yet"
           schema:
-            $ref: "#/definitions/AccessRole"
+            $ref: "#/definitions/core.v1.AccessRole"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete access-role by name"
       operationId: "deleteAccessRole"
       produces:
@@ -2722,7 +2722,7 @@ paths:
   /api/v1/namespaces/{namespace}/jobs:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get list of active queued jobs"
       description: "A job is an asynchronous server process"
       operationId: "getJobs"
@@ -2775,12 +2775,12 @@ paths:
         200:
           description: "List of active jobs"
           schema:
-            $ref: "#/definitions/Jobs"
+            $ref: "#/definitions/core.v1.Jobs"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Create new job"
       operationId: "addJob"
       produces:
@@ -2794,12 +2794,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Job"
+          $ref: "#/definitions/core.v1.Job"
       responses:
         202:
           description: "The created job"
           schema:
-            $ref: "#/definitions/Job"
+            $ref: "#/definitions/core.v1.Job"
         404:
           description: "Resource does not exists"
         403:
@@ -2807,7 +2807,7 @@ paths:
   /api/v1/namespaces/{namespace}/jobs/{job}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get job by id"
       operationId: "getJob"
       produces:
@@ -2827,14 +2827,14 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/Job"
+            $ref: "#/definitions/core.v1.Job"
         404:
           description: "Job does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Delete job by id"
       operationId: "deleteJob"
       produces:
@@ -2859,7 +2859,7 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - "v1"
+      - core.v1
       summary: "Patch job as rfc6902 request"
       description: "Update specific attributes of a job"
       operationId: "updateJob"
@@ -2884,12 +2884,12 @@ paths:
         schema:
           type: array
           items:
-            $ref: "#/definitions/JsonPatch"
+            $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
           schema:
-            $ref: "#/definitions/Job"
+            $ref: "#/definitions/core.v1.Job"
         404:
           description: "Resource does not exists"
         403:
@@ -2897,7 +2897,7 @@ paths:
   /api/v1/namespaces/{namespace}/processes:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get all processes"
       operationId: "getProcesses"
       produces:
@@ -2949,14 +2949,14 @@ paths:
         200:
           description: "Process"
           schema:
-            $ref: "#/definitions/Processes"
+            $ref: "#/definitions/core.v1.Processes"
         404:
           description: "Job does not exists"
         403:
           description: "Access denied"
     post:
       tags:
-      - "v1"
+      - core.v1
       summary: "Trigger a new process"
       operationId: "addProcess"
       produces:
@@ -2970,12 +2970,12 @@ paths:
       - in: body
         name: data
         schema:
-          $ref: "#/definitions/Process"
+          $ref: "#/definitions/core.v1.Process"
       responses:
         202:
           description: "Returns a 202 if successful"
           schema:
-            $ref: "#/definitions/Process"
+            $ref: "#/definitions/core.v1.Process"
         404:
           description: "Job does not exists"
         403:
@@ -2983,7 +2983,7 @@ paths:
   /api/v1/namespaces/{namespace}/processes/{process}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get a single process of a job"
       operationId: "getProcess"
       produces:
@@ -3003,14 +3003,14 @@ paths:
         200:
           description: "Process"
           schema:
-            $ref: "#/definitions/Process"
+            $ref: "#/definitions/core.v1.Process"
         404:
           description: "Process does not exists"
         403:
           description: "Access denied"
     delete:
       tags:
-      - "v1"
+      - core.v1
       summary: "Abort running process"
       operationId: "deleteProcess"
       produces:
@@ -3036,7 +3036,7 @@ paths:
   /api/v1/namespaces/{namespace}/jobs/{job}/logs:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get logs of a job"
       operationId: "getJobLogs"
       produces:
@@ -3093,7 +3093,7 @@ paths:
         200:
           description: "Job"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -3101,7 +3101,7 @@ paths:
   /api/v1/namespaces/{namespace}/jobs/{job}/logs/{log}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get a single job error"
       operationId: "getJobLog"
       produces:
@@ -3126,7 +3126,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Job does not exists"
         403:
@@ -3134,7 +3134,7 @@ paths:
   /api/v1/namespaces/{namespace}/processes/{process}/logs:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get logs of a process"
       operationId: "getProcessLogs"
       produces:
@@ -3191,7 +3191,7 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Process does not exists"
         403:
@@ -3199,7 +3199,7 @@ paths:
   /api/v1/namespaces/{namespace}/process/{process}/logs/{log}:
     get:
       tags:
-      - "v1"
+      - core.v1
       summary: "Get a single process log"
       operationId: "getProcessLog"
       produces:
@@ -3224,13 +3224,13 @@ paths:
         200:
           description: "Log"
           schema:
-            $ref: "#/definitions/Log"
+            $ref: "#/definitions/core.v1.Log"
         404:
           description: "Log does not exists"
         403:
           description: "Access denied"
 definitions:
-  JsonPatch:
+  core.v1.JsonPatch:
     description: "A JSON Patch according rfc6902."
     type: "object"
     properties:
@@ -3240,32 +3240,32 @@ definitions:
         type: "string"
       value:
         type: "string"
-  Links:
+  core.v1.Links:
     description: "Contains resource links (URL) to other resources."
     type: "object"
     properties:
       self:
-        $ref: "#/definitions/Link"
-  ListLinks:
+        $ref: "#/definitions/core.v1.Link"
+  core.v1.ListLinks:
     type: "object"
     properties:
       self:
-        $ref: "#/definitions/Link"
+        $ref: "#/definitions/core.v1.Link"
       prev:
-        $ref: "#/definitions/Link"
+        $ref: "#/definitions/core.v1.Link"
       next:
-        $ref: "#/definitions/Link"
-  Link:
+        $ref: "#/definitions/core.v1.Link"
+  core.v1.Link:
     type: "object"
     properties:
       href:
         type: "string"
-  List:
+  core.v1.List:
     type: "object"
     properties:
       _links:
         description: "Holds a list of links rfc1738 to other resources."
-        $ref: "#/definitions/ListLinks"
+        $ref: "#/definitions/core.v1.ListLinks"
       kind:
         description: "The resource type, always List."
         type: "string"
@@ -3276,11 +3276,11 @@ definitions:
       total:
         description: "Holds the number of total available items on the server. Note that a List resource is always paged. You need to traverse with offset and limit to request further resources in the list."
         type: "number"
-  Resource:
+  core.v1.Resource:
     type: "object"
     properties:
       _links:
-        $ref: "#/definitions/Links"
+        $ref: "#/definitions/core.v1.Links"
       name:
         description: "Resource identifier. Note that the name is immutable once created on the server and must be unique in its own resource context."
         type: "string"
@@ -3300,8 +3300,8 @@ definitions:
         description: "Injected secrets in this resource."
         type: "array"
         items:
-          $ref: "#/definitions/SecretMount"
-  SecretMount:
+          $ref: "#/definitions/core.v1.SecretMount"
+  core.v1.SecretMount:
     type: "object"
     properties:
       secret:
@@ -3313,40 +3313,40 @@ definitions:
       to:
         description: "The resource path where the secret value should be injected (You may use a recursive path by delimiting keys with '.', for example: data.resource.password)."
         type: "string"
-  Namespaces:
+  core.v1.Namespaces:
     description: "A list of namespaces."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Namespace"
-  Namespace:
+              $ref: "#/definitions/core.v1.Namespace"
+  core.v1.Namespace:
     description: "A namespace is a namespace to separate resources."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
             description: "The resource type, always Namespace."
             type: "string"
             default: "Namespace"
-  Secrets:
+  core.v1.Secrets:
     description: "A list of secrets."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Secret"
-  Secret:
+              $ref: "#/definitions/core.v1.Secret"
+  core.v1.Secret:
     description: "A secret is sensitive information which can be injected into another resource. A secret gets specially encrypted on the server and is always base64 encoded."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3356,20 +3356,20 @@ definitions:
           data:
             description: "The secrets data. You may specify multiple keys. Important: You need to base64 encode the values!"
             type: object
-  Users:
+  core.v1.Users:
     description: "A list of users."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/User"
-  User:
+              $ref: "#/definitions/core.v1.User"
+  core.v1.User:
     description: "A local tubee user."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3383,20 +3383,20 @@ definitions:
               password:
                 description: "The users password. Gets hashed on the server and can not be retrieved after."
                 type: "string"
-  AccessRules:
+  core.v1.AccessRules:
     description: "A list of access rules."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/AccessRule"
-  AccessRule:
+              $ref: "#/definitions/core.v1.AccessRule"
+  core.v1.AccessRule:
     description: "An access rule allows to specify what access roles can access which resources."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3434,20 +3434,20 @@ definitions:
                 type: "array"
                 items:
                   type: "string"
-  AccessRoles:
+  core.v1.AccessRoles:
     description: "A list of access roles."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/AccessRole"
-  AccessRole:
+              $ref: "#/definitions/core.v1.AccessRole"
+  core.v1.AccessRole:
     description: "An access role is defined list which matches authenticated user identifiers."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3462,20 +3462,20 @@ definitions:
                 type: "array"
                 items:
                   type: "string"
-  Processes:
+  core.v1.Processes:
     description: "A list of processes."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Process"
-  Process:
+              $ref: "#/definitions/core.v1.Process"
+  core.v1.Process:
     description: "A process is a sub resource of a job. Each process represents one job execution."
     allOf:
-      - $ref: '#/definitions/Job'
+      - $ref: '#/definitions/core.v1.Job'
       - type: object
         properties:
           kind:
@@ -3492,20 +3492,20 @@ definitions:
               code:
                 description: "The result code of the process."
                 type: "number"
-  Jobs:
+  core.v1.Jobs:
     description: "A list of jobs."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Job"
-  Job:
+              $ref: "#/definitions/core.v1.Job"
+  core.v1.Job:
     description: "A job is a synchronization job which declares when and what collections should be synchronized."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3586,20 +3586,20 @@ definitions:
                     description: "The number of secconds beween failed job retries. The default is 300 (5min)."
                     type: "integer"
                     default: 0
-  Logs:
+  core.v1.Logs:
     description: "A list of logs."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Log"
-  Log:
+              $ref: "#/definitions/core.v1.Log"
+  core.v1.Log:
     description: "A log messagage from a process."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3622,20 +3622,20 @@ definitions:
               exception:
                 description: "Holds an exception object if the log message holds an exception reference."
                 type: "object"
-  Collections:
+  core.v1.Collections:
     description: "A list of collections."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Collections"
-  Collection:
+              $ref: "#/definitions/core.v1.Collections"
+  core.v1.Collection:
     description: "A collection is a collection of data objects, meaning a collection of similar objects."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3651,20 +3651,20 @@ definitions:
               schema:
                 type: object
                 default: {}
-  Endpoints:
+  core.v1.Endpoints:
     description: "A list of endpoints."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Endpoint"
-  Endpoint:
+              $ref: "#/definitions/core.v1.Endpoint"
+  core.v1.Endpoint:
     description: "An endpoint represents an external resource to browse (proxy), import or export. This may be a database, a file, a http service, ..."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -3715,10 +3715,10 @@ definitions:
                   filter_all:
                     description: "Specify a filter which always gets applied to the endpoint if objects are retrieved."
                     type: "string"
-  PdoEndpoint:
+  core.v1.PdoEndpoint:
     description: "Pdo endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -3747,10 +3747,10 @@ definitions:
                     description: "Driver specific connection options."
                     type: object
                     default: {}
-  MysqlEndpoint:
+  core.v1.MysqlEndpoint:
     description: "MySQL/MariaDB (and other MySQL forks) endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -3782,10 +3782,10 @@ definitions:
                   socket:
                     description: "Specifies the socket or named pipe that should be used."
                     type: string
-  LdapEndpoint:
+  core.v1.LdapEndpoint:
     description: "LDAP (OpenLDAP, Microsoft AD and other LDAP compatible Server) endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -3817,10 +3817,10 @@ definitions:
                   options:
                     description: "More ldap specific settings (http://php.net/manual/en/function.ldap-set-option.php)."
                     type: object
-  OdataRestEndpoint:
+  core.v1.OdataRestEndpoint:
     description: "OData REST API endpoint (Compatible with Microsoft graph (Office365 and more) and other OData compatible api's)"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -3871,10 +3871,10 @@ definitions:
                       scope:
                         description: "OAuth2 scopes"
                         type: string
-  UcsEndpoint:
+  core.v1.UcsEndpoint:
     description: "UCS endpoint (Univention Corporate Server, https://www.univention.com/products/ucs)"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -3906,10 +3906,10 @@ definitions:
                       password:
                         description: "Password if required."
                         type: string
-  MongodbEndpoint:
+  core.v1.MongodbEndpoint:
     description: "MongoDB endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -3937,10 +3937,10 @@ definitions:
                     description: "Advanced Driver options"
                     type: object
                     default: {}
-  BalloonEndpoint:
+  core.v1.BalloonEndpoint:
     description: "Balloon cloud server endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         required:
         - kind
@@ -4010,10 +4010,10 @@ definitions:
                         default: null
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
                         type: string
-  CsvEndpoint:
+  core.v1.CsvEndpoint:
     description: "CSV data format endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -4023,7 +4023,7 @@ definitions:
           data:
             properties:
               storage:
-                $ref: '#/definitions/Storage'
+                $ref: '#/definitions/core.v1.Storage'
               file:
                 description: "File uri or pattern, depends what storage you have choosen."
                 type: string
@@ -4043,10 +4043,10 @@ definitions:
                     description: "Escape character."
                     type: string
                     default: "\\"
-  XmlEndpoint:
+  core.v1.XmlEndpoint:
     description: "XML data format endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -4056,7 +4056,7 @@ definitions:
           data:
             properties:
               storage:
-                $ref: '#/definitions/Storage'
+                $ref: '#/definitions/core.v1.Storage'
               file:
                 description: "File uri or pattern, depends what storage you have choosen."
                 type: string
@@ -4080,10 +4080,10 @@ definitions:
                     description: "Preserve whitespace, note this is only useful if the XmlEndpoint is a destination endpoint."
                     type: boolean
                     default: false
-  JsonEndpoint:
+  core.v1.JsonEndpoint:
     description: "JSON data format endpoint"
     allOf:
-      - $ref: '#/definitions/Endpoint'
+      - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         properties:
           kind:
@@ -4093,11 +4093,11 @@ definitions:
           data:
             properties:
               storage:
-                $ref: '#/definitions/Storage'
+                $ref: '#/definitions/core.v1.Storage'
               file:
                 description: "File uri or pattern, depends what storage you have choosen."
                 type: string
-  Storage:
+  core.v1.Storage:
     description: "The storage defines where data can be fetched."
     type: object
     properties:
@@ -4110,20 +4110,20 @@ definitions:
           - LocalFilesystem
           - Smb
           - Balloon
-  Workflows:
+  core.v1.Workflows:
     description: "A list of workflows."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/Workflow"
-  Workflow:
+              $ref: "#/definitions/core.v1.Workflow"
+  core.v1.Workflow:
     description: "A workflow gets used if an endpoint gets imported or exported. A workflow defines if and what object and also if and what attributes of an object should be written to or from an endpoint."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -4152,16 +4152,16 @@ definitions:
                 description: "Map attributes from the endpoint to the collection schema (if the endpoint is of type source) or map attributes from the collection to the endpoint if the endpoint is of type destination."
                 type: object
                 default: {}
-  AttributeMap:
+  core.v1.AttributeMap:
     type: "object"
     properties:
       map:
         type: "object"
         description: "Attribute map"
-  EndpointObjects:
+  core.v1.EndpointObjects:
     description: "A list of endpoint objects."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           kind:
@@ -4171,30 +4171,30 @@ definitions:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/EndpointObject"
-  EndpointObject:
+              $ref: "#/definitions/core.v1.EndpointObject"
+  core.v1.EndpointObject:
     description: "An endpoint object is the actual object on an endpoint itself."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           data:
             description: "Attributes"
             type: "object"
-  DataObjects:
+  core.v1.DataObjects:
     description: "List of data objects."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/DataObject"
-  DataObject:
+              $ref: "#/definitions/core.v1.DataObject"
+  core.v1.DataObject:
     description: "A data object represents a single object in a collection (data collection)."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
@@ -4204,20 +4204,20 @@ definitions:
           data:
             description: "Attributes"
             type: "object"
-  ObjectRelations:
+  core.v1.ObjectRelations:
     description: "A list of relations."
     allOf:
-      - $ref: '#/definitions/List'
+      - $ref: '#/definitions/core.v1.List'
       - type: object
         properties:
           data:
             type: "array"
             items:
-              $ref: "#/definitions/ObjectRelation"
-  ObjectRelation:
+              $ref: "#/definitions/core.v1.ObjectRelation"
+  core.v1.ObjectRelation:
     description: "An object relation represents a releationship between two data objects. A relationship may apply to objects of different collections and/or namespaces."
     allOf:
-      - $ref: '#/definitions/Resource'
+      - $ref: '#/definitions/core.v1.Resource'
       - type: object
         properties:
           kind:
