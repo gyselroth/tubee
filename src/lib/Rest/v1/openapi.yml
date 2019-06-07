@@ -3683,6 +3683,7 @@ components:
     core.v1.Links:
       description: Contains resource links (URL) to other resources.
       type: object
+      readOnly: true
       properties:
         self:
           $ref: "#/components/schemas/core.v1.Link"
@@ -3857,6 +3858,7 @@ components:
                 password:
                   description: The users password. Gets hashed on the server and can not be
                     retrieved after.
+                  writeOnly: true
                   type: string
     core.v1.AccessRules:
       description: A list of access rules.
@@ -4020,6 +4022,31 @@ components:
             namespace:
               description: The resource namespace
               type: string
+          status:
+            type: object
+            readOnly: true
+            properties:
+               status: 
+                 type: boolean
+               last_process:
+                 type: object
+                 default: null
+                 nullable: true
+                 properties:
+                   process:
+                     type: string
+                   next:
+                     type: integer
+                   started:
+                     type: string
+                   ended:
+                     type: string
+                     nullable: true
+                     default: null
+                   result: 
+                     type: string
+                   code:
+                     type: integer
             data:
               type: object
               default:
@@ -4381,6 +4408,18 @@ components:
             collection:
               description: The data object collection
               type: string
+            status:
+              type: object
+              readOnly: true
+              properties:
+                 available: 
+                   type: boolean
+                 exception:
+                   type: string
+                 error:
+                   type: string
+                 code:
+                   type: integer
             data:
               type: object
               properties:
@@ -4701,6 +4740,11 @@ components:
                   - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"                    
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -4956,6 +5000,11 @@ components:
                   - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -5004,6 +5053,11 @@ components:
                   - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -5059,6 +5113,11 @@ components:
                   - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
