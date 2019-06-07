@@ -5387,6 +5387,9 @@ components:
             data:
               description: Attributes
               type: object
+            status:
+              type: object
+              readOnly: true
     core.v1.ObjectRelations:
       description: A list of relations.
       allOf:
@@ -5409,6 +5412,9 @@ components:
               description: The resource type, always DataObjectRelation.
               type: string
               default: DataObjectRelation
+            status:
+              type: object
+              readOnly: true
             data:
               type: object
               required:
