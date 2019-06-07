@@ -5,7 +5,7 @@
 * CORE: [FIX] Add workflow with no data ends in Undefined index exception #44
 * API: [CHANGE] Added core.v1 prefix to all requests and resources in openapi/swagger schemas
 * CORE: [CHANGE] Ucs endpoint must check search response for equality #45
-* API: [CHANGE] Added readonly flags to job/process/endpoint status fieldss
+* API: [CHANGE] Added readonly flags to Job/Process/Endpoint,DataObjectRelation,DataObject status fieldss
 
 
 ## 1.0.0-beta20
