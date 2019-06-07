@@ -72,16 +72,17 @@ class Factory
                 'category' => get_class($this),
             ]);
 
-            return $this->cache->get($kind);
+            // return $this->cache->get($kind);
         }
 
         $spec = $this->loadSpecification();
+        $key = 'core.v1.'.$kind;
 
-        if (!isset($spec['components']['schemas'][$kind])) {
+        if (!isset($spec['components']['schemas'][$key])) {
             throw new InvalidArgumentException('provided resource kind is invalid');
         }
 
-        $schema = new Schema($spec['components']['schemas'][$kind]);
+        $schema = new Schema($spec['components']['schemas'][$key]);
         $schema->setRefLookup(new ArrayRefLookup($spec));
         $schema->setFlags(Schema::VALIDATE_EXTRA_PROPERTY_EXCEPTION);
         $this->cache->set($kind, $schema);
@@ -314,7 +315,7 @@ class Factory
     protected function loadSpecification(): array
     {
         if ($this->cache->has('openapi')) {
-            return $this->cache->get('openapi');
+            //        return $this->cache->get('openapi');
         }
 
         $data = Yaml::parseFile(self::SPEC);
