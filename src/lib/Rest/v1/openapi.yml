@@ -4375,6 +4375,12 @@ components:
                 - BalloonEndpoint
                 - OdataRestEndpoint
                 - UcsEndpoint
+            namespace:
+              description: The resource namespace
+              type: string
+            collection:
+              description: The data object collection
+              type: string
             data:
               type: object
               properties:
@@ -5098,8 +5104,11 @@ components:
               - Workflow
             data:
               type: object
-              required:
-              - map
+              default:
+                priority: 0
+                ensure: last
+                condition: null
+                map: []
               properties:
                 priority:
                   description: The priority defines in what order multiple workflows get
@@ -5125,6 +5134,7 @@ components:
                     the collection to the endpoint if the endpoint is of type
                     destination.
                   type: array
+                  default: []
                   items:
                     $ref: "#/components/schemas/MapAttribute"
     GarbageWorkflow:

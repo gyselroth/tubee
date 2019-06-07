@@ -1,3 +1,10 @@
+## 1.0.0-beta21
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Jun 07 09:01:12 CEST 2019
+
+* CORE: [FIX] Add workflow with no data ends in Undefined index exception #44
+
+
 ## 1.0.0-beta20
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jun 03 15:50:12 CEST 2019
