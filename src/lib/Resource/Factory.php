@@ -72,7 +72,7 @@ class Factory
                 'category' => get_class($this),
             ]);
 
-            // return $this->cache->get($kind);
+            return $this->cache->get($kind);
         }
 
         $spec = $this->loadSpecification();
@@ -315,7 +315,7 @@ class Factory
     protected function loadSpecification(): array
     {
         if ($this->cache->has('openapi')) {
-            //        return $this->cache->get('openapi');
+            return $this->cache->get('openapi');
         }
 
         $data = Yaml::parseFile(self::SPEC);

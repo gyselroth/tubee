@@ -157,7 +157,6 @@ class Factory
         }
 
         $resource['namespace'] = $namespace->getName();
-
         $result = $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
 
         $resource['data'] += [
