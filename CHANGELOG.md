@@ -1,3 +1,10 @@
+## 1.0.0-beta22
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Jun 12 14:01:12 CEST 2019
+
+* API: [FIX] fixes process data Tubee\Rest\Middlewares\ExceptionHandler,ERROR]: uncaught exception Unexpected property: data
+
+
 ## 1.0.0-beta21
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Jun 07 09:01:12 CEST 2019

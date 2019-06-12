@@ -4022,31 +4022,31 @@ components:
             namespace:
               description: The resource namespace
               type: string
-          status:
-            type: object
-            readOnly: true
-            properties:
-               status: 
-                 type: boolean
-               last_process:
-                 type: object
-                 default: null
-                 nullable: true
-                 properties:
-                   process:
-                     type: string
-                   next:
-                     type: integer
-                   started:
-                     type: string
-                   ended:
-                     type: string
-                     nullable: true
-                     default: null
-                   result: 
-                     type: string
-                   code:
-                     type: integer
+            status:
+              type: object
+              readOnly: true
+              properties:
+                 status:
+                   type: boolean
+                 last_process:
+                   type: object
+                   default: null
+                   nullable: true
+                   properties:
+                     process:
+                       type: string
+                     next:
+                       type: integer
+                     started:
+                       type: string
+                     ended:
+                       type: string
+                       nullable: true
+                       default: null
+                     result:
+                       type: string
+                     code:
+                       type: integer
             data:
               type: object
               default:
@@ -4412,7 +4412,7 @@ components:
               type: object
               readOnly: true
               properties:
-                 available: 
+                 available:
                    type: boolean
                  exception:
                    type: string
@@ -4744,7 +4744,7 @@ components:
                       StreamStorage: "#/components/schemas/core.v1.StreamStorage"
                       SmbStorage: "#/components/schemas/core.v1.SmbStorage"
                       BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
-                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"                    
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
