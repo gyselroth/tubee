@@ -1,3 +1,10 @@
+## 1.0.0-beta25
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jun 17 09:23:12 CEST 2019
+
+* CORE: [FIX] Added new logs mongodb index (parent, namespace) which drastically increase log request performance
+
+
 ## 1.0.0-beta24
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jun 17 09:23:12 CEST 2019

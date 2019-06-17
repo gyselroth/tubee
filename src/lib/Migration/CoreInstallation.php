@@ -147,6 +147,7 @@ class CoreInstallation implements DeltaInterface
         $this->db->logs->createIndex(['datetime' => 1], ['expireAfterSeconds' => 1209600]);
         $this->db->logs->createIndex(['level_name' => 1]);
         $this->db->logs->createIndex(['context.process' => 1, 'context.namespace' => 1, 'context.parent' => 1]);
+        $this->db->logs->createIndex(['context.namespace' => 1, 'context.parent' => 1]);
         $this->db->logs->createIndex(['context.job' => 1, 'context.namespace' => 1]);
         $this->db->logs->createIndex(['context.collection' => 1, 'context.namespace' => 1]);
         $this->db->logs->createIndex(['context.endpoint' => 1, 'context.collection' => 1, 'context.namespace' => 1]);
