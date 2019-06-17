@@ -214,6 +214,8 @@ class Factory
 
         if (empty($sort)) {
             $sort = ['$natural' => -1];
+        } elseif ($sort == ['$natural' => 1]) {
+            $sort = [];
         }
 
         $result = $collection->find($query, [

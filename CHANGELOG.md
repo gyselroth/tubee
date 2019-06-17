@@ -1,3 +1,17 @@
+## 1.0.0-beta24
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jun 17 09:23:12 CEST 2019
+
+* CORE: [FIX] Do not sort if sort is equal {$natual: 1}, this is a default anyway but will slow down the query if mentioned
+
+
+## 1.0.0-beta23
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Jun 12 14:01:12 CEST 2019
+
+* API: [FIX] error":"TypeError","message":"Argument 3 passed to Tubee\\DataObjectRelation\\Factory::watch() must be of the type boolean, array given, called in /usr/share/tubee/src/lib/Rest/v1/ObjectRelations.php on line 80
+
+
 ## 1.0.0-beta22
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Jun 12 14:01:12 CEST 2019

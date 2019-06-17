@@ -181,6 +181,9 @@ class Factory
         });
     }
 
+    /**
+     * Get all.
+     */
     public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
         $filter = $this->prepareQuery($namespace, $query);
@@ -191,6 +194,9 @@ class Factory
         });
     }
 
+    /**
+     * Delete resource identified by objects.
+     */
     public function deleteFromObject(DataObjectInterface $object_1, DataObjectInterface $object_2, bool $simulate = false): bool
     {
         $relations = [
@@ -212,6 +218,9 @@ class Factory
         return true;
     }
 
+    /**
+     * Create or update realation.
+     */
     public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $relations = [
@@ -336,6 +345,9 @@ class Factory
         return $this->resource_factory->initResource(new DataObjectRelation($resource, $object));
     }
 
+    /**
+     * Prepare query.
+     */
     protected function prepareQuery(ResourceNamespaceInterface $namespace, ?array $query = null): array
     {
         $filter = [
