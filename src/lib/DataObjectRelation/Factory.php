@@ -266,8 +266,11 @@ class Factory
         }
 
         if ($exists !== null) {
+            $update = $exists['data'];
+            $update['context'] = $context;
+
             $data = [
-                'data' => $exists['data'],
+                'data' => $update,
                 'endpoints' => array_replace_recursive($exists['endpoints'], $endpoints),
             ];
 
