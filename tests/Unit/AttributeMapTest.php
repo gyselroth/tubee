@@ -192,6 +192,16 @@ class AttributeMapTest extends TestCase
         $this->assertSame('foobar', $result['foo']);
     }
 
+    public function testAttributeFilterTrim()
+    {
+        $map = new AttributeMap([
+            ['name' => 'foo',  'value' => 'foobar ', 'filter' => ['StringTrim']],
+        ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
+
+        $result = $map->map(['foo' => 'foo']);
+        $this->assertSame('foobar', $result['foo']);
+    }
+
     /*public function testAttributeScriptDynamicValue()
     {
         $map = new AttributeMap([

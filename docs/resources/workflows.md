@@ -103,7 +103,8 @@ The mapping is defined within `map` and contains a list of attribute mappings. E
 | value | `null`  | Defines a static value. |
 | script | `null` | Execute JavaScript using the V8 engine.  |
 | type | `<same type as value>` | Convert the value to another type. |
-| rewrite | `null` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
+| rewrite | `[]` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
+| filters | `[]` | Chain of predefined string filters to apply |
 | unwind | `null`  | Unwind a list and operate attribute options on each list element. |
 | skip | `false` | If true the attribute gets ignored. This may be useful if an attribute is only used for an object relation creation or relation context. |
 | map | <object> | Define an object relation mapping to another collection. Automatically create DataObjectReations. |
@@ -263,7 +264,26 @@ This mapping will automatically try to create DataObjectRelations between those 
 Skip is by default false. An attribute which has skip on `true` is declared as a virtual attribute and never gets written anywhere. 
 However a skip: true attribute may be useful if it gets used to write a DataObjectRelation context (See [Map](#Map)).
 
-
 ### Writeonly 
 
 A password attribute is an example for such attributes. Passwords usually may be writeable but get not returned. While writeonly is set to true and DataObject already exists on the endpoint, the attribute does not get written. writeonly: true attributes may only get written during object creation. Note that it does not matter what value `ensure` holds while the attribute is set on writeonly and the DataObject already exists.
+
+### Filter
+
+Specify an optional chain of filters to apply as string filters:
+
+* Alnum
+* Alpha
+* BaseName
+* Digits
+* Dir
+* HtmlEntities
+* RealPath
+* StringPrefix
+* StringSuffix
+* StringToLower
+* StringToUpper
+* StringTrim
+* StripNewlines
+* StripTags
+* UriNormalize

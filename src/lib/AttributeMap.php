@@ -195,12 +195,12 @@ class AttributeMap implements AttributeMapInterface
             $attrv = $this->firstArrayElement($attrv, $attr);
         }
 
-        if (count($value['filter']) > 0) {
+        if (isset($value['filter']) && count($value['filter']) > 0) {
             $chain = new FilterChain(['filters' => $this->getFilters($value['filter'])]);
             $attrv = $chain->filter($attrv);
         }
 
-        if (isset($value['rewrite'])) {
+        if (isset($value['rewrite']) && count($value['rewrite']) > 0) {
             $attrv = $this->rewrite($attrv, $value['rewrite']);
         }
 
