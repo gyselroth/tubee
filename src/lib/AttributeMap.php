@@ -20,6 +20,7 @@ use Tubee\AttributeMap\Exception;
 use Tubee\AttributeMap\Transform;
 use Tubee\V8\Engine as V8Engine;
 use V8Js;
+use Zend\Filter\FilterChain;
 
 class AttributeMap implements AttributeMapInterface
 {
@@ -194,6 +195,11 @@ class AttributeMap implements AttributeMapInterface
             $attrv = $this->firstArrayElement($attrv, $attr);
         }
 
+        if (count($value['filter']) > 0) {
+            $chain = new FilterChain(['filters' => $this->getFilters($value['filter'])]);
+            $attrv = $chain->filter($attrv);
+        }
+
         if (isset($value['rewrite'])) {
             $attrv = $this->rewrite($attrv, $value['rewrite']);
         }
@@ -205,6 +211,19 @@ class AttributeMap implements AttributeMapInterface
         }
 
         return $attrv;
+    }
+
+    /**
+     * Get filters.
+     */
+    protected function getFilters(array $filter = []): array
+    {
+        $result = [];
+        foreach ($filter as $value) {
+            $result[] = ['name' => $value];
+        }
+
+        return $result;
     }
 
     /**
@@ -250,10 +269,6 @@ class AttributeMap implements AttributeMapInterface
                 'exception' => $e,
             ]);
         }
-
-        //if (isset($data[$attr])) {
-        //    return $data[$attr];
-        //}
 
         return $result;
     }

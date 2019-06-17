@@ -11,7 +11,7 @@ log during debugging sessions.
 
 For example the current processed object my be logged by calling:
 ```js
-core.logger.debug(JSON.encode(object));
+core.logger.debug(JSON.stringify(object));
 ```
 
 ## Other inbuilt functionality

@@ -3,6 +3,8 @@
 **Date**: Mon Jun 17 09:23:12 CEST 2019
 
 * CORE: [FIX] Added new logs mongodb index (parent, namespace) which drastically increase log request performance
+* DOCS: [CHANGE] Added permalink extension (anchors)
+* CORE: [FEATURE] Added predefined filters to workflow attributes
 
 
 ## 1.0.0-beta24

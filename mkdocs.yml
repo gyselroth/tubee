@@ -5,6 +5,8 @@ extra_css:
 markdown_extensions:
 - markdown_include.include:
     base_path: .
+- toc:
+    permalink: 
 nav:
  - Home: index.md
  - Overwiew: overview.md

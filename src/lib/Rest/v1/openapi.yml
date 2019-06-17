@@ -5317,6 +5317,7 @@ components:
           default: null
         rewrite:
           type: array
+          default: []
           description: Rewrite resolved attribute values
           items:
             type: object
@@ -5336,6 +5337,27 @@ components:
               to:
                 type: string
                 description: "The destination value. You may use variables ($1, $2,...) from regex subsets if match has been used."
+        filter:
+          description: "Apply various filters."
+          type: array
+          default: []
+          items:
+            type: string
+            enum:
+            - Alnum
+            - Alpha
+            - BaseName
+            - Digits
+            - Dir
+            - HtmlEntities
+            - RealPath
+            - StringPrefix
+            - StringSuffix
+            - StringToLower
+            - StringToUpper
+            - StringTrim
+            - StripNewlines
+            - StripTags
     core.v1.EndpointObjects:
       description: A list of endpoint objects.
       allOf:
