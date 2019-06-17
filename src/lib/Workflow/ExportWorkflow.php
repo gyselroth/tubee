@@ -113,12 +113,8 @@ class ExportWorkflow extends Workflow
             ]);
         }
 
-        if (!isset($endpoints[$this->endpoint->getName()]['result'])) {
-            if (isset($exists->getData()[$this->endpoint->getResourceIdentifier()])) {
-                $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getResourceIdentifier()];
-            } else {
-                $endpoints[$this->endpoint->getName()]['result'] = null;
-            }
+        if (isset($exists->getData()[$this->endpoint->getResourceIdentifier()])) {
+            $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getResourceIdentifier()];
         }
 
         $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);

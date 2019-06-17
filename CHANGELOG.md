@@ -5,6 +5,7 @@
 * CORE: [FIX] Added new logs mongodb index (parent, namespace) which drastically increase log request performance
 * DOCS: [CHANGE] Added permalink extension (anchors)
 * CORE: [FEATURE] Added predefined filters to workflow attributes
+* CORE: [CHANGE] Update endpoint status of DataObject #49
 
 
 ## 1.0.0-beta24
