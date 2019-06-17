@@ -124,8 +124,19 @@ class ImportWorkflow extends Workflow
                     ],
                 ];
 
-                $collection->changeObject($exists, $object, $simulate, $endpoints);
                 $this->importRelations($exists, $map, $simulate, $endpoints);
+                $endpoints = $exists->getEndpoints();
+
+                if (isset($endpoints[$this->endpoint->getName()])
+                    && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
+                    $this->logger->warning('source object with given import filter is not unique (multiple data objects found), skip update resource', [
+                        'category' => get_class($this),
+                    ]);
+
+                    return true;
+                }
+
+                $collection->changeObject($exists, $object, $simulate, $endpoints);
 
                 return true;
 
@@ -181,30 +192,32 @@ class ImportWorkflow extends Workflow
 
             $namespace = $this->endpoint->getCollection()->getResourceNamespace();
             $collection = $namespace->getCollection($definition['map']['collection']);
-            $relative = $collection->getObject([
+            $relatives = $collection->getObjects([
                 $definition['map']['to'] => $data[$definition['name']],
             ]);
 
-            $this->logger->debug('ensure relation state ['.$definition['map']['ensure'].'] for relation to ['.$relative->getId().']', [
-                'category' => get_class($this),
-            ]);
+            foreach ($relatives as $relative) {
+                $this->logger->debug('ensure relation state ['.$definition['map']['ensure'].'] for relation to ['.$relative->getId().']', [
+                    'category' => get_class($this),
+                ]);
 
-            switch ($definition['map']['ensure']) {
-                case WorkflowInterface::ENSURE_EXISTS:
-                case WorkflowInterface::ENSURE_LAST:
-                    $context = array_intersect_key($data, array_flip($definition['map']['context']));
-                    $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
-                    $collection = $this->endpoint->getCollection()->getName();
-                    $ep = $this->endpoint->getName();
+                switch ($definition['map']['ensure']) {
+                    case WorkflowInterface::ENSURE_EXISTS:
+                    case WorkflowInterface::ENSURE_LAST:
+                        $context = array_intersect_key($data, array_flip($definition['map']['context']));
+                        $namespace = $this->endpoint->getCollection()->getResourceNamespace()->getName();
+                        $collection = $this->endpoint->getCollection()->getName();
+                        $ep = $this->endpoint->getName();
 
-                    $endpoints = [
-                        join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
-                    ];
+                        $endpoints = [
+                            join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
+                        ];
 
-                    $object->createOrUpdateRelation($relative, $context, $simulate, $endpoints);
+                        $object->createOrUpdateRelation($relative, $context, $simulate, $endpoints);
 
-                break;
-                default:
+                    break;
+                    default:
+                }
             }
         }
 
@@ -217,7 +230,9 @@ class ImportWorkflow extends Workflow
     protected function getImportObject(CollectionInterface $collection, array $map, array $object, UTCDateTimeInterface $ts): ?DataObjectInterface
     {
         $filter = array_intersect_key($map, array_flip($this->endpoint->getImport()));
-        //TODO: debug import line here
+        $this->logger->debug('try to match source object in collection with [{filter}]', [
+            'filter' => json_encode($filter),
+        ]);
 
         if (empty($filter) || count($filter) !== count($this->endpoint->getImport())) {
             throw new Exception\ImportConditionNotMet('import condition attributes are not available from mapping');
@@ -230,13 +245,6 @@ class ImportWorkflow extends Workflow
         } catch (DataObjectException\NotFound $e) {
             return null;
         }
-
-        /*$endpoints = $exists->getEndpoints();
-
-        if ($exists !== false && isset($endpoints[$this->endpoint->getName()])
-        && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
-            throw new Exception\ImportConditionNotMet('import filter matched multiple source objects');
-        }*/
 
         return $exists;
     }

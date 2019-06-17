@@ -15,7 +15,9 @@ use Generator;
 use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
+use Psr\Log\LoggerInterface;
 use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObject\Exception\NotFound;
 use Tubee\DataObjectRelation;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
@@ -42,12 +44,20 @@ class Factory
     protected $resource_factory;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, ResourceFactory $resource_factory)
+    public function __construct(Database $db, ResourceFactory $resource_factory, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->resource_factory = $resource_factory;
+        $this->logger = $logger;
     }
 
     /**
@@ -141,8 +151,11 @@ class Factory
         }
 
         $that = $this;
+        $logger = $this->logger;
+        $resource_factory = $this->resource_factory;
+        $db = $this->db;
 
-        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation, $that) {
+        return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($object, $relation, $logger, $resource_factory, $db, $that) {
             $object_1 = $resource['data']['relation'][0];
             $object_2 = $resource['data']['relation'][1];
             $related = $object_1;
@@ -151,24 +164,29 @@ class Factory
                 $related = $object_2;
             }
 
-            $related = $object->getCollection()->getResourceNamespace()->switch($related['namespace'])->getCollection($related['collection'])->getObject(['name' => $related['object']]);
+            try {
+                $related = $object->getCollection()->getResourceNamespace()->switch($related['namespace'])->getCollection($related['collection'])->getObject(['name' => $related['object']]);
 
-            return $that->build($resource, $related);
+                return $that->build($resource, $related);
+            } catch (NotFound $e) {
+                $logger->error('could not resolve related data object, drop relation', [
+                    'category' => get_class($this),
+                    'exception' => $e,
+                ]);
+
+                $resource_factory->deleteFrom($db->{Factory::COLLECTION_NAME}, $resource['_id']);
+
+                return null;
+            }
         });
     }
 
+    /**
+     * Get all.
+     */
     public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $filter = [
-            'namespace' => $namespace->getName(),
-        ];
-
-        if (!empty($query)) {
-            $filter = [
-                '$and' => [$filter, $query],
-            ];
-        }
-
+        $filter = $this->prepareQuery($namespace, $query);
         $that = $this;
 
         return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($that) {
@@ -176,6 +194,9 @@ class Factory
         });
     }
 
+    /**
+     * Delete resource identified by objects.
+     */
     public function deleteFromObject(DataObjectInterface $object_1, DataObjectInterface $object_2, bool $simulate = false): bool
     {
         $relations = [
@@ -197,6 +218,9 @@ class Factory
         return true;
     }
 
+    /**
+     * Create or update realation.
+     */
     public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $relations = [
@@ -278,6 +302,9 @@ class Factory
         return $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
     }
 
+    /**
+     * Update.
+     */
     public function update(DataObjectRelationInterface $resource, array $data): bool
     {
         $data['name'] = $resource->getName();
@@ -287,6 +314,9 @@ class Factory
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
 
+    /**
+     * Delete one.
+     */
     public function deleteOne(DataObjectRelationInterface $relation, bool $simulate = false): bool
     {
         $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $relation->getId());
@@ -299,9 +329,10 @@ class Factory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        $filter = $this->prepareQuery($namespace, $query);
         $that = $this;
 
-        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($that) {
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $filter, function (array $resource) use ($that) {
             return $that->build($resource);
         }, $offset, $limit, $sort);
     }
@@ -312,5 +343,23 @@ class Factory
     public function build(array $resource, ?DataObjectInterface $object = null): DataObjectRelationInterface
     {
         return $this->resource_factory->initResource(new DataObjectRelation($resource, $object));
+    }
+
+    /**
+     * Prepare query.
+     */
+    protected function prepareQuery(ResourceNamespaceInterface $namespace, ?array $query = null): array
+    {
+        $filter = [
+            'namespace' => $namespace->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $filter;
     }
 }

@@ -20,6 +20,7 @@ use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Log\MongoDBFormatter;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Zend\Mail\Message;
@@ -188,9 +189,9 @@ class Sync extends AbstractJob
         ]);
 
         if ($endpoint->getType() === EndpointInterface::TYPE_SOURCE) {
-            $this->import($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+            $this->import($collection, $this->getFilter(), ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
         } elseif ($endpoint->getType() === EndpointInterface::TYPE_DESTINATION) {
-            $this->export($collection, $this->data['filter'], ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
+            $this->export($collection, $this->getFilter(), ['name' => $endpoint->getName()], $this->data['simulate'], $this->data['ignore']);
         } else {
             $this->logger->warning('skip endpoint ['.$endpoint->getIdentifier().'], endpoint type is neither source nor destination', [
                 'category' => get_class($this),
@@ -198,6 +199,18 @@ class Sync extends AbstractJob
         }
 
         $this->logger->popProcessor();
+    }
+
+    /**
+     * Decode filter.
+     */
+    protected function getFilter(): array
+    {
+        if ($this->data['filter'] === null) {
+            return [];
+        }
+
+        return (array) json_decode($this->data['filter']);
     }
 
     /**
@@ -212,6 +225,7 @@ class Sync extends AbstractJob
         foreach ($this->logger->getHandlers() as $handler) {
             if ($handler instanceof MongoDBHandler) {
                 $handler->setLevel($level);
+                $handler->setFormatter(new MongoDBFormatter());
 
                 $this->logger->pushProcessor(function ($record) use ($context) {
                     $record['context'] = array_merge($record['context'], $context);
@@ -254,7 +268,7 @@ class Sync extends AbstractJob
 
             foreach ($endpoints as $ep) {
                 $identifier = $ep->getIdentifier();
-                $this->logger->info('start expot to destination endpoint ['.$identifier.']', [
+                $this->logger->info('start export to destination endpoint ['.$identifier.']', [
                     'category' => get_class($this),
                 ]);
 
@@ -344,7 +358,7 @@ class Sync extends AbstractJob
             $i = 0;
             foreach ($ep->getAll($filter) as $id => $object) {
                 ++$i;
-                $this->logger->debug('process ['.$i.'] import for object ['.$id.'] into data type ['.$collection->getIdentifier().']', [
+                $this->logger->debug('process object ['.$i.'] import for object ['.$object->getId().'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
                     'attributes' => $object,
                 ]);
@@ -356,13 +370,13 @@ class Sync extends AbstractJob
                         ]);
 
                         if ($workflow->import($collection, $object, $this->timestamp, $simulate) === true) {
-                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $id.'], skip any further workflows for the current data object', [
+                            $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $object->getId().'], skip any further workflows for the current data object', [
                                 'category' => get_class($this),
                             ]);
 
                             continue 2;
                         }
-                        $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $id.'], condition does not match or unusable ensure', [
+                        $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $object->getId().'], condition does not match or unusable ensure', [
                                 'category' => get_class($this),
                             ]);
                     }
@@ -387,7 +401,14 @@ class Sync extends AbstractJob
                 }
             }
 
-            $this->garbageCollector($collection, $ep, $simulate, $ignore);
+            if (empty($filter)) {
+                $this->garbageCollector($collection, $ep, $simulate, $ignore);
+            } else {
+                $this->logger->info('skip garbage collection, a query has been issued for import', [
+                    'category' => get_class($this),
+                ]);
+            }
+
             $ep->shutdown($simulate);
         }
 

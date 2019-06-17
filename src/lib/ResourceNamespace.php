@@ -106,9 +106,9 @@ class ResourceNamespace extends AbstractResource implements ResourceNamespaceInt
     /**
      * {@inheritdoc}
      */
-    public function getCollections(array $collections = [], ?int $offset = null, ?int $limit = null): Generator
+    public function getCollections(array $collections = [], ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->collection_factory->getAll($this, $collections, $offset, $limit);
+        return $this->collection_factory->getAll($this, $collections, $offset, $limit, $sort);
     }
 
     /**

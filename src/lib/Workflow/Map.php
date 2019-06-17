@@ -20,7 +20,7 @@ class Map
     /**
      * Map.
      */
-    public static function map(AttributeMapInterface $map, array $object, array $mongodb_object, UTCDateTimeInterface $ts): Iterable
+    public static function map(AttributeMapInterface $map, array $object, array $mongodb_object, UTCDateTimeInterface $ts): iterable
     {
         $object = Helper::associativeArrayToPath($object);
         $mongodb_object = Helper::associativeArrayToPath($mongodb_object);

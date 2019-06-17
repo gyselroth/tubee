@@ -39,8 +39,13 @@ use Tubee\V8\Engine as V8Engine;
 use Psr\SimpleCache\CacheInterface;
 use Cache\Adapter\Void\VoidCachePool;
 use Cache\Adapter\Apcu\ApcuCachePool;
+use Dreamscapes\Ldap\Core\Ldap as DreamscapesLdap;
+use Tubee\Log\MongoDBFormatter as MongoDBFormatter;
 
 return [
+    DreamscapesLdap::class => [
+        'singleton' => false
+    ],
     Dispatcher::class => [
         'arguments' => [
             'stack' => [
@@ -49,10 +54,10 @@ return [
                 '{'.ExceptionHandler::class.'}',
                 '{'.JsonPayload::class.'}',
                 '{'.QueryDecoder::class.'}',
+                '{'.FastRoute::class.'}',
                 '{'.AuthMiddleware::class.'}',
                 '{'.AclMiddleware::class.'}',
                 '{'.TrailingSlash::class.'}',
-                '{'.FastRoute::class.'}',
                 '{'.RequestHandler::class.'}',
             ],
             'resolver' => '{'.ContainerResolver::class.'}'
@@ -113,6 +118,10 @@ return [
     ],
     Migration::class => [
         'calls' => [
+            [
+                'method' => 'injectDelta',
+                'arguments' => ['delta' => '{'.Migration\AddWriteableAttributeMap::class.'}']
+            ],
             [
                 'method' => 'injectDelta',
                 'arguments' => ['delta' => '{'.Migration\CoreInstallation::class.'}']
@@ -184,7 +193,15 @@ return [
                     'database' => 'tubee',
                     'collection' => 'logs',
                     'level' => 1000,
-                ]
+                ],
+                'calls' => [
+                    'formatter' => [
+                        'method' => 'setFormatter',
+                        'arguments' => [
+                            'formatter' => '{'.MongoDBFormatter::class.'}'
+                        ]
+                    ]
+                ],
             ],
             'stderr' => [
                 'use' => Monolog\Handler\StreamHandler::class,

@@ -92,16 +92,7 @@ class Factory
      */
     public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $filter = [
-            'namespace' => $namespace->getName(),
-        ];
-
-        if (!empty($query)) {
-            $filter = [
-                '$and' => [$filter, $query],
-            ];
-        }
-
+        $filter = $this->prepareQuery($namespace, $query);
         $that = $this;
 
         return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace, $that) {
@@ -139,9 +130,13 @@ class Factory
             ]);
 
             foreach ($resource['secrets'] as $secret) {
-                $blob = $this->getOne($namespace, $secret['secret'])->getData();
-                $data = base64_decode(Helper::getArrayValue($blob, $secret['key']));
-                $resource = Helper::setArrayValue($resource, $secret['to'], $data);
+                try {
+                    $blob = $this->getOne($namespace, $secret['secret'])->getData();
+                    $data = base64_decode(Helper::getArrayValue($blob, $secret['key']));
+                    $resource = Helper::setArrayValue($resource, $secret['to'], $data);
+                } catch (\Exception $e) {
+                    throw new Exception\SecretNotResolvable('secret key '.$secret['key'].' is not resolveable');
+                }
             }
         }
 
@@ -207,9 +202,10 @@ class Factory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        $filter = $this->prepareQuery($namespace, $query);
         $that = $this;
 
-        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace, $that) {
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $filter, function (array $resource) use ($namespace, $that) {
             return $that->build($resource, $namespace);
         }, $offset, $limit, $sort);
     }
@@ -224,6 +220,24 @@ class Factory
         unset($resource['blob']);
 
         return $this->resource_factory->initResource(new Secret($resource, $namespace));
+    }
+
+    /**
+     * Prepare query.
+     */
+    protected function prepareQuery(ResourceNamespaceInterface $namespace, ?array $query = null): array
+    {
+        $filter = [
+            'namespace' => $namespace->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $filter;
     }
 
     /**

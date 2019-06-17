@@ -187,10 +187,6 @@ class Ldap extends AbstractEndpoint
         $object = array_change_key_case($object);
         $dn = $this->getDn($object, $endpoint_object);
 
-        if (isset($diff['entrydn'])) {
-            unset($diff['entrydn']);
-        }
-
         $this->logChange($dn, $diff);
 
         if ($dn !== $endpoint_object['entrydn']) {
@@ -270,7 +266,7 @@ class Ldap extends AbstractEndpoint
                 ]);
         }
 
-        return null;
+        return '(objectClass=*)';
     }
 
     /**
@@ -282,6 +278,8 @@ class Ldap extends AbstractEndpoint
         $this->logGetAll($filter);
 
         $i = 0;
+        $this->logger->debug(json_encode([$filter, $this->basedn]));
+
         $result = $this->ldap->ldapSearch($this->basedn, $filter)->getEntries();
         array_shift($result);
 
@@ -299,6 +297,10 @@ class Ldap extends AbstractEndpoint
     {
         $result = [];
         foreach ($diff as $attribute => $update) {
+            if ($attribute === 'entrydn') {
+                continue;
+            }
+
             switch ($update['action']) {
                 case AttributeMapInterface::ACTION_REPLACE:
                     $result[] = [
@@ -353,6 +355,22 @@ class Ldap extends AbstractEndpoint
     }
 
     /**
+     * Normalize dn.
+     */
+    protected function normalizeDn(string $dn): string
+    {
+        $parts = explode(',', $dn);
+        $normalized = [];
+
+        foreach ($parts as $part) {
+            $subs = explode('=', $part);
+            $normalized[] = strtolower($subs[0]).'='.$subs[1];
+        }
+
+        return join(',', $normalized);
+    }
+
+    /**
      * Prepare object.
      */
     protected function prepareRawObject(array $result): array
@@ -362,11 +380,12 @@ class Ldap extends AbstractEndpoint
             if ($key === 'count') {
                 continue;
             }
+
             if ($key === 'dn') {
-                $object['entrydn'] = $attr;
+                $object['entrydn'] = $this->normalizeDn($attr);
             } elseif (!is_int($key)) {
                 if ($attr['count'] === 1) {
-                    if (preg_match('~[^\x20-\x7E\t\r\n]~', $attr[0]) > 0) {
+                    if (json_encode($attr[0]) === false) {
                         $object[$key] = base64_encode($attr[0]);
                     } else {
                         $object[$key] = $attr[0];
@@ -376,7 +395,7 @@ class Ldap extends AbstractEndpoint
                     unset($val['count']);
 
                     foreach ($val as $v) {
-                        if (preg_match('~[^\x20-\x7E\t\r\n]~', $v) > 0) {
+                        if (json_encode($v) === false) {
                             $object[$key][] = base64_encode($v);
                         } else {
                             $object[$key][] = $v;
@@ -415,7 +434,7 @@ class Ldap extends AbstractEndpoint
     protected function getDn(array $object, array $endpoint_object = []): string
     {
         if (isset($object['entrydn'])) {
-            return $object['entrydn'];
+            return $this->normalizeDn($object['entrydn']);
         }
         if (isset($endpoint_object['entrydn'])) {
             return $endpoint_object['entrydn'];

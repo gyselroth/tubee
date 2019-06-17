@@ -13,6 +13,7 @@ namespace Tubee\Rest\Middlewares;
 
 use Garden\Schema\ValidationException;
 use Lcobucci\ContentNegotiation\UnformattedResponse;
+use Micro\Auth\Exception\NotAuthenticated;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
@@ -84,6 +85,11 @@ class ExceptionHandler implements MiddlewareInterface
             $http_code = 422;
             $body['code'] = 422;
             $body['more'] = $exception->getValidation()->getErrors();
+        }
+
+        if ($exception instanceof NotAuthenticated) {
+            $body['code'] = 401;
+            $http_code = 401;
         }
 
         $this->logger->error('uncaught exception '.$message.']', [

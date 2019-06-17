@@ -73,12 +73,17 @@ class Acl
             $names[] = $role->getName();
         }
 
+        $this->logger->debug('selected access-roles {access-roles}', [
+            'category' => get_class($this),
+            'access-roles' => $names,
+        ]);
+
         if ($names === []) {
             $this->logger->info('no matching access roles for ['.$user->getIdentifier().']', [
                 'category' => get_class($this),
             ]);
 
-            throw new Exception\NotAllowed('Not allowed to call this resource');
+            throw new Exception\NotAllowed('not allowed to call this resource');
         }
 
         $rules = $this->rule_factory->getAll([
@@ -87,6 +92,13 @@ class Acl
 
         $method = $request->getMethod();
         $attributes = $request->getAttributes();
+
+        $this->logger->debug('verify access for http request {method}:{uri} using {attributes}', [
+            'category' => get_class($this),
+            'uri' => $request->getUri(),
+            'method' => $method,
+            'attributes' => $attributes,
+        ]);
 
         foreach ($rules as $rule) {
             $data = $rule->getData();
@@ -119,13 +131,13 @@ class Acl
             'roles' => $names,
         ]);
 
-        throw new Exception\NotAllowed('Not allowed to call this resource');
+        throw new Exception\NotAllowed('not allowed to call this resource');
     }
 
     /**
      * Filter output resources.
      */
-    public function filterOutput(ServerRequestInterface $request, Identity $user, Iterable $resources)// : Generator
+    public function filterOutput(ServerRequestInterface $request, Identity $user, iterable $resources)// : Generator
     {
         $count = 0;
         foreach ($resources as $resource) {

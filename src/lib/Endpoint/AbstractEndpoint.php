@@ -281,7 +281,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     public function getWorkflows(array $workflows = [], ?int $offset = null, ?int $limit = null): Generator
     {
         return $this->workflow_factory->getAll($this, $workflows, $offset, $limit, [
-            'priority' => 1,
+            'data.priority' => 1,
         ]);
     }
 
@@ -310,7 +310,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
             return null;
         }
 
-        return json_decode(stripslashes($this->parseAttribute($this->filter_one, $object)), true);
+        return Helper::jsonDecode(stripslashes($this->parseAttribute($this->filter_one, $object)), true);
     }
 
     /**
@@ -322,7 +322,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
             return null;
         }
 
-        return json_decode(stripslashes($this->filter_all), true);
+        return Helper::jsonDecode(stripslashes($this->filter_all), true);
     }
 
     /**

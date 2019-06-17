@@ -85,18 +85,7 @@ class Factory
      */
     public function getAll(EndpointInterface $endpoint, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $filter = [
-            'namespace' => $endpoint->getCollection()->getResourceNamespace()->getName(),
-            'collection' => $endpoint->getCollection()->getName(),
-            'endpoint' => $endpoint->getName(),
-        ];
-
-        if (!empty($query)) {
-            $filter = [
-                '$and' => [$filter, $query],
-            ];
-        }
-
+        $filter = $this->prepareQuery($endpoint, $query);
         $that = $this;
 
         return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($endpoint, $that) {
@@ -174,9 +163,10 @@ class Factory
      */
     public function watch(EndpointInterface $endpoint, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        $filter = $this->prepareQuery($endpoint, $query);
         $that = $this;
 
-        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($endpoint, $that) {
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $filter, function (array $resource) use ($endpoint, $that) {
             return $that->build($resource, $endpoint);
         }, $offset, $limit, $sort);
     }
@@ -205,5 +195,25 @@ class Factory
         }
 
         return $this->resource_factory->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $resource));
+    }
+
+    /**
+     * Prepare query.
+     */
+    protected function prepareQuery(EndpointInterface $endpoint, ?array $query = null): array
+    {
+        $filter = [
+            'namespace' => $endpoint->getCollection()->getResourceNamespace()->getName(),
+            'collection' => $endpoint->getCollection()->getName(),
+            'endpoint' => $endpoint->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $filter;
     }
 }

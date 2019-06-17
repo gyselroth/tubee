@@ -63,7 +63,7 @@ class ExportWorkflow extends Workflow
 
         switch ($ensure) {
             case WorkflowInterface::ENSURE_ABSENT:
-                return $this->ensureAbsent($exists, $map, $simulate);
+                return $this->ensureAbsent($object, $exists, $map, $simulate);
             case WorkflowInterface::ENSURE_EXISTS:
                 return $this->ensureExists($object, $map, $ts, $simulate);
             default:
@@ -85,10 +85,9 @@ class ExportWorkflow extends Workflow
 
         $diff = $this->attribute_map->getDiff($map, $exists->getData());
 
-        $endpoints = [$this->endpoint->getName() => [
-            'last_sync' => $ts,
-            'garbage' => false,
-        ]];
+        $endpoints = $object->getEndpoints();
+        $endpoints[$this->endpoint->getName()]['last_sync'] = $ts;
+        $endpoints[$this->endpoint->getName()]['garbage'] = false;
 
         if (count($diff) > 0) {
             $this->logger->info('update object on endpoint ['.$this->endpoint->getIdentifier().'] with attributes [{attributes}]', [
@@ -114,12 +113,8 @@ class ExportWorkflow extends Workflow
             ]);
         }
 
-        if (!isset($endpoints[$this->endpoint->getName()]['result'])) {
-            if (isset($exists->getData()[$this->endpoint->getResourceIdentifier()])) {
-                $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getResourceIdentifier()];
-            } else {
-                $endpoints[$this->endpoint->getName()]['result'] = null;
-            }
+        if (isset($exists->getData()[$this->endpoint->getResourceIdentifier()])) {
+            $endpoints[$this->endpoint->getName()]['result'] = $exists->getData()[$this->endpoint->getResourceIdentifier()];
         }
 
         $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
@@ -132,7 +127,7 @@ class ExportWorkflow extends Workflow
      */
     protected function ensureExists(DataObjectInterface $object, array $map, UTCDateTimeInterface $ts, bool $simulate = false)
     {
-        $this->logger->info('create new object on endpoint ['.$this->endpoint->getIdentifier().']', [
+        $this->logger->info('create new object {object} on endpoint ['.$this->endpoint->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
@@ -154,13 +149,21 @@ class ExportWorkflow extends Workflow
     /**
      * Remove object from endpoint.
      */
-    protected function ensureAbsent(EndpointObjectInterface $exists, array $map, bool $simulate = false)
+    protected function ensureAbsent(DataObjectInterface $object, EndpointObjectInterface $exists, array $map, bool $simulate = false)
     {
         $this->logger->info('delete existing object from endpoint ['.$this->endpoint->getIdentifier().']', [
             'category' => get_class($this),
         ]);
 
         $this->endpoint->delete($this->attribute_map, $map, $exists->getData(), $simulate);
+
+        $endpoints = [
+            $this->endpoint->getName() => [
+                'garbage' => true,
+            ],
+        ];
+
+        $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
 
         return true;
     }
@@ -184,13 +187,14 @@ class ExportWorkflow extends Workflow
     {
         try {
             if ($this->endpoint->flushRequired()) {
-                $exists = null;
-            } else {
-                $exists = $this->endpoint->getOne($map, $this->attribute_map->getAttributes());
+                return null;
             }
 
-            $this->logger->debug('found existing object on destination endpoint with provided filter_one', [
+            $exists = $this->endpoint->getOne($map, $this->attribute_map->getAttributes());
+
+            $this->logger->debug('found existing object {object} on destination endpoint with provided filter_one', [
                 'category' => get_class($this),
+                'resource' => json_encode($exists->getData()),
             ]);
 
             return $exists;

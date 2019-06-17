@@ -27,12 +27,12 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql wget dialog  \
+    && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql17 wget dialog  \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.a /usr/lib/ \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.so /usr/lib/ \
-    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb7u4_amd64.deb \
+    && wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u11_amd64.deb \
     && dpkg -i *.deb
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -83,7 +83,7 @@ RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \
   && sed 's/unix:\/run\/php\/php7.2-fpm.sock/127.0.0.1:9000/g' -i /etc/nginx/conf.d/tubee.conf
 
 ENV TUBEE_PATH /usr/share/tubee
-ENV TUBEE_DIR_CONFIG /etc/tubee
+ENV TUBEE_CONFIG_DIR /etc/tubee
 
 EXPOSE 443 9000
 CMD service nginx start && php-fpm;

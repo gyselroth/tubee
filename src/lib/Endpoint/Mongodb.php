@@ -41,7 +41,6 @@ class Mongodb extends AbstractEndpoint
      */
     public function __construct(string $name, string $type, Collection $pool, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->identifier = '_id';
         $this->pool = $pool;
         parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }

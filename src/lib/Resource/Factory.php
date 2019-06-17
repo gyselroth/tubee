@@ -76,12 +76,13 @@ class Factory
         }
 
         $spec = $this->loadSpecification();
+        $key = 'core.v1.'.$kind;
 
-        if (!isset($spec['components']['schemas'][$kind])) {
+        if (!isset($spec['components']['schemas'][$key])) {
             throw new InvalidArgumentException('provided resource kind is invalid');
         }
 
-        $schema = new Schema($spec['components']['schemas'][$kind]);
+        $schema = new Schema($spec['components']['schemas'][$key]);
         $schema->setRefLookup(new ArrayRefLookup($spec));
         $schema->setFlags(Schema::VALIDATE_EXTRA_PROPERTY_EXCEPTION);
         $this->cache->set($kind, $schema);
@@ -213,6 +214,8 @@ class Factory
 
         if (empty($sort)) {
             $sort = ['$natural' => -1];
+        } elseif ($sort == ['$natural' => 1]) {
+            $sort = [];
         }
 
         $result = $collection->find($query, [
@@ -223,7 +226,10 @@ class Factory
         ]);
 
         foreach ($result as $resource) {
-            yield (string) $resource['_id'] => $build->call($this, $resource);
+            $result = $build->call($this, $resource);
+            if ($result !== null) {
+                yield (string) $resource['_id'] => $result;
+            }
         }
 
         return $total;
@@ -261,9 +267,15 @@ class Factory
             ]);
 
             foreach ($result as $resource) {
+                $bound = $build->call($this, $resource);
+
+                if ($bound === null) {
+                    continue;
+                }
+
                 yield (string) $resource['_id'] => [
                     'insert',
-                    $build->call($this, $resource),
+                    $bound,
                 ];
             }
         }
@@ -274,9 +286,15 @@ class Factory
             }
 
             $event = $stream->current();
+            $bound = $build->call($this, $event['fullDocument']);
+
+            if ($bound === null) {
+                continue;
+            }
+
             yield (string) $event['fullDocument']['_id'] => [
                 $event['operationType'],
-                $build->call($this, $event['fullDocument']),
+                $bound,
             ];
         }
     }

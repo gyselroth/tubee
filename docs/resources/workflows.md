@@ -87,7 +87,7 @@ This workflow only gets executed if the object has a property `disabled` with a 
 
 Besides a condition and the ensure type there is possibility to set a priority in which order the workflows get tested.
 By default each workflow has the priority `0`.
-`0` is the highest priority. A workflow with the priority `0` gets tested before a worklfow with the priority `2`.
+`0` is the highest priority. A workflow with the priority `0` gets executed before a worklfow with the priority `2`.
 
 ## Mapping
 
@@ -103,10 +103,12 @@ The mapping is defined within `map` and contains a list of attribute mappings. E
 | value | `null`  | Defines a static value. |
 | script | `null` | Execute JavaScript using the V8 engine.  |
 | type | `<same type as value>` | Convert the value to another type. |
-| rewrite | `null` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
+| rewrite | `[]` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
+| filters | `[]` | Chain of predefined string filters to apply |
 | unwind | `null`  | Unwind a list and operate attribute options on each list element. |
 | skip | `false` | If true the attribute gets ignored. This may be useful if an attribute is only used for an object relation creation or relation context. |
 | map | <object> | Define an object relation mapping to another collection. Automatically create DataObjectReations. |
+| writeonly | `false` | Writeonly flag may be set to true for attributes which get not returned by endpoints (writeonly attributes). |
 
 ### Name
 
@@ -257,3 +259,31 @@ This mapping will automatically try to create DataObjectRelations between those 
 | ensure | `last` | By default the relationship gets created and updated. You may set ensure to `exists` or `absent` while on exists the relation will not get updated (for example if context data gets changed). If absent the relation gets removed.  |
 | context | `<empty list>` | A list of attributes to use as context attributes. (Note that you can also use attributes which have `skip: true` set.)  |
 
+### Skip
+
+Skip is by default false. An attribute which has skip on `true` is declared as a virtual attribute and never gets written anywhere. 
+However a skip: true attribute may be useful if it gets used to write a DataObjectRelation context (See [Map](#Map)).
+
+### Writeonly 
+
+A password attribute is an example for such attributes. Passwords usually may be writeable but get not returned. While writeonly is set to true and DataObject already exists on the endpoint, the attribute does not get written. writeonly: true attributes may only get written during object creation. Note that it does not matter what value `ensure` holds while the attribute is set on writeonly and the DataObject already exists.
+
+### Filter
+
+Specify an optional chain of filters to apply as string filters:
+
+* Alnum
+* Alpha
+* BaseName
+* Digits
+* Dir
+* HtmlEntities
+* RealPath
+* StringPrefix
+* StringSuffix
+* StringToLower
+* StringToUpper
+* StringTrim
+* StripNewlines
+* StripTags
+* UriNormalize

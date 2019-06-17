@@ -64,6 +64,7 @@ class Ucs extends AbstractEndpoint
     {
         $this->client = $client;
         $this->flavor = $flavor;
+        $this->identifier = self::ATTR_DN;
         parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
     }
 
@@ -203,6 +204,8 @@ class Ucs extends AbstractEndpoint
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/put';
         $dn = $this->getResourceId($object, $endpoint_object);
+        $diff[self::ATTR_DN] = $dn;
+
         $this->logChange($dn, $diff);
         $map_parent = substr($dn, strpos($dn, ',') + 1);
         $ep_parent = substr($endpoint_object[self::ATTR_DN], strpos($endpoint_object[self::ATTR_DN], ',') + 1);
@@ -312,15 +315,23 @@ class Ucs extends AbstractEndpoint
         ];
 
         $result = $this->parse($this->client->post($url, $this->getRequestOptions($options)));
+        $filtered = [];
 
-        if (count($result) > 1) {
+        //ucs can only do wildcard queries, it's required to manually filter the result
+        foreach ($result as $resource) {
+            if (isset($resource[$query['objectProperty']]) && $resource[$query['objectProperty']] === $query['objectPropertyValue']) {
+                $filtered[] = $resource;
+            }
+        }
+
+        if (count($filtered) > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$this->filter_one);
         }
-        if (count($result) === 0) {
+        if (count($filtered) === 0) {
             throw new Exception\ObjectNotFound('no object found with filter '.$this->filter_one);
         }
 
-        $dn = $this->getResourceId(array_shift($result));
+        $dn = $this->getResourceId(array_shift($filtered));
 
         return $this->build($this->fetchObject($dn));
     }

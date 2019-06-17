@@ -13,7 +13,7 @@ paths:
   /api:
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get api entrypoint
       operationId: getApi
       responses:
@@ -24,7 +24,7 @@ paths:
   /api/v1:
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get api entrypoint
       operationId: getV1
       responses:
@@ -35,7 +35,7 @@ paths:
   /api/v1/namespaces:
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get namespaces
       description: A namespace is a logical group of collections
       operationId: getNamespaces
@@ -97,29 +97,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Namespaces"
+                $ref: "#/components/schemas/core.v1.Namespaces"
         "403":
           description: Access denied
     post:
       tags:
-        - v1
+        - core.v1
       summary: Add namespace
       operationId: addNamespace
       requestBody:
-        $ref: "#/components/requestBodies/Namespace"
+        $ref: "#/components/requestBodies/core.v1.Namespace"
       responses:
         "201":
           description: If successful the server will respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Namespace"
+                $ref: "#/components/schemas/core.v1.Namespace"
         "403":
           description: Access denied
   "/api/v1/namespaces/{namespace}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get specific namespace
       description: A namespace is a logical group of collections
       operationId: getNamespace
@@ -144,14 +144,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Namespace"
+                $ref: "#/components/schemas/core.v1.Namespace"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete specific namespace
       operationId: deleteNamespace
       parameters:
@@ -170,7 +170,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace namespace
       operationId: replaceNamespace
       parameters:
@@ -181,26 +181,26 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/Namespace"
+        $ref: "#/components/requestBodies/core.v1.Namespace"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Namespace"
+                $ref: "#/components/schemas/core.v1.Namespace"
         "201":
           description: If successful and the object was newly created the server will
             respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Namespace"
+                $ref: "#/components/schemas/core.v1.Namespace"
         "403":
           description: Access denied
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch namespace as rfc6902 request
       operationId: updateNamespace
       description: Update specific attributes of a namespace
@@ -217,7 +217,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/JsonPatch"
+                $ref: "#/components/schemas/core.v1.JsonPatch"
         description: Namespace
       responses:
         "200":
@@ -225,7 +225,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Namespace"
+                $ref: "#/components/schemas/core.v1.Namespace"
         "403":
           description: Access denied
         "404":
@@ -233,7 +233,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get collections
       description: A collection is collection of data objects of a specific type
       operationId: getCollections
@@ -301,14 +301,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collections"
+                $ref: "#/components/schemas/core.v1.Collections"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     post:
       tags:
-        - v1
+        - core.v1
       summary: Add collection
       operationId: addCollection
       parameters:
@@ -319,14 +319,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/Collection"
+        $ref: "#/components/requestBodies/core.v1.Collection"
       responses:
         "201":
           description: If successful the server will respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/core.v1.Collection"
         "403":
           description: Access denied
         "404":
@@ -334,7 +334,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get specific collection
       description: A collection is collection of dataobjects of a specific type
       operationId: getCollection
@@ -365,14 +365,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/core.v1.Collection"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete specific collection
       operationId: deleteCollection
       parameters:
@@ -397,7 +397,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace collection
       operationId: replaceCollection
       parameters:
@@ -414,26 +414,26 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/Collection"
+        $ref: "#/components/requestBodies/core.v1.Collection"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/core.v1.Collection"
         "201":
           description: If successful and the object was newly created the server will
             respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/core.v1.Collection"
         "403":
           description: Access denied
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch collection as rfc6902 request
       description: Update specific attributes of a collection
       operationId: updateCollection
@@ -451,14 +451,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/JsonPatchArray2"
+        $ref: "#/components/requestBodies/core.v1.JsonPatchArray2"
       responses:
         "200":
           description: Collection
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Collection"
+                $ref: "#/components/schemas/core.v1.Collection"
         "403":
           description: Access denied
         "404":
@@ -466,7 +466,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/logs":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get logs of a collection
       operationId: getCollectionLogs
       parameters:
@@ -539,7 +539,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -547,7 +547,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/logs/{log}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get a single collection log
       operationId: getCollectionLog
       parameters:
@@ -575,7 +575,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -583,7 +583,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get endpoints
       description: An endpoint is either of type source or destination and defines an
         import/export destination
@@ -658,14 +658,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoints"
+                $ref: "#/components/schemas/core.v1.Endpoints"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     post:
       tags:
-        - v1
+        - core.v1
       summary: Add Endpoint
       operationId: addEndpoint
       parameters:
@@ -692,7 +692,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
+                $ref: "#/components/schemas/core.v1.Endpoint"
         "403":
           description: Access denied
         "404":
@@ -700,7 +700,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get specific endpoint
       description: An endpoint is either of type source or destination and defines an
         import/export destination
@@ -738,14 +738,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
+                $ref: "#/components/schemas/core.v1.Endpoint"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete specific endpoint
       operationId: deleteEndpoint
       parameters:
@@ -776,7 +776,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace endppoint
       operationId: replaceEndpoint
       parameters:
@@ -802,26 +802,26 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Endpoint"
+              $ref: "#/components/schemas/core.v1.Endpoint"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
+                $ref: "#/components/schemas/core.v1.Endpoint"
         "201":
           description: If successful and the object was newly created the server will
             respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
+                $ref: "#/components/schemas/core.v1.Endpoint"
         "403":
           description: Access denied
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch collection as rfc6902 request
       description: Update specific attributes of a endpoint
       operationId: updateEndpoint
@@ -845,14 +845,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/JsonPatchArray2"
+        $ref: "#/components/requestBodies/core.v1.JsonPatchArray2"
       responses:
         "200":
           description: Endpoint
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Endpoint"
+                $ref: "#/components/schemas/core.v1.Endpoint"
         "403":
           description: Access denied
         "404":
@@ -860,7 +860,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get logs of an endpoint
       operationId: getEndpointLogs
       parameters:
@@ -939,7 +939,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -947,7 +947,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get a single endpoint log
       operationId: getEndpointLog
       parameters:
@@ -981,7 +981,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -989,7 +989,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get endpoint workflows
       description: A workflow is an action how to import/export a collection and with what
         attribute map
@@ -1070,12 +1070,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflows"
+                $ref: "#/components/schemas/core.v1.Workflows"
         "403":
           description: Access denied
     post:
       tags:
-        - v1
+        - core.v1
       summary: Add worfklow to endpoint
       operationId: addWorkflow
       parameters:
@@ -1098,14 +1098,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/Workflow"
+        $ref: "#/components/requestBodies/core.v1.Workflow"
       responses:
         "201":
           description: If successful the server will respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "#/components/schemas/core.v1.Workflow"
         "403":
           description: Access denied
         "404":
@@ -1113,7 +1113,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get specifc endpoint workflow
       description: A workflow is an action how to import/export a collection and with what
         attribute map
@@ -1157,14 +1157,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "#/components/schemas/core.v1.Workflow"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete specific workflow from
       operationId: deleteWorkflow
       parameters:
@@ -1201,7 +1201,7 @@ paths:
           description: Resource does not exists
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace workflow
       operationId: replaceWorkflow
       parameters:
@@ -1230,26 +1230,26 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/Workflow"
+        $ref: "#/components/requestBodies/core.v1.Workflow"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "#/components/schemas/core.v1.Workflow"
         "201":
           description: If successful and the object was newly created the server will
             respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "#/components/schemas/core.v1.Workflow"
         "403":
           description: Access denied
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch workflow as rfc6902 request
       description: Update specific attributes of a workflow
       operationId: updateWorkflow
@@ -1284,7 +1284,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/JsonPatch"
+                $ref: "#/components/schemas/core.v1.JsonPatch"
         description: Workflow
       responses:
         "200":
@@ -1292,7 +1292,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Workflow"
+                $ref: "#/components/schemas/core.v1.Workflow"
         "403":
           description: Access denied
         "404":
@@ -1300,7 +1300,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get specific object
       description: Get an object of a specific collection
       operationId: getObject
@@ -1340,7 +1340,7 @@ paths:
           description: Resource does not exists
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch object as rfc6902 request
       description: Update specific attributes of an object
       operationId: updateObject
@@ -1364,28 +1364,28 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/JsonPatchArray"
+        $ref: "#/components/requestBodies/core.v1.JsonPatchArray"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObject"
+                $ref: "#/components/schemas/core.v1.DataObject"
         "202":
           description: If write argument is true the server will respond with 202 Accepted
             since this is an asynchronous request.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/core.v1.Job"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     put:
       tags:
-        - v1
+        - core.v1
       summary: Replace or create object
       description: Replace all data attributes of an object (Or create one if not exists)
       operationId: replaceObject
@@ -1416,35 +1416,35 @@ paths:
           schema:
             type: boolean
       requestBody:
-        $ref: "#/components/requestBodies/DataObject"
+        $ref: "#/components/requestBodies/core.v1.DataObject"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObject"
+                $ref: "#/components/schemas/core.v1.DataObject"
         "201":
           description: If successful and the object was newly created the server will
             respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObject"
+                $ref: "#/components/schemas/core.v1.DataObject"
         "202":
           description: If write argument is true the server will respond with 202 Accepted
             since this is an asynchronous request.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/core.v1.Job"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete object
       description: Delete a specific object
       operationId: deleteObject
@@ -1474,7 +1474,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/core.v1.Job"
         "204":
           description: If successful the server will respond with 204 No Content
         "403":
@@ -1484,7 +1484,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get relative objects of an object
       description: Get all objects the object is related to
       operationId: getObjectRelations
@@ -1564,7 +1564,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectRelations"
+                $ref: "#/components/schemas/core.v1.ObjectRelations"
         "403":
           description: Access denied
         "404":
@@ -1572,7 +1572,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get single relative object of an object
       operationId: getObjectRelation
       parameters:
@@ -1606,7 +1606,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObjectRelation"
+                $ref: "#/components/schemas/core.v1.DataObjectRelation"
         "403":
           description: Access denied
         "404":
@@ -1614,7 +1614,7 @@ paths:
   "/api/v1/namespaces/{namespace}/relations":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get data object relations
       description: Get data object relations
       operationId: getRelations
@@ -1682,14 +1682,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ObjectRelations"
+                $ref: "#/components/schemas/core.v1.ObjectRelations"
         "403":
           description: Access denied
         "404":
           description: Resource not found
     post:
       tags:
-        - v1
+        - core.v1
       summary: Add new object relation
       operationId: addRelation
       parameters:
@@ -1700,14 +1700,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/DataObjectRelation"
+        $ref: "#/components/requestBodies/core.v1.DataObjectRelation"
       responses:
         "200":
           description: Object relation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObjectRelation"
+                $ref: "#/components/schemas/core.v1.DataObjectRelation"
         "403":
           description: Access denied
         "404":
@@ -1715,7 +1715,7 @@ paths:
   "/api/v1/namespaces/{namespace}/relations/{relation}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get single relation
       operationId: getRelation
       parameters:
@@ -1737,14 +1737,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObjectRelation"
+                $ref: "#/components/schemas/core.v1.DataObjectRelation"
         "403":
           description: Access denied
         "404":
           description: Resource not found
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch relation as rfc6902 request
       description: Update specific attributes of a relation
       operationId: updateRelation
@@ -1762,21 +1762,21 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/JsonPatchArray"
+        $ref: "#/components/requestBodies/core.v1.JsonPatchArray"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObjectRelation"
+                $ref: "#/components/schemas/core.v1.DataObjectRelation"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     put:
       tags:
-        - v1
+        - core.v1
       summary: Replace object relation
       operationId: replaceRelation
       parameters:
@@ -1793,21 +1793,21 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/DataObjectRelation"
+        $ref: "#/components/requestBodies/core.v1.DataObjectRelation"
       responses:
         "200":
           description: Object relation
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObjectRelation"
+                $ref: "#/components/schemas/core.v1.DataObjectRelation"
         "403":
           description: Access denied
         "404":
           description: Resource not found
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete object relation
       operationId: deleteObjectRelation
       parameters:
@@ -1833,7 +1833,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get objects from endpoint
       description: An endpoint is either of type source or destination and defines an
         import/export destination
@@ -1914,7 +1914,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EndpointObjects"
+                $ref: "#/components/schemas/core.v1.EndpointObjects"
         "403":
           description: Access denied
         "404":
@@ -1922,7 +1922,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/history":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get object history
       description: Get the history of all modifications from a specific object
       operationId: getObjectHistory
@@ -2002,7 +2002,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObjects"
+                $ref: "#/components/schemas/core.v1.DataObjects"
         "403":
           description: Access denied
         "404":
@@ -2010,7 +2010,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get logs of an object
       operationId: getObjectLogs
       parameters:
@@ -2089,7 +2089,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -2097,7 +2097,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get a single object log
       operationId: getObjectLog
       parameters:
@@ -2131,7 +2131,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -2139,7 +2139,7 @@ paths:
   "/api/v1/namespaces/{namespace}/collections/{collection}/objects":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get objects of a specific collection
       description: A object is a data object from a specifc collection
       operationId: getObjects
@@ -2213,14 +2213,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObjects"
+                $ref: "#/components/schemas/core.v1.DataObjects"
         "403":
           description: Access denied
         "404":
           description: Resource does not exists
     post:
       tags:
-        - v1
+        - core.v1
       summary: Add a new object of a specifc collection
       operationId: addObject
       parameters:
@@ -2237,21 +2237,21 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/DataObject"
+        $ref: "#/components/requestBodies/core.v1.DataObject"
       responses:
         "201":
           description: If successful the server will respond with 201 Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataObject"
+                $ref: "#/components/schemas/core.v1.DataObject"
         "202":
           description: If write argument is true the server will respond with 202 Accepted
             since this is an asynchronous request.
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/core.v1.Job"
         "403":
           description: Access denied
         "404":
@@ -2259,7 +2259,7 @@ paths:
   "/api/v1/namespaces/{namespace}/secrets":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get secrets
       description: An secret holds secret data which should not get exposed and is
         specially encrypted on the server. A secret can be injected into other
@@ -2329,12 +2329,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Secrets"
+                $ref: "#/components/schemas/core.v1.Secrets"
         "403":
           description: Access denied
     post:
       tags:
-        - v1
+        - core.v1
       summary: Create a new secret
       operationId: addSecret
       parameters:
@@ -2345,20 +2345,20 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/Secret"
+        $ref: "#/components/requestBodies/core.v1.Secret"
       responses:
         "201":
           description: The created secret
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Secret"
+                $ref: "#/components/schemas/core.v1.Secret"
         "403":
           description: Access denied
   "/api/v1/namespaces/{namespace}/secrets/{secret}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get secret by name
       operationId: getSecret
       parameters:
@@ -2380,14 +2380,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Secret"
+                $ref: "#/components/schemas/core.v1.Secret"
         "403":
           description: Access denied
         "404":
           description: secret does not exists
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch secret as rfc6902 request
       operationId: updateSecret
       parameters:
@@ -2409,7 +2409,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/JsonPatch"
+                $ref: "#/components/schemas/core.v1.JsonPatch"
         description: secret json patch
       responses:
         "200":
@@ -2417,12 +2417,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Secret"
+                $ref: "#/components/schemas/core.v1.Secret"
         "403":
           description: Access denied
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace an secret
       operationId: replaceSecret
       parameters:
@@ -2439,19 +2439,19 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/Secret"
+        $ref: "#/components/requestBodies/core.v1.Secret"
       responses:
         "201":
           description: The created secret
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Secret"
+                $ref: "#/components/schemas/core.v1.Secret"
         "403":
           description: Access denied
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete secret by name
       operationId: deleteSecret
       parameters:
@@ -2477,7 +2477,7 @@ paths:
   /api/v1/users:
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get users
       description: An User defines what role is granted access to what resource
       operationId: getUsers
@@ -2539,29 +2539,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Users"
+                $ref: "#/components/schemas/core.v1.Users"
         "403":
           description: Access denied
     post:
       tags:
-        - v1
+        - core.v1
       summary: Create a new User
       operationId: addUser
       requestBody:
-        $ref: "#/components/requestBodies/User"
+        $ref: "#/components/requestBodies/core.v1.User"
       responses:
         "201":
           description: The created User
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/core.v1.User"
         "403":
           description: Access denied
   "/api/v1/users/{user}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get User by name
       operationId: getUser
       parameters:
@@ -2577,14 +2577,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/core.v1.User"
         "403":
           description: Access denied
         "404":
           description: User does not exists
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch User as rfc6902 request
       operationId: updateUser
       parameters:
@@ -2600,7 +2600,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/JsonPatch"
+                $ref: "#/components/schemas/core.v1.JsonPatch"
         description: User json patch
       responses:
         "200":
@@ -2608,12 +2608,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/core.v1.User"
         "403":
           description: Access denied
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace an User
       operationId: replaceUser
       parameters:
@@ -2624,19 +2624,19 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/User"
+        $ref: "#/components/requestBodies/core.v1.User"
       responses:
         "201":
           description: The created User
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/User"
+                $ref: "#/components/schemas/core.v1.User"
         "403":
           description: Access denied
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete User by name
       operationId: deleteUser
       parameters:
@@ -2656,7 +2656,7 @@ paths:
   /api/v1/access-rules:
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get access rules
       description: An access rule defines what role is granted access to what resource
       operationId: getAccessRules
@@ -2718,29 +2718,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRules"
+                $ref: "#/components/schemas/core.v1.AccessRules"
         "403":
           description: Access denied
     post:
       tags:
-        - v1
+        - core.v1
       summary: Create a new access rule
       operationId: addAccessRule
       requestBody:
-        $ref: "#/components/requestBodies/AccessRule"
+        $ref: "#/components/requestBodies/core.v1.AccessRule"
       responses:
         "201":
           description: The created access rule
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRule"
+                $ref: "#/components/schemas/core.v1.AccessRule"
         "403":
           description: Access denied
   "/api/v1/access-rules/{access-rule}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get access rule by name
       operationId: getAccessRule
       parameters:
@@ -2756,14 +2756,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRule"
+                $ref: "#/components/schemas/core.v1.AccessRule"
         "403":
           description: Access denied
         "404":
           description: access rule does not exists
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch access rule as rfc6902 request
       operationId: updateAccessRule
       parameters:
@@ -2779,7 +2779,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/JsonPatch"
+                $ref: "#/components/schemas/core.v1.JsonPatch"
         description: Access rule json patch
       responses:
         "200":
@@ -2787,12 +2787,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRule"
+                $ref: "#/components/schemas/core.v1.AccessRule"
         "403":
           description: Access denied
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace an access rule
       operationId: replaceAccessRule
       parameters:
@@ -2803,19 +2803,19 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/AccessRule"
+        $ref: "#/components/requestBodies/core.v1.AccessRule"
       responses:
         "201":
           description: The created access rule
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRule"
+                $ref: "#/components/schemas/core.v1.AccessRule"
         "403":
           description: Access denied
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete access-rule by name
       operationId: deleteAccessRule
       parameters:
@@ -2836,7 +2836,7 @@ paths:
   /api/v1/access-roles:
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get access roles
       description: An access role defines what role is granted access to what resource
       operationId: getAccessRoles
@@ -2898,29 +2898,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRoles"
+                $ref: "#/components/schemas/core.v1.AccessRoles"
         "403":
           description: Access denied
     post:
       tags:
-        - v1
+        - core.v1
       summary: Create a new access role
       operationId: addAccessRole
       requestBody:
-        $ref: "#/components/requestBodies/AccessRole"
+        $ref: "#/components/requestBodies/core.v1.AccessRole"
       responses:
         "201":
           description: The created access role
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRole"
+                $ref: "#/components/schemas/core.v1.AccessRole"
         "403":
           description: Access denied
   "/api/v1/access-roles/{access-role}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get access role by name
       operationId: getAccessRole
       parameters:
@@ -2936,14 +2936,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRole"
+                $ref: "#/components/schemas/core.v1.AccessRole"
         "403":
           description: Access denied
         "404":
           description: access role does not exists
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch access role as rfc6902 request
       operationId: updateAccessRole
       parameters:
@@ -2959,7 +2959,7 @@ paths:
             schema:
               type: array
               items:
-                $ref: "#/components/schemas/JsonPatch"
+                $ref: "#/components/schemas/core.v1.JsonPatch"
         description: Access role json patch
       responses:
         "200":
@@ -2967,12 +2967,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRole"
+                $ref: "#/components/schemas/core.v1.AccessRole"
         "403":
           description: Access denied
     put:
       tags:
-        - v1
+        - core.v1
       summary: Create or replace an access role
       operationId: replaceAccessRole
       parameters:
@@ -2983,25 +2983,25 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/AccessRole"
+        $ref: "#/components/requestBodies/core.v1.AccessRole"
       responses:
         "200":
           description: The updated access role
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRole"
+                $ref: "#/components/schemas/core.v1.AccessRole"
         "201":
           description: The created access role if it did not exists yet
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AccessRole"
+                $ref: "#/components/schemas/core.v1.AccessRole"
         "403":
           description: Access denied
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete access-role by name
       operationId: deleteAccessRole
       parameters:
@@ -3022,7 +3022,7 @@ paths:
   "/api/v1/namespaces/{namespace}/jobs":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get list of active queued jobs
       description: A job is an asynchronous server process
       operationId: getJobs
@@ -3090,12 +3090,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Jobs"
+                $ref: "#/components/schemas/core.v1.Jobs"
         "403":
           description: Access denied
     post:
       tags:
-        - v1
+        - core.v1
       summary: Create new job
       operationId: addJob
       parameters:
@@ -3109,14 +3109,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Job"
+              $ref: "#/components/schemas/core.v1.Job"
       responses:
         "202":
           description: The created job
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/core.v1.Job"
         "403":
           description: Access denied
         "404":
@@ -3124,7 +3124,7 @@ paths:
   "/api/v1/namespaces/{namespace}/jobs/{job}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get job by id
       operationId: getJob
       parameters:
@@ -3146,14 +3146,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/core.v1.Job"
         "403":
           description: Access denied
         "404":
           description: Job does not exists
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Delete job by id
       operationId: deleteJob
       parameters:
@@ -3178,7 +3178,7 @@ paths:
           description: Job does not exists
     patch:
       tags:
-        - v1
+        - core.v1
       summary: Patch job as rfc6902 request
       description: Update specific attributes of a job
       operationId: updateJob
@@ -3196,14 +3196,14 @@ paths:
           schema:
             type: string
       requestBody:
-        $ref: "#/components/requestBodies/JsonPatchArray"
+        $ref: "#/components/requestBodies/core.v1.JsonPatchArray"
       responses:
         "200":
           description: If successful the server will respond with 200 OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Job"
+                $ref: "#/components/schemas/core.v1.Job"
         "403":
           description: Access denied
         "404":
@@ -3211,7 +3211,7 @@ paths:
   "/api/v1/namespaces/{namespace}/processes":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get all processes
       operationId: getProcesses
       parameters:
@@ -3278,14 +3278,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Processes"
+                $ref: "#/components/schemas/core.v1.Processes"
         "403":
           description: Access denied
         "404":
           description: Job does not exists
     post:
       tags:
-        - v1
+        - core.v1
       summary: Trigger a new process
       operationId: addProcess
       parameters:
@@ -3299,14 +3299,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Process"
+              $ref: "#/components/schemas/core.v1.Process"
       responses:
         "202":
           description: Returns a 202 if successful
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Process"
+                $ref: "#/components/schemas/core.v1.Process"
         "403":
           description: Access denied
         "404":
@@ -3314,7 +3314,7 @@ paths:
   "/api/v1/namespaces/{namespace}/processes/{process}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get a single process of a job
       operationId: getProcess
       parameters:
@@ -3336,14 +3336,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Process"
+                $ref: "#/components/schemas/core.v1.Process"
         "403":
           description: Access denied
         "404":
           description: Process does not exists
     delete:
       tags:
-        - v1
+        - core.v1
       summary: Abort running process
       operationId: deleteProcess
       parameters:
@@ -3369,7 +3369,7 @@ paths:
   "/api/v1/namespaces/{namespace}/jobs/{job}/logs":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get logs of a job
       operationId: getJobLogs
       parameters:
@@ -3442,7 +3442,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -3450,7 +3450,7 @@ paths:
   "/api/v1/namespaces/{namespace}/jobs/{job}/logs/{log}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get a single job error
       operationId: getJobLog
       parameters:
@@ -3478,7 +3478,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -3486,7 +3486,7 @@ paths:
   "/api/v1/namespaces/{namespace}/processes/{process}/logs":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get logs of a process
       operationId: getProcessLogs
       parameters:
@@ -3559,7 +3559,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -3567,7 +3567,7 @@ paths:
   "/api/v1/namespaces/{namespace}/process/{process}/logs/{log}":
     get:
       tags:
-        - v1
+        - core.v1
       summary: Get a single process log
       operationId: getProcessLog
       parameters:
@@ -3595,7 +3595,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Log"
+                $ref: "#/components/schemas/core.v1.Log"
         "403":
           description: Access denied
         "404":
@@ -3604,69 +3604,69 @@ servers:
   - url: /
 components:
   requestBodies:
-    JsonPatchArray:
+    core.v1.JsonPatchArray:
       content:
         application/json-patch+json:
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/JsonPatch"
+              $ref: "#/components/schemas/core.v1.JsonPatch"
       description: Object
-    Namespace:
+    core.v1.Namespace:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Namespace"
-    Collection:
+            $ref: "#/components/schemas/core.v1.Namespace"
+    core.v1.Collection:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Collection"
-    AccessRule:
+            $ref: "#/components/schemas/core.v1.Collection"
+    core.v1.AccessRule:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/AccessRule"
-    JsonPatchArray2:
+            $ref: "#/components/schemas/core.v1.AccessRule"
+    core.v1.JsonPatchArray2:
       content:
         application/json:
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/JsonPatch"
+              $ref: "#/components/schemas/core.v1.JsonPatch"
       description: Collection
-    Workflow:
+    core.v1.Workflow:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Workflow"
-    DataObject:
+            $ref: "#/components/schemas/core.v1.Workflow"
+    core.v1.DataObject:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/DataObject"
-    DataObjectRelation:
+            $ref: "#/components/schemas/core.v1.DataObject"
+    core.v1.DataObjectRelation:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/DataObjectRelation"
-    Secret:
+            $ref: "#/components/schemas/core.v1.DataObjectRelation"
+    core.v1.Secret:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/Secret"
-    User:
+            $ref: "#/components/schemas/core.v1.Secret"
+    core.v1.User:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/User"
-    AccessRole:
+            $ref: "#/components/schemas/core.v1.User"
+    core.v1.AccessRole:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/AccessRole"
+            $ref: "#/components/schemas/core.v1.AccessRole"
   schemas:
-    JsonPatch:
+    core.v1.JsonPatch:
       description: A JSON Patch according rfc6902.
       type: object
       required:
@@ -3680,32 +3680,33 @@ components:
           type: string
         value:
           type: string
-    Links:
+    core.v1.Links:
       description: Contains resource links (URL) to other resources.
       type: object
+      readOnly: true
       properties:
         self:
-          $ref: "#/components/schemas/Link"
-    ListLinks:
+          $ref: "#/components/schemas/core.v1.Link"
+    core.v1.ListLinks:
       type: object
       properties:
         self:
-          $ref: "#/components/schemas/Link"
+          $ref: "#/components/schemas/core.v1.Link"
         prev:
-          $ref: "#/components/schemas/Link"
+          $ref: "#/components/schemas/core.v1.Link"
         next:
-          $ref: "#/components/schemas/Link"
-    Link:
+          $ref: "#/components/schemas/core.v1.Link"
+    core.v1.Link:
       type: object
       properties:
         href:
           type: string
           readOnly: true
-    List:
+    core.v1.List:
       type: object
       properties:
         _links:
-          $ref: "#/components/schemas/ListLinks"
+          $ref: "#/components/schemas/core.v1.ListLinks"
         kind:
           description: The resource type, always List.
           type: string
@@ -3721,11 +3722,11 @@ components:
             limit to request further resources in the list.
           type: number
           readOnly: true
-    Resource:
+    core.v1.Resource:
       type: object
       properties:
         _links:
-          $ref: "#/components/schemas/Links"
+          $ref: "#/components/schemas/core.v1.Links"
         name:
           description: Resource identifier. Note that the name is immutable once created on
             the server and must be unique in its own resource context.
@@ -3756,8 +3757,8 @@ components:
           description: Injected secrets in this resource.
           type: array
           items:
-            $ref: "#/components/schemas/SecretMount"
-    SecretMount:
+            $ref: "#/components/schemas/core.v1.SecretMount"
+    core.v1.SecretMount:
       type: object
       required:
       - secret
@@ -3777,42 +3778,42 @@ components:
             may use a recursive path by delimiting keys with '.', for example:
             data.resource.password)."
           type: string
-    Namespaces:
+    core.v1.Namespaces:
       description: A list of namespaces.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Namespace"
-    Namespace:
+                $ref: "#/components/schemas/core.v1.Namespace"
+    core.v1.Namespace:
       description: A namespace is a namespace to separate resources.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           properties:
             kind:
               description: The resource type, always Namespace.
               type: string
               default: Namespace
-    Secrets:
+    core.v1.Secrets:
       description: A list of secrets.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Secret"
-    Secret:
+                $ref: "#/components/schemas/core.v1.Secret"
+    core.v1.Secret:
       description: A secret is sensitive information which can be injected into another
         resource. A secret gets specially encrypted on the server and is always
         base64 encoded.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           required:
           - data
@@ -3826,20 +3827,20 @@ components:
                 need to base64 encode the values!"
               type: object
               additionalProperties: true
-    Users:
+    core.v1.Users:
       description: A list of users.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/User"
-    User:
+                $ref: "#/components/schemas/core.v1.User"
+    core.v1.User:
       description: A local tubee user.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           required:
           - data
@@ -3857,22 +3858,23 @@ components:
                 password:
                   description: The users password. Gets hashed on the server and can not be
                     retrieved after.
+                  writeOnly: true
                   type: string
-    AccessRules:
+    core.v1.AccessRules:
       description: A list of access rules.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/AccessRule"
-    AccessRule:
+                $ref: "#/components/schemas/core.v1.AccessRule"
+    core.v1.AccessRule:
       description: An access rule allows to specify what access roles can access which
         resources.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           default:
             data:
@@ -3928,21 +3930,21 @@ components:
                   type: array
                   items:
                     type: string
-    AccessRoles:
+    core.v1.AccessRoles:
       description: A list of access roles.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/AccessRole"
-    AccessRole:
+                $ref: "#/components/schemas/core.v1.AccessRole"
+    core.v1.AccessRole:
       description: An access role is defined list which matches authenticated user
         identifiers.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           default:
             data:
@@ -3965,21 +3967,21 @@ components:
                   type: array
                   items:
                     type: string
-    Processes:
+    core.v1.Processes:
       description: A list of processes.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Process"
-    Process:
+                $ref: "#/components/schemas/core.v1.Process"
+    core.v1.Process:
       description: A process is a sub resource of a job. Each process represents one job
         execution.
       allOf:
-        - $ref: "#/components/schemas/Job"
+        - $ref: "#/components/schemas/core.v1.Job"
         - type: object
           properties:
             kind:
@@ -3996,21 +3998,21 @@ components:
                 code:
                   description: The result code of the process.
                   type: number
-    Jobs:
+    core.v1.Jobs:
       description: A list of jobs.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Job"
-    Job:
+                $ref: "#/components/schemas/core.v1.Job"
+    core.v1.Job:
       description: A job is a synchronization job which declares when and what collections
         should be synchronized.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           properties:
             kind:
@@ -4020,6 +4022,31 @@ components:
             namespace:
               description: The resource namespace
               type: string
+            status:
+              type: object
+              readOnly: true
+              properties:
+                 status:
+                   type: boolean
+                 last_process:
+                   type: object
+                   default: null
+                   nullable: true
+                   properties:
+                     process:
+                       type: string
+                     next:
+                       type: integer
+                     started:
+                       type: string
+                     ended:
+                       type: string
+                       nullable: true
+                       default: null
+                     result:
+                       type: string
+                     code:
+                       type: integer
             data:
               type: object
               default:
@@ -4028,9 +4055,10 @@ components:
                   receiver: []
                 collections: []
                 endpoints: []
-                filter: []
+                filter: null
                 ignore: true
                 simulate: false
+                active: false
                 log_level: error
                 options:
                   at: 0
@@ -4078,14 +4106,19 @@ components:
                   default:
                     []
                 filter:
-                  description: Data object filter.
-                  default: []
-                  type: object
+                  description: JSON encoded data object filter.
+                  default: null
+                  nullable: true
+                  type: string
                 ignore:
                   description: If enabled the server does ignores any sync errors and
                     continue with the process.
                   type: boolean
                   default: true
+                active:
+                  description: If true the job gets queued and executed. By default jobs are disabled initially.
+                  type: boolean
+                  default: false
                 simulate:
                   description: Dry run mode. Job runs normally but does not do any changes.
                   type: boolean
@@ -4138,20 +4171,20 @@ components:
                       description: Maximum runtime of a job (process). By default there is no timeout. This option should be handled carefully.
                       type: integer
                       default: 0
-    Logs:
+    core.v1.Logs:
       description: A list of logs.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Log"
-    Log:
+                $ref: "#/components/schemas/core.v1.Log"
+    core.v1.Log:
       description: A log messagage from a process.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           properties:
             kind:
@@ -4175,21 +4208,21 @@ components:
                   description: Holds an exception object if the log message holds an
                     exception reference.
                   type: object
-    Collections:
+    core.v1.Collections:
       description: A list of collections.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Collections"
-    Collection:
+                $ref: "#/components/schemas/core.v1.Collections"
+    core.v1.Collection:
       description: A collection is a collection of data objects, meaning a collection of
         similar objects.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           properties:
             kind:
@@ -4241,7 +4274,7 @@ components:
                         description: "Attribute must have a value."
                         type: boolean
                         default: false
-    StreamStorage:
+    core.v1.StreamStorage:
       description: Use a streaming endpoint to fetch data. Usually used for a http url.
       type: object
       required:
@@ -4252,7 +4285,7 @@ components:
           type: string
           enum:
           - StreamStorage
-    SmbStorage:
+    core.v1.SmbStorage:
       description: SMB/CIFS share.
       type: object
       required:
@@ -4285,7 +4318,7 @@ components:
           type: string
           nullable: true
           default: null
-    BalloonStorage:
+    core.v1.BalloonStorage:
       description: Access a balloon cloud storage.
       type: object
       required:
@@ -4317,7 +4350,7 @@ components:
           description: "Advanced request options"
           type: object
           default: {}
-    LocalFilesystemStorage:
+    core.v1.LocalFilesystemStorage:
       description: Access the local filesystem from the tubee server point of view.
       type: object
       required:
@@ -4333,21 +4366,21 @@ components:
           description: "Root directory."
           type: string
           default: "/root"
-    Endpoints:
+    core.v1.Endpoints:
       description: A list of endpoints.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Endpoint"
-    Endpoint:
+                $ref: "#/components/schemas/core.v1.Endpoint"
+    core.v1.Endpoint:
       description: An endpoint represents an external resource to browse (proxy), import or
         export. This may be a database, a file, a http service, ...
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           required:
           - endpoint
@@ -4369,6 +4402,24 @@ components:
                 - BalloonEndpoint
                 - OdataRestEndpoint
                 - UcsEndpoint
+            namespace:
+              description: The resource namespace
+              type: string
+            collection:
+              description: The data object collection
+              type: string
+            status:
+              type: object
+              readOnly: true
+              properties:
+                 available:
+                   type: boolean
+                 exception:
+                   type: string
+                 error:
+                   type: string
+                 code:
+                   type: integer
             data:
               type: object
               properties:
@@ -4420,10 +4471,10 @@ components:
                       description: Specify a filter which always gets applied to the
                         endpoint if objects are retrieved.
                       type: string
-    PdoEndpoint:
+    core.v1.PdoEndpoint:
       description: Pdo endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4463,10 +4514,10 @@ components:
                       type: object
                       default:
                         {}
-    MysqlEndpoint:
+    core.v1.MysqlEndpoint:
       description: MySQL/MariaDB (and other MySQL forks) endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4515,10 +4566,10 @@ components:
                       description: MySQL driver options. See http://php.net/manual/de/mysqli.options.php for possible options.
                       type: object
                       default: {}
-    LdapEndpoint:
+    core.v1.LdapEndpoint:
       description: LDAP (OpenLDAP, Microsoft AD and other LDAP compatible Server) endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4564,11 +4615,11 @@ components:
                         (http://php.net/manual/en/function.ldap-set-option.php).
                       type: object
                       default: {}
-    OdataRestEndpoint:
+    core.v1.OdataRestEndpoint:
       description: OData REST API endpoint (Compatible with Microsoft graph (Office365 and
         more) and other OData compatible api's)
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4654,10 +4705,20 @@ components:
                           type: string
                           nullable: true
                           default: null
-    ImageEndpoint:
+                options:
+                  type: object
+                  default:
+                    identifier: id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: id
+                      description: Endpoint resource identifier.
+                      type: string
+    core.v1.ImageEndpoint:
       description: Images (Files)
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4673,12 +4734,17 @@ components:
                   default:
                     kind: StreamStorage
                   oneOf:
-                  - $ref: "#/components/schemas/StreamStorage"
-                  - $ref: "#/components/schemas/SmbStorage"
-                  - $ref: "#/components/schemas/BalloonStorage"
-                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  - $ref: "#/components/schemas/core.v1.StreamStorage"
+                  - $ref: "#/components/schemas/core.v1.SmbStorage"
+                  - $ref: "#/components/schemas/core.v1.BalloonStorage"
+                  - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -4703,11 +4769,11 @@ components:
                       description: "Resize image to a max. height (in pixels)."
                       type: integer
                       default: 0
-    UcsEndpoint:
+    core.v1.UcsEndpoint:
       description: UCS endpoint (Univention Corporate Server,
         https://www.univention.com/products/ucs)
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4757,10 +4823,10 @@ components:
                           type: string
                           nullable: true
                           default: null
-    MongodbEndpoint:
+    core.v1.MongodbEndpoint:
       description: MongoDB endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4796,10 +4862,20 @@ components:
                       type: object
                       default:
                         {}
-    BalloonEndpoint:
+                options:
+                  type: object
+                  default:
+                    identifier: _id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: _id
+                      description: Endpoint resource identifier.
+                      type: string
+    core.v1.BalloonEndpoint:
       description: Balloon cloud server endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           required:
             - kind
@@ -4888,10 +4964,20 @@ components:
                           nullable: true
                           default: null
                           type: string
-    CsvEndpoint:
+                options:
+                  type: object
+                  default:
+                    identifier: id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: id
+                      description: Endpoint resource identifier.
+                      type: string
+    core.v1.CsvEndpoint:
       description: CSV data format endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4908,12 +4994,17 @@ components:
                   default:
                     kind: StreamStorage
                   oneOf:
-                  - $ref: "#/components/schemas/StreamStorage"
-                  - $ref: "#/components/schemas/SmbStorage"
-                  - $ref: "#/components/schemas/BalloonStorage"
-                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  - $ref: "#/components/schemas/core.v1.StreamStorage"
+                  - $ref: "#/components/schemas/core.v1.SmbStorage"
+                  - $ref: "#/components/schemas/core.v1.BalloonStorage"
+                  - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -4937,10 +5028,10 @@ components:
                       description: Escape character.
                       type: string
                       default: \
-    XmlEndpoint:
+    core.v1.XmlEndpoint:
       description: XML data format endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -4956,12 +5047,17 @@ components:
                   default:
                     kind: StreamStorage
                   oneOf:
-                  - $ref: "#/components/schemas/StreamStorage"
-                  - $ref: "#/components/schemas/SmbStorage"
-                  - $ref: "#/components/schemas/BalloonStorage"
-                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  - $ref: "#/components/schemas/core.v1.StreamStorage"
+                  - $ref: "#/components/schemas/core.v1.SmbStorage"
+                  - $ref: "#/components/schemas/core.v1.BalloonStorage"
+                  - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
@@ -4992,10 +5088,10 @@ components:
                         XmlEndpoint is a destination endpoint.
                       type: boolean
                       default: false
-    JsonEndpoint:
+    core.v1.JsonEndpoint:
       description: JSON data format endpoint
       allOf:
-        - $ref: "#/components/schemas/Endpoint"
+        - $ref: "#/components/schemas/core.v1.Endpoint"
         - type: object
           properties:
             kind:
@@ -5011,16 +5107,21 @@ components:
                   default:
                     kind: StreamStorage
                   oneOf:
-                  - $ref: "#/components/schemas/StreamStorage"
-                  - $ref: "#/components/schemas/SmbStorage"
-                  - $ref: "#/components/schemas/BalloonStorage"
-                  - $ref: "#/components/schemas/LocalFilesystemStorage"
+                  - $ref: "#/components/schemas/core.v1.StreamStorage"
+                  - $ref: "#/components/schemas/core.v1.SmbStorage"
+                  - $ref: "#/components/schemas/core.v1.BalloonStorage"
+                  - $ref: "#/components/schemas/core.v1.LocalFilesystemStorage"
                   discriminator:
                     propertyName: kind
+                    mapping:
+                      StreamStorage: "#/components/schemas/core.v1.StreamStorage"
+                      SmbStorage: "#/components/schemas/core.v1.SmbStorage"
+                      BalloonStorage: "#/components/schemas/core.v1.BalloonStorage"
+                      LocalFilesystemStorage: "#/components/schemas/core.v1.LocalFilesystemStorage"
                 file:
                   description: File uri or pattern, depends what storage you have choosen.
                   type: string
-    Storage:
+    core.v1.Storage:
       description: The storage defines where data can be fetched.
       type: object
       default:
@@ -5035,22 +5136,22 @@ components:
             - LocalFilesystemStorage
             - SmbStorage
             - BalloonStorage
-    Workflows:
+    core.v1.Workflows:
       description: A list of workflows.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/Workflow"
-    Workflow:
+                $ref: "#/components/schemas/core.v1.Workflow"
+    core.v1.Workflow:
       description: A workflow gets used if an endpoint gets imported or exported. A
         workflow defines if and what object and also if and what attributes of
         an object should be written to or from an endpoint.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           properties:
             kind:
@@ -5062,8 +5163,11 @@ components:
               - Workflow
             data:
               type: object
-              required:
-              - map
+              default:
+                priority: 0
+                ensure: last
+                condition: null
+                map: []
               properties:
                 priority:
                   description: The priority defines in what order multiple workflows get
@@ -5089,14 +5193,15 @@ components:
                     the collection to the endpoint if the endpoint is of type
                     destination.
                   type: array
+                  default: []
                   items:
-                    $ref: "#/components/schemas/MapAttribute"
-    GarbageWorkflow:
+                    $ref: "#/components/schemas/core.v1.MapAttribute"
+    core.v1.GarbageWorkflow:
       description: A workflow gets used if an endpoint gets imported or exported. A
         workflow defines if and what object and also if and what attributes of
         an object should be written to or from an endpoint.
       allOf:
-        - $ref: "#/components/schemas/Workflow"
+        - $ref: "#/components/schemas/core.v1.Workflow"
         - type: object
           properties:
             kind:
@@ -5108,8 +5213,6 @@ components:
               - Workflow
             data:
               type: object
-              required:
-              - map
               properties:
                 priority:
                   description: The priority defines in what order multiple workflows get
@@ -5122,8 +5225,10 @@ components:
                     - last
                     - absent
                   default: last
-    MapAttribute:
+    core.v1.MapAttribute:
       type: object
+      required:
+      - name
       properties:
         name:
           type: string
@@ -5152,7 +5257,7 @@ components:
           - absent
           - merge
         unwind:
-          $ref: "#/components/schemas/MapAttribute"
+          $ref: "#/components/schemas/core.v1.MapAttribute"
         type:
           description: "Convert attribute to a different type."
           type: string
@@ -5166,7 +5271,11 @@ components:
           - array
           - binary
         skip:
-          description: "If tru the attribute does not get stored in the resource object itself. This might be useful if an attribute meant only be used to create resource relations."
+          description: "If true the attribute does not get stored in the resource object itself. This might be useful if an attribute meant to be only to create resource relations."
+          type: boolean
+          default: false
+        writeonly:
+          description: "If true the attribute gets only written intially. Some endpoints might not deliver some attributes like passwords."
           type: boolean
           default: false
         map:
@@ -5194,6 +5303,7 @@ components:
               - absent
             context:
               type: array
+              default: []
               items:
                 type: string
         required:
@@ -5207,6 +5317,7 @@ components:
           default: null
         rewrite:
           type: array
+          default: []
           description: Rewrite resolved attribute values
           items:
             type: object
@@ -5226,10 +5337,31 @@ components:
               to:
                 type: string
                 description: "The destination value. You may use variables ($1, $2,...) from regex subsets if match has been used."
-    EndpointObjects:
+        filter:
+          description: "Apply various filters."
+          type: array
+          default: []
+          items:
+            type: string
+            enum:
+            - Alnum
+            - Alpha
+            - BaseName
+            - Digits
+            - Dir
+            - HtmlEntities
+            - RealPath
+            - StringPrefix
+            - StringSuffix
+            - StringToLower
+            - StringToUpper
+            - StringTrim
+            - StripNewlines
+            - StripTags
+    core.v1.EndpointObjects:
       description: A list of endpoint objects.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             kind:
@@ -5239,31 +5371,33 @@ components:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/EndpointObject"
-    EndpointObject:
+                $ref: "#/components/schemas/core.v1.EndpointObject"
+    core.v1.EndpointObject:
       description: An endpoint object is the actual object on an endpoint itself.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
+          required:
+          - data
           properties:
             data:
               description: Attributes
               type: object
-    DataObjects:
+    core.v1.DataObjects:
       description: List of data objects.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/DataObject"
-    DataObject:
+                $ref: "#/components/schemas/core.v1.DataObject"
+    core.v1.DataObject:
       description: A data object represents a single object in a collection (data
         collection).
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           required:
           - data
@@ -5275,28 +5409,34 @@ components:
             data:
               description: Attributes
               type: object
-    ObjectRelations:
+            status:
+              type: object
+              readOnly: true
+    core.v1.ObjectRelations:
       description: A list of relations.
       allOf:
-        - $ref: "#/components/schemas/List"
+        - $ref: "#/components/schemas/core.v1.List"
         - type: object
           properties:
             data:
               type: array
               items:
-                $ref: "#/components/schemas/DataObjectRelation"
-    DataObjectRelation:
+                $ref: "#/components/schemas/core.v1.DataObjectRelation"
+    core.v1.DataObjectRelation:
       description: An object relation represents a releationship between two data objects.
         A relationship may apply to objects of different collections and/or
         namespaces.
       allOf:
-        - $ref: "#/components/schemas/Resource"
+        - $ref: "#/components/schemas/core.v1.Resource"
         - type: object
           properties:
             kind:
               description: The resource type, always DataObjectRelation.
               type: string
               default: DataObjectRelation
+            status:
+              type: object
+              readOnly: true
             data:
               type: object
               required:

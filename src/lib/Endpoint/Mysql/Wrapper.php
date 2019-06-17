@@ -145,7 +145,7 @@ class Wrapper extends mysqli
     /**
      * Prepare query.
      */
-    public function prepareValues(string $query, Iterable $values): mysqli_stmt
+    public function prepareValues(string $query, iterable $values): mysqli_stmt
     {
         $this->logger->debug('prepare and execute sql query ['.$query.'] with values [{values}]', [
             'category' => get_class($this),

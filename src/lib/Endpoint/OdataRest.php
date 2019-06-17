@@ -31,7 +31,6 @@ class OdataRest extends AbstractRest
      */
     public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->identifier = 'id';
         $this->container = 'value';
         parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }
@@ -94,8 +93,10 @@ class OdataRest extends AbstractRest
 
         $options = $this->getRequestOptions();
         $options['query']['$filter'] = $filter;
+        $attributes[] = $this->identifier;
         $options['query']['$select'] = join(',', $attributes);
         $result = $this->client->get('', $options);
+
         $data = $this->getResponse($result);
 
         if (count($data) > 1) {

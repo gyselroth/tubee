@@ -23,7 +23,7 @@ class Transform
     {
         switch ($type) {
             case AttributeMapInterface::TYPE_ARRAY:
-                return (array) $value;
+                return array_values((array) $value);
 
             break;
             case AttributeMapInterface::TYPE_STRING:

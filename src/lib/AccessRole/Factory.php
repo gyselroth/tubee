@@ -129,9 +129,9 @@ class Factory
     {
         $that = $this;
 
-        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, null, (function ($resource) use ($that) {
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function ($resource) use ($that) {
             return $that->build($resource);
-        })->bindTo($this), $offset, $limit, $sort);
+        }, $offset, $limit, $sort);
     }
 
     /**

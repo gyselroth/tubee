@@ -192,6 +192,16 @@ class AttributeMapTest extends TestCase
         $this->assertSame('foobar', $result['foo']);
     }
 
+    public function testAttributeFilterTrim()
+    {
+        $map = new AttributeMap([
+            ['name' => 'foo',  'value' => 'foobar ', 'filter' => ['StringTrim']],
+        ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
+
+        $result = $map->map(['foo' => 'foo']);
+        $this->assertSame('foobar', $result['foo']);
+    }
+
     /*public function testAttributeScriptDynamicValue()
     {
         $map = new AttributeMap([
@@ -344,7 +354,7 @@ class AttributeMapTest extends TestCase
     public function testGetDiffNoChange()
     {
         $map = new AttributeMap([
-            ['name' => 'foo', 'ensure' => 'last', 'from' => 'foo'],
+            ['name' => 'foo', 'ensure' => 'last', 'from' => 'foo', 'writeonly' => false],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $mapped = ['foo' => 'foo'];
@@ -353,10 +363,29 @@ class AttributeMapTest extends TestCase
         $this->assertSame([], $result);
     }
 
+    public function testGetDiffWriteonlyAttribute()
+    {
+        $map = new AttributeMap([
+            ['name' => 'foo', 'ensure' => 'last', 'from' => 'foo', 'writeonly' => false],
+            ['name' => 'bar', 'ensure' => 'last', 'from' => 'foo', 'writeonly' => true],
+        ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
+
+        $mapped = ['foo' => 'foofoo', 'bar' => 'foo'];
+        $existing = ['foo' => 'foo'];
+        $expected = [
+            'foo' => [
+                'action' => AttributeMapInterface::ACTION_REPLACE,
+                'value' => 'foofoo',
+            ],
+        ];
+        $result = $map->getDiff($mapped, $existing);
+        $this->assertSame($expected, $result);
+    }
+
     public function testGetDiffUpdateValue()
     {
         $map = new AttributeMap([
-            ['name' => 'foo', 'from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_LAST],
+            ['name' => 'foo', 'from' => 'foo', 'ensure' => AttributeMapInterface::ENSURE_LAST, 'writeonly' => false],
         ], new V8Engine($this->createMock(LoggerInterface::class)), $this->createMock(LoggerInterface::class));
 
         $mapped = ['foo' => 'foo'];

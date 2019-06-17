@@ -93,17 +93,7 @@ class Factory
      */
     public function getAll(CollectionInterface $collection, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $filter = [
-            'namespace' => $collection->getResourceNamespace()->getName(),
-            'collection' => $collection->getName(),
-        ];
-
-        if (!empty($query)) {
-            $filter = [
-                '$and' => [$filter, $query],
-            ];
-        }
-
+        $filter = $this->prepareQuery($collection, $query);
         $that = $this;
 
         return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($collection, $that) {
@@ -164,7 +154,7 @@ class Factory
         try {
             $endpoint->transformQuery();
         } catch (\Throwable $e) {
-            throw new Exception\InvalidFilter('filters must be tubee (MongoDb) compatible dql');
+            throw new Exception\InvalidFilter('filters must be tubee (MongoDB) compatible dql');
         }
 
         $endpoint->setup();
@@ -191,6 +181,10 @@ class Factory
         $data = $this->resource_factory->validate($data);
         $data = Validator::validate($data);
 
+        if ($data['data']['type'] === EndpointInterface::TYPE_SOURCE) {
+            $this->ensureIndex($resource->getCollection(), $data['data']['options']['import']);
+        }
+
         foreach ($data['secrets'] as $secret) {
             $data = Helper::deleteArrayValue($data, $secret['to']);
         }
@@ -215,9 +209,10 @@ class Factory
      */
     public function watch(CollectionInterface $collection, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        $filter = $this->prepareQuery($collection, $query);
         $that = $this;
 
-        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($collection, $that) {
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $filter, function (array $resource) use ($collection, $that) {
             return $that->build($resource, $collection);
         }, $offset, $limit, $sort);
     }
@@ -231,6 +226,25 @@ class Factory
         $resource = $this->secret_factory->resolve($collection->getResourceNamespace(), $resource);
 
         return $this->resource_factory->initResource($factory::build($resource, $collection, $this->workflow_factory, $this->logger));
+    }
+
+    /**
+     * Prepare query.
+     */
+    protected function prepareQuery(CollectionInterface $collection, ?array $query = null): array
+    {
+        $filter = [
+            'namespace' => $collection->getResourceNamespace()->getName(),
+            'collection' => $collection->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $filter;
     }
 
     /**

@@ -20,6 +20,7 @@ use Tubee\AttributeMap\Exception;
 use Tubee\AttributeMap\Transform;
 use Tubee\V8\Engine as V8Engine;
 use V8Js;
+use Zend\Filter\FilterChain;
 
 class AttributeMap implements AttributeMapInterface
 {
@@ -151,6 +152,10 @@ class AttributeMap implements AttributeMapInterface
                 }
             }
 
+            if (isset($value['type']) && $value['type'] === AttributeMapInterface::TYPE_ARRAY) {
+                $unwind = array_values($unwind);
+            }
+
             $attrv = $unwind;
         }
 
@@ -190,7 +195,12 @@ class AttributeMap implements AttributeMapInterface
             $attrv = $this->firstArrayElement($attrv, $attr);
         }
 
-        if (isset($value['rewrite'])) {
+        if (isset($value['filter']) && count($value['filter']) > 0) {
+            $chain = new FilterChain(['filters' => $this->getFilters($value['filter'])]);
+            $attrv = $chain->filter($attrv);
+        }
+
+        if (isset($value['rewrite']) && count($value['rewrite']) > 0) {
             $attrv = $this->rewrite($attrv, $value['rewrite']);
         }
 
@@ -201,6 +211,19 @@ class AttributeMap implements AttributeMapInterface
         }
 
         return $attrv;
+    }
+
+    /**
+     * Get filters.
+     */
+    protected function getFilters(array $filter = []): array
+    {
+        $result = [];
+        foreach ($filter as $value) {
+            $result[] = ['name' => $value];
+        }
+
+        return $result;
     }
 
     /**
@@ -247,17 +270,13 @@ class AttributeMap implements AttributeMapInterface
             ]);
         }
 
-        //if (isset($data[$attr])) {
-        //    return $data[$attr];
-        //}
-
         return $result;
     }
 
     /**
      * Shift first array element.
      */
-    protected function firstArrayElement(Iterable $value, string $attribute)
+    protected function firstArrayElement(iterable $value, string $attribute)
     {
         if (empty($value)) {
             return $value;

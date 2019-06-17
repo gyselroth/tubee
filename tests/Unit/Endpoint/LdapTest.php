@@ -21,6 +21,7 @@ use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception;
 use Tubee\Endpoint\Ldap;
 use Tubee\Endpoint\Ldap\Exception as LdapException;
+use Tubee\Exception\InvalidJson as InvalidJsonException;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class LdapTest extends TestCase
@@ -96,16 +97,39 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => '(uid={uid)']],
+            'data' => ['options' => ['filter_one' => '{"uid":"test"}']],
         ]);
 
         $result = $ldap->getOne([])->getData();
         $this->assertSame(['uid' => 'foo'], $result);
     }
 
+    public function testGetOneBinaryAttributeBase64()
+    {
+        $string = openssl_random_pseudo_bytes(10);
+        $search = $this->createMock(LdapResult::class);
+        $search->method('countEntries')->willReturn(1);
+        $search->method('getEntries')->willReturn([
+            ['foo' => [
+                'count' => 1,
+                0 => $string,
+            ]],
+        ]);
+
+        $client = $this->createMock(LdapClient::class);
+        $client->method('ldapSearch')->willReturn($search);
+
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"test"}']],
+        ]);
+
+        $result = $ldap->getOne([])->getData();
+        $this->assertSame(['foo' => base64_encode($string)], $result);
+    }
+
     public function testGetOneMultipleFound()
     {
-        $this->expectException(Exception\ObjectMultipleFound::class);
+        $this->expectException(InvalidJsonException::class);
         $search = $this->createMock(LdapResult::class);
         $search->method('countEntries')->willReturn(2);
 
@@ -129,7 +153,7 @@ class LdapTest extends TestCase
         $client->method('ldapSearch')->willReturn($search);
 
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-            'data' => ['options' => ['filter_one' => '(uid={uid)']],
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
         ]);
 
         $result = $ldap->getOne([])->getData();
@@ -225,6 +249,22 @@ class LdapTest extends TestCase
             'modtype' => LDAP_MODIFY_BATCH_ADD,
             'values' => ['bar'],
         ]];
+
+        $this->assertSame($expected, $result);
+    }
+
+    public function testGetDiffIgnoreEntrydn()
+    {
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(LdapClient::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $diff = [
+            'entrydn' => [
+                'action' => AttributeMapInterface::ACTION_REPLACE,
+                'value' => 'foo',
+            ],
+        ];
+
+        $result = $ldap->getDiff($this->createMock(AttributeMapInterface::class), $diff);
+        $expected = [];
 
         $this->assertSame($expected, $result);
     }
@@ -492,6 +532,32 @@ class LdapTest extends TestCase
             'entrydn' => 'uid=foo,ou=foo',
             'foo' => 'foo',
         ];
+
+        $diff = [];
+
+        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+        $this->assertSame('uid=foo,ou=bar', $result);
+    }
+
+    public function testDontMoveObjectIfCaseNotMatch()
+    {
+        $client = $this->createMock(LdapClient::class);
+        $client->expects($this->never())->method('rename');
+
+        $search = $this->createMock(LdapResult::class);
+        $search->method('countEntries')->willReturn(1);
+        $search->method('getEntries')->willReturn([
+            ['dn' => 'UID=foo,OU=bar'],
+        ]);
+
+        $client->method('ldapSearch')->willReturn($search);
+
+        $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $object = [
+            'entrydn' => 'uid=foo,ou=bar',
+        ];
+
+        $ep_object = $ldap->getOne([])->getData();
 
         $diff = [];
 

@@ -158,9 +158,9 @@ class Collection extends AbstractResource implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null): Generator
+    public function getEndpoints(array $endpoints = [], ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        return $this->endpoint_factory->getAll($this, $endpoints, $offset, $limit);
+        return $this->endpoint_factory->getAll($this, $endpoints, $offset, $limit, $sort);
     }
 
     /**
@@ -216,9 +216,9 @@ class Collection extends AbstractResource implements CollectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getObjects(array $query = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null): Generator
+    public function getObjects(array $query = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = ['$natural' => -1]): Generator
     {
-        return $this->object_factory->getAll($this, $query, $include_dataset, $offset, $limit);
+        return $this->object_factory->getAll($this, $query, $include_dataset, $offset, $limit, $sort);
     }
 
     /**

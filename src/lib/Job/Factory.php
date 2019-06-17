@@ -14,6 +14,7 @@ namespace Tubee\Job;
 use Generator;
 use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
+use Psr\Log\LoggerInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Async\Sync;
 use Tubee\Job;
@@ -65,15 +66,23 @@ class Factory
     protected $log_factory;
 
     /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Initialize.
      */
-    public function __construct(Database $db, ResourceFactory $resource_factory, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory)
+    public function __construct(Database $db, ResourceFactory $resource_factory, Scheduler $scheduler, ProcessFactory $process_factory, LogFactory $log_factory, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->resource_factory = $resource_factory;
         $this->scheduler = $scheduler;
         $this->process_factory = $process_factory;
         $this->log_factory = $log_factory;
+        $this->logger = $logger;
     }
 
     /**
@@ -81,16 +90,7 @@ class Factory
      */
     public function getAll(ResourceNamespaceInterface $namespace, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        $filter = [
-            'namespace' => $namespace->getName(),
-        ];
-
-        if (!empty($query)) {
-            $filter = [
-                '$and' => [$filter, $query],
-            ];
-        }
-
+        $filter = $this->prepareQuery($namespace, $query);
         $that = $this;
 
         return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $filter, $offset, $limit, $sort, function (array $resource) use ($namespace, $that) {
@@ -112,8 +112,13 @@ class Factory
 
         foreach ($tasks as $task) {
             try {
-                $this->scheduler->cancelJob($task['_id']);
+                $this->scheduler->cancelJob($task->getId());
             } catch (\Exception $e) {
+                $this->logger->error('failed to cancel job [{job}]', [
+                    'category' => get_class($this),
+                    'exception' => $e,
+                    'job' => $task->getId(),
+                ]);
             }
         }
 
@@ -152,7 +157,6 @@ class Factory
         }
 
         $resource['namespace'] = $namespace->getName();
-
         $result = $this->resource_factory->addTo($this->db->{self::COLLECTION_NAME}, $resource);
 
         $resource['data'] += [
@@ -160,7 +164,9 @@ class Factory
             'job' => $resource['name'],
         ];
 
-        $this->scheduler->addJob(Sync::class, $resource['data'], $resource['data']['options']);
+        if ($resource['data']['active'] === true) {
+            $this->scheduler->addJob(Sync::class, $resource['data'], $resource['data']['options']);
+        }
 
         return $result;
     }
@@ -192,7 +198,26 @@ class Factory
             'namespace' => $resource->getResourceNamespace()->getName(),
         ];
 
-        $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
+        if ($data['data']['active'] === true) {
+            $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
+        } else {
+            $procs = $this->scheduler->getJobs([
+                'data.namespace' => $resource->getResourceNamespace()->getName(),
+                'data.job' => $resource->getName(),
+            ]);
+
+            foreach ($procs as $proc) {
+                try {
+                    $this->scheduler->cancelJob($proc->getId());
+                } catch (\Exception $e) {
+                    $this->logger->error('failed to cancel job [{job}]', [
+                        'category' => get_class($this),
+                        'exception' => $e,
+                        'job' => $proc->getId(),
+                    ]);
+                }
+            }
+        }
 
         return $this->resource_factory->updateIn($this->db->{self::COLLECTION_NAME}, $resource, $data);
     }
@@ -202,9 +227,10 @@ class Factory
      */
     public function watch(ResourceNamespaceInterface $namespace, ?ObjectIdInterface $after = null, bool $existing = true, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
+        $filter = $this->prepareQuery($namespace, $query);
         $that = $this;
 
-        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $query, function (array $resource) use ($namespace, $that) {
+        return $this->resource_factory->watchFrom($this->db->{self::COLLECTION_NAME}, $after, $existing, $filter, function (array $resource) use ($namespace, $that) {
             return $that->build($resource, $namespace);
         }, $offset, $limit, $sort);
     }
@@ -215,5 +241,23 @@ class Factory
     public function build(array $resource, ResourceNamespaceInterface $namespace): JobInterface
     {
         return $this->resource_factory->initResource(new Job($resource, $namespace, $this->scheduler, $this->process_factory, $this->log_factory));
+    }
+
+    /**
+     * Prepare query.
+     */
+    protected function prepareQuery(ResourceNamespaceInterface $namespace, ?array $query = null): array
+    {
+        $filter = [
+            'namespace' => $namespace->getName(),
+        ];
+
+        if (!empty($query)) {
+            $filter = [
+                '$and' => [$filter, $query],
+            ];
+        }
+
+        return $filter;
     }
 }

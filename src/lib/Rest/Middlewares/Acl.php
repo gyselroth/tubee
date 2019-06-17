@@ -39,6 +39,12 @@ class Acl implements MiddlewareInterface
      */
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
+        $target = $request->getRequestTarget();
+
+        if ($target === '/api/v1' || $target === '/api') {
+            return $handler->handle($request);
+        }
+
         $identity = $request->getAttribute('identity');
 
         if ($identity === null || $this->acl->isAllowed($request, $identity)) {

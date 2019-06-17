@@ -29,12 +29,12 @@ RUN apt-get update && apt-get install -y \
   && rm -rf /var/lib/apt/lists/*
 
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/8/prod.list > /etc/apt/sources.list.d/mssql-release.list \
+    && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql wget dialog  \
+    && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql17 wget dialog  \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.a /usr/lib/ \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.so /usr/lib/ \
-    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb7u4_amd64.deb \
+    && wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u11_amd64.deb \
     && dpkg -i *.deb
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -67,7 +67,6 @@ RUN pecl install xdebug \
 RUN apt-get update && apt-get --no-install-recommends install -y nginx make rsync gnupg smbclient
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
- && php -r "if (hash_file('sha384', 'composer-setup.php') === '93b54496392c062774670ac18b134c3b3a95e5a5e5c8f1a9f115f203b75bf9a129d5daa8ba6a13e2cc8a1da0806388a8') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" \
  && php composer-setup.php --filename=composer --install-dir=/usr/bin \
  && php -r "unlink('composer-setup.php');"
 
@@ -81,9 +80,10 @@ RUN mkdir /etc/ssl/tubee \
   && mv key.pem /etc/ssl/tubee/ \
   && mv chain.pem /etc/ssl/tubee/
 
-COPY nginx.conf /etc/nginx/conf.d
+COPY packaging/docker-dev/nginx.conf /etc/nginx/conf.d/tubee.conf
 
-RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default
+RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \
+  && echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf
 
 EXPOSE 80 443 9000
 

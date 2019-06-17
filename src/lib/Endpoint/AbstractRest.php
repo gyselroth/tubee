@@ -97,7 +97,7 @@ abstract class AbstractRest extends AbstractEndpoint
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
-        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object);
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
         $this->logChange($uri, $diff);
 
         if ($simulate === false) {
@@ -114,7 +114,7 @@ abstract class AbstractRest extends AbstractEndpoint
      */
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($endpoint_object);
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
         $this->logDelete($uri);
 
         if ($simulate === false) {
@@ -215,10 +215,14 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * Get identifier.
      */
-    protected function getResourceId(array $object): string
+    protected function getResourceId(array $object, array $endpoint_object = []): string
     {
         if (isset($object[$this->identifier])) {
             return $object[$this->identifier];
+        }
+
+        if (isset($endpoint_object[$this->identifier])) {
+            return $endpoint_object[$this->identifier];
         }
 
         throw new RestException\IdNotFound('attribute '.$this->identifier.' is not available');

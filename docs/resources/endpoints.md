@@ -43,8 +43,7 @@ tubectl get ep accounts json-export -n playground -o yaml
 Destination endpoints are used to export objects from tubee to another service.
 
 An endpoint with type `destination` always requires the option `filter_one` to be defined. This filter defines how an object on the endpoint can be uniquely identified by tubee.
-This filter varies between the different type of endpoints. For example file_one with LdapEndpoint is an ldap query. Using MysqlEndpoint filter_one is an SQL where query. Using XmlEndpoint filter_one is an xpath.
-
+Like all tubee queries/filters this is a MongoDB DSL query.
 Like filter_one you may specify a filter_all which filters all data objects on the endpoint. This may be useful if the endpoint is of type `source`.
 
 ## Source endpoints
@@ -62,7 +61,7 @@ Source endpoints require the option `import` to be defined. This options holds a
 | MongodbEndpoint | MongoDB server |
 | MoodleEndpoint | Moodle |
 | BalloonEndpoint | [balloon](https://github.com/gyselroth/balloon) cloud server |
-| ODataRestEndpoint | REST API defined as [OData](https://www.odata.org/), like microsoft online services (Office 365). |
+| ODataRestEndpoint | REST API defined as [OData](https://www.odata.org/), like microsoft online services (graph API, Office 365). |
 | XmlEndpoint | Xml data format |
 | CsvEndpoint | Csv data format |
 | JsonEndpoint | Json data format |
