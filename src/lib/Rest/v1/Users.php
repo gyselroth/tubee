@@ -59,7 +59,7 @@ class Users
         ], $request->getQueryParams());
 
         if (isset($query['watch'])) {
-            $cursor = $this->user_factory->watch(null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            $cursor = $this->user_factory->watch(null, isset($query['stream']), $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }

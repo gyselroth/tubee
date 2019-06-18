@@ -1,3 +1,10 @@
+## 1.0.0-beta27
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jun 18 11:03:12 CEST 2019
+
+* CORE: [FIX] Fixes watch changeStream
+
+
 ## 1.0.0-beta26
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jun 17 16:57:12 CEST 2019

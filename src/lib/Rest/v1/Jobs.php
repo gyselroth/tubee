@@ -80,7 +80,7 @@ class Jobs
         $namespace = $this->namespace_factory->getOne($namespace);
 
         if (isset($query['watch'])) {
-            $cursor = $this->job_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            $cursor = $this->job_factory->watch($namespace, null, isset($query['stream']), $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }
@@ -164,21 +164,6 @@ class Jobs
             'limit' => 20,
         ], $request->getQueryParams());
 
-        if (isset($query['watch'])) {
-            $filter = [
-                'fullDocument.context.namespace' => $namespace,
-                'fullDocument.context.job' => $job,
-            ];
-
-            if (!empty($query['query'])) {
-                $filter = ['$and' => [$filter, $query['query']]];
-            }
-
-            $logs = $this->log_factory->watch(null, true, $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
-
-            return Helper::watchAll($request, $identity, $this->acl, $logs);
-        }
-
         $filter = [
             'context.namespace' => $namespace,
             'context.job' => $job,
@@ -186,6 +171,12 @@ class Jobs
 
         if (!empty($query['query'])) {
             $filter = ['$and' => [$filter, $query['query']]];
+        }
+
+        if (isset($query['watch'])) {
+            $logs = $this->log_factory->watch(null, isset($query['stream']), $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $logs);
         }
 
         $logs = $this->log_factory->getAll($filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);

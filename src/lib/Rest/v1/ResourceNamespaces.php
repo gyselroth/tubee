@@ -58,7 +58,7 @@ class ResourceNamespaces
         ], $request->getQueryParams());
 
         if (isset($query['watch'])) {
-            $cursor = $this->namespace_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+            $cursor = $this->namespace_factory->watch(null, isset($query['stream']), $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }
