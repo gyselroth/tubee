@@ -1,3 +1,10 @@
+## 1.0.0-beta26
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jun 17 16:57:12 CEST 2019
+
+* CORE: [FIX] DataObjectRealtion context gets now changed if the context changes during sync
+
+
 ## 1.0.0-beta25
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jun 17 09:23:12 CEST 2019
