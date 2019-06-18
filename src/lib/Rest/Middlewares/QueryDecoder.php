@@ -53,8 +53,10 @@ class QueryDecoder implements MiddlewareInterface
             $query['query'] = [];
         }
 
-        if (isset($query['stream']) && $query['stream'] !== 'false' && !empty($query['stream']) && !isset($query['limit'])) {
-            $query['limit'] = null;
+        if (isset($query['stream']) && $query['stream'] !== 'false' && !empty($query['stream'])) {
+            if (!isset($query['limit'])) {
+                $query['limit'] = null;
+            }
         } else {
             $query['stream'] = null;
         }
