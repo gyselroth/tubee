@@ -104,7 +104,7 @@ The mapping is defined within `map` and contains a list of attribute mappings. E
 | script | `null` | Execute JavaScript using the V8 engine.  |
 | type | `<same type as value>` | Convert the value to another type. |
 | rewrite | `[]` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
-| filters | `[]` | Chain of predefined string filters to apply |
+| filter | `[]` | Chain of predefined string filters to apply |
 | unwind | `null`  | Unwind a list and operate attribute options on each list element. |
 | skip | `false` | If true the attribute gets ignored. This may be useful if an attribute is only used for an object relation creation or relation context. |
 | map | <object> | Define an object relation mapping to another collection. Automatically create DataObjectReations. |
