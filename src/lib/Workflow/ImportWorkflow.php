@@ -104,6 +104,8 @@ class ImportWorkflow extends Workflow
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
+                        'last_successful_sync' => $ts,
+                        'success' => true,
                         'garbage' => false,
                     ],
                 ];
@@ -120,6 +122,8 @@ class ImportWorkflow extends Workflow
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
+                        'last_successful_sync' => $ts,
+                        'success' => true,
                         'garbage' => false,
                     ],
                 ];

@@ -1,3 +1,11 @@
+## 1.0.0-beta29
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Jun 27 11:22:11 CEST 2019
+
+* CORE: [CHANGE] Includes exception for failed DataObject syncs
+* CORE: [CHANGE] DataObject endpoint garbage is set to true if the DataObject does not exists on the endpoint
+
+
 ## 1.0.0-beta28
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jun 18 13:45:12 CEST 2019
