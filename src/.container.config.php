@@ -41,17 +41,8 @@ use Cache\Adapter\Void\VoidCachePool;
 use Cache\Adapter\Apcu\ApcuCachePool;
 use Dreamscapes\Ldap\Core\Ldap as DreamscapesLdap;
 use Tubee\Log\MongoDBFormatter as MongoDBFormatter;
-use Swoole\Http\Server as HttpServer;
 
 return [
-    HttpServer::class => [
-        'arguments' => [
-            'host' => '0.0.0.0',
-            'port' => 8095,
-            'mode' => SWOOLE_BASE,
-            'sock_type' => SWOOLE_SOCK_TCP,
-        ]
-    ],
     DreamscapesLdap::class => [
         'singleton' => false
     ],
