@@ -74,21 +74,19 @@ class Helper
         $options = isset($query['pretty']) ? JSON_PRETTY_PRINT : 0;
 
         $stream = new StreamIterator($cursor, function ($resource) use ($request, $options) {
-            /*if ($this->tell() === 0) {
+            if ($this->tell() === 0) {
                 echo  '[';
             } else {
                 echo  ',';
             }
 
             echo json_encode($resource->decorate($request), $options);
-             */
 
-            return json_encode($resource->decorate($request), $options);
             if ($this->eof()) {
-                return ']';
+                echo ']';
             }
 
-            //flush();
+            flush();
         });
 
         return (new Response($stream))
@@ -109,22 +107,22 @@ class Helper
         $options = isset($query['pretty']) ? JSON_PRETTY_PRINT : 0;
 
         $stream = new StreamIterator($cursor, function ($event) use ($request, $options) {
-            /*if ($this->tell() === 0) {
+            if ($this->tell() === 0) {
                 echo  '[';
             } else {
                 echo  ',';
-            }*/
+            }
 
-            return json_encode([
+            echo json_encode([
                 $event[0],
                 $event[1]->decorate($request),
             ], $options);
 
             if ($this->eof()) {
-                return ']';
+                echo ']';
             }
 
-            //flush();
+            flush();
         });
 
         return (new Response($stream))

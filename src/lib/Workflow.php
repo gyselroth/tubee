@@ -196,6 +196,17 @@ class Workflow extends AbstractResource implements WorkflowInterface
             $status['result'] = $result;
         }
 
+        if ($status['exception'] !== null) {
+            $exception = $status['exception'];
+            $status['exception'] = [
+                'class' => get_class($exception),
+                'message' => $exception->getMessage(),
+                'code' => $exception->getCode(),
+                'file' => $exception->getFile().':'.$exception->getLine(),
+                'trace' => $exception->getTraceAsString(),
+            ];
+        }
+
         $endpoints = [
             $this->endpoint->getName() => $status,
         ];

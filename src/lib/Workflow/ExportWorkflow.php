@@ -74,6 +74,7 @@ class ExportWorkflow extends Workflow
                 break;
                 case WorkflowInterface::ENSURE_EXISTS:
                     $result = $this->ensureExists($object, $map, $ts, $simulate);
+                    $exists = true;
 
                 break;
                 default:
