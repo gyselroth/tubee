@@ -33,6 +33,7 @@ class ExportWorkflow extends Workflow
         }
 
         $exists = false;
+        $result = null;
 
         try {
             $map = $this->attribute_map->map($attributes, $ts);

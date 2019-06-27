@@ -11,7 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee;
 
-use MongoDB\UTCDateTime;
+use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
