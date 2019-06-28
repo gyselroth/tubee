@@ -129,10 +129,10 @@ class ImportWorkflow extends Workflow
                 ];
 
                 $this->importRelations($exists, $map, $simulate, $endpoints);
-                $endpoints = $exists->getEndpoints();
+                $exist_ep = $exists->getEndpoints();
 
-                if (isset($endpoints[$this->endpoint->getName()])
-                    && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
+                if (isset($exist_ep[$this->endpoint->getName()])
+                    && $exist_ep[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
                     $this->logger->warning('source object with given import filter is not unique (multiple data objects found), skip update resource', [
                         'category' => get_class($this),
                     ]);

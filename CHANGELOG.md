@@ -1,3 +1,10 @@
+## 1.0.0-beta30
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Jun 28 09:04:11 CEST 2019
+
+* CORE: [FIX] Import DataObject (update) does not update last_sync to current timestamp
+
+
 ## 1.0.0-beta29
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Thu Jun 27 11:22:11 CEST 2019
