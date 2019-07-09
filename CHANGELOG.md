@@ -1,3 +1,10 @@
+## 1.0.0-beta31
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jul 09 09:04:11 CEST 2019
+
+* CORE: [FEATURE] Added MicrosoftGraph endpoint with support for groups and teams
+
+
 ## 1.0.0-beta30
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Jun 28 09:04:11 CEST 2019
