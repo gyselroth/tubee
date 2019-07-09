@@ -101,7 +101,7 @@ abstract class AbstractRest extends AbstractEndpoint
         $this->logChange($uri, $diff);
 
         if ($simulate === false) {
-            $result = $this->client->patch($uri, $this->getRequestOptions([
+            $this->client->patch($uri, $this->getRequestOptions([
                 'json' => $diff,
             ]));
         }
