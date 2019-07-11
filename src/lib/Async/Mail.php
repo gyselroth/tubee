@@ -50,7 +50,7 @@ class Mail extends AbstractJob
     /**
      * Constructor.
      */
-    public function __construct(TransportInterface $transport, LoggerInterface $logger, ?Iterable $config = null)
+    public function __construct(TransportInterface $transport, LoggerInterface $logger, array $config = [])
     {
         $this->transport = $transport;
         $this->logger = $logger;
@@ -60,12 +60,8 @@ class Mail extends AbstractJob
     /**
      * Set options.
      */
-    public function setOptions(?Iterable $config = []): self
+    public function setOptions(array $config = []): self
     {
-        if (null === $config) {
-            return $this;
-        }
-
         foreach ($config as $option => $value) {
             switch ($option) {
                 case 'sender_address':
