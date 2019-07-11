@@ -67,7 +67,7 @@ class AccessRoles
         ], $request->getQueryParams());
 
         if (isset($query['watch'])) {
-            $cursor = $this->role_factory->watch(null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+            $cursor = $this->role_factory->watch(null, isset($query['stream']), $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }

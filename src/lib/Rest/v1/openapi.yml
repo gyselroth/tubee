@@ -4402,6 +4402,7 @@ components:
                 - BalloonEndpoint
                 - OdataRestEndpoint
                 - UcsEndpoint
+                - MicrosoftGraphEndpoint
             namespace:
               description: The resource namespace
               type: string
@@ -4615,6 +4616,16 @@ components:
                         (http://php.net/manual/en/function.ldap-set-option.php).
                       type: object
                       default: {}
+    core.v1.MicrosoftGraphEndpoint:
+      description: Microsoft graph API
+      allOf:
+        - $ref: "#/components/schemas/core.v1.OdataRestEndpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always MicrosoftGraphEndpoint.
+              type: string
+              default: MicrosoftGraphEndpoint
     core.v1.OdataRestEndpoint:
       description: OData REST API endpoint (Compatible with Microsoft graph (Office365 and
         more) and other OData compatible api's)

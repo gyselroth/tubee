@@ -79,7 +79,7 @@ class Endpoints
         $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
 
         if (isset($query['watch'])) {
-            $cursor = $this->endpoint_factory->watch($collection, null, true, $query['query'], $query['offset'], $query['limit'], $query['sort']);
+            $cursor = $this->endpoint_factory->watch($collection, null, isset($query['stream']), $query['query'], $query['offset'], $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }
@@ -181,22 +181,6 @@ class Endpoints
             'limit' => 20,
         ], $request->getQueryParams());
 
-        if (isset($query['watch'])) {
-            $filter = [
-                'fullDocument.context.namespace' => $namespace,
-                'fullDocument.context.collection' => $collection,
-                'fullDocument.context.endpoint' => $endpoint,
-            ];
-
-            if (!empty($query['query'])) {
-                $filter = ['$and' => [$filter, $query['query']]];
-            }
-
-            $logs = $this->log_factory->watch(null, true, $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
-
-            return Helper::watchAll($request, $identity, $this->acl, $logs);
-        }
-
         $filter = [
             'context.namespace' => $namespace,
             'context.collection' => $collection,
@@ -205,6 +189,12 @@ class Endpoints
 
         if (!empty($query['query'])) {
             $filter = ['$and' => [$filter, $query['query']]];
+        }
+
+        if (isset($query['watch'])) {
+            $logs = $this->log_factory->watch(null, isset($query['stream']), $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $logs);
         }
 
         $logs = $this->log_factory->getAll($filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);

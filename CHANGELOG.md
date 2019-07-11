@@ -1,3 +1,46 @@
+## 1.0.0-beta32
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Jul 11 15:42:11 CEST 2019
+
+* CORE: [FIX] last_sync/last_successful_sync have an old timestamp #53 
+
+
+## 1.0.0-beta31
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jul 09 09:04:11 CEST 2019
+
+* CORE: [FEATURE] Added MicrosoftGraph endpoint with support for groups and teams
+
+
+## 1.0.0-beta30
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Jun 28 09:04:11 CEST 2019
+
+* CORE: [FIX] Import DataObject (update) does not update last_sync to current timestamp
+
+
+## 1.0.0-beta29
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Jun 27 11:22:11 CEST 2019
+
+* CORE: [CHANGE] Includes exception for failed DataObject syncs
+* CORE: [CHANGE] DataObject endpoint garbage is set to true if the DataObject does not exists on the endpoint
+
+
+## 1.0.0-beta28
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jun 18 13:45:12 CEST 2019
+
+* CORE: [FIX] Fixes stream
+
+
+## 1.0.0-beta27
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jun 18 11:03:12 CEST 2019
+
+* CORE: [FIX] Fixes watch changeStream
+
+
 ## 1.0.0-beta26
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jun 17 16:57:12 CEST 2019

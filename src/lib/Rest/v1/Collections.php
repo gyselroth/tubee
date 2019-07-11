@@ -79,7 +79,7 @@ class Collections
         $namespace = $this->namespace_factory->getOne($namespace);
 
         if (isset($query['watch'])) {
-            $cursor = $this->collection_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            $cursor = $this->collection_factory->watch($namespace, null, isset($query['stream']), $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }
@@ -163,21 +163,6 @@ class Collections
             'limit' => 20,
         ], $request->getQueryParams());
 
-        if (isset($query['watch'])) {
-            $filter = [
-                'fullDocument.context.namespace' => $namespace,
-                'fullDocument.context.collection' => $collection,
-            ];
-
-            if (!empty($query['query'])) {
-                $filter = ['$and' => [$filter, $query['query']]];
-            }
-
-            $logs = $this->log_factory->watch(null, isset($query['stream']), $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
-
-            return Helper::watchAll($request, $identity, $this->acl, $logs);
-        }
-
         $filter = [
             'context.namespace' => $namespace,
             'context.collection' => $collection,
@@ -185,6 +170,12 @@ class Collections
 
         if (!empty($query['query'])) {
             $filter = ['$and' => [$filter, $query['query']]];
+        }
+
+        if (isset($query['watch'])) {
+            $logs = $this->log_factory->watch(null, isset($query['stream']), $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $logs);
         }
 
         $logs = $this->log_factory->getAll($filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);

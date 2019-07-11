@@ -57,7 +57,8 @@ RUN pecl install mongodb \
     && pecl install smbclient \
     && pecl install sqlsrv \
     && pecl install pdo_sqlsrv \
-    && docker-php-ext-enable mongodb apcu imagick smbclient pcntl sqlsrv pdo_sqlsrv mysqli
+    && pecl install swoole \
+    && docker-php-ext-enable mongodb apcu imagick smbclient pcntl sqlsrv pdo_sqlsrv mysqli swoole
 
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \

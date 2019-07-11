@@ -104,9 +104,15 @@ class ImportWorkflow extends Workflow
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
+                        'last_successful_sync' => $ts,
+                        'success' => true,
                         'garbage' => false,
                     ],
                 ];
+
+                if (isset($object[$this->endpoint->getResourceIdentifier()])) {
+                    $endpoints[$this->endpoint->getName()]['result'] = $object[$this->endpoint->getResourceIdentifier()];
+                }
 
                 $id = $collection->createObject(Helper::pathArrayToAssociative($this->removeMapAttributes($map)), $simulate, $endpoints);
                 $this->importRelations($collection->getObject(['_id' => $id]), $map, $simulate, $endpoints);
@@ -116,19 +122,25 @@ class ImportWorkflow extends Workflow
             break;
             default:
             case WorkflowInterface::ENSURE_LAST:
-                $object = Map::map($this->attribute_map, $this->removeMapAttributes($map), ['data' => $exists->getData()], $ts);
+                $mapped = Map::map($this->attribute_map, $this->removeMapAttributes($map), ['data' => $exists->getData()], $ts);
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,
+                        'last_successful_sync' => $ts,
+                        'success' => true,
                         'garbage' => false,
                     ],
                 ];
 
-                $this->importRelations($exists, $map, $simulate, $endpoints);
-                $endpoints = $exists->getEndpoints();
+                if (isset($object[$this->endpoint->getResourceIdentifier()])) {
+                    $endpoints[$this->endpoint->getName()]['result'] = $object[$this->endpoint->getResourceIdentifier()];
+                }
 
-                if (isset($endpoints[$this->endpoint->getName()])
-                    && $endpoints[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
+                $this->importRelations($exists, $map, $simulate, $endpoints);
+                $exist_ep = $exists->getEndpoints();
+
+                if (isset($exist_ep[$this->endpoint->getName()])
+                    && $exist_ep[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
                     $this->logger->warning('source object with given import filter is not unique (multiple data objects found), skip update resource', [
                         'category' => get_class($this),
                     ]);
@@ -136,7 +148,7 @@ class ImportWorkflow extends Workflow
                     return true;
                 }
 
-                $collection->changeObject($exists, $object, $simulate, $endpoints);
+                $collection->changeObject($exists, $mapped, $simulate, $endpoints);
 
                 return true;
 
@@ -186,14 +198,15 @@ class ImportWorkflow extends Workflow
                 continue;
             }
 
-            $this->logger->debug('find related object from ['.$object->getId().'] to ['.$definition['map']['collection'].':'.$definition['map']['to'].'] => ['.$data[$definition['name']].']', [
+            $this->logger->debug('find related object from ['.$object->getId().'] to ['.$definition['map']['collection'].':'.$definition['map']['to'].'] => [{value}]', [
                 'category' => get_class($this),
+                'value' => $data[$definition['name']],
             ]);
 
             $namespace = $this->endpoint->getCollection()->getResourceNamespace();
             $collection = $namespace->getCollection($definition['map']['collection']);
             $relatives = $collection->getObjects([
-                $definition['map']['to'] => $data[$definition['name']],
+                $definition['map']['to'] => ['$in' => (array) $data[$definition['name']]],
             ]);
 
             foreach ($relatives as $relative) {
@@ -209,11 +222,11 @@ class ImportWorkflow extends Workflow
                         $collection = $this->endpoint->getCollection()->getName();
                         $ep = $this->endpoint->getName();
 
-                        $endpoints = [
+                        $list = [
                             join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
                         ];
 
-                        $object->createOrUpdateRelation($relative, $context, $simulate, $endpoints);
+                        $object->createOrUpdateRelation($relative, $context, $simulate, $list);
 
                     break;
                     default:

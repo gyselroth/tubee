@@ -242,7 +242,7 @@ class Factory
     {
         $pipeline = $query;
         if (!empty($pipeline)) {
-            $pipeline = [['$match' => $query]];
+            $pipeline = [['$match' => $this->prepareQuery($query)]];
         }
 
         $stream = $collection->watch($pipeline, [
@@ -250,7 +250,12 @@ class Factory
         ]);
 
         if ($existing === true) {
-            $query = $this->prepareQuery($query);
+            if (empty($sort)) {
+                $sort = ['$natural' => -1];
+            } elseif ($sort == ['$natural' => 1]) {
+                $sort = [];
+            }
+
             $total = $collection->count($query);
 
             if ($offset !== null && $total === 0) {
@@ -327,24 +332,23 @@ class Factory
     }
 
     /**
-     * Remove fullDocument prefix from keys.
+     * Add fullDocument prefix to keys.
      */
     protected function prepareQuery(array $query): array
     {
-        $filter = $query;
-        if (isset($query['$and'])) {
-            $query = $query['$and'][0];
-        }
-
         $new = [];
         foreach ($query as $key => $value) {
-            $new[substr($key, 13)] = $value;
-        }
+            switch ($key) {
+                case '$and':
+                case '$or':
+                    foreach ($value as $sub_key => $sub) {
+                        $new[$key][$sub_key] = $this->prepareQuery($sub);
+                    }
 
-        if (isset($filter['$and'])) {
-            $filter['$and'][0] = $new;
-
-            return $filter;
+                break;
+                default:
+                    $new['fullDocument.'.$key] = $value;
+            }
         }
 
         return $new;

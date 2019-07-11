@@ -78,7 +78,7 @@ class Processes
         $namespace = $this->namespace_factory->getOne($namespace);
 
         if (isset($query['watch'])) {
-            $cursor = $this->process_factory->watch($namespace, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            $cursor = $this->process_factory->watch($namespace, null, isset($query['stream']), $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }
@@ -139,26 +139,6 @@ class Processes
             'limit' => 20,
         ], $request->getQueryParams());
 
-        if (isset($query['watch'])) {
-            $filter = [
-                '$or' => [[
-                    'fullDocument.context.namespace' => $namespace,
-                    'fullDocument.context.process' => $process,
-                ], [
-                    'fullDocument.context.namespace' => $namespace,
-                    'fullDocument.context.parent' => $process,
-                ]],
-            ];
-
-            if (!empty($query['query'])) {
-                $filter = ['$and' => [$filter, $query['query']]];
-            }
-
-            $logs = $this->log_factory->watch(null, true, $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
-
-            return Helper::watchAll($request, $identity, $this->acl, $logs);
-        }
-
         $filter = [
             '$or' => [[
                 'context.namespace' => $namespace,
@@ -171,6 +151,12 @@ class Processes
 
         if (!empty($query['query'])) {
             $filter = ['$and' => [$filter, $query['query']]];
+        }
+
+        if (isset($query['watch'])) {
+            $logs = $this->log_factory->watch(null, isset($query['stream']), $filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);
+
+            return Helper::watchAll($request, $identity, $this->acl, $logs);
         }
 
         $logs = $this->log_factory->getAll($filter, (int) $query['offset'], (int) $query['limit'], $query['sort']);

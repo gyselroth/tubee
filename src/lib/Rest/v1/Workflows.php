@@ -70,7 +70,7 @@ class Workflows
         $endpoint = $namespace->getCollection($collection)->getEndpoint($endpoint);
 
         if (isset($query['watch'])) {
-            $cursor = $this->workflow_factory->watch($endpoint, null, true, $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
+            $cursor = $this->workflow_factory->watch($endpoint, null, isset($query['stream']), $query['query'], (int) $query['offset'], (int) $query['limit'], $query['sort']);
 
             return Helper::watchAll($request, $identity, $this->acl, $cursor);
         }

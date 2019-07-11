@@ -62,6 +62,7 @@ services:
   tubee-dev:
     image: gyselroth/tubee:latest-dev
     ports:
+      - "8095:8095"
       - "8090:443"
     entrypoint: sh -c "make -C /srv/www/tubee deps; php /srv/www/tubee/src/cgi-bin/cli.php upgrade -i; service nginx start && php-fpm"
     volumes:
