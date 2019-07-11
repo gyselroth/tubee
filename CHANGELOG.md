@@ -1,3 +1,10 @@
+## 1.0.0-beta32
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Jul 11 15:42:11 CEST 2019
+
+* CORE: [FIX] last_sync/last_successful_sync have an old timestamp #53 
+
+
 ## 1.0.0-beta31
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jul 09 09:04:11 CEST 2019

@@ -41,8 +41,12 @@ use Cache\Adapter\Void\VoidCachePool;
 use Cache\Adapter\Apcu\ApcuCachePool;
 use Dreamscapes\Ldap\Core\Ldap as DreamscapesLdap;
 use Tubee\Log\MongoDBFormatter as MongoDBFormatter;
+use TaskScheduler\JobInterface;
 
 return [
+    JobInterface::class => [
+        'singleton' => false
+    ],
     DreamscapesLdap::class => [
         'singleton' => false
     ],
