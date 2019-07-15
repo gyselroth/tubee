@@ -209,7 +209,12 @@ class Factory
      */
     public function getAllFrom(Collection $collection, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null, ?Closure $build = null): Generator
     {
-        $total = $collection->count($query);
+        $total = 0;
+
+        if ($limit !== null) {
+            $total = $collection->count($query);
+        }
+
         $offset = $this->calcOffset($total, $offset);
 
         if ($sort === []) {
