@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\Workflow;
 
-use Generator;
 use MongoDB\BSON\UTCDateTimeInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\Endpoint\Exception as EndpointException;
@@ -27,7 +26,7 @@ class ExportWorkflow extends Workflow
     public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
-        $attributes['relations'] = iterator_to_array($this->getRelations($object));
+        $attributes['relations'] = $object->getResolvedRelationsAsArray();
         if ($this->checkCondition($attributes) === false) {
             return false;
         }
@@ -161,18 +160,6 @@ class ExportWorkflow extends Workflow
         $this->endpoint->delete($this->attribute_map, $map, $exists->getData(), $simulate);
 
         return null;
-    }
-
-    /**
-     * Transform relations to array.
-     */
-    protected function getRelations(DataObjectInterface $object): Generator
-    {
-        foreach ($object->getRelations() as $relation) {
-            $resource = $relation->toArray();
-            $resource['object'] = $relation->getDataObject()->toArray();
-            yield $resource;
-        }
     }
 
     /**

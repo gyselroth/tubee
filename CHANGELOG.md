@@ -1,5 +1,13 @@
 ## 1.0.0-beta34
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jul 15 13:48:11 CEST 2019
+
+* CORE: [FIX] Fix order if resources were retrieved via api
+* CORE: [CHANGE] Cache resolved relations during workflow executions
+
+
+## 1.0.0-beta34
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jul 15 10:45:14 CEST 2019
 
 * CORE: [FIX] Do not count objects during fetch if no limit was given

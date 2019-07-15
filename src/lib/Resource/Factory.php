@@ -216,15 +216,6 @@ class Factory
         }
 
         $offset = $this->calcOffset($total, $offset);
-
-        if ($sort === []) {
-            $sort = null;
-        } elseif (empty($sort)) {
-            $sort = ['$natural' => -1];
-        } elseif ($sort == ['$natural' => 1]) {
-            $sort = [];
-        }
-
         $result = $collection->find($query, [
             'projection' => ['history' => 0],
             'skip' => $offset,

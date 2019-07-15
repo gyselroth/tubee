@@ -106,6 +106,7 @@ class CoreInstallation implements DeltaInterface
         $this->db->relations->createIndex(['data.relation' => 1, 'name' => 1]);
         $this->db->relations->createIndex(['endpoints' => 1]);
         $this->db->relations->createIndex(['namespace' => 1, 'name' => 1], ['unique' => true]);
+        $this->db->relations->createIndex(['data.relation.namespace' => 1, 'data.relation.collection' => 1, 'data.relation.object' => 1]);
 
         if (!$this->namespace_factory->has('default')) {
             $this->namespace_factory->add([

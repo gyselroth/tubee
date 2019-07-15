@@ -37,6 +37,13 @@ class DataObject extends AbstractResource implements DataObjectInterface
     protected $relation_factory;
 
     /**
+     * Relations.
+     *
+     * @var null|array
+     */
+    protected $relations;
+
+    /**
      * Data object.
      */
     public function __construct(array $resource, CollectionInterface $collection, DataObjectRelationFactory $relation_factory)
@@ -135,6 +142,23 @@ class DataObject extends AbstractResource implements DataObjectInterface
     public function deleteRelation(DataObjectInterface $object, bool $simulate = false): bool
     {
         return $this->relation_factory->deleteFromObject($this, $object, $simulate);
+    }
+
+    /**
+     * Get relations as array (and cache).
+     */
+    public function getResolvedRelationsAsArray(): array
+    {
+        if ($this->relations === null) {
+            $this->relations = [];
+            foreach ($this->getRelations() as $relation) {
+                $resource = $relation->toArray();
+                $resource['object'] = $relation->getDataObject()->toArray();
+                $this->relations[] = $relation;
+            }
+        }
+
+        return $this->relations;
     }
 
     /**

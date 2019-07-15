@@ -71,6 +71,10 @@ class QueryDecoder implements MiddlewareInterface
             $query['sort'] = [];
         }
 
+        if (empty($query['sort'])) {
+            $query['sort'] = ['$natural' => -1];
+        }
+
         $request = $request->withQueryParams($query);
 
         return $handler->handle($request);
