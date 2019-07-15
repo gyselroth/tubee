@@ -212,7 +212,9 @@ class Factory
         $total = $collection->count($query);
         $offset = $this->calcOffset($total, $offset);
 
-        if (empty($sort)) {
+        if ($sort === []) {
+            $sort = null;
+        } elseif (empty($sort)) {
             $sort = ['$natural' => -1];
         } elseif ($sort == ['$natural' => 1]) {
             $sort = [];

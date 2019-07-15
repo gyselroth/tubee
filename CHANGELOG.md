@@ -1,3 +1,10 @@
+## 1.0.0-beta333
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jul 15 10:44:11 CEST 2019
+
+* CORE: [FIX] Performance fix during fetching relations
+
+
 ## 1.0.0-beta32
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Jul 11 15:42:11 CEST 2019
