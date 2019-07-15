@@ -1,3 +1,10 @@
+## 1.0.0-beta36
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jul 15 15:44:11 CEST 2019
+
+* CORE: [FIX] Fix DataObject relations to array conversion
+
+
 ## 1.0.0-beta35
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jul 15 13:48:11 CEST 2019

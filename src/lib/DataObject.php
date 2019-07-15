@@ -154,7 +154,7 @@ class DataObject extends AbstractResource implements DataObjectInterface
             foreach ($this->getRelations() as $relation) {
                 $resource = $relation->toArray();
                 $resource['object'] = $relation->getDataObject()->toArray();
-                $this->relations[] = $relation;
+                $this->relations[] = $resource;
             }
         }
 
