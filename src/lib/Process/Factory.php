@@ -85,7 +85,7 @@ class Factory
     {
         $resource['kind'] = 'Process';
         $resource = $this->resource_factory->validate($resource);
-        Validator::validate($resource);
+        $resource = Validator::validate($resource);
 
         $resource['data']['namespace'] = $namespace->getName();
         $process = $this->scheduler->addJob(Sync::class, $resource['data']);
