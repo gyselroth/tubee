@@ -101,7 +101,7 @@ class OdataRest extends AbstractRest
             $result = $this->client->get('', $options);
             $data = $this->getResponse($result);
         } catch (RequestException $e) {
-            if ($result->getStatusCode() === 404) {
+            if ($e->getCode() === 404) {
                 throw new Exception\ObjectNotFound('no object found with filter '.$filter);
             }
 
