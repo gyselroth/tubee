@@ -85,10 +85,6 @@ class Helper
      */
     public static function associativeArrayToPath(iterable $arr, iterable $narr = [], $nkey = ''): array
     {
-        /*if ($nkey !== '') {
-            $narr[substr($nkey, 0, -1)] = $arr;
-        }*/
-
         foreach ($arr as $key => $value) {
             if (is_array($value)) {
                 $narr = array_merge($narr, self::associativeArrayToPath($value, $narr, $nkey.$key.'.'));

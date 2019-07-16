@@ -1,3 +1,10 @@
+## 1.0.0-beta38
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jul 16 14:28:23 CEST 2019
+
+* CORE: [FIX] GRAPH API (ODataRest) returns a 404 if an object was not found from id=x filter
+
+
 ## 1.0.0-beta37
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jul 16 09:24:22 CEST 2019
