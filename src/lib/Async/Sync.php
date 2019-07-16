@@ -20,6 +20,7 @@ use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Helper;
 use Tubee\Log\MongoDBFormatter;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
@@ -210,7 +211,7 @@ class Sync extends AbstractJob
             return [];
         }
 
-        return (array) json_decode($this->data['filter']);
+        return (array) Helper::jsonDecode($this->data['filter']);
     }
 
     /**

@@ -1,3 +1,12 @@
+## 1.0.0-beta37
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jul 16 09:24:22 CEST 2019
+
+* CORE: [FIX] Member batch result verify team via status and not code
+* CORE: [FIX] Validate Process/Job filter before register/update a new one
+* CORE: [FIX] Validate Endpoint filter_all/filter_new before register/update a new one
+
+
 ## 1.0.0-beta36
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jul 15 15:44:11 CEST 2019

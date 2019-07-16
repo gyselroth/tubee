@@ -415,7 +415,7 @@ class MicrosoftGraph extends OdataRest
 
                 break;
                 case 'team':
-                    if ($response['code'] === 200) {
+                    if ($response['status'] === 200) {
                         $set['resourceProvisioningOptions'][] = 'Team';
                     }
 

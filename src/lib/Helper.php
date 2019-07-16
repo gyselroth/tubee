@@ -16,7 +16,7 @@ class Helper
     /**
      * Propper json_decode.
      */
-    public static function jsonDecode($data, $options)
+    public static function jsonDecode(string $data, bool $options = true)
     {
         $result = json_decode($data, $options);
 
