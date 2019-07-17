@@ -1,3 +1,10 @@
+## 1.0.0-beta39
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jul 16 14:28:23 CEST 2019
+
+* CORE: [FIX] A Throwable exception (TypeError) might lead to multiple loggers and therefore the wrong process id gets attached to logs 
+
+
 ## 1.0.0-beta38
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jul 16 14:28:23 CEST 2019

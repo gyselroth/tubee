@@ -298,7 +298,7 @@ class Sync extends AbstractJob
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
                         'category' => get_class($this),
                     ]);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     ++$this->error_count;
 
                     $this->logger->error('failed export object to destination endpoint ['.$identifier.']', [
@@ -385,7 +385,7 @@ class Sync extends AbstractJob
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
                         'category' => get_class($this),
                     ]);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     ++$this->error_count;
 
                     $this->logger->error('failed import data object from source endpoint ['.$identifier.']', [
