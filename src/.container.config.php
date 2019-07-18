@@ -128,6 +128,10 @@ return [
             ],
             [
                 'method' => 'injectDelta',
+                'arguments' => ['delta' => '{'.Migration\AddKindAttributeMap::class.'}']
+            ],
+            [
+                'method' => 'injectDelta',
                 'arguments' => ['delta' => '{'.Migration\CoreInstallation::class.'}']
             ],
         ]

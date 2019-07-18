@@ -14,6 +14,13 @@ namespace Tubee\AttributeMap;
 interface AttributeMapInterface
 {
     /**
+     * Attribute kinds.
+     */
+    const KIND_MAP = 'map';
+    const KIND_STATIC = 'static';
+    const KIND_SCRIPT = 'script';
+
+    /**
      * Ensure states.
      */
     const ENSURE_EXISTS = 'exists';

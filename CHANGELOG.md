@@ -6,6 +6,7 @@
 * CORE: [FIX] MicrosoftGraphEndpoint: Remove group member/owner ends in "Write requests are only supported on contained entities"
 * CORE: [FIX] MicrosoftGraphEndpoint: Resolve all group members/owners (limit of 100 resources)
 * CORE: [FIX] MicrosoftGraphEndpoint: Do not throw exception if /groups/{group}/team fails
+* CORE: [CHANGE] Add attribute type #34
 
 
 ## 1.0.0-beta38
