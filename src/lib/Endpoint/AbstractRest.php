@@ -170,15 +170,23 @@ abstract class AbstractRest extends AbstractEndpoint
     }
 
     /**
+     * Decode response.
+     */
+    protected function decodeResponse($response): array
+    {
+        $this->logger->debug('request to ['.$this->client->getConfig('base_uri').'] ended with code ['.$response->getStatusCode().']', [
+            'category' => get_class($this),
+        ]);
+
+        return json_decode($response->getBody()->getContents(), true);
+    }
+
+    /**
      * Verify response.
      */
     protected function getResponse($response): array
     {
-        $data = json_decode($response->getBody()->getContents(), true);
-
-        $this->logger->debug('request to ['.$this->client->getConfig('base_uri').'] ended with code ['.$response->getStatusCode().']', [
-            'category' => get_class($this),
-        ]);
+        $data = $this->decodeResponse($response);
 
         if (isset($this->container)) {
             if (isset($data[$this->container])) {

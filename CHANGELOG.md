@@ -1,8 +1,11 @@
 ## 1.0.0-beta39
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Tue Jul 16 14:28:23 CEST 2019
+**Date**: Thu Jul 18 10:36:23 CEST 2019
 
 * CORE: [FIX] A Throwable exception (TypeError) might lead to multiple loggers and therefore the wrong process id gets attached to logs 
+* CORE: [FIX] MicrosoftGraphEndpoint: Remove group member/owner ends in "Write requests are only supported on contained entities"
+* CORE: [FIX] MicrosoftGraphEndpoint: Resolve all group members/owners (limit of 100 resources)
+* CORE: [FIX] MicrosoftGraphEndpoint: Do not throw exception if /groups/{group}/team fails
 
 
 ## 1.0.0-beta38

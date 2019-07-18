@@ -296,7 +296,7 @@ class MicrosoftGraph extends OdataRest
                 $requests[] = [
                     'id' => 'remove-'.$type.'-'.$member,
                     'method' => 'DELETE',
-                    'url' => '/groups/'.$id.'/'.$type.'/'.$member,
+                    'url' => '/groups/'.$id.'/'.$type.'/'.$member.'/$ref',
                      'headers' => [
                         'Content-Type' => 'application/json',
                     ],
@@ -322,7 +322,7 @@ class MicrosoftGraph extends OdataRest
     /**
      * Batch call.
      */
-    protected function batch(array $requests, bool $simulate = false): array
+    protected function batch(array $requests, bool $simulate = false, bool $throw = true): array
     {
         $results = [];
 
@@ -339,7 +339,7 @@ class MicrosoftGraph extends OdataRest
                     'json' => $chunk,
                 ]));
 
-                $results = array_merge($results, $this->validateBatchResponse($response));
+                $results = array_merge($results, $this->validateBatchResponse($response, $throw));
             }
         }
 
@@ -349,7 +349,7 @@ class MicrosoftGraph extends OdataRest
     /**
      * Validate batch request.
      */
-    protected function validateBatchResponse($response): array
+    protected function validateBatchResponse($response, bool $throw = true): array
     {
         $data = json_decode($response->getBody()->getContents(), true);
 
@@ -363,14 +363,15 @@ class MicrosoftGraph extends OdataRest
                 'id' => $result['id'],
             ]);
 
-            if (isset($result['body']['error'])) {
+            if (isset($result['body']['error']) && $throw === true) {
                 throw new GraphException\BatchRequestFailed('batch request part failed with error '.$result['body']['error']['message'].' and http code '.$result['status']);
             }
+
             $this->logger->debug('batch request part [{request}] succeeded with http code [{status}]', [
-                    'category' => get_class($this),
-                    'request' => $result['id'] ?? null,
-                    'status' => $result['status'] ?? null,
-                ]);
+                'category' => get_class($this),
+                'request' => $result['id'] ?? null,
+                'status' => $result['status'] ?? null,
+            ]);
         }
 
         return $data['responses'];
@@ -405,7 +406,7 @@ class MicrosoftGraph extends OdataRest
             'requests' => $requests,
         ]);
 
-        $data = $this->batch($requests);
+        $data = $this->batch($requests, false, false);
 
         $set = [
             'owners' => [],
@@ -420,6 +421,14 @@ class MicrosoftGraph extends OdataRest
                 default:
                     foreach ($response['body'][$this->container] as $record) {
                         $set[$response['id']][] = $record['id'];
+                    }
+
+                    $id = $response['id'];
+                    $response = $response['body'];
+                    while (isset($response['@odata.nextLink'])) {
+                        $options = $this->getRequestOptions();
+                        $response = $this->decodeResponse($this->client->get($response['@odata.nextLink'], $options));
+                        $set[$id] = array_merge($set[$id], array_column($response[$this->container], 'id'));
                     }
 
                 break;
