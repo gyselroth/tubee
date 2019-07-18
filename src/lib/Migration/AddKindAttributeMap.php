@@ -37,19 +37,13 @@ class AddKindAttributeMap implements DeltaInterface
     {
         foreach ($this->db->workflows->find() as $workflow) {
             $attributes = $workflow['data']['map'];
-            foreach ($attributes as $key => $attribute) {
-                if ($attribute['script'] !== null) {
-                    $attribute['kind'] = 'script';
-                    $attribute['value'] = $attribute['script'];
-                } elseif ($attribute['from'] !== null) {
-                    $attribute['kind'] = 'from';
-                    $attribute['value'] = $attribute['from'];
-                } else {
-                    $attribute['kind'] = 'static';
-                    $attribute['value'] = $attribute['value'];
-                }
+            foreach ($attributes as $key => &$attribute) {
+                $attribute = $this->convertToKind($attribute);
 
-                unset($attribute['script'], $attribute['from']);
+                while (isset($attribute['unwind']) && is_array($attribute['unwind'])) {
+                    $attribute = &$attribute['unwind'];
+                    $attribute = $this->convertToKind($attribute);
+                }
             }
 
             $this->db->workflows->updateOne(['_id' => $workflow['_id']], [
@@ -58,5 +52,29 @@ class AddKindAttributeMap implements DeltaInterface
         }
 
         return true;
+    }
+
+    /**
+     * Covnert old style declartion to kind/value.
+     */
+    protected function convertToKind(array $attribute): array
+    {
+        if (isset($attribute['script'])) {
+            $attribute['kind'] = 'script';
+            $attribute['value'] = $attribute['script'];
+        } elseif (isset($attribute['from'])) {
+            $attribute['kind'] = 'map';
+            $attribute['value'] = $attribute['from'];
+        } elseif (isset($attribute['value'])) {
+            $attribute['kind'] = 'static';
+            $attribute['value'] = $attribute['value'];
+        } else {
+            $attribute['kind'] = 'static';
+            $attribute['value'] = null;
+        }
+
+        unset($attribute['script'], $attribute['from']);
+
+        return $attribute;
     }
 }
