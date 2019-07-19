@@ -1,3 +1,10 @@
+## 1.0.0-beta40
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Jul 19 09:36:23 CEST 2019
+
+* CORE: [FIX] Job includes last process status from wrong namespace 
+
+
 ## 1.0.0-beta39
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Thu Jul 18 10:36:23 CEST 2019
