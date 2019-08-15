@@ -245,13 +245,12 @@ class Factory
 
         $stream = $collection->watch($pipeline, [
             'resumeAfter' => $after,
+            'fullDocument' => 'updateLookup',
         ]);
 
         if ($existing === true) {
             if (empty($sort)) {
-                $sort = ['$natural' => -1];
-            } elseif ($sort == ['$natural' => 1]) {
-                $sort = [];
+                $sort = ['created' => 1];
             }
 
             $total = $collection->count($query);
