@@ -23,7 +23,7 @@ data:
     identifier: null
     flush: true
     import: []
-    filter_one: test
+    filter_one: null
     filter_all: null
   resource: []
   file: /tmp/accounts.json

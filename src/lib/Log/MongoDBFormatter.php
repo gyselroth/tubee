@@ -23,7 +23,18 @@ class MongoDBFormatter implements FormatterInterface
      */
     public function format(array $record): array
     {
-        return $this->formatArray($record);
+        $formatted = [
+            'changed' => $record['datetime'],
+            'namespace' => $record['context']['namespace'] ?? null,
+            'collection' => $record['context']['collection'] ?? null,
+            'endpoint' => $record['context']['endpoint'] ?? null,
+        ];
+
+        unset($record['context']['namespace'], $record['context']['collection'], $record['context']['endpoint'], $record['datetime']);
+
+        $formatted['data'] = $record;
+
+        return $this->formatArray($formatted);
     }
 
     /**
@@ -48,7 +59,7 @@ class MongoDBFormatter implements FormatterInterface
                 $record[$name] = $this->formatDate($value);
             } elseif ($value instanceof \Throwable) {
                 $record[$name] = $this->formatException($value);
-            } elseif ($name === 'context') {
+            } elseif ($name === 'data' || $name === 'context') {
                 $record[$name] = $this->formatArray($value);
             } elseif ($value instanceof BSONType) {
                 continue;

@@ -137,7 +137,7 @@ class Factory
     /**
      * Get all.
      */
-    public function getAll(CollectionInterface $collection, ?array $query = null, bool $include_dataset = true, ?int $offset = 0, ?int $limit = 0, ?array $sort = ['$natural' => -1]): Generator
+    public function getAll(CollectionInterface $collection, ?array $query = null, bool $include_dataset = true, ?int $offset = 0, ?int $limit = 0, ?array $sort = null): Generator
     {
         $that = $this;
 

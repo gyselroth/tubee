@@ -227,14 +227,18 @@ class Sync extends AbstractJob
             if ($handler instanceof MongoDBHandler) {
                 $handler->setLevel($level);
                 $handler->setFormatter(new MongoDBFormatter());
-
-                $this->logger->pushProcessor(function ($record) use ($context) {
-                    $record['context'] = array_merge($record['context'], $context);
-
-                    return $record;
-                });
             }
         }
+
+        while (count($this->logger->getProcessors()) > 1) {
+            $this->logger->popProcessor();
+        }
+
+        $this->logger->pushProcessor(function ($record) use ($context) {
+            $record['context'] = array_merge($record['context'], $context);
+
+            return $record;
+        });
 
         return true;
     }

@@ -23,21 +23,27 @@ data:
   condition: "core.result(core.object.data.disabled === false && core.object.data.username)"
   map:
   - name: entrydn
-    script: "core.result('uid='+core.object.data.username+',ou='+core.object.department+',o=company,dc=example,dc=org')"
+    kind: script
+    value: "core.result('uid='+core.object.data.username+',ou='+core.object.department+',o=company,dc=example,dc=org')"
     required: true
   - name: uid
-    from: data.username
+    kind: map
+    value: data.username
     required: false
   - name: sn
-    from: data.last_name
+    kind: map
+    value: data.last_name
     required: false
   - name: givenName
-    from: data.givenname
+    kind: map
+    value: data.givenname
     required: false
   - name: cn
-    script: "core.result(core.object.data.firstname +' '+core.object.data.last_name)"
+    kind: script
+    value: "core.result(core.object.data.firstname +' '+core.object.data.last_name)"
     required: false
   - name: objectClass
+    kind: static
     value: 
       - inetOrgPerson
     required: true
@@ -98,10 +104,9 @@ The mapping is defined within `map` and contains a list of attribute mappings. E
 | Option      | Default | Description  |
 | ------------- | -------------- |--------------|
 | name | `<required>` | The name of the destination attribute. (May also contain `.` to specify a deep path like `data.username`).  |
+| kind | `map` | May either be `map` (1:1 attribute mapping), `static` (static inline value) or `script` (scripted attribute using vanilla javascript (V8). |
 | ensure | `last` | Like a workflow itself, each attribute may have a different ensure level.  |
-| from | `null` | Map the value from the attribute 1:1 to the attribute named in `name`.  |
-| value | `null`  | Defines a static value. |
-| script | `null` | Execute JavaScript using the V8 engine.  |
+| value | `null`  | Defines the value of the attribute. The value depends on what kind of attribute this is. |
 | type | `<same type as value>` | Convert the value to another type. |
 | rewrite | `[]` | Rewrite a mapped attribute to another value (May also be done using a scripted attribute). |
 | filter | `[]` | Chain of predefined string filters to apply |
@@ -125,6 +130,16 @@ map:
 
 The `data.` prefix is required since a DataObjects data is placed within a data container. See an example of a DataObject [here](resources/data-objects.md).
 
+### Kind
+
+There are three different attribute kinds while map is the default one.
+
+| Kind      | Description  |
+| ------------- |--------------|
+| map | The value will hold the name of the source attribute from which value will be taken. The value must be string in this case since all attribute names are strings.  |
+| static | The value is a static value. It may be any supported type.  |
+| script | The value is a javascript executed by the V8 engine. The result must set by calling `core.result()` while the current DataObject is accessible using `core.object`.  |
+
 ### Ensure
 
 The ensure type on a attributes knows one more type `merge` compared to workflow itself.
@@ -137,17 +152,6 @@ The ensure type on a attributes knows one more type `merge` compared to workflow
 | merge | The attributes get merged, only useful if the value is an array/list.  |
 
 
-### Map: from/value/script
-
-A mapping attribute may be one of `from` (1:1 mapping), `value` (static mapping) or `script` (scripted attribute).
-
-#### From
-From defines the source attribute. The given source attributes value gets mapped to the named attribute.
-
-#### Value
-Instead using a value from an object, you may define a static value for an attribute using `value`.
-
-#### Script
 Defines mighty scipted attributes. The engine executes JavaScript and used the result of `core.result()` as the value for the attribute.
 
 ### Type
@@ -167,7 +171,8 @@ Example:
 ```yaml
 map:
 - name: entrydn
-  script: "core.result('uid='+core.object.data.username+',ou='+core.object.department+',o=company,dc=example,dc=org')"  
+  kind: script
+  value: "core.result('uid='+core.object.data.username+',ou='+core.object.department+',o=company,dc=example,dc=org')"  
   rewrite:
   - from: uid=admin,ou=admins,o=company,dc=example,dc=org
     to: uid=Administrator,ou=admins,o=company,dc=example,dc=org
@@ -213,7 +218,7 @@ Lets unwind the attribute `adresses` and grab the value with `from`.
 ```yaml
 map:
 - name: street
-  from: data.adresses
+  value: data.adresses
   unwind:
     from: root.street
 ```
@@ -238,7 +243,7 @@ Example:
 ```yaml
 map:
 - name: data.member
-  from: member
+  value: member
   map:
     collection: accounts
     to: data.dn

@@ -40,14 +40,9 @@ class Log extends AbstractResource implements LogInterface
             '_links' => [
             ],
             'kind' => 'Log',
-            'created' => $this->resource['datetime']->toDateTime()->format('c'),
-            'changed' => $this->resource['datetime']->toDateTime()->format('c'),
-            'data' => [
-                'level' => $this->resource['level'],
-                'level_name' => $this->resource['level_name'],
-                'message' => $this->resource['message'],
-                'category' => isset($this->resource['context']['category']) ? $this->resource['context']['category'] : '<unknown>',
-            ],
+            'created' => $this->resource['changed']->toDateTime()->format('c'),
+            'changed' => $this->resource['changed']->toDateTime()->format('c'),
+            'data' => $this->getData(),
         ];
 
         if (isset($this->resource['context']['exception'])) {

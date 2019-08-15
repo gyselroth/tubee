@@ -141,11 +141,11 @@ class Processes
 
         $filter = [
             '$or' => [[
-                'context.namespace' => $namespace,
-                'context.process' => $process,
+                'namespace' => $namespace,
+                'data.context.process' => $process,
             ], [
-                'context.namespace' => $namespace,
-                'context.parent' => $process,
+                'namespace' => $namespace,
+                'data.context.parent' => $process,
             ]],
         ];
 

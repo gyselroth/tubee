@@ -182,7 +182,7 @@ class Xml extends AbstractFile
     public function transformQuery(?array $query = null)
     {
         if ($this->filter_all !== null && empty($query)) {
-            return '//*['.QueryTransformer::transform($this->filter_all).']';
+            return '//*['.QueryTransformer::transform($this->getFilterAll()).']';
         }
         if (!empty($query)) {
             if ($this->filter_all === null) {
@@ -197,7 +197,7 @@ class Xml extends AbstractFile
                 ]).']';
         }
 
-        return null;
+        return '//*';
     }
 
     /**
@@ -219,6 +219,14 @@ class Xml extends AbstractFile
 
             foreach ($node as $result) {
                 $result = Converter::xmlToArray($result);
+                if (!is_array($result)) {
+                    $this->logger->error('xml needs to yield objects ['.$xml['path'].'], make sure a propper endpoint filter has been set', [
+                        'category' => get_class($this),
+                    ]);
+
+                    continue;
+                }
+
                 yield $this->build($result);
                 ++$i;
             }

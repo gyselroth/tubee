@@ -17,7 +17,7 @@ kind: Collection
 Executing `tubectl apply -f resources.yaml` will create those two resources for you. 
 You may edit this file locally and run `tubectl apply -f resources.yaml` again to apply your changes. 
 
->**Note** The order of resources does not matter. tubectl will order the resource for you automatically.
+>**Note** The order of resources does not matter. tubectl will order the resources for you automatically.
 
 ```yaml
 name: default

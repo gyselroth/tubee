@@ -145,14 +145,14 @@ class CoreInstallation implements DeltaInterface
         }
 
         //remove logs after 14 days
-        $this->db->logs->createIndex(['datetime' => 1], ['expireAfterSeconds' => 1209600]);
-        $this->db->logs->createIndex(['level_name' => 1]);
-        $this->db->logs->createIndex(['context.process' => 1, 'context.namespace' => 1, 'context.parent' => 1]);
-        $this->db->logs->createIndex(['context.namespace' => 1, 'context.parent' => 1]);
-        $this->db->logs->createIndex(['context.job' => 1, 'context.namespace' => 1]);
-        $this->db->logs->createIndex(['context.collection' => 1, 'context.namespace' => 1]);
-        $this->db->logs->createIndex(['context.endpoint' => 1, 'context.collection' => 1, 'context.namespace' => 1]);
-        $this->db->logs->createIndex(['context.object' => 1, 'context.collection' => 1, 'context.namespace' => 1]);
+        $this->db->logs->createIndex(['changed' => 1], ['expireAfterSeconds' => 1209600]);
+        $this->db->logs->createIndex(['data.level_name' => 1]);
+        $this->db->logs->createIndex(['data.context.process' => 1, 'namespace' => 1, 'data.context.parent' => 1]);
+        $this->db->logs->createIndex(['namespace' => 1, 'data.context.parent' => 1]);
+        $this->db->logs->createIndex(['data.context.job' => 1, 'namespace' => 1]);
+        $this->db->logs->createIndex(['collection' => 1, 'namespace' => 1]);
+        $this->db->logs->createIndex(['endpoint' => 1, 'collection' => 1, 'namespace' => 1]);
+        $this->db->logs->createIndex(['data.context.object' => 1, 'collection' => 1, 'namespace' => 1]);
 
         return true;
     }

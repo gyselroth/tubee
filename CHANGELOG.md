@@ -2,7 +2,14 @@
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Jul 19 09:36:23 CEST 2019
 
-* CORE: [FIX] Job includes last process status from wrong namespace 
+* CORE: [FIX] Job includes last process status from wrong namespace
+* CORE: [FIX] Remove all processors from the logger before a new sync jobs starts
+* CORE: [CHANGE] Removed $natural mongodb sorting (replaced with indexed changed: 1 sort by default), ($natural sorting does not use indices ans is therefore too slow)
+* CORE: [CHANGE] Changed log resource structure, Log resources have now a more identical structure than other resources
+* CORE: [FIX] DOMXPath::query(): Invalid expression at /srv/www/tubee/src/lib/Endpoint/Xml.php:218
+* CORE: [FIX] Log error if xml yields an invalid EndpointObject and continue with the next
+* CORE: [FEATURE] Added support for $exists query to the XmlEndpoint
+* CORE: [FIX] Watch streams now include updates and removals
 
 
 ## 1.0.0-beta39
