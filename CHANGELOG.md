@@ -1,3 +1,75 @@
+## 1.0.0-beta40
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Aug 16 10:57:23 CEST 2019
+
+* CORE: [FIX] Job includes last process status from wrong namespace
+* CORE: [FIX] Remove all processors from the logger before a new sync jobs starts
+* CORE: [CHANGE] Removed $natural mongodb sorting (replaced with indexed changed: 1 sort by default), ($natural sorting does not use indices ans is therefore too slow)
+* CORE: [CHANGE] Changed log resource structure, Log resources have now a more identical structure than other resources
+* CORE: [FIX] DOMXPath::query(): Invalid expression at /srv/www/tubee/src/lib/Endpoint/Xml.php:218
+* CORE: [FIX] Log error if xml yields an invalid EndpointObject and continue with the next
+* CORE: [FEATURE] Added support for $exists query to the XmlEndpoint
+* CORE: [FIX] Watch streams now include updates and removals
+* CORE: [FIX] Watch dataobjects Fatal error: Method StreamIterator\StreamIterator toString() must not throw an exception, caught TypeError: Argument 1 passed to Tubee\DataObject\Factory::build() must be of the type array
+* CORE: [FIX] Do not drop fields if skip is true #56
+
+
+## 1.0.0-beta39
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Jul 18 10:36:23 CEST 2019
+
+* CORE: [FIX] A Throwable exception (TypeError) might lead to multiple loggers and therefore the wrong process id gets attached to logs 
+* CORE: [FIX] MicrosoftGraphEndpoint: Remove group member/owner ends in "Write requests are only supported on contained entities"
+* CORE: [FIX] MicrosoftGraphEndpoint: Resolve all group members/owners (limit of 100 resources)
+* CORE: [FIX] MicrosoftGraphEndpoint: Do not throw exception if /groups/{group}/team fails
+* CORE: [CHANGE] Add attribute type #34
+
+
+## 1.0.0-beta38
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jul 16 14:28:23 CEST 2019
+
+* CORE: [FIX] GRAPH API (ODataRest) returns a 404 if an object was not found from id=x filter
+
+
+## 1.0.0-beta37
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jul 16 09:24:22 CEST 2019
+
+* CORE: [FIX] Member batch result verify team via status and not code
+* CORE: [FIX] Validate Process/Job filter before register/update a new one
+* CORE: [FIX] Validate Endpoint filter_all/filter_new before register/update a new one
+
+
+## 1.0.0-beta36
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jul 15 15:44:11 CEST 2019
+
+* CORE: [FIX] Fix DataObject relations to array conversion
+
+
+## 1.0.0-beta35
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jul 15 13:48:11 CEST 2019
+
+* CORE: [FIX] Fix order if resources were retrieved via api
+* CORE: [CHANGE] Cache resolved relations during workflow executions
+
+
+## 1.0.0-beta34
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jul 15 10:45:14 CEST 2019
+
+* CORE: [FIX] Do not count objects during fetch if no limit was given
+
+
+## 1.0.0-beta33
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jul 15 10:44:11 CEST 2019
+
+* CORE: [FIX] Performance fix during fetching relations
+
+
 ## 1.0.0-beta32
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Jul 11 15:42:11 CEST 2019

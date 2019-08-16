@@ -43,7 +43,7 @@ class QueryDecoder implements MiddlewareInterface
             $query['watch'] = null;
         }
 
-        if (isset($query['query'])) {
+        if (!empty($query['query'])) {
             $query['query'] = toPHP(fromJSON($query['query']), [
                 'root' => 'array',
                 'document' => 'array',
@@ -61,7 +61,7 @@ class QueryDecoder implements MiddlewareInterface
             $query['stream'] = null;
         }
 
-        if (isset($query['sort'])) {
+        if (!empty($query['sort'])) {
             $query['sort'] = json_decode(htmlspecialchars_decode($query['sort']), true);
 
             if (json_last_error()) {
@@ -69,6 +69,12 @@ class QueryDecoder implements MiddlewareInterface
             }
         } else {
             $query['sort'] = [];
+        }
+
+        if (isset($query['stream']) && empty($query['sort'])) {
+            $query['sort'] = ['created' => 1];
+        } elseif (empty($query['sort'])) {
+            $query['sort'] = ['created' => -1];
         }
 
         $request = $request->withQueryParams($query);

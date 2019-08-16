@@ -233,41 +233,49 @@ class AttributeMap implements AttributeMapInterface
     {
         $result = null;
 
-        if (isset($value['value'])) {
-            $result = $value['value'];
-        }
+        switch ($value['kind']) {
+            default:
+            case AttributeMapInterface::KIND_MAP:
+                try {
+                    if (isset($value['value'])) {
+                        $result = Helper::getArrayValue($data, $value['value']);
+                    }
+                } catch (\Exception $e) {
+                    $this->logger->warning('failed to resolve value of map attribute ['.$attr.'] from ['.$value['value'].']', [
+                        'category' => get_class($this),
+                        'exception' => $e,
+                    ]);
+                }
 
-        try {
-            if (isset($value['from'])) {
-                $result = Helper::getArrayValue($data, $value['from']);
-            }
-        } catch (\Exception $e) {
-            $this->logger->warning('failed to resolve value of attribute ['.$attr.'] from ['.$value['from'].']', [
-                'category' => get_class($this),
-                'exception' => $e,
-            ]);
-        }
+            break;
+            case AttributeMapInterface::KIND_STATIC:
+                $result = $value['value'];
 
-        try {
-            if (isset($value['script'])) {
-                $this->logger->debug('attribute ['.$attr.'] is scripted [{script}]', [
-                    'category' => get_class($this),
-                    'script' => $value['script'],
-                ]);
+            break;
+            case AttributeMapInterface::KIND_SCRIPT:
+                try {
+                    if (isset($value['value'])) {
+                        $this->logger->debug('attribute ['.$attr.'] is scripted [{script}]', [
+                            'category' => get_class($this),
+                            'script' => $value['value'],
+                        ]);
 
-                $this->v8->executeString($value['script'], '', V8Js::FLAG_FORCE_ARRAY);
-                $result = $this->v8->getLastResult();
+                        $this->v8->executeString($value['value'], '', V8Js::FLAG_FORCE_ARRAY);
+                        $result = $this->v8->getLastResult();
 
-                $this->logger->debug('script result of ['.$attr.'] core.result() is [{value}]', [
-                    'category' => get_class($this),
-                    'value' => $value,
-                ]);
-            }
-        } catch (\Exception $e) {
-            $this->logger->warning('failed to execute script ['.$value['script'].'] of attribute ['.$attr.']', [
-                'category' => get_class($this),
-                'exception' => $e,
-            ]);
+                        $this->logger->debug('script result of ['.$attr.'] core.result() is [{value}]', [
+                            'category' => get_class($this),
+                            'value' => $value,
+                        ]);
+                    }
+                } catch (\Exception $e) {
+                    $this->logger->warning('failed to execute script ['.$value['value'].'] of attribute ['.$attr.']', [
+                        'category' => get_class($this),
+                        'exception' => $e,
+                    ]);
+                }
+
+            break;
         }
 
         return $result;

@@ -13,6 +13,7 @@ namespace Tubee\Endpoint;
 
 use Generator;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\OdataRest\QueryTransformer;
@@ -95,9 +96,17 @@ class OdataRest extends AbstractRest
         $options['query']['$filter'] = $filter;
         $attributes[] = $this->identifier;
         $options['query']['$select'] = join(',', $attributes);
-        $result = $this->client->get('', $options);
 
-        $data = $this->getResponse($result);
+        try {
+            $result = $this->client->get('', $options);
+            $data = $this->getResponse($result);
+        } catch (RequestException $e) {
+            if ($e->getCode() === 404) {
+                throw new Exception\ObjectNotFound('no object found with filter '.$filter);
+            }
+
+            throw $e;
+        }
 
         if (count($data) > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);

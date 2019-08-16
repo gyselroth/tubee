@@ -182,9 +182,9 @@ class Endpoints
         ], $request->getQueryParams());
 
         $filter = [
-            'context.namespace' => $namespace,
-            'context.collection' => $collection,
-            'context.endpoint' => $endpoint,
+            'namespace' => $namespace,
+            'collection' => $collection,
+            'endpoint' => $endpoint,
         ];
 
         if (!empty($query['query'])) {

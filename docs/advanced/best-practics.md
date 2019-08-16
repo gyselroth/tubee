@@ -16,6 +16,6 @@ There is a collection `accounts` with a destination endpoint `openldap-mydomain`
 data to the same OpenLDAP server. This endpoint should also be named `openldap-mydomain`.
 This is possibile since an endpoint name must only be unique for each namespace/collection pair.
 
-## Performance workflows
-It is a good choice to put workflows which are executed most likely first. Meaning settint the priority to `1` and if there are others worflows give them
-a lower priority. That way the core does not need to execute multiple workflow conditions.
+## Workflow performance
+It is a good choice to put workflows first which are executed most likely first. Meaning setting the priority to `1` and if there are other worflows give them
+a lower priority. That way there is no need to execute multiple workflows to determine which one will match an applied.

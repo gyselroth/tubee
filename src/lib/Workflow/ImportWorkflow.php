@@ -122,7 +122,7 @@ class ImportWorkflow extends Workflow
             break;
             default:
             case WorkflowInterface::ENSURE_LAST:
-                $mapped = Map::map($this->attribute_map, $this->removeMapAttributes($map), ['data' => $exists->getData()], $ts);
+                $mapped = Map::map($this->attribute_map, $map, ['data' => $exists->getData()], $ts);
                 $endpoints = [
                     $this->endpoint->getName() => [
                         'last_sync' => $ts,

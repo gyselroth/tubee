@@ -130,7 +130,7 @@ class Factory
     /**
      * Get all from object.
      */
-    public function getAllFromObject(DataObjectInterface $object, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
+    public function getAllFromObject(DataObjectInterface $object, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = []): Generator
     {
         $relation = [
             'namespace' => $object->getCollection()->getResourceNamespace()->getName(),

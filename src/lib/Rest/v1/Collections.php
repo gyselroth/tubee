@@ -164,8 +164,8 @@ class Collections
         ], $request->getQueryParams());
 
         $filter = [
-            'context.namespace' => $namespace,
-            'context.collection' => $collection,
+            'namespace' => $namespace,
+            'collection' => $collection,
         ];
 
         if (!empty($query['query'])) {

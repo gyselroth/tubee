@@ -94,6 +94,12 @@ class QueryTransformer
                                     $part .= "($key!='$a')";
 
                                 break;
+                                case '$exists':
+                                    if ($a) {
+                                        $part .= "($key=*)";
+                                    }
+
+                                break;
                             }
                         }
 

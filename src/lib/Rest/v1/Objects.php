@@ -201,9 +201,9 @@ class Objects
         ], $request->getQueryParams());
 
         $filter = [
-            'context.namespace' => $namespace,
-            'context.collection' => $collection,
-            'context.object' => $object,
+            'namespace' => $namespace,
+            'collection' => $collection,
+            'data.context.object' => $object,
         ];
 
         if (!empty($query['query'])) {

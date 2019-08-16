@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Endpoint;
 
 use InvalidArgumentException;
+use Tubee\Helper;
 
 class Validator
 {
@@ -26,6 +27,14 @@ class Validator
 
         if ($resource['data']['type'] === EndpointInterface::TYPE_DESTINATION && !isset($resource['data']['options']['filter_one'])) {
             throw new InvalidArgumentException('destintation endpoint must have single object filter options.filter_one as a string');
+        }
+
+        if (isset($resource['data']['options']['filter_one'])) {
+            Helper::jsonDecode(stripslashes($resource['data']['options']['filter_one']), true);
+        }
+
+        if (isset($resource['data']['options']['filter_all'])) {
+            Helper::jsonDecode(stripslashes($resource['data']['options']['filter_all']), true);
         }
 
         return $resource;

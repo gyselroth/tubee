@@ -151,6 +151,7 @@ class Factory
     {
         $resource['kind'] = 'Job';
         $resource = $this->resource_factory->validate($resource);
+        $resource = Validator::validate($resource);
 
         if ($this->has($namespace, $resource['name'])) {
             throw new Exception\NotUnique('job '.$resource['name'].' does already exists');
@@ -191,6 +192,7 @@ class Factory
         $data['kind'] = $resource->getKind();
 
         $data = $this->resource_factory->validate($data);
+        $data = Validator::validate($data);
 
         $task = $data['data'];
         $task += [

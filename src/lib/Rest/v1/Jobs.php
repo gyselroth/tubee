@@ -165,8 +165,8 @@ class Jobs
         ], $request->getQueryParams());
 
         $filter = [
-            'context.namespace' => $namespace,
-            'context.job' => $job,
+            'namespace' => $namespace,
+            'data.context.job' => $job,
         ];
 
         if (!empty($query['query'])) {

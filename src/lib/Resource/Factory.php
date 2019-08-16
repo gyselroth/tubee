@@ -209,15 +209,13 @@ class Factory
      */
     public function getAllFrom(Collection $collection, ?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null, ?Closure $build = null): Generator
     {
-        $total = $collection->count($query);
-        $offset = $this->calcOffset($total, $offset);
+        $total = 0;
 
-        if (empty($sort)) {
-            $sort = ['$natural' => -1];
-        } elseif ($sort == ['$natural' => 1]) {
-            $sort = [];
+        if ($limit !== null) {
+            $total = $collection->count($query);
         }
 
+        $offset = $this->calcOffset($total, $offset);
         $result = $collection->find($query, [
             'projection' => ['history' => 0],
             'skip' => $offset,
@@ -247,13 +245,12 @@ class Factory
 
         $stream = $collection->watch($pipeline, [
             'resumeAfter' => $after,
+            'fullDocument' => 'updateLookup',
         ]);
 
         if ($existing === true) {
             if (empty($sort)) {
-                $sort = ['$natural' => -1];
-            } elseif ($sort == ['$natural' => 1]) {
-                $sort = [];
+                $sort = ['created' => 1];
             }
 
             $total = $collection->count($query);

@@ -61,10 +61,6 @@ class Factory
      */
     public function getAll(?array $query = null, ?int $offset = null, ?int $limit = null, ?array $sort = null): Generator
     {
-        if (empty($sort)) {
-            $sort = ['datetime' => -1];
-        }
-
         $that = $this;
 
         return $this->resource_factory->getAllFrom($this->db->{self::COLLECTION_NAME}, $query, $offset, $limit, $sort, function (array $resource) use ($that) {

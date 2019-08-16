@@ -20,6 +20,7 @@ use TaskScheduler\AbstractJob;
 use TaskScheduler\Scheduler;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
+use Tubee\Helper;
 use Tubee\Log\MongoDBFormatter;
 use Tubee\ResourceNamespace\Factory as ResourceNamespaceFactory;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
@@ -210,7 +211,7 @@ class Sync extends AbstractJob
             return [];
         }
 
-        return (array) json_decode($this->data['filter']);
+        return (array) Helper::jsonDecode($this->data['filter']);
     }
 
     /**
@@ -226,14 +227,18 @@ class Sync extends AbstractJob
             if ($handler instanceof MongoDBHandler) {
                 $handler->setLevel($level);
                 $handler->setFormatter(new MongoDBFormatter());
-
-                $this->logger->pushProcessor(function ($record) use ($context) {
-                    $record['context'] = array_merge($record['context'], $context);
-
-                    return $record;
-                });
             }
         }
+
+        while (count($this->logger->getProcessors()) > 1) {
+            $this->logger->popProcessor();
+        }
+
+        $this->logger->pushProcessor(function ($record) use ($context) {
+            $record['context'] = array_merge($record['context'], $context);
+
+            return $record;
+        });
 
         return true;
     }
@@ -274,6 +279,14 @@ class Sync extends AbstractJob
 
                 if (!isset($workflows[$identifier])) {
                     $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
+
+                    if (count($workflows[$identifier]) === 0) {
+                        $this->logger->warning('no workflows available in destination endpoint ['.$ep->getIdentifier().'], skip export', [
+                            'category' => get_class($this),
+                        ]);
+
+                        continue;
+                    }
                 }
 
                 try {
@@ -297,7 +310,7 @@ class Sync extends AbstractJob
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
                         'category' => get_class($this),
                     ]);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     ++$this->error_count;
 
                     $this->logger->error('failed export object to destination endpoint ['.$identifier.']', [
@@ -353,6 +366,14 @@ class Sync extends AbstractJob
             $ep->setup($simulate);
             if (!isset($workflows[$identifier])) {
                 $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
+
+                if (count($workflows[$identifier]) === 0) {
+                    $this->logger->warning('no workflows available in source endpoint ['.$ep->getIdentifier().'], skip import', [
+                        'category' => get_class($this),
+                    ]);
+
+                    continue;
+                }
             }
 
             $i = 0;
@@ -384,7 +405,7 @@ class Sync extends AbstractJob
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
                         'category' => get_class($this),
                     ]);
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     ++$this->error_count;
 
                     $this->logger->error('failed import data object from source endpoint ['.$identifier.']', [
@@ -443,6 +464,13 @@ class Sync extends AbstractJob
         ]]);
 
         $workflows = iterator_to_array($endpoint->getWorkflows(['kind' => 'GarbageWorkflow']));
+        if (count($workflows) === 0) {
+            $this->logger->info('no garbage workflows available in ['.$endpoint->getIdentifier().'], skip garbage collection', [
+                'category' => get_class($this),
+            ]);
+
+            return false;
+        }
 
         $i = 0;
         foreach ($collection->getObjects($filter, false) as $id => $object) {

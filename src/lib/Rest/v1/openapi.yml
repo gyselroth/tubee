@@ -5244,20 +5244,19 @@ components:
         name:
           type: string
           description: The name of the attribute to map to
-        from:
+        kind:
           type: string
-          description: Use from to map source attribute to destination one to one. (Note you must define one of from, value or script).
+          description: Defines the attribute type.
+          enum:
+          - map
+          - static
+          - script
           nullable: true
-          default: null
+          default: map
         value:
           nullable: true
           default: null
-          description: Defines a static value attribute. (Note you must define one of from, value or script).
-        script:
-          type: string
-          nullable: true
-          default: null
-          description: Define a scripted attribute. Write a vanilla javascript code to resolve a value. Return the value with `core.result()`. The current object is available in the variable `core.object` (Note you must define one of from, value or script).
+          description: Holds the value of the attribute. If this is a `map` attribute, the value must be an attribute name. If this is a static attribute the value holds the actual static value. And at last if the attribute is of type script, the value is javascript code executed by the V8 engine. Write a vanilla javascript code to resolve a value. Return the value with `core.result()`. The current object is available in the variable `core.object` (Note you must define one of from, value or script).
         ensure:
           type: string
           description: The name of the attribute to map to

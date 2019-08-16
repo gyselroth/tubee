@@ -92,6 +92,7 @@ class Job extends AbstractResource implements JobInterface
             'status' => function () use ($resource, $scheduler) {
                 $process = iterator_to_array($scheduler->getJobs([
                     'data.job' => $resource->getName(),
+                    'data.namespace' => $this->namespace->getName(),
                     'data.parent' => ['$exists' => false],
                 ]));
 
