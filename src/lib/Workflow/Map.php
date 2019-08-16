@@ -28,6 +28,10 @@ class Map
         foreach ($map->getMap() as $name => $value) {
             $name = $value['name'];
 
+            if ($value['skip'] === true) {
+                continue;
+            }
+
             $exists = isset($mongodb_object[$name]);
             if ($value['ensure'] === WorkflowInterface::ENSURE_EXISTS && $exists === true) {
                 continue;

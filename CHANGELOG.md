@@ -10,6 +10,8 @@
 * CORE: [FIX] Log error if xml yields an invalid EndpointObject and continue with the next
 * CORE: [FEATURE] Added support for $exists query to the XmlEndpoint
 * CORE: [FIX] Watch streams now include updates and removals
+* CORE: [FIX] Watch dataobjects Fatal error: Method StreamIterator\StreamIterator toString() must not throw an exception, caught TypeError: Argument 1 passed to Tubee\DataObject\Factory::build() must be of the type array
+* CORE: [FIX] Do not drop fields if skip is true #56
 
 
 ## 1.0.0-beta39
