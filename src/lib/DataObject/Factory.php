@@ -222,7 +222,7 @@ class Factory
         $that = $this;
 
         return $this->resource_factory->watchFrom($this->db->{$collection->getCollection()}, $after, $existing, $query, function (array $resource) use ($collection, $that) {
-            return $that->build($collection, $resource);
+            return $that->build($resource, $collection);
         }, $offset, $limit, $sort);
     }
 

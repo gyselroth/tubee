@@ -279,6 +279,14 @@ class Sync extends AbstractJob
 
                 if (!isset($workflows[$identifier])) {
                     $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
+
+                    if (count($workflows[$identifier]) === 0) {
+                        $this->logger->warning('no workflows available in destination endpoint ['.$endpoint->getIdentifier().'], skip export', [
+                            'category' => get_class($this),
+                        ]);
+
+                        continue;
+                    }
                 }
 
                 try {
@@ -358,6 +366,14 @@ class Sync extends AbstractJob
             $ep->setup($simulate);
             if (!isset($workflows[$identifier])) {
                 $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
+
+                if (count($workflows[$identifier]) === 0) {
+                    $this->logger->warning('no workflows available in source endpoint ['.$endpoint->getIdentifier().'], skip import', [
+                        'category' => get_class($this),
+                    ]);
+
+                    continue;
+                }
             }
 
             $i = 0;
@@ -448,6 +464,13 @@ class Sync extends AbstractJob
         ]]);
 
         $workflows = iterator_to_array($endpoint->getWorkflows(['kind' => 'GarbageWorkflow']));
+        if (count($workflows) === 0) {
+            $this->logger->info('no garbage workflows available in ['.$endpoint->getIdentifier().'], skip garbage collection', [
+                'category' => get_class($this),
+            ]);
+
+            return false;
+        }
 
         $i = 0;
         foreach ($collection->getObjects($filter, false) as $id => $object) {
