@@ -281,7 +281,7 @@ class Sync extends AbstractJob
                     $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
 
                     if (count($workflows[$identifier]) === 0) {
-                        $this->logger->warning('no workflows available in destination endpoint ['.$endpoint->getIdentifier().'], skip export', [
+                        $this->logger->warning('no workflows available in destination endpoint ['.$ep->getIdentifier().'], skip export', [
                             'category' => get_class($this),
                         ]);
 
@@ -368,7 +368,7 @@ class Sync extends AbstractJob
                 $workflows[$identifier] = iterator_to_array($ep->getWorkflows(['kind' => 'Workflow']));
 
                 if (count($workflows[$identifier]) === 0) {
-                    $this->logger->warning('no workflows available in source endpoint ['.$endpoint->getIdentifier().'], skip import', [
+                    $this->logger->warning('no workflows available in source endpoint ['.$ep->getIdentifier().'], skip import', [
                         'category' => get_class($this),
                     ]);
 
