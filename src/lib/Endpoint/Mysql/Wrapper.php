@@ -63,9 +63,9 @@ class Wrapper extends mysqli
     /**
      * Port.
      *
-     * @var string
+     * @var int
      */
-    protected $port;
+    protected $port = 3306;
 
     /**
      * Options.
@@ -84,7 +84,7 @@ class Wrapper extends mysqli
     /**
      * construct.
      */
-    public function __construct(string $host, LoggerInterface $logger, ?string $username = null, ?string $passwd = null, ?string $dbname = null, ?int $port = 3306, ?string $socket = null, ?array $options = [])
+    public function __construct(string $host, LoggerInterface $logger, string $dbname, ?string $username = null, ?string $passwd = null, ?int $port = 3306, ?string $socket = null, ?array $options = [])
     {
         $this->logger = $logger;
         $this->host = $host;
@@ -99,9 +99,9 @@ class Wrapper extends mysqli
     /**
      * Setup.
      */
-    public function connect(): Wrapper
+    public function initialize(): Wrapper
     {
-        parent::__construct($this->host, $this->username, $this->passwd, $this->options);
+        parent::__construct($this->host, $this->username ?? '', $this->passwd ?? '', $this->dbname, $this->port ?? 3306);
 
         return $this;
     }
@@ -127,7 +127,7 @@ class Wrapper extends mysqli
     /**
      * Select query.
      */
-    public function query(string $query): bool
+    public function query($query, $resultmode = null)
     {
         $this->logger->debug('execute sql query ['.$query.']', [
             'category' => get_class($this),
@@ -160,10 +160,22 @@ class Wrapper extends mysqli
 
         $types = '';
         foreach ($values as $attr => $value) {
-            $types .= 's';
+            switch (gettype($value)) {
+            case 'integer':
+                $types .= 'i';
+
+            break;
+            case 'double':
+                $types .= 'd';
+
+            break;
+            default:
+            case 'string':
+                $types .= 's';
+            }
         }
 
-        $stmt->bind_param($types, ...$values);
+        $stmt->bind_param($types, ...array_values($values));
         $stmt->execute();
 
         if ($stmt->error) {

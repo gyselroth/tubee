@@ -67,7 +67,7 @@ class Wrapper extends PDO
     /**
      * Connect.
      */
-    public function connect(): Wrapper
+    public function initialize(): Wrapper
     {
         parent::__construct($this->dsn, $this->username, $this->password, $this->options);
 

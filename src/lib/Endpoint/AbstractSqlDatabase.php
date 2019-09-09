@@ -43,7 +43,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
      */
     public function setup(bool $simulate = false): EndpointInterface
     {
-        $this->socket->connect();
+        $this->socket->initialize();
         //$result = $this->socket->select('SELECT count(*) FROM '.$this->table);
 
         return $this;
@@ -97,7 +97,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
     {
         $values = array_intersect_key($object, $diff);
-        $filter = $this->getFilterOne($object);
+        $filter = $this->transformQuery($this->getFilterOne(['object' => $object, 'map' => $values]));
         $this->logChange($filter, $diff);
         $query = 'UPDATE '.$this->table.' SET '.implode(',', $diff).' WHERE '.$filter;
 
@@ -113,7 +113,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
      */
     public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
     {
-        $filter = $this->transformQuery($this->getFilterOne($object));
+        $filter = $this->transformQuery($this->getFilterOne(['object' => $object, 'map' => $object]));
         $this->logDelete($filter);
 
         $sql = 'DELETE FROM '.$this->table.' WHERE '.$filter;

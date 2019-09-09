@@ -1,3 +1,10 @@
+## 1.0.0-beta41
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Sep 09 10:09:21 CEST 2019
+
+* CORE: [FIX] Fixes unusable MysqlEndpoint (Could not be initialized)
+
+
 ## 1.0.0-beta40
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Aug 16 10:57:23 CEST 2019
