@@ -75,24 +75,6 @@ class Wrapper extends PDO
     }
 
     /**
-     * Query.
-     */
-    public function select(string $query): PDOStatement
-    {
-        $this->logger->debug('execute sql query ['.$query.']', [
-            'category' => get_class($this),
-        ]);
-
-        $result = parent::query($query);
-
-        if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->errorInfo()[2].' ('.$this->errorCode().')');
-        }
-
-        return $result;
-    }
-
-    /**
      * Select query.
      */
     public function query(string $query): bool
@@ -104,7 +86,7 @@ class Wrapper extends PDO
         $result = $this->exec($query);
 
         if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->errorInfo().' ('.$this->errorCode().')');
+            throw new Exception\InvalidQuery('failed to execute sql query with error '.implode(',', $this->errorInfo()).' ('.$this->errorCode().')');
         }
         $this->logger->debug('sql query affected ['.$result.'] rows', [
                 'category' => get_class($this),
@@ -126,16 +108,14 @@ class Wrapper extends PDO
         $stmt = $this->prepare($query);
 
         if (!($stmt instanceof PDOStatement)) {
-            throw new Exception\InvalidQuery('failed to prepare pdo query with error '.$this->errorInfo().' ('.$this->errorCode().')');
+            throw new Exception\InvalidQuery('failed to prepare pdo query with error '.implode(',', $this->errorInfo()).' ('.$this->errorCode().')');
         }
 
-        $types = '';
-        foreach ($values as $attr => $value) {
-            $types .= 's';
-        }
+        $result = $stmt->execute($values);
 
-        $stmt->bind_param($types, ...$values);
-        $stmt->execute();
+        if ($result === false) {
+            throw new Exception\InvalidQuery('failed to execute prepared pdo query with error '.implode(',', $this->errorInfo()).' ('.$this->errorCode().')');
+        }
 
         return $stmt;
     }

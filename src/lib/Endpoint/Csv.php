@@ -150,7 +150,7 @@ class Csv extends AbstractFile
         $this->logGetOne($filter);
 
         foreach ($this->getAll($filter) as $object) {
-            return $this->build($object);
+            return $this->build($object, $filter);
         }
 
         throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
@@ -254,7 +254,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support change(), use Endpoint\CsvInMemory instead or flush=true');
     }
@@ -262,7 +262,7 @@ class Csv extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support delete(), use Endpoint\CsvInMemory instead or flush=true');
     }

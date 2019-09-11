@@ -271,14 +271,13 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         $xml = $this->files[0];
         $attrs = [];
-        $filter = $this->transformQuery($this->getFilterOne($object));
-        $this->logChange($filter, $diff);
+        $this->logChange($endpoint_object->getFilter(), $diff);
         $xpath = new \DOMXPath($xml['dom']);
-        $node = $xpath->query($filter);
+        $node = $xpath->query($endpoint_object->getFilter());
         $node = $node[0];
 
         foreach ($diff as $attribute => $update) {
@@ -317,13 +316,12 @@ class Xml extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
         $xml = $this->files[0];
-        $filter = $this->transformQuery($this->getFilterOne($object));
-        $this->logDelete($filter);
+        $this->logDelete($endpoint_object->getFilter());
         $xpath = new \DOMXPath($xml['dom']);
-        $node = $xpath->query($filter);
+        $node = $xpath->query($endpoint_object->getFilter());
         $node = $node[0];
         $xml['xml_root']->removeChild($node);
 
@@ -357,7 +355,7 @@ class Xml extends AbstractFile
 
             $node = Converter::xmlToArray(array_shift($nodes));
 
-            return $this->build($node);
+            return $this->build($node, $filter);
         }
     }
 

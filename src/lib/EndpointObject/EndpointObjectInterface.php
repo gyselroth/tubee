@@ -25,4 +25,9 @@ interface EndpointObjectInterface extends ResourceInterface
      * Get endpoint.
      */
     public function getEndpoint(): EndpointInterface;
+
+    /**
+     * Get filter.
+     */
+    public function getFilter();
 }

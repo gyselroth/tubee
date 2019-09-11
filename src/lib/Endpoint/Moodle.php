@@ -55,7 +55,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    /*public function getDiff(AttributeMapInterface $map, array $object, array $endpoint_object): array
+    /*public function getDiff(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object): array
     {
         $id = $this->getEndpointId($endpoint_object);
         $diff = [[]];
@@ -118,7 +118,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         /*$id = $this->getEndpointId($endpoint_object);
         $diff = [$diff];
@@ -167,7 +167,7 @@ class Moodle extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
         /*$id = $this->getEndpointId($endpoint_object);
         $diff = [[]];
@@ -237,7 +237,7 @@ class Moodle extends AbstractEndpoint
     /**
      * Get moodle resource id.
      */
-    protected function getEndpointId(array $endpoint_object): string
+    protected function getEndpointId(EndpointObjectInterface $endpoint_object): string
     {
         if (isset($endpoint_object['id'])) {
             return $endpoint_object['id'];

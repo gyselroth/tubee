@@ -23,6 +23,7 @@ use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception;
 use Tubee\Endpoint\Ucs;
 use Tubee\Endpoint\Ucs\Exception as UcsException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class UcsTest extends TestCase
@@ -524,7 +525,10 @@ class UcsTest extends TestCase
             'foo' => 'bar',
         ];
 
-        $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $object);
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
+        $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $ep_object);
         $this->assertTrue($result);
     }
 
@@ -541,7 +545,10 @@ class UcsTest extends TestCase
             'foo' => 'bar',
         ];
 
-        $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $object, true);
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
+        $result = $ucs->delete($this->createMock(AttributeMapInterface::class), $object, $ep_object, true);
         $this->assertTrue($result);
     }
 
@@ -563,11 +570,14 @@ class UcsTest extends TestCase
             'foo' => 'foo',
         ];
 
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
         $diff = [
             'foo' => 'foo',
         ];
 
-        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object);
+        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
         $this->assertSame('uid=foo,ou=bar', $result);
     }
 
@@ -585,11 +595,14 @@ class UcsTest extends TestCase
             'foo' => 'foo',
         ];
 
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
         $diff = [
             'foo' => 'foo',
         ];
 
-        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object, true);
+        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object, true);
         $this->assertNull($result);
     }
 
@@ -611,10 +624,13 @@ class UcsTest extends TestCase
             'foo' => 'foo',
         ];
 
-        $ep_object = [
+        $data = [
             '$dn$' => 'uid=foo,ou=foo,ou=foobar',
             'foo' => 'foo',
         ];
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($data);
 
         $diff = [];
 

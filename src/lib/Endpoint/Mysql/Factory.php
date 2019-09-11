@@ -15,6 +15,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Mysql as MysqlEndpoint;
+use Tubee\Endpoint\Pdo\QueryTransformer;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
@@ -27,6 +28,6 @@ class Factory
         $options = $resource['data']['resource'];
         $wrapper = new Wrapper($options['host'], $logger, $options['dbname'], $options['username'], $options['passwd'], $options['port'], $options['socket']);
 
-        return new MysqlEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $wrapper, $collection, $workflow, $logger, $resource);
+        return new MysqlEndpoint($resource['name'], $resource['data']['type'], QueryTransformer::filterField($resource['data']['table']), $wrapper, $collection, $workflow, $logger, $resource);
     }
 }

@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Tubee\Endpoint\Mysql;
 
 use mysqli;
-use mysqli_result;
 use mysqli_stmt;
 use Psr\Log\LoggerInterface;
 
@@ -104,24 +103,6 @@ class Wrapper extends mysqli
         parent::__construct($this->host, $this->username ?? '', $this->passwd ?? '', $this->dbname, $this->port ?? 3306);
 
         return $this;
-    }
-
-    /**
-     * Query.
-     */
-    public function select(string $query): mysqli_result
-    {
-        $this->logger->debug('execute sql query ['.$query.']', [
-            'category' => get_class($this),
-        ]);
-
-        $result = parent::query($query);
-
-        if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->error.' ('.$this->errno.')');
-        }
-
-        return $result;
     }
 
     /**

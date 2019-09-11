@@ -27,6 +27,6 @@ class Factory
         $options = $resource['data']['resource'];
         $wrapper = new Wrapper($options['dsn'], $logger, $options['username'], $options['passwd'], $options['options']);
 
-        return new PdoEndpoint($resource['name'], $resource['data']['type'], $resource['data']['table'], $wrapper, $collection, $workflow, $logger, $resource);
+        return new PdoEndpoint($resource['name'], $resource['data']['type'], QueryTransformer::filterField($resource['data']['table']), $wrapper, $collection, $workflow, $logger, $resource);
     }
 }

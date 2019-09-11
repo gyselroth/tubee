@@ -48,8 +48,11 @@ class PdoTest extends TestCase
             ],
         ];
 
-        $expected = "(foo='bar' AND foobar='foobar') AND (bar='foo' AND barf='barf')";
-        $result = $pdo->transformQuery($query);
-        $this->assertSame($expected, $result);
+        $efilter = '(foo= ? AND foobar= ?) AND (bar= ? AND barf= ?)';
+        $evalues = ['bar', 'foobar', 'foo', 'barf'];
+
+        list($filter, $values) = $pdo->transformQuery($query);
+        $this->assertSame($efilter, $filter);
+        $this->assertSame($evalues, $values);
     }
 }

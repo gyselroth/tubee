@@ -63,6 +63,14 @@ class EndpointObject extends AbstractResource implements EndpointObjectInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getFilter()
+    {
+        return $this->resource['filter'] ?? null;
+    }
+
+    /**
      * Get endpoint.
      */
     public function getEndpoint(): EndpointInterface

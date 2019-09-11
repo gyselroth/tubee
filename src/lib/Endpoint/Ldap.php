@@ -182,14 +182,15 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         $object = array_change_key_case($object);
+        $endpoint_object = $endpoint_object->getData();
         $dn = $this->getDn($object, $endpoint_object);
 
         $this->logChange($dn, $diff);
 
-        if ($dn !== $endpoint_object['entrydn']) {
+        if (strtolower($dn) !== strtolower($endpoint_object['entrydn'])) {
             $this->moveLdapObject($dn, $endpoint_object['entrydn'], $simulate);
             $rdn_attr = explode('=', $dn);
             $rdn_attr = strtolower(array_shift($rdn_attr));
@@ -211,8 +212,9 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
+        $endpoint_object = $endpoint_object->getData();
         $dn = $this->getDn($object, $endpoint_object);
         $this->logDelete($dn);
 
@@ -351,7 +353,7 @@ class Ldap extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $this->build($this->prepareRawObject($result->getEntries()[0]));
+        return $this->build($this->prepareRawObject($result->getEntries()[0]), $filter);
     }
 
     /**

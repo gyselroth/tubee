@@ -143,8 +143,9 @@ class MicrosoftGraph extends OdataRest
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
+        $endpoint_object = $endpoint_object->getData();
         $id = $this->getResourceId($object, $endpoint_object);
         $uri = $this->client->getConfig('base_uri').'/'.$id;
         $requests = [];
@@ -236,7 +237,7 @@ class MicrosoftGraph extends OdataRest
             $data = array_merge_recursive($data, $this->fetchMembers($data['id']));
         }
 
-        return $this->build($data);
+        return $this->build($data, $filter);
     }
 
     /**
@@ -256,7 +257,7 @@ class MicrosoftGraph extends OdataRest
     /**
      * Get member batch requests.
      */
-    protected function getMemberChangeBatchRequests(string $id, array $diff, array $endpoint_object): array
+    protected function getMemberChangeBatchRequests(string $id, array $diff, EndpointObjectInterface $endpoint_object): array
     {
         $requests = [];
 

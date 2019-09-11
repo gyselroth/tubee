@@ -65,7 +65,7 @@ class Mongodb extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
         }
 
-        return $this->build(array_shift($result));
+        return $this->build(array_shift($result), $filter);
     }
 
     /**
@@ -126,13 +126,12 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
-        $filter = $this->transformQuery($this->getFilterOne($object));
-        $this->logChange($filter, $diff);
+        $this->logChange($endpoint_object->getFilter(), $diff);
 
         if ($simulate === false) {
-            $this->pool->updateOne($filter, $diff);
+            $this->pool->updateOne($endpoint_object->getFilter(), $diff);
         }
 
         return (string) $endpoint_object['_id'];
@@ -169,13 +168,11 @@ class Mongodb extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, ?array $endpoint_object = null, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
-        $filter = $this->transformQuery($this->getFilterOne($object));
-        $this->logDelete($filter);
-
+        $this->logDelete($endpoint_object->getFilter());
         if ($simulate === false) {
-            $this->pool->deleteOne($filter);
+            $this->pool->deleteOne($endpoint_object->getFilter());
         }
 
         return true;

@@ -1,3 +1,12 @@
+## 1.0.0-beta42
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Sep 11 16:20:21 CEST 2019
+
+* CORE: [FIX] ErrorException: Undefined property: PDOStatement::$num_rows in /usr/share/tubee/src/lib/Endpoint/Pdo.php:84
+* CORE: [CHANGE] Use prepared stmts for fetching mysql/pdo endpoint data, filter column/table names
+* CORE: [FIX] Fixes endpoints MongodbEndpoint/PdoEndpoint/MysqlEndpoint as destination ep
+
+
 ## 1.0.0-beta41
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Sep 09 10:09:21 CEST 2019
