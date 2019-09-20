@@ -123,7 +123,7 @@ class ExportWorkflow extends Workflow
                 'diff' => $diff,
             ]);
 
-            return $this->endpoint->change($this->attribute_map, $diff, $map, $exists->getData(), $simulate);
+            return $this->endpoint->change($this->attribute_map, $diff, $map, $exists, $simulate);
         }
         $this->logger->debug('object on endpoint ['.$this->endpoint->getIdentifier().'] is already up2date', [
                 'category' => get_class($this),
@@ -157,7 +157,7 @@ class ExportWorkflow extends Workflow
             'category' => get_class($this),
         ]);
 
-        $this->endpoint->delete($this->attribute_map, $map, $exists->getData(), $simulate);
+        $this->endpoint->delete($this->attribute_map, $map, $exists, $simulate);
 
         return null;
     }

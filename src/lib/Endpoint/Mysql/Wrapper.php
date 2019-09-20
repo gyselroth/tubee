@@ -12,7 +12,6 @@ declare(strict_types=1);
 namespace Tubee\Endpoint\Mysql;
 
 use mysqli;
-use mysqli_result;
 use mysqli_stmt;
 use Psr\Log\LoggerInterface;
 
@@ -63,9 +62,9 @@ class Wrapper extends mysqli
     /**
      * Port.
      *
-     * @var string
+     * @var int
      */
-    protected $port;
+    protected $port = 3306;
 
     /**
      * Options.
@@ -84,7 +83,7 @@ class Wrapper extends mysqli
     /**
      * construct.
      */
-    public function __construct(string $host, LoggerInterface $logger, ?string $username = null, ?string $passwd = null, ?string $dbname = null, ?int $port = 3306, ?string $socket = null, ?array $options = [])
+    public function __construct(string $host, LoggerInterface $logger, string $dbname, ?string $username = null, ?string $passwd = null, ?int $port = 3306, ?string $socket = null, ?array $options = [])
     {
         $this->logger = $logger;
         $this->host = $host;
@@ -99,35 +98,17 @@ class Wrapper extends mysqli
     /**
      * Setup.
      */
-    public function connect(): Wrapper
+    public function initialize(): Wrapper
     {
-        parent::__construct($this->host, $this->username, $this->passwd, $this->options);
+        parent::__construct($this->host, $this->username ?? '', $this->passwd ?? '', $this->dbname, $this->port ?? 3306);
 
         return $this;
     }
 
     /**
-     * Query.
-     */
-    public function select(string $query): mysqli_result
-    {
-        $this->logger->debug('execute sql query ['.$query.']', [
-            'category' => get_class($this),
-        ]);
-
-        $result = parent::query($query);
-
-        if (false === $result) {
-            throw new Exception\InvalidQuery('failed to execute sql query with error '.$this->error.' ('.$this->errno.')');
-        }
-
-        return $result;
-    }
-
-    /**
      * Select query.
      */
-    public function query(string $query): bool
+    public function query($query, $resultmode = null)
     {
         $this->logger->debug('execute sql query ['.$query.']', [
             'category' => get_class($this),
@@ -145,7 +126,7 @@ class Wrapper extends mysqli
     /**
      * Prepare query.
      */
-    public function prepareValues(string $query, iterable $values): mysqli_stmt
+    public function prepareValues(string $query, array $values): mysqli_stmt
     {
         $this->logger->debug('prepare and execute sql query ['.$query.'] with values [{values}]', [
             'category' => get_class($this),
@@ -160,10 +141,25 @@ class Wrapper extends mysqli
 
         $types = '';
         foreach ($values as $attr => $value) {
-            $types .= 's';
+            switch (gettype($value)) {
+            case 'integer':
+                $types .= 'i';
+
+            break;
+            case 'double':
+                $types .= 'd';
+
+            break;
+            default:
+            case 'string':
+                $types .= 's';
+            }
         }
 
-        $stmt->bind_param($types, ...$values);
+        if (count($values) > 0) {
+            $stmt->bind_param($types, ...array_values($values));
+        }
+
         $stmt->execute();
 
         if ($stmt->error) {

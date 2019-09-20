@@ -17,6 +17,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\Rest\Exception as RestException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 abstract class AbstractRest extends AbstractEndpoint
@@ -95,7 +96,7 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
         $this->logChange($uri, $diff);
@@ -112,7 +113,7 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
         $this->logDelete($uri);
@@ -223,14 +224,17 @@ abstract class AbstractRest extends AbstractEndpoint
     /**
      * Get identifier.
      */
-    protected function getResourceId(array $object, array $endpoint_object = []): string
+    protected function getResourceId(array $object, ?EndpointObjectInterface $endpoint_object = null): string
     {
         if (isset($object[$this->identifier])) {
             return $object[$this->identifier];
         }
 
-        if (isset($endpoint_object[$this->identifier])) {
-            return $endpoint_object[$this->identifier];
+        if ($endpoint_object !== null) {
+            $data = $endpoint_object->getData();
+            if (isset($data[$this->identifier])) {
+                return $data[$this->identifier];
+            }
         }
 
         throw new RestException\IdNotFound('attribute '.$this->identifier.' is not available');

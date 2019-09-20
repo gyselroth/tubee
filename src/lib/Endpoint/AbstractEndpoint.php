@@ -328,9 +328,12 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * Build endpoint object.
      */
-    protected function build(array $object): EndpointObjectInterface
+    protected function build(array $object, $filter = null): EndpointObjectInterface
     {
-        return new EndpointObject(['data' => $object], $this);
+        return new EndpointObject([
+            'data' => $object,
+            'filter' => $filter,
+        ], $this);
     }
 
     /**

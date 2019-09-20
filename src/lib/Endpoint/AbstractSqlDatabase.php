@@ -14,6 +14,7 @@ namespace Tubee\Endpoint;
 use InvalidArgumentException;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Endpoint\Pdo\QueryTransformer;
+use Tubee\EndpointObject\EndpointObjectInterface;
 
 abstract class AbstractSqlDatabase extends AbstractEndpoint
 {
@@ -43,7 +44,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
      */
     public function setup(bool $simulate = false): EndpointInterface
     {
-        $this->socket->connect();
+        $this->socket->initialize();
         //$result = $this->socket->select('SELECT count(*) FROM '.$this->table);
 
         return $this;
@@ -76,11 +77,11 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
         foreach ($diff as $attribute => $update) {
             switch ($update['action']) {
                 case AttributeMapInterface::ACTION_REPLACE:
-                    $result[$attribute] = '`'.$attribute.'` = ?';
+                    $result[$attribute] = QueryTransformer::filterField($attribute).' = ?';
 
                 break;
                 case AttributeMapInterface::ACTION_REMOVE:
-                    $result[$attribute] = '`'.$attribute.'` = NULL';
+                    $result[$attribute] = QueryTransformer::filterField($attribute).' = NULL';
 
                 break;
                 default:
@@ -94,10 +95,12 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
-        $values = array_intersect_key($object, $diff);
-        $filter = $this->getFilterOne($object);
+        $values = array_values(array_intersect_key($object, $diff));
+        list($filter, $fv) = $endpoint_object->getFilter();
+        $values = array_merge($values, $fv);
+
         $this->logChange($filter, $diff);
         $query = 'UPDATE '.$this->table.' SET '.implode(',', $diff).' WHERE '.$filter;
 
@@ -111,15 +114,15 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
-        $filter = $this->transformQuery($this->getFilterOne($object));
+        list($filter, $values) = $endpoint_object->getFilter();
         $this->logDelete($filter);
 
         $sql = 'DELETE FROM '.$this->table.' WHERE '.$filter;
 
         if ($simulate === false) {
-            $this->socket->query($sql);
+            $this->socket->prepareValues($sql, $values);
         }
 
         return true;
@@ -146,7 +149,7 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
                 ]);
         }
 
-        return null;
+        return [null, []];
     }
 
     /**
@@ -156,19 +159,17 @@ abstract class AbstractSqlDatabase extends AbstractEndpoint
     {
         $columns = [];
         $values = [];
-        $repl = [];
 
         foreach ($object as $column => $value) {
             if (is_array($value)) {
                 throw new Exception\EndpointCanNotHandleArray('endpoint can not handle array as a value ["'.$column.'"]. did you forget to set a decorator?');
             }
 
-            $columns[] = '`'.$column.'`';
-            $repl[] = '?';
+            $columns[] = QueryTransformer::filterField($column);
             $values[] = $value;
         }
 
-        $sql = 'INSERT INTO '.$this->table.' ('.implode(',', $columns).') VALUES ('.implode(',', $repl).')';
+        $sql = 'INSERT INTO '.$this->table.' ('.implode(',', $columns).') VALUES ('.implode(',', array_fill(0, count($values), '?')).')';
 
         if ($simulate === false) {
             return $this->socket->prepareValues($sql, $values);

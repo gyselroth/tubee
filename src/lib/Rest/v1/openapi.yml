@@ -4539,6 +4539,7 @@ components:
                   type: object
                   required:
                   - host
+                  - dbname
                   properties:
                     host:
                       description: MySQL Server (Or compatible MySQL fork like MariaDB).
@@ -4553,6 +4554,10 @@ components:
                       type: string
                       nullable: true
                       default: null
+                    dbname:
+                      description: Database.
+                      type: string
+                      nullable: false
                     port:
                       description: Specifies the port number to attempt to connect to the
                         MySQL server.

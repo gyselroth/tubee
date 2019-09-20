@@ -14,16 +14,27 @@ namespace Tubee\Endpoint\Pdo;
 class QueryTransformer
 {
     /**
+     * Filter column/table name.
+     */
+    public static function filterField(string $name): string
+    {
+        return preg_replace('/[^0-9,a-z,A-Z$_]/', '', $name);
+    }
+
+    /**
      * Convert mongodb like query to sql query.
      */
-    public static function transform(array $query): string
+    public static function transform(array $query)
     {
+        $values = [];
         $result = '';
         $simple = [];
 
         foreach ($query as $key => $value) {
             if (is_array($value) && isset($value['$and']) || isset($value['$or'])) {
-                $result .= self::transform($value);
+                list($q, $v) = self::transform($value);
+                $result .= $q;
+                $values = array_merge($values, $v);
 
                 continue;
             }
@@ -34,7 +45,9 @@ class QueryTransformer
                 case '$and':
                     $subs = [];
                     foreach ($value as $sub) {
-                        $subs[] = self::transform($sub);
+                        list($q, $v) = self::transform($sub);
+                        $subs[] = $q;
+                        $values = array_merge($values, $v);
                     }
 
                     $result .= implode(' AND ', $subs);
@@ -43,7 +56,9 @@ class QueryTransformer
                 case '$or':
                     $subs = [];
                     foreach ($value as $sub) {
-                        $subs[] = self::transform($sub);
+                        list($q, $v) = self::transform($sub);
+                        $subs[] = $q;
+                        $values = array_merge($values, $v);
                     }
 
                     $result .= implode(' OR ', $subs);
@@ -54,13 +69,55 @@ class QueryTransformer
                     if (is_array($value)) {
                         foreach ($value as $t => $a) {
                             if (!is_array($a) && $t[0] !== '$') {
-                                $parts[] = '('.$t.'='.$a.')';
+                                if ($a === null) {
+                                    $parts[] = '('.self::filterField($t).' IS NULL)';
+                                } else {
+                                    $parts[] = '('.self::filterField($t).'=?)';
+                                    $values[] = $a;
+                                }
+                            }
+
+                            switch ($t) {
+                                case '$ne':
+                                    if ($a === null) {
+                                        $parts[] = '('.$key.' IS NOT NULL)';
+                                    } else {
+                                        $values[] = $a;
+                                        $parts[] = '('.$key.'!=?)';
+                                    }
+
+                                break;
+                                case '$gt':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'>?)';
+
+                                break;
+                                case '$lt':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'<?)';
+
+                                break;
+                                case '$lte':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'<=?)';
+
+                                break;
+                                case '$gte':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'>=?)';
+
+                                break;
                             }
                         }
 
                         $result .= implode(' AND ', $parts);
                     } else {
-                        $simple[] = $key.'=\''.$value.'\'';
+                        if ($value === null) {
+                            $simple[] = self::filterField($key).' IS NULL';
+                        } else {
+                            $simple[] = self::filterField($key).'= ?';
+                            $values[] = $value;
+                        }
                     }
 
                 break;
@@ -71,6 +128,6 @@ class QueryTransformer
             $result .= '('.implode(' AND ', $simple).')';
         }
 
-        return $result;
+        return [$result, $values];
     }
 }

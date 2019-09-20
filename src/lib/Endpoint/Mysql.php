@@ -52,7 +52,7 @@ class Mysql extends AbstractSqlDatabase
      */
     public function getAll(?array $query = null): Generator
     {
-        $filter = $this->transformQuery($query);
+        list($filter, $values) = $this->transformQuery($query);
         $this->logGetAll($filter);
 
         if ($filter === null) {
@@ -62,7 +62,7 @@ class Mysql extends AbstractSqlDatabase
         }
 
         try {
-            $result = $this->socket->select($sql);
+            $result = $this->socket->prepareValues($sql, $values);
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to fetch resources from endpoint', [
                 'class' => get_class($this),
@@ -87,11 +87,11 @@ class Mysql extends AbstractSqlDatabase
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        $filter = $this->transformQuery($this->getFilterOne($object));
+        list($filter, $values) = $query = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
-        $result = $this->socket->select($sql);
+        $result = $this->socket->prepareValues($sql, $values);
 
         if ($result->num_rows > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
@@ -100,7 +100,7 @@ class Mysql extends AbstractSqlDatabase
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $this->build($result->fetch_assoc());
+        return $this->build($result->fetch_assoc(), $query);
     }
 
     /**

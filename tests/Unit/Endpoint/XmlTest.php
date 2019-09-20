@@ -18,6 +18,7 @@ use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception;
 use Tubee\Endpoint\Xml;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Storage\StorageInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -505,12 +506,14 @@ EOT;
                 ],
             ],
         ]);
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getFilter')->willReturn("//*[(bar='foo')]");
+
         $xml->setup();
         $xml->delete($this->createMock(AttributeMapInterface::class), [
             'foo' => 'foo',
-        ], [
-            'bar' => 'foo',
-        ]);
+        ], $ep_object);
 
         $xml->shutdown();
 
@@ -559,12 +562,12 @@ EOT;
             ],
         ];
 
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getFilter')->willReturn("//*[(bar='foo')]");
+
         $xml->change($this->createMock(AttributeMapInterface::class), $diff, [
             'foo' => 'foo',
-        ], [
-            'bar' => 'foo',
-            'foobar' => 'foobar',
-        ]);
+        ], $ep_object);
 
         $xml->shutdown();
 

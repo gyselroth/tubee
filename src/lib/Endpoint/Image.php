@@ -151,7 +151,7 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support change()');
     }
@@ -159,7 +159,7 @@ class Image extends AbstractFile
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
         throw new Exception\UnsupportedEndpointOperation('endpoint '.get_class($this).' does not support delete()');
     }

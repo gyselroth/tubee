@@ -21,6 +21,7 @@ use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception;
 use Tubee\Endpoint\Ldap;
 use Tubee\Endpoint\Ldap\Exception as LdapException;
+use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Exception\InvalidJson as InvalidJsonException;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -458,7 +459,10 @@ class LdapTest extends TestCase
             'foo' => 'bar',
         ];
 
-        $result = $ldap->delete($this->createMock(AttributeMapInterface::class), $object, $object);
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
+        $result = $ldap->delete($this->createMock(AttributeMapInterface::class), $object, $ep_object);
         $this->assertTrue($result);
     }
 
@@ -472,7 +476,10 @@ class LdapTest extends TestCase
             'foo' => 'bar',
         ];
 
-        $result = $ldap->delete($this->createMock(AttributeMapInterface::class), $object, $object, true);
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
+        $result = $ldap->delete($this->createMock(AttributeMapInterface::class), $object, $ep_object, true);
         $this->assertTrue($result);
     }
 
@@ -487,13 +494,16 @@ class LdapTest extends TestCase
             'foo' => 'foo',
         ];
 
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
         $diff = [[
             'attrib' => 'foo',
             'modtype' => LDAP_MODIFY_BATCH_REPLACE,
             'values' => ['foo'],
         ]];
 
-        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object);
+        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
         $this->assertSame('uid=foo,ou=bar', $result);
     }
 
@@ -507,13 +517,16 @@ class LdapTest extends TestCase
             'foo' => 'foo',
         ];
 
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($object);
+
         $diff = [[
             'attrib' => 'foo',
             'modtype' => LDAP_MODIFY_BATCH_REPLACE,
             'values' => ['foo'],
         ]];
 
-        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $object, true);
+        $result = $ldap->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object, true);
         $this->assertNull($result);
     }
 
@@ -528,10 +541,13 @@ class LdapTest extends TestCase
             'foo' => 'foo',
         ];
 
-        $ep_object = [
+        $data = [
             'entrydn' => 'uid=foo,ou=foo',
             'foo' => 'foo',
         ];
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($data);
 
         $diff = [];
 
@@ -544,20 +560,14 @@ class LdapTest extends TestCase
         $client = $this->createMock(LdapClient::class);
         $client->expects($this->never())->method('rename');
 
-        $search = $this->createMock(LdapResult::class);
-        $search->method('countEntries')->willReturn(1);
-        $search->method('getEntries')->willReturn([
-            ['dn' => 'UID=foo,OU=bar'],
-        ]);
-
-        $client->method('ldapSearch')->willReturn($search);
-
         $ldap = new Ldap('foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $object = [
             'entrydn' => 'uid=foo,ou=bar',
         ];
 
-        $ep_object = $ldap->getOne([])->getData();
+        $data = ['entrydn' => 'UID=foo,OU=bar'];
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($data);
 
         $diff = [];
 

@@ -115,6 +115,6 @@ class OdataRest extends AbstractRest
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $this->build(array_shift($data));
+        return $this->build(array_shift($data), $filter);
     }
 }

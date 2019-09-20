@@ -108,9 +108,10 @@ class Ucs extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/remove';
+        $endpoint_object = $endpoint_object->getData();
         $resource = $this->getResourceId($object, $endpoint_object);
         $this->logDelete($resource);
 
@@ -200,9 +201,10 @@ class Ucs extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         $url = $this->client->getConfig('base_uri').'/command/udm/put';
+        $endpoint_object = $endpoint_object->getData();
         $dn = $this->getResourceId($object, $endpoint_object);
         $diff[self::ATTR_DN] = $dn;
 

@@ -122,12 +122,12 @@ interface EndpointInterface extends ResourceInterface
     /**
      * Change object on endpoint.
      */
-    public function change(AttributeMapInterface $map, array $diff, array $object, array $endpoint_object, bool $simulate = false): ?string;
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string;
 
     /**
      * Remove object from endpoint.
      */
-    public function delete(AttributeMapInterface $map, array $object, array $endpoint_object, bool $simulate = false): bool;
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool;
 
     /**
      * Read endpoint.
