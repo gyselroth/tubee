@@ -1,6 +1,13 @@
+## 1.0.0-beta44
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fr Sep 20 16:41:20 CEST 2019
+
+* CORE: [FIX] Error: Call to undefined method mysqli_stmt::fetch_assoc() in /usr/share/tubee/src/lib/Endpoint/Mysql.php:77
+
+
 ## 1.0.0-beta43
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Wed Sep 20 15:47:20 CEST 2019
+**Date**: Fr Sep 20 15:47:20 CEST 2019
 
 * CORE: [FIX] ArgumentCountError: Wrong parameter count for mysqli_stmt::bind_param() in /usr/share/tubee/src/lib/Endpoint/Mysql/Wrapper.php:159
 * CORE: [FEATURE] Support query dsl for PdoEndpoint and MysqlEndpoint
