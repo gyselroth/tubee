@@ -1,3 +1,11 @@
+## 1.0.0-beta43
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Sep 20 15:47:20 CEST 2019
+
+* CORE: [FIX] ArgumentCountError: Wrong parameter count for mysqli_stmt::bind_param() in /usr/share/tubee/src/lib/Endpoint/Mysql/Wrapper.php:159
+* CORE: [FEATURE] Support query dsl for PdoEndpoint and MysqlEndpoint
+
+
 ## 1.0.0-beta42
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Sep 11 16:20:21 CEST 2019

@@ -69,15 +69,55 @@ class QueryTransformer
                     if (is_array($value)) {
                         foreach ($value as $t => $a) {
                             if (!is_array($a) && $t[0] !== '$') {
-                                $parts[] = '('.self::filterField($t).'=?)';
-                                $values[] = $a;
+                                if ($a === null) {
+                                    $parts[] = '('.self::filterField($t).' IS NULL)';
+                                } else {
+                                    $parts[] = '('.self::filterField($t).'=?)';
+                                    $values[] = $a;
+                                }
+                            }
+
+                            switch ($t) {
+                                case '$ne':
+                                    if ($a === null) {
+                                        $parts[] = '('.$key.' IS NOT NULL)';
+                                    } else {
+                                        $values[] = $a;
+                                        $parts[] = '('.$key.'!=?)';
+                                    }
+
+                                break;
+                                case '$gt':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'>?)';
+
+                                break;
+                                case '$lt':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'<?)';
+
+                                break;
+                                case '$lte':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'<=?)';
+
+                                break;
+                                case '$gte':
+                                    $values[] = $a;
+                                    $parts[] = '('.$key.'>=?)';
+
+                                break;
                             }
                         }
 
                         $result .= implode(' AND ', $parts);
                     } else {
-                        $simple[] = self::filterField($key).'= ?';
-                        $values[] = $value;
+                        if ($value === null) {
+                            $simple[] = self::filterField($key).' IS NULL';
+                        } else {
+                            $simple[] = self::filterField($key).'= ?';
+                            $values[] = $value;
+                        }
                     }
 
                 break;

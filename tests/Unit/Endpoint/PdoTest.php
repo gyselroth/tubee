@@ -55,4 +55,36 @@ class PdoTest extends TestCase
         $this->assertSame($efilter, $filter);
         $this->assertSame($evalues, $values);
     }
+
+    public function testTransformIsNull()
+    {
+        $pdo = new Pdo('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $this->createMock(PdoWrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            'foo' => null,
+        ];
+
+        $efilter = '(foo IS NULL)';
+        $evalues = [];
+
+        list($filter, $values) = $pdo->transformQuery($query);
+        $this->assertSame($efilter, $filter);
+        $this->assertSame($evalues, $values);
+    }
+
+    public function testTransformNotNull()
+    {
+        $pdo = new Pdo('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $this->createMock(PdoWrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+
+        $query = [
+            'foo' => ['$ne' => null],
+        ];
+
+        $efilter = '(foo IS NOT NULL)';
+        $evalues = [];
+
+        list($filter, $values) = $pdo->transformQuery($query);
+        $this->assertSame($efilter, $filter);
+        $this->assertSame($evalues, $values);
+    }
 }

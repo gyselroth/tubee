@@ -126,7 +126,7 @@ class Wrapper extends mysqli
     /**
      * Prepare query.
      */
-    public function prepareValues(string $query, iterable $values): mysqli_stmt
+    public function prepareValues(string $query, array $values): mysqli_stmt
     {
         $this->logger->debug('prepare and execute sql query ['.$query.'] with values [{values}]', [
             'category' => get_class($this),
@@ -156,7 +156,10 @@ class Wrapper extends mysqli
             }
         }
 
-        $stmt->bind_param($types, ...array_values($values));
+        if (count($values) > 0) {
+            $stmt->bind_param($types, ...array_values($values));
+        }
+
         $stmt->execute();
 
         if ($stmt->error) {
