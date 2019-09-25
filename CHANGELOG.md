@@ -1,3 +1,11 @@
+## 1.0.0-beta45
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Sep 25 12:21:20 CEST 2019
+
+* CORE: [FIX] Sort operation used more than the maximum 33554432 bytes of RAM. Add an index, or specify a smaller limit. There is now no sorting during stream requests.
+* CORE: [FIX] Errors during streams are now handled as StreamError and be returned to the requested as such.
+
+
 ## 1.0.0-beta44
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fr Sep 20 16:41:20 CEST 2019

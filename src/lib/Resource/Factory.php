@@ -249,10 +249,6 @@ class Factory
         ]);
 
         if ($existing === true) {
-            if (empty($sort)) {
-                $sort = ['created' => 1];
-            }
-
             $total = $collection->count($query);
 
             if ($offset !== null && $total === 0) {
