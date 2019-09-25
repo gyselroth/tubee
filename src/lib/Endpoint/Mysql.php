@@ -73,6 +73,7 @@ class Mysql extends AbstractSqlDatabase
         }
 
         $i = 0;
+        $result = $result->get_result();
 
         while ($row = $result->fetch_assoc()) {
             yield $this->build($row);
@@ -92,6 +93,7 @@ class Mysql extends AbstractSqlDatabase
 
         $sql = 'SELECT * FROM '.$this->table.' WHERE '.$filter;
         $result = $this->socket->prepareValues($sql, $values);
+        $result = $result->get_result();
 
         if ($result->num_rows > 1) {
             throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
@@ -100,7 +102,7 @@ class Mysql extends AbstractSqlDatabase
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $this->build($result->fetch_assoc(), $query);
+        return $this->build($result->fetch(), $query);
     }
 
     /**

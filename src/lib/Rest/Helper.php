@@ -72,6 +72,7 @@ class Helper
 
         $query = $request->getQueryParams();
         $options = isset($query['pretty']) ? JSON_PRETTY_PRINT : 0;
+        $error = null;
 
         $stream = new StreamIterator($cursor, function ($resource) use ($request, $options) {
             if ($this->tell() === 0) {
@@ -85,6 +86,20 @@ class Helper
             if ($this->eof()) {
                 echo ']';
             }
+
+            flush();
+        }, function (\Throwable $e) {
+            if ($this->tell() === 0) {
+                echo  '[';
+            } else {
+                echo  ',';
+            }
+
+            echo json_encode([
+                'kind' => 'StreamError',
+                'error' => $e->getMessage(),
+                'class' => get_class($e),
+            ]).']';
 
             flush();
         });
@@ -121,6 +136,20 @@ class Helper
             if ($this->eof()) {
                 echo ']';
             }
+
+            flush();
+        }, function (\Throwable $e) {
+            if ($this->tell() === 0) {
+                echo  '[';
+            } else {
+                echo  ',';
+            }
+
+            echo json_encode(['ADDED', [
+                'kind' => 'StreamError',
+                'error' => $e->getMessage(),
+                'class' => get_class($e),
+            ]]).']';
 
             flush();
         });

@@ -63,7 +63,7 @@
         "php-jsonpatch/php-jsonpatch": "^3.0",
         "stolt/json-merge-patch": "^1.0",
         "psr/http-message": "^1.0",
-        "gyselroth/stream-iterator": "dev-master",
+        "gyselroth/stream-iterator": "^1.0.1",
         "guzzlehttp/guzzle": "~6.0",
         "paragonie/halite": "^4",
         "vanilla/garden-schema": "dev-master#0a93bb9",
