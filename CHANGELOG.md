@@ -1,3 +1,10 @@
+## 1.0.0-beta46
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Sep 25 14:42:20 CEST 2019
+
+* CORE: [FIX] Fixes default ordering (created by descending)
+
+
 ## 1.0.0-beta45
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Sep 25 12:21:20 CEST 2019
