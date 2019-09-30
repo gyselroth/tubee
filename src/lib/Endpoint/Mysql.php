@@ -102,7 +102,7 @@ class Mysql extends AbstractSqlDatabase
             throw new Exception\ObjectNotFound('no object found with filter '.$filter);
         }
 
-        return $this->build($result->fetch(), $query);
+        return $this->build($result->fetch_assoc(), $query);
     }
 
     /**

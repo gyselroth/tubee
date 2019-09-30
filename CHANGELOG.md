@@ -1,3 +1,17 @@
+## 1.0.0-beta47
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Sep 30 09:52:21 CEST 2019
+
+* CORE: [FIX] Error: Call to undefined method mysqli_result::fetch() in /usr/share/tubee/src/lib/Endpoint/Mysql.php:105
+
+
+## 1.0.0-beta46
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Sep 25 14:42:20 CEST 2019
+
+* CORE: [FIX] Fixes default ordering (created by descending)
+
+
 ## 1.0.0-beta45
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Sep 25 12:21:20 CEST 2019

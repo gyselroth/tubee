@@ -71,6 +71,10 @@ class QueryDecoder implements MiddlewareInterface
             $query['sort'] = [];
         }
 
+        if ($query['stream'] === null && empty($query['sort'])) {
+            $query['sort'] = ['created' => -1];
+        }
+
         $request = $request->withQueryParams($query);
 
         return $handler->handle($request);
