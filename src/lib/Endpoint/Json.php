@@ -50,7 +50,7 @@ class Json extends AbstractFile
         $streams = $this->storage->openReadStreams($this->file);
 
         if ($this->type === EndpointInterface::TYPE_DESTINATION) {
-            $this->writeable = $this->storage->openWriteStream($this->file);
+            $this->writable = $this->storage->openWriteStream($this->file);
         }
 
         foreach ($streams as $path => $stream) {
