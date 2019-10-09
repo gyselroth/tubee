@@ -1,3 +1,11 @@
+## 1.0.0-beta48
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Oct 09 10:14:21 CEST 2019
+
+* CORE: [FIX] The default XMLEndpoint filter is now //node_name while node_name is the configured node_name of the endpoint options (By default it is `row`).
+* CORE: [FIX] SmbStorage openWriteStream() does not truncate files anymore
+
+
 ## 1.0.0-beta47
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Sep 30 09:52:21 CEST 2019

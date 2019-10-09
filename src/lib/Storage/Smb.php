@@ -12,8 +12,8 @@ declare(strict_types=1);
 namespace Tubee\Storage;
 
 use Generator;
+use Icewind\SMB\IServer;
 use Icewind\SMB\IShare;
-use Icewind\SMB\NativeServer;
 use Psr\Log\LoggerInterface;
 
 class Smb implements StorageInterface
@@ -28,7 +28,7 @@ class Smb implements StorageInterface
     /**
      * SMB server.
      *
-     * @var NativeServer
+     * @var IServer
      */
     protected $server;
 
@@ -49,7 +49,7 @@ class Smb implements StorageInterface
     /**
      * Init storage.
      */
-    public function __construct(NativeServer $server, LoggerInterface $logger, string $share, string $root = '/')
+    public function __construct(IServer $server, LoggerInterface $logger, string $share, string $root = '/')
     {
         $this->server = $server;
         $this->logger = $logger;
@@ -87,13 +87,14 @@ class Smb implements StorageInterface
      */
     public function openReadStream(string $file)
     {
-        $path = $this->root.DIRECTORY_SEPARATOR.$file;
+        $path = preg_replace('#/+#', '/', $this->root.DIRECTORY_SEPARATOR.$file);
 
         $this->logger->debug('open read stream from file ['.$path.']', [
             'category' => get_class($this),
         ]);
 
         $stream = $this->share->read($path);
+
         if ($stream === false) {
             throw new Exception\OpenStreamFailed('failed open read stream for '.$path);
         }
@@ -112,7 +113,8 @@ class Smb implements StorageInterface
             'category' => get_class($this),
         ]);
 
-        $stream = $this->share->write($path);
+        $stream = $this->share->write($path, false);
+
         if ($stream === false) {
             throw new Exception\OpenStreamFailed('failed open write stream for '.$path);
         }
@@ -135,13 +137,18 @@ class Smb implements StorageInterface
     {
         $result = [];
         $base = dirname($pattern);
+
+        if ($base === '.') {
+            $base = '';
+        }
+
         $path = $this->root.DIRECTORY_SEPARATOR.$base;
         $content = $this->share->dir($path);
         $pattern = basename($pattern);
 
         foreach ($content as $node) {
-            if (preg_match('#'.$pattern.'#', $node->getName())) {
-                $result[] = $path.DIRECTORY_SEPARATOR.$node->getName();
+            if ($node->getName() === $pattern || preg_match('#'.$pattern.'#', $node->getName())) {
+                $result[] = ltrim(preg_replace('#/+#', '/', $path.DIRECTORY_SEPARATOR.$node->getName()), '/');
             }
         }
 

@@ -79,10 +79,10 @@ class Xml extends AbstractFile
      */
     public function setup(bool $simulate = false): EndpointInterface
     {
+        $streams = $this->storage->openReadStreams($this->file);
+
         if ($this->type === EndpointInterface::TYPE_DESTINATION) {
-            $streams = [$this->file => $this->storage->openWriteStream($this->file)];
-        } else {
-            $streams = $this->storage->openReadStreams($this->file);
+            $this->writable = $this->storage->openWriteStream($this->file);
         }
 
         foreach ($streams as $path => $stream) {
@@ -161,11 +161,12 @@ class Xml extends AbstractFile
         foreach ($this->files as $resource) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
                 $this->flush($simulate);
-                if (fwrite($resource['stream'], $resource['dom']->saveXML()) === false) {
+                if (fwrite($this->writable, $resource['dom']->saveXML()) === false) {
                     throw new Exception\WriteOperationFailed('failed create xml file '.$resource['path']);
                 }
 
-                $this->storage->syncWriteStream($resource['stream'], $resource['path']);
+                $this->storage->syncWriteStream($this->writable, $resource['path']);
+                fclose($resource['stream']);
             } else {
                 fclose($resource['stream']);
             }
@@ -197,7 +198,7 @@ class Xml extends AbstractFile
                 ]).']';
         }
 
-        return '//*';
+        return '//'.$this->node_name;
     }
 
     /**
@@ -219,6 +220,7 @@ class Xml extends AbstractFile
 
             foreach ($node as $result) {
                 $result = Converter::xmlToArray($result);
+
                 if (!is_array($result)) {
                     $this->logger->error('xml needs to yield objects ['.$xml['path'].'], make sure a propper endpoint filter has been set', [
                         'category' => get_class($this),

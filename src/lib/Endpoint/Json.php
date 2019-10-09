@@ -47,10 +47,10 @@ class Json extends AbstractFile
      */
     public function setup(bool $simulate = false): EndpointInterface
     {
+        $streams = $this->storage->openReadStreams($this->file);
+
         if ($this->type === EndpointInterface::TYPE_DESTINATION) {
-            $streams = [$this->file => $this->storage->openWriteStream($this->file)];
-        } else {
-            $streams = $this->storage->openReadStreams($this->file);
+            $this->writeable = $this->storage->openWriteStream($this->file);
         }
 
         foreach ($streams as $path => $stream) {
@@ -85,12 +85,11 @@ class Json extends AbstractFile
         foreach ($this->files as $resource) {
             if ($simulate === false && $this->type === EndpointInterface::TYPE_DESTINATION) {
                 $json = json_encode($resource['content'], JSON_PRETTY_PRINT);
-
-                if (fwrite($resource['stream'], $json) === false) {
+                if (fwrite($this->writable, $json) === false) {
                     throw new Exception\WriteOperationFailed('failed create json file '.$resource['path']);
                 }
-
-                $this->storage->syncWriteStream($resource['stream'], $resource['path']);
+                $this->storage->syncWriteStream($this->writable, $resource['path']);
+                fclose($resource['stream']);
             } else {
                 fclose($resource['stream']);
             }

@@ -30,7 +30,11 @@ class XmlTest extends TestCase
         $storage
             ->expects($this->once())
             ->method('openWriteStream')
-            ->willReturn(fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'rw'));
+            ->willReturn(fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'w'));
+        $storage
+            ->expects($this->once())
+            ->method('openReadStreams')
+            ->will($this->returnCallback(function () { yield 'path' => fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'r'); }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $xml->setup();
@@ -43,8 +47,8 @@ class XmlTest extends TestCase
             ->expects($this->once())
             ->method('openReadStreams')
             ->will($this->returnCallback(function () {
-                yield fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'r');
-                yield fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'r');
+                yield 'path1' => fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'r');
+                yield 'path2' => fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'r');
             }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_SOURCE, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
@@ -61,6 +65,10 @@ class XmlTest extends TestCase
         $storage
             ->expects($this->once())
             ->method('syncWriteStream');
+        $storage
+            ->expects($this->once())
+            ->method('openReadStreams')
+            ->will($this->returnCallback(function () { yield 'path' => fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'r'); }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $xml->setup();
@@ -75,6 +83,10 @@ class XmlTest extends TestCase
             ->expects($this->once())
             ->method('openWriteStream')
             ->willReturn(fopen('php://temp/maxmemory:1', 'r'));
+        $storage
+            ->expects($this->once())
+            ->method('openReadStreams')
+            ->will($this->returnCallback(function () { yield fopen('data://text/plain;base64,'.base64_encode('<root></root>'), 'r'); }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $xml->setup();
@@ -195,6 +207,7 @@ class XmlTest extends TestCase
             ->expects($this->once())
             ->method('openWriteStream')
             ->willReturn($stream);
+        $storage->method('openReadStreams')->willReturn((yield));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $xml->setup();
@@ -219,15 +232,20 @@ EOT;
 
     public function testCreateObjectWithExistingData()
     {
-        $stream = fopen('php://memory', 'rw');
-        fwrite($stream, '<root><row><bar>foo</bar></row></root>');
-        rewind($stream);
+        $streamr = fopen('php://memory', 'rw');
+        fwrite($streamr, '<root><row><bar>foo</bar></row></root>');
+        rewind($streamr);
+        $streamw = fopen('php://memory', 'rw');
 
         $storage = $this->createMock(StorageInterface::class);
         $storage
             ->expects($this->once())
             ->method('openWriteStream')
-            ->willReturn($stream);
+            ->willReturn($streamw);
+        $storage
+            ->expects($this->once())
+            ->method('openReadStreams')
+            ->will($this->returnCallback(function () use ($streamr) { yield 'path' => $streamr; }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $xml->setup();
@@ -236,8 +254,8 @@ EOT;
         ]);
         $xml->shutdown();
 
-        rewind($stream);
-        $result = stream_get_contents($stream);
+        rewind($streamw);
+        $result = stream_get_contents($streamw);
         $expected = <<<EOT
 <?xml version="1.0"?>
 <root>
@@ -263,6 +281,7 @@ EOT;
             ->expects($this->once())
             ->method('openWriteStream')
             ->willReturn($stream);
+        $storage->method('openReadStreams')->willReturn((yield));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
         $xml->setup();
@@ -303,6 +322,7 @@ EOT;
             ->expects($this->once())
             ->method('openWriteStream')
             ->willReturn($stream);
+        $storage->method('openReadStreams')->willReturn((yield));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => [
@@ -489,15 +509,20 @@ EOT;
 
     public function testDeleteObject()
     {
-        $stream = fopen('php://memory', 'rw');
-        fwrite($stream, '<root><row><bar>foo</bar></row></root>');
-        rewind($stream);
+        $streamr = fopen('php://memory', 'rw');
+        fwrite($streamr, '<root><row><bar>bar</bar></row><row><bar>foo</bar></row></root>');
+        rewind($streamr);
+        $streamw = fopen('php://memory', 'rw');
 
         $storage = $this->createMock(StorageInterface::class);
         $storage
             ->expects($this->once())
             ->method('openWriteStream')
-            ->willReturn($stream);
+            ->willReturn($streamw);
+        $storage
+            ->expects($this->once())
+            ->method('openReadStreams')
+            ->will($this->returnCallback(function () use ($streamr) { yield 'path' => $streamr; }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => [
@@ -517,11 +542,15 @@ EOT;
 
         $xml->shutdown();
 
-        rewind($stream);
-        $result = stream_get_contents($stream);
+        rewind($streamw);
+        $result = stream_get_contents($streamw);
         $expected = <<<EOT
 <?xml version="1.0"?>
-<root/>\n
+<root>
+  <row>
+    <bar>bar</bar>
+  </row>
+</root>\n
 EOT;
 
         $this->assertSame($expected, $result);
@@ -529,15 +558,20 @@ EOT;
 
     public function testChangeObject()
     {
-        $stream = fopen('php://memory', 'rw');
-        fwrite($stream, '<root><row><bar>foo</bar><foobar>foo</foobar></row></root>');
-        rewind($stream);
+        $streamr = fopen('php://memory', 'rw');
+        fwrite($streamr, '<root><row><bar>foo</bar><foobar>foo</foobar></row></root>');
+        rewind($streamr);
+        $streamw = fopen('php://memory', 'rw');
 
         $storage = $this->createMock(StorageInterface::class);
         $storage
             ->expects($this->once())
             ->method('openWriteStream')
-            ->willReturn($stream);
+            ->willReturn($streamw);
+        $storage
+            ->expects($this->once())
+            ->method('openReadStreams')
+            ->will($this->returnCallback(function () use ($streamr) { yield 'path' => $streamr; }));
 
         $xml = new Xml('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $storage, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => [
@@ -571,8 +605,8 @@ EOT;
 
         $xml->shutdown();
 
-        rewind($stream);
-        $result = stream_get_contents($stream);
+        rewind($streamw);
+        $result = stream_get_contents($streamw);
         $expected = <<<EOT
 <?xml version="1.0"?>
 <root>

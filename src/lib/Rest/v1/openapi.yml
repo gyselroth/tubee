@@ -4318,6 +4318,11 @@ components:
           type: string
           nullable: true
           default: null
+        workgroup:
+          description: "SMB workgroup"
+          type: string
+          nullable: true
+          default: null
     core.v1.BalloonStorage:
       description: Access a balloon cloud storage.
       type: object
