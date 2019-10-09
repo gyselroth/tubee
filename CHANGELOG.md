@@ -1,3 +1,11 @@
+## 1.0.0-beta49
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Oct 09 13:04:22 CEST 2019
+
+* CORE: [FIX] Catch throwable errors during checking endpoint status
+* CORE: [FIX] Added upgrade migration for SmbStorage (workgroup)
+
+
 ## 1.0.0-beta48
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Oct 09 10:14:21 CEST 2019

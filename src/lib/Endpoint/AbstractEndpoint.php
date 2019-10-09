@@ -181,7 +181,7 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
                     return [
                         'available' => true,
                     ];
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     return [
                         'available' => false,
                         'exception' => get_class($e),
