@@ -1,3 +1,10 @@
+## 1.0.0-beta50
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Oct 11 13:55:22 CEST 2019
+
+* CORE: [FIX] TypeError: Argument 2 passed to Tubee\Endpoint\AbstractRest::getResourceId() must implement interface Tubee\EndpointObject\EndpointObjectInterface or be null, array given
+
+
 ## 1.0.0-beta49
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Oct 09 13:04:22 CEST 2019
