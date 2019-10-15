@@ -132,6 +132,10 @@ return [
             ],
             [
                 'method' => 'injectDelta',
+                'arguments' => ['delta' => '{'.Migration\AddWorkgroupSmbStorage::class.'}']
+            ],
+            [
+                'method' => 'injectDelta',
                 'arguments' => ['delta' => '{'.Migration\CoreInstallation::class.'}']
             ],
         ]

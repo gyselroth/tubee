@@ -114,7 +114,7 @@ class Balloon implements StorageInterface
     /**
      * {@inheritdoc}
      */
-    public function SyncWriteStream($stream, string $file): bool
+    public function syncWriteStream($stream, string $file): bool
     {
         $size = fstat($stream)['size'];
 

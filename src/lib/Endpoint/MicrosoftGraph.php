@@ -145,8 +145,8 @@ class MicrosoftGraph extends OdataRest
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
-        $endpoint_object = $endpoint_object->getData();
         $id = $this->getResourceId($object, $endpoint_object);
+        $endpoint_object = $endpoint_object->getData();
         $uri = $this->client->getConfig('base_uri').'/'.$id;
         $requests = [];
 
@@ -257,7 +257,7 @@ class MicrosoftGraph extends OdataRest
     /**
      * Get member batch requests.
      */
-    protected function getMemberChangeBatchRequests(string $id, array $diff, EndpointObjectInterface $endpoint_object): array
+    protected function getMemberChangeBatchRequests(string $id, array $diff, array $endpoint_object): array
     {
         $requests = [];
 

@@ -72,10 +72,10 @@ class Csv extends AbstractFile
      */
     public function setup(bool $simulate = false): EndpointInterface
     {
+        $streams = $this->storage->openReadStreams($this->file);
+
         if ($this->type === EndpointInterface::TYPE_DESTINATION) {
-            $streams = [$this->file => $this->storage->openWriteStream($this->file)];
-        } else {
-            $streams = $this->storage->openReadStreams($this->file);
+            $this->writable = $this->storage->openWriteStream($this->file);
         }
 
         foreach ($streams as $path => $stream) {
@@ -236,7 +236,7 @@ class Csv extends AbstractFile
             $this->create($map, $this->files[0]['header'], $simulate);
         }
 
-        if (fputcsv($this->files[0]['resource'], $object, $this->delimiter, $this->enclosure, $this->escape) === false) {
+        if (fputcsv($this->writable, $object, $this->delimiter, $this->enclosure, $this->escape) === false) {
             throw new Exception\WriteOperationFailed('failed append object to csv file '.$this->file);
         }
 

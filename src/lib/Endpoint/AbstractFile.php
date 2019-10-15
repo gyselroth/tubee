@@ -40,6 +40,13 @@ abstract class AbstractFile extends AbstractEndpoint
     protected $files = [];
 
     /**
+     * Writable stream (destination endpoint).
+     *
+     * @var resource
+     */
+    protected $writable;
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, string $file, StorageInterface $storage, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, ?Iterable $resource = [])
@@ -62,10 +69,8 @@ abstract class AbstractFile extends AbstractEndpoint
             return true;
         }
 
-        foreach ($this->files as $stream) {
-            if (ftruncate($stream['stream'], 0) === false) {
-                throw new Exception\WriteOperationFailed('failed flush file '.$this->file);
-            }
+        if (ftruncate($this->writable, 0) === false) {
+            throw new Exception\WriteOperationFailed('failed flush file '.$this->file);
         }
 
         return true;

@@ -11,7 +11,9 @@ declare(strict_types=1);
 
 namespace Tubee\Storage;
 
-use Icewind\SMB\NativeServer;
+use Icewind\SMB\AnonymousAuth;
+use Icewind\SMB\BasicAuth;
+use Icewind\SMB\ServerFactory;
 use InvalidArgumentException;
 use MongoDB\BSON\ObjectId;
 use Psr\Log\LoggerInterface;
@@ -26,7 +28,15 @@ class Factory
     {
         switch ($resource['kind']) {
             case 'SmbStorage':
-                $server = new NativeServer($resource['host'], $resource['username'], $resource['password']);
+                $factory = new ServerFactory();
+
+                if ($resource['username'] && $resource['password']) {
+                    $auth = new BasicAuth($resource['username'], $resource['workgroup'], $resource['password']);
+                } else {
+                    $auth = new AnonymousAuth();
+                }
+
+                $server = $factory->createServer($resource['host'], $auth);
 
                 return new Smb($server, $logger, $resource['share'], $resource['root']);
 
