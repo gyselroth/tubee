@@ -288,6 +288,14 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
     /**
      * {@inheritdoc}
      */
+    public function count(?array $query = null): int
+    {
+        return 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getType(): string
     {
         return $this->type;

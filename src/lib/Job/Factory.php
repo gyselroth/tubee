@@ -163,6 +163,7 @@ class Factory
         $resource['data'] += [
             'namespace' => $namespace->getName(),
             'job' => $resource['name'],
+            'error_count' => 0,
         ];
 
         if ($resource['data']['active'] === true) {
@@ -198,6 +199,7 @@ class Factory
         $task += [
             'job' => $resource->getName(),
             'namespace' => $resource->getResourceNamespace()->getName(),
+            'error_count' => 0,
         ];
 
         if ($data['data']['active'] === true) {
@@ -206,6 +208,7 @@ class Factory
             $procs = $this->scheduler->getJobs([
                 'data.namespace' => $resource->getResourceNamespace()->getName(),
                 'data.job' => $resource->getName(),
+                //'data.status' => ['$lt' => 3],
             ]);
 
             foreach ($procs as $proc) {

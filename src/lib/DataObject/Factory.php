@@ -63,6 +63,15 @@ class Factory
     }
 
     /**
+     * Count objects.
+     */
+    public function count(CollectionInterface $collection, array $query = []): int
+    {
+        return $this->db->{$collection->getCollection()}->count($query);
+    }
+
+    /**
+     * /**
      * Has object.
      */
     public function has(CollectionInterface $collection, string $name): bool

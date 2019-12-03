@@ -63,6 +63,11 @@ class Process extends AbstractResource implements ProcessInterface
         $parent = isset($data['parent']) ? (string) $data['parent'] : null;
         $job = isset($data['job']) ? $data['job'] : null;
         unset($data['parent'], $data['namespace'], $data['job']);
+        $estimated = null;
+
+        if ($this->resource['status'] > 1 && isset($this->resource['progress']) && $this->resource['progress'] >= 1) {
+            $estimated = new DateTime('@'.(string) round((time() - $this->resource['started']->toDateTime()->format('U')) / $this->resource['progress'] * 100 + time()));
+        }
 
         $result = [
             '_links' => [
@@ -74,8 +79,11 @@ class Process extends AbstractResource implements ProcessInterface
             'data' => $data,
             'status' => [
                 'job' => $job,
+                'errors' => $this->resource['data']['error_count'] ?? 0,
+                'progress' => $this->resource['progress'] ?? 0.0,
                 'parent' => $parent,
                 'next' => $this->resource['options']['at'] === 0 ? null : (new DateTime('@'.(string) $this->resource['options']['at']))->format('c'),
+                'estimated' => $estimated === null ? null : $estimated->format('c'),
                 'started' => $this->resource['status'] === 0 ? null : $this->resource['started']->toDateTime()->format('c'),
                 'ended' => $this->resource['status'] <= 2 ? null : $this->resource['ended']->toDateTime()->format('c'),
                 'result' => JobInterface::STATUS_MAP[$this->resource['status']],

@@ -56,6 +56,23 @@ class Balloon extends AbstractRest
     /**
      * {@inheritdoc}
      */
+    public function count(?array $query = null): int
+    {
+        $query = $this->transformQuery($query);
+
+        $options = $this->getRequestOptions();
+        $options['query'] = [
+            'query' => $query,
+        ];
+
+        $response = $this->client->get('', $options);
+
+        return $this->decodeResponse($response)['total'] ?? 0;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAll(?array $query = null): Generator
     {
         $query = $this->transformQuery($query);

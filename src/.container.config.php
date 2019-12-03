@@ -45,7 +45,7 @@ use TaskScheduler\JobInterface;
 
 return [
     JobInterface::class => [
-        'singleton' => false
+        'singleton' => false,
     ],
     DreamscapesLdap::class => [
         'singleton' => false

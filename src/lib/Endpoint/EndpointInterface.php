@@ -130,6 +130,11 @@ interface EndpointInterface extends ResourceInterface
     public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool;
 
     /**
+     * Count EndpointObjects.
+     */
+    public function count(?array $query = null): int;
+
+    /**
      * Read endpoint.
      */
     public function getAll(?array $query = null): Generator;

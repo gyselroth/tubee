@@ -274,6 +274,16 @@ class Ldap extends AbstractEndpoint
     /**
      * {@inheritdoc}
      */
+    public function count(?array $query = null): int
+    {
+        $filter = $this->transformQuery($query);
+
+        return $this->ldap->ldapSearch($this->basedn, $filter)->countEntries();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAll(?array $query = null): Generator
     {
         $filter = $this->transformQuery($query);

@@ -11,8 +11,8 @@ declare(strict_types=1);
 
 namespace Tubee\Testsuite\Unit;
 
+use Helmich\MongoMock\MockDatabase;
 use MongoDB\BSON\ObjectId;
-use MongoDB\Database;
 use Monolog\Logger;
 use PHPUnit\Framework\TestCase;
 use TaskScheduler\Scheduler;
@@ -36,7 +36,7 @@ class SyncTest extends TestCase
         $scheduler = $this->createMock(Scheduler::class);
         $scheduler->expects($this->never())->method('addJob');
 
-        $sync = new Sync($factory, $this->createMock(Database::class), $scheduler, $this->createMock(Logger::class));
+        $sync = new Sync($factory, $this->getDb(), $scheduler, $this->createMock(Logger::class));
         $sync->setId(new ObjectId());
         $sync->setData([
             'namespace' => 'foo',
@@ -93,7 +93,7 @@ class SyncTest extends TestCase
 
         $scheduler->expects($this->exactly(2))->method('addJob');
 
-        $sync = new Sync($factory, $this->createMock(Database::class), $scheduler, $this->createMock(Logger::class));
+        $sync = new Sync($factory, $this->getDb(), $scheduler, $this->createMock(Logger::class));
         $sync->setId($id);
         unset($data['parent']);
         $data['collections'] = [['bar', 'foo']];
@@ -129,7 +129,7 @@ class SyncTest extends TestCase
         $scheduler = $this->createMock(Scheduler::class);
         $scheduler->expects($this->never())->method('addJob');
 
-        $sync = new Sync($factory, $this->createMock(Database::class), $scheduler, $this->createMock(Logger::class));
+        $sync = new Sync($factory, $this->getDb(), $scheduler, $this->createMock(Logger::class));
         $sync->setId($id);
         $data['collections'] = ['bar', 'foo'];
         $data['endpoints'] = ['foobar'];
@@ -189,7 +189,7 @@ class SyncTest extends TestCase
 
         $scheduler->expects($this->exactly(4))->method('addJob');
 
-        $sync = new Sync($factory, $this->createMock(Database::class), $scheduler, $this->createMock(Logger::class));
+        $sync = new Sync($factory, $this->getDb(), $scheduler, $this->createMock(Logger::class));
         $sync->setId($id);
         unset($data['parent']);
         $data['collections'] = [['bar', 'foo']];
@@ -250,7 +250,7 @@ class SyncTest extends TestCase
 
         $scheduler->expects($this->exactly(4))->method('addJob');
 
-        $sync = new Sync($factory, $this->createMock(Database::class), $scheduler, $this->createMock(Logger::class));
+        $sync = new Sync($factory, $this->getDb(), $scheduler, $this->createMock(Logger::class));
         $sync->setId($id);
         unset($data['parent']);
         $data['collections'] = [['bar', 'foo']];
@@ -258,6 +258,17 @@ class SyncTest extends TestCase
 
         $sync->setData($data);
         $sync->start();
+    }
+
+    protected function getDb()
+    {
+        return new MockDatabase('foobar', [
+            'typeMap' => [
+                'root' => 'array',
+                'document' => 'array',
+                'array' => 'array',
+            ],
+        ]);
     }
 
     protected function getMockEndpoint($name)
