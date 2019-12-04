@@ -1,9 +1,16 @@
-## 1.0.0-beta52
+## 1.0.0-beta53
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Fri Dec 04 15:58:21 CEST 2019
+**Date**: Wed Dec 04 17:14:21 CEST 2019
 
 ### Bugfixes
+* Links against taskscheduler v3.2.1 (progress rate limit fix)
+* Fixes exception logging
 
+## 1.0.0-beta52
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Wed Dec 04 15:58:21 CEST 2019
+
+### Bugfixes
 * Do not send notifications from child processes 
 
 
@@ -12,12 +19,10 @@
 **Date**: Tue Dec 03 16:31:21 CEST 2019
 
 ### Bugfixes
-
 * Job notification includes errors from child processes
 * Do not cancel processes which have status >= 3 after a job gets disabled
 
 ### Features
-
 * Processes with estimated time to finish
 * Sync jobs with progress information
 * Endpoints can now count their EndpointObjects

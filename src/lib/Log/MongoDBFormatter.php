@@ -59,8 +59,8 @@ class MongoDBFormatter implements FormatterInterface
                 $record[$name] = $this->formatDate($value);
             } elseif ($value instanceof \Throwable) {
                 $record[$name] = $this->formatException($value);
-            } elseif (($name === 'data' || $name === 'context') && is_array($value)) {
-                //$record[$name] = $this->formatArray($value);
+            } elseif (($name === 'data' || $name === 'context')) {
+                $record[$name] = $this->formatArray($value);
             } elseif ($value instanceof BSONType) {
                 continue;
             } elseif (is_object($value) || is_array($value)) {
