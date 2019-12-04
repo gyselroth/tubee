@@ -208,7 +208,7 @@ class Factory
             $procs = $this->scheduler->getJobs([
                 'data.namespace' => $resource->getResourceNamespace()->getName(),
                 'data.job' => $resource->getName(),
-                //'data.status' => ['$lt' => 3],
+                'status' => ['$lt' => 3],
             ]);
 
             foreach ($procs as $proc) {

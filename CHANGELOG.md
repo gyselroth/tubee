@@ -5,6 +5,7 @@
 ### Bugfixes
 
 * Job notification includes errors from child processes
+* Do not cancel processes which have status >= 3 after a job gets disabled
 
 ### Features
 
