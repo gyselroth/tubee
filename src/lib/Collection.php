@@ -224,6 +224,14 @@ class Collection extends AbstractResource implements CollectionInterface
     /**
      * {@inheritdoc}
      */
+    public function countObjects(array $query = [], bool $include_dataset = true, ?int $offset = null, ?int $limit = null, ?array $sort = null): int
+    {
+        return $this->object_factory->count($this, $query);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function createObject(array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         return $this->object_factory->create($this, $object, $simulate, $endpoints);

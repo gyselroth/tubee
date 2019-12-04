@@ -145,10 +145,37 @@ class Sync extends AbstractJob
                 'category' => get_class($this),
             ]);
 
+            $i = 0;
             foreach ($this->stack as $proc) {
+                ++$i;
                 $proc->wait();
+                $this->updateProgress($i / count($this->stack) * 100);
+
+                $record = $this->db->{$this->scheduler->getJobQueue()}->findOne([
+                    '_id' => $proc->getId(),
+                ]);
+
+                $this->error_count += $record['data']['error_count'] ?? 0;
+                $this->increaseErrorCount();
             }
+
+            $this->stack = [];
         }
+    }
+
+    /**
+     * Update error count.
+     */
+    protected function increaseErrorCount(): self
+    {
+        $this->db->{$this->scheduler->getJobQueue()}->updateOne([
+            '_id' => $this->getId(),
+            'data.error_count' => ['$exists' => true],
+        ], [
+            '$set' => ['data.error_count' => $this->error_count],
+        ]);
+
+        return $this;
     }
 
     /**
@@ -171,6 +198,7 @@ class Sync extends AbstractJob
                 $this->stack[] = $this->scheduler->addJob(self::class, $data);
             } else {
                 $this->execute($collection, $endpoint);
+                $this->increaseErrorCount();
             }
         }
     }
@@ -263,8 +291,14 @@ class Sync extends AbstractJob
             $ep->setup($simulate);
         }
 
+        $total = $collection->countObjects($filter);
         $i = 0;
+
         foreach ($collection->getObjects($filter) as $id => $object) {
+            if ($total !== 0) {
+                $this->updateProgress($i / $total * 100);
+            }
+
             ++$i;
             $this->logger->debug('process ['.$i.'] export for object ['.(string) $id.'] - [{fields}] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
@@ -377,7 +411,13 @@ class Sync extends AbstractJob
             }
 
             $i = 0;
+            $total = $ep->count($filter);
+
             foreach ($ep->getAll($filter) as $id => $object) {
+                if ($total !== 0) {
+                    $this->updateProgress($i / $total * 100);
+                }
+
                 ++$i;
                 $this->logger->debug('process object ['.$i.'] import for object ['.$object->getId().'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
@@ -561,11 +601,11 @@ class Sync extends AbstractJob
         $iso = $this->timestamp->toDateTime()->format('c');
 
         if ($this->error_count === 0) {
-            $subject = "Job ended with $this->error_count errors";
-            $body = "Hi there\n\nThe sync process ".(string) $this->getId()." started at $iso ended with $this->error_count errors.";
-        } else {
             $subject = 'Good job! The job finished with no errors';
             $body = "Hi there\n\nThe sync process ".(string) $this->getId()." started at $iso finished with no errors.";
+        } else {
+            $subject = "Job ended with $this->error_count errors";
+            $body = "Hi there\n\nThe sync process ".(string) $this->getId()." started at $iso ended with $this->error_count errors.";
         }
 
         $mail = (new Message())

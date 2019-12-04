@@ -63,6 +63,24 @@ class OdataRest extends AbstractRest
     /**
      * {@inheritdoc}
      */
+    public function count(?array $query = null): int
+    {
+        $options = $this->getRequestOptions();
+        $query = $this->transformQuery($query);
+
+        if ($query !== null) {
+            $options['query']['$filter'] = $query;
+        }
+
+        $options['query']['$count'] = true;
+        $response = $this->client->get('', $options);
+
+        return (int) $this->decodeResponse($response);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAll(?array $query = null): Generator
     {
         $options = $this->getRequestOptions();

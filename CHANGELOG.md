@@ -1,3 +1,19 @@
+## 1.0.0-beta51
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Dec 03 16:31:21 CEST 2019
+
+### Bugfixes
+
+* Job notification includes errors from child processes
+* Do not cancel processes which have status >= 3 after a job gets disabled
+
+### Features
+
+* Processes with estimated time to finish
+* Sync jobs with progress information
+* Endpoints can now count their EndpointObjects
+
+
 ## 1.0.0-beta50
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Oct 11 13:55:22 CEST 2019

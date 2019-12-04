@@ -88,6 +88,8 @@ class Factory
         $resource = Validator::validate($resource);
 
         $resource['data']['namespace'] = $namespace->getName();
+
+        $resource['data']['error_count'] = 0;
         $process = $this->scheduler->addJob(Sync::class, $resource['data']);
 
         return $process->getId();

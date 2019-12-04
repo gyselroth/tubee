@@ -40,6 +40,33 @@ class Pdo extends AbstractSqlDatabase
     /**
      * {@inheritdoc}
      */
+    public function count(?array $query = null): int
+    {
+        list($filter, $values) = $this->transformQuery($query);
+
+        if ($filter === null) {
+            $sql = 'SELECT COUNT(*) as count FROM '.$this->table;
+        } else {
+            $sql = 'SELECT COUNT(*) as count FROM '.$this->table.' WHERE '.$filter;
+        }
+
+        try {
+            $result = $this->socket->prepareValues($sql, $values);
+
+            return (int) $result->fetch(\PDO::FETCH_ASSOC)['count'];
+        } catch (InvalidQuery $e) {
+            $this->logger->error('failed to count number of objects from endpoint', [
+                'class' => get_class($this),
+                'exception' => $e,
+            ]);
+
+            return 0;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getAll(?array $query = null): Generator
     {
         list($filter, $values) = $this->transformQuery($query);
