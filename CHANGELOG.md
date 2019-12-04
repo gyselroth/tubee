@@ -1,3 +1,12 @@
+## 1.0.0-beta52
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Dec 04 15:58:21 CEST 2019
+
+### Bugfixes
+
+* Do not send notifications from child processes 
+
+
 ## 1.0.0-beta51
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Dec 03 16:31:21 CEST 2019
