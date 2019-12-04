@@ -195,6 +195,7 @@ class Sync extends AbstractJob
                     'parent' => $this->getId(),
                 ]);
 
+                $data['notification'] = ['enabled' => false, 'receiver' => []];
                 $this->stack[] = $this->scheduler->addJob(self::class, $data);
             } else {
                 $this->execute($collection, $endpoint);
