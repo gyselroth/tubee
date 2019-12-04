@@ -88,6 +88,6 @@
         "phpv8/v8js-stubs": "^1.4.1",
         "friendsofphp/php-cs-fixer": "*",
         "phpunit/phpunit": "^5.7.0",
-        "phpstan/phpstan": "*"
+        "phpstan/phpstan": "^0.11.19"
     }
 }
