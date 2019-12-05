@@ -1,3 +1,11 @@
+## 1.0.0-beta54
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Dec 05 10:04:21 CEST 2019
+
+### Bugfixes
+* Links against taskscheduler v3.2.2 (progress rate to 100% after finish)
+
+
 ## 1.0.0-beta53
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Dec 04 17:14:21 CEST 2019
@@ -5,6 +13,7 @@
 ### Bugfixes
 * Links against taskscheduler v3.2.1 (progress rate limit fix)
 * Fixes exception logging
+
 
 ## 1.0.0-beta52
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
