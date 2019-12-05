@@ -15,8 +15,7 @@ before_install:
 - if [ "$version" == "" ]; then version=$TRAVIS_BUILD_NUMBER; fi;
 script:
 - make VERSION=$version
-- test "$TRAVIS_TAG" != "" && version=${TRAVIS_TAG:1};
-- test "$TRAVIS_TAG" != "" && docker build -t gyselroth/tubee:$version .
+- if [ "$TRAVIS_TAG" != "" ]; then docker build -t gyselroth/tubee:$version .; fi
 notifications:
   email: false
 before_deploy:
