@@ -3,6 +3,25 @@
 **Date**: Thu Dec 05 10:04:21 CEST 2019
 
 ### Bugfixes
+* The cli interface does not end with status code > 0 if it ends with an exception
+
+### Changes
+* Added /openapi/v2 and /openapi/v3 to retrieve OpenAPI sepcs (Instead /specs)
+* Added /healthz endpoints
+* Skip authentication for /api and /api/v1 (This includes the new endpoints /healthz and /openapi)
+
+### Packaging
+* Discontinue distribution of deb packages
+* Removal of example k8s resources
+* Helm repository for tubee: https://github.com/gyselroth/tubee-helm
+* Docs are now in a separate repository https://github.com/gyselroth/tubee-docs
+
+
+## 1.0.0-beta54
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Dec 05 10:04:21 CEST 2019
+
+### Bugfixes
 * Links against taskscheduler v3.2.2 (progress rate to 100% after finish)
 
 
