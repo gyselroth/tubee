@@ -21,9 +21,11 @@ class Routes
     public static function collect()
     {
         return FastRoute\simpleDispatcher(function (FastRoute\RouteCollector $r) {
+            $r->addRoute('GET', '/healthz', [v1\Api::class, 'get']);
             $r->addRoute('GET', '/api', [v1\Api::class, 'get']);
             $r->addRoute('GET', '/api/v1', [v1\Api::class, 'get']);
-            $r->addRoute('GET', '/spec/api/v1', [Specifications::class, 'getApiv1']);
+            $r->addRoute('GET', '/openapi/v2', [Specifications::class, 'getApiv2']);
+            $r->addRoute('GET', '/openapi/v3', [Specifications::class, 'getApiv3']);
             $r->addRoute('GET', '/api/v1/namespaces', [v1\ResourceNamespaces::class, 'getAll']);
             $r->addRoute('POST', '/api/v1/namespaces', [v1\ResourceNamespaces::class, 'post']);
             $r->addRoute('GET', '/api/v1/namespaces/{namespace}', [v1\ResourceNamespaces::class, 'getOne']);

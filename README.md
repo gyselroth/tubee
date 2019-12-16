@@ -6,7 +6,6 @@
 [![Code Coverage](https://scrutinizer-ci.com/g/gyselroth/tubee/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/tubee/?branch=master)
 [![GitHub release](https://img.shields.io/github/release/gyselroth/tubee.svg)](https://github.com/gyselroth/tubee/releases)
 [ ![Download](https://api.bintray.com/packages/gyselroth/tubee/tubee/images/download.svg)](https://bintray.com/gyselroth/tubee/tubee/_latestVersion) 
-[![Documentation Status](https://readthedocs.org/projects/tubee/badge/?version=latest)](https://tubee.readthedocs.io/en/latest/?badge=latest)
 
 tubee is a data management engine with proxy capabilities for other services and its core feature is the possibility to synchronize data between multiple services (endpoints) such as databases, ldap server, file formats, web applications and more. Everything can be fully automated using tubee. You may specify different synchronization workflows and defined custom attribute mappings. Create scripted attributes, conditions, synchronization jobs and more. tubee can be used to automatically synchronize your objecs between multiple endpoints. This can be everything in its nature, for example synchronize user accounts from an XML file to Active Directory and MongoDB. Do whatever you have to do.
 
@@ -25,7 +24,6 @@ tubee is a data management engine with proxy capabilities for other services and
 * Attribute map workflows
 * Full featured OpenAPI v2 REST API
 * SDK's for 3rt party software
-* Published as debian package, tar archive and docker image
 * Full support for a cloud native deployment like on Kubernetes
 * Perfectly scalable for your needs
 * Console client for Linux, Windows and OSX
@@ -54,7 +52,7 @@ tubee is a data management engine with proxy capabilities for other services and
     * Stream (HTTP,FTP and more)
 
 ## Documentation
-Visit [https://tubee.readthedocs.io](https://tubee.readthedocs.io) to get started!
+Visit the [docs](https://gyselroth.github.io/tubee-docs/) to get started!
 
 ## Changelog
 A changelog is available [here](https://github.com/gyselroth/tubee/blob/master/CHANGELOG.md).

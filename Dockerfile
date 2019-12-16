@@ -20,7 +20,6 @@ RUN apt-get update && apt-get install -y \
   git \
   chrpath \
   python \
-  nginx \
   smbclient \
   libglib2.0-dev \
   ca-certificates-java \
@@ -68,7 +67,6 @@ RUN mkdir /etc/ssl/tubee \
   && mv chain.pem /etc/ssl/tubee/
 
 RUN mkdir /usr/share/tubee && mkdir /usr/share/tubee/bin/console -p && mkdir /etc/tubee
-COPY packaging/nginx.conf /etc/nginx/conf.d/tubee.conf
 COPY src/lib /usr/share/tubee/src/lib
 COPY vendor /usr/share/tubee/vendor
 COPY src/.container.config.php /usr/share/tubee/src
@@ -79,11 +77,7 @@ COPY config/config.yaml.docker.dist /etc/tubee/config.docker.yaml
 RUN ln -s /usr/share/tubee/bin/console/tubeecli /usr/bin/tubeecli
 
 RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \
-  && echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf \
-  && sed 's/unix:\/run\/php\/php7.2-fpm.sock/127.0.0.1:9000/g' -i /etc/nginx/conf.d/tubee.conf
+  && echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf
 
 ENV TUBEE_PATH /usr/share/tubee
 ENV TUBEE_CONFIG_DIR /etc/tubee
-
-EXPOSE 443 9000
-CMD service nginx start && php-fpm;
