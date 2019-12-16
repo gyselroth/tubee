@@ -25,7 +25,15 @@ class Auth extends MicroAuth
     {
         $target = $request->getRequestTarget();
 
-        if (preg_match('#^/spec/#', $target)) {
+        $skip = [
+            '/healthz',
+            '/openapi/v2',
+            '/openapi/v3',
+            '/api',
+            '/api/v1',
+        ];
+
+        if (in_array($target, $skip)) {
             return $handler->handle($request);
         }
 

@@ -23,10 +23,25 @@ class Specifications
     /**
      * Get spec.
      */
-    public function getApiv1(ServerRequestInterface $request): ResponseInterface
+    public function getApiv2(ServerRequestInterface $request): ResponseInterface
     {
         $query = $request->getQueryParams();
         $data = $this->load(__DIR__.'/v1/swagger.yml');
+
+        return new UnformattedResponse(
+            (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
+            $data,
+            ['pretty' => isset($query['pretty'])]
+        );
+    }
+
+    /**
+     * Get spec.
+     */
+    public function getApiv3(ServerRequestInterface $request): ResponseInterface
+    {
+        $query = $request->getQueryParams();
+        $data = $this->load(__DIR__.'/v1/openapi.yml');
 
         return new UnformattedResponse(
             (new Response())->withStatus(StatusCodeInterface::STATUS_OK),
