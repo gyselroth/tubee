@@ -52,7 +52,7 @@ tubee is a data management engine with proxy capabilities for other services and
     * Stream (HTTP,FTP and more)
 
 ## Documentation
-Visit [https://tubee.readthedocs.io](https://tubee.readthedocs.io) to get started!
+Visit the [docs](https://gyselroth.github.io/tubee-docs/) to get started!
 
 ## Changelog
 A changelog is available [here](https://github.com/gyselroth/tubee/blob/master/CHANGELOG.md).
