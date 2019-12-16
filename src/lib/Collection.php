@@ -250,7 +250,7 @@ class Collection extends AbstractResource implements CollectionInterface
      */
     public function deleteObject(ObjectIdInterface $id, bool $simulate = false): bool
     {
-        return $this->object_factory->deleteOne($this, $id, $simulate);
+        return $this->object_factory->deleteOne($this, (string) $id, $simulate);
     }
 
     /**

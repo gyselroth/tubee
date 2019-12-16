@@ -1,9 +1,10 @@
-## 1.0.0-beta54
+## 1.0.0-beta55
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Thu Dec 05 10:04:21 CEST 2019
+**Date**: Mon Dec 16 10:41:22 CET 2019
 
 ### Bugfixes
 * The cli interface does not end with status code > 0 if it ends with an exception
+* TypeError: Argument 2 passed to Tubee\DataObject\Factory::deleteOne() must be of the type string, object given, called in /usr/share/tubee/src/lib/Collection.php on line 253
 
 ### Changes
 * Added /openapi/v2 and /openapi/v3 to retrieve OpenAPI sepcs (Instead /specs)
@@ -19,7 +20,7 @@
 
 ## 1.0.0-beta54
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Thu Dec 05 10:04:21 CEST 2019
+**Date**: Thu Dec 05 10:04:21 CET 2019
 
 ### Bugfixes
 * Links against taskscheduler v3.2.2 (progress rate to 100% after finish)
@@ -27,7 +28,7 @@
 
 ## 1.0.0-beta53
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Wed Dec 04 17:14:21 CEST 2019
+**Date**: Wed Dec 04 17:14:21 CET 2019
 
 ### Bugfixes
 * Links against taskscheduler v3.2.1 (progress rate limit fix)
@@ -36,7 +37,7 @@
 
 ## 1.0.0-beta52
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Wed Dec 04 15:58:21 CEST 2019
+**Date**: Wed Dec 04 15:58:21 CET 2019
 
 ### Bugfixes
 * Do not send notifications from child processes 
@@ -44,7 +45,7 @@
 
 ## 1.0.0-beta51
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
-**Date**: Tue Dec 03 16:31:21 CEST 2019
+**Date**: Tue Dec 03 16:31:21 CET 2019
 
 ### Bugfixes
 * Job notification includes errors from child processes
