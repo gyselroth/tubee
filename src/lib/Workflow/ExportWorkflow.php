@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Workflow;
 
 use MongoDB\BSON\UTCDateTimeInterface;
+use Tubee\Async\Sync;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\Endpoint\Exception as EndpointException;
 use Tubee\EndpointObject\EndpointObjectInterface;
@@ -23,7 +24,7 @@ class ExportWorkflow extends Workflow
     /**
      * {@inheritdoc}
      */
-    public function export(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
+    public function export(DataObjectInterface $object, Sync $process, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
         $attributes['relations'] = $object->getResolvedRelationsAsArray();
@@ -35,7 +36,7 @@ class ExportWorkflow extends Workflow
         $result = null;
 
         try {
-            $map = $this->attribute_map->map($attributes, $ts);
+            $map = $this->attribute_map->map($attributes, $process->getTimestamp());
 
             $this->logger->info('mapped object attributes [{map}] for write', [
                 'category' => get_class($this),
@@ -72,16 +73,16 @@ class ExportWorkflow extends Workflow
 
                 break;
                 case WorkflowInterface::ENSURE_EXISTS:
-                    $result = $this->ensureExists($object, $map, $ts, $simulate);
+                    $result = $this->ensureExists($object, $map, $process->getTimestamp(), $simulate);
                     $exists = true;
 
                 break;
                 default:
                 case WorkflowInterface::ENSURE_LAST:
-                    $result = $this->ensureLast($object, $exists, $map, $ts, $simulate);
+                    $result = $this->ensureLast($object, $exists, $map, $process->getTimestamp(), $simulate);
             }
         } catch (\Exception $e) {
-            $this->updateObject($object, $simulate, $ts, $result, [
+            $this->updateObject($object, $simulate, $process, $result, [
                 'garbage' => !$exists,
                 'exception' => $e,
                 'success' => false,
@@ -90,7 +91,7 @@ class ExportWorkflow extends Workflow
             throw $e;
         }
 
-        $this->updateObject($object, $simulate, $ts, $result, [
+        $this->updateObject($object, $simulate, $process, $result, [
             'garbage' => !$exists,
             'exception' => null,
             'success' => true,

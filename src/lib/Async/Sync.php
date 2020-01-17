@@ -132,6 +132,14 @@ class Sync extends AbstractJob
     }
 
     /**
+     * Get timestamp.
+     */
+    public function getTimestamp(): ?UTCDateTime
+    {
+        return $this->timestamp;
+    }
+
+    /**
      * Loop collections.
      */
     protected function loopCollections(array $collections, array $endpoints)
@@ -330,7 +338,7 @@ class Sync extends AbstractJob
                             'category' => get_class($this),
                         ]);
 
-                        if ($workflow->export($object, $this->timestamp, $simulate) === true) {
+                        if ($workflow->export($object, $this, $simulate) === true) {
                             $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $id.'], skip any further workflows for the current data object', [
                                 'category' => get_class($this),
                             ]);
@@ -431,7 +439,7 @@ class Sync extends AbstractJob
                             'category' => get_class($this),
                         ]);
 
-                        if ($workflow->import($collection, $object, $this->timestamp, $simulate) === true) {
+                        if ($workflow->import($collection, $object, $this, $simulate) === true) {
                             $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the object ['.(string) $object->getId().'], skip any further workflows for the current data object', [
                                 'category' => get_class($this),
                             ]);
@@ -528,7 +536,7 @@ class Sync extends AbstractJob
                         'category' => get_class($this),
                     ]);
 
-                    if ($workflow->cleanup($object, $this->timestamp, $simulate) === true) {
+                    if ($workflow->cleanup($object, $this, $simulate) === true) {
                         $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the current garbage object, skip any further workflows for the current garbage object', [
                             'category' => get_class($this),
                         ]);
@@ -563,7 +571,7 @@ class Sync extends AbstractJob
         $ep = $endpoint->getName();
         $key = join('/', [$namespace, $collection, $ep]);
 
-        $this->info('mark all relation data objects older than [{timestamp}] (last_sync) as garbage', [
+        $this->logger->info('mark all relation data objects older than [{timestamp}] (last_sync) as garbage', [
             'class' => get_class($this),
             'timestamp' => $this->timestamp,
         ]);

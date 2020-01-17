@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Workflow;
 
 use MongoDB\BSON\UTCDateTimeInterface;
+use Tubee\Async\Sync;
 use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Exception as DataObjectException;
@@ -24,7 +25,7 @@ class ImportWorkflow extends Workflow
     /**
      * {@inheritdoc}
      */
-    public function cleanup(DataObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
+    public function cleanup(DataObjectInterface $object, Sync $process, bool $simulate = false): bool
     {
         $attributes = $object->toArray();
         if ($this->checkCondition($attributes) === false) {
@@ -32,7 +33,7 @@ class ImportWorkflow extends Workflow
         }
 
         $attributes = Helper::associativeArrayToPath($attributes);
-        $map = $this->attribute_map->map($attributes, $ts);
+        $map = $this->attribute_map->map($attributes, $process->getTimestamp());
         $this->logger->info('mapped object attributes [{map}] for cleanup', [
             'category' => get_class($this),
             'map' => array_keys($map),
@@ -45,8 +46,18 @@ class ImportWorkflow extends Workflow
             break;
             default:
             case WorkflowInterface::ENSURE_LAST:
-                $resource = Map::map($this->attribute_map, $map, ['data' => $object->getData()], $ts);
-                $object->getCollection()->changeObject($object, $resource, $simulate);
+                $resource = Map::map($this->attribute_map, $map, ['data' => $object->getData()], $process->getTimestamp());
+                $object->getCollection()->changeObject($object, $resource, $simulate, [
+                    'name' => $this->endpoint->getName(),
+                    'cleanup' => [
+                        'last_sync' => $process->getTimestamp(),
+                        'last_successful_sync' => $process->getTimestamp(),
+                        'process' => $process->getId(),
+                        'workflow' => $this->getName(),
+                        'success' => true,
+                    ],
+                ]);
+
                 $this->importRelations($object, $map, $simulate);
 
                 return true;
@@ -60,20 +71,20 @@ class ImportWorkflow extends Workflow
     /**
      * {@inheritdoc}
      */
-    public function import(CollectionInterface $collection, EndpointObjectInterface $object, UTCDateTimeInterface $ts, bool $simulate = false): bool
+    public function import(CollectionInterface $collection, EndpointObjectInterface $object, Sync $process, bool $simulate = false): bool
     {
         $object = $object->getData();
         if ($this->checkCondition($object) === false) {
             return false;
         }
 
-        $map = $this->attribute_map->map($object, $ts);
+        $map = $this->attribute_map->map($object, $process->getTimestamp());
         $this->logger->info('mapped object attributes [{map}] for import', [
             'category' => get_class($this),
             'map' => array_keys($map),
         ]);
 
-        $exists = $this->getImportObject($collection, $map, $object, $ts);
+        $exists = $this->getImportObject($collection, $map, $object, $process->getTimestamp());
 
         if ($exists === null) {
             $this->logger->info('found no existing data object for given import attributes', [
@@ -101,46 +112,48 @@ class ImportWorkflow extends Workflow
 
             break;
             case WorkflowInterface::ENSURE_EXISTS:
-                $endpoints = [
-                    $this->endpoint->getName() => [
-                        'last_sync' => $ts,
-                        'last_successful_sync' => $ts,
-                        'success' => true,
-                        'garbage' => false,
-                    ],
+                $endpoint = [
+                    'name' => $this->endpoint->getName(),
+                    'last_sync' => $process->getTimestamp(),
+                    'last_successful_sync' => $process->getTimestamp(),
+                    'process' => $process->getId(),
+                    'workflow' => $this->getName(),
+                    'success' => true,
+                    'garbage' => false,
                 ];
 
                 if (isset($object[$this->endpoint->getResourceIdentifier()])) {
-                    $endpoints[$this->endpoint->getName()]['result'] = $object[$this->endpoint->getResourceIdentifier()];
+                    $endpoint['result'] = $object[$this->endpoint->getResourceIdentifier()];
                 }
 
-                $id = $collection->createObject(Helper::pathArrayToAssociative($this->removeMapAttributes($map)), $simulate, $endpoints);
-                $this->importRelations($collection->getObject(['_id' => $id]), $map, $simulate, $endpoints);
+                $id = $collection->createObject(Helper::pathArrayToAssociative($this->removeMapAttributes($map)), $simulate, $endpoint);
+                $this->importRelations($collection->getObject(['_id' => $id]), $map, $simulate, $endpoint);
 
                 return true;
 
             break;
             default:
             case WorkflowInterface::ENSURE_LAST:
-                $mapped = Map::map($this->attribute_map, $map, ['data' => $exists->getData()], $ts);
-                $endpoints = [
-                    $this->endpoint->getName() => [
-                        'last_sync' => $ts,
-                        'last_successful_sync' => $ts,
-                        'success' => true,
-                        'garbage' => false,
-                    ],
+                $mapped = Map::map($this->attribute_map, $map, ['data' => $exists->getData()], $process->getTimestamp());
+                $endpoint = [
+                    'name' => $this->endpoint->getName(),
+                    'last_sync' => $process->getTimestamp(),
+                    'last_successful_sync' => $process->getTimestamp(),
+                    'process' => $process->getId(),
+                    'workflow' => $this->getName(),
+                    'success' => true,
+                    'garbage' => false,
                 ];
 
                 if (isset($object[$this->endpoint->getResourceIdentifier()])) {
-                    $endpoints[$this->endpoint->getName()]['result'] = $object[$this->endpoint->getResourceIdentifier()];
+                    $endpoint['result'] = $object[$this->endpoint->getResourceIdentifier()];
                 }
 
-                $this->importRelations($exists, $map, $simulate, $endpoints);
+                $this->importRelations($exists, $map, $simulate, $endpoint);
                 $exist_ep = $exists->getEndpoints();
 
                 if (isset($exist_ep[$this->endpoint->getName()])
-                    && $exist_ep[$this->endpoint->getName()]['last_sync']->toDateTime() >= $ts->toDateTime()) {
+                    && $exist_ep[$this->endpoint->getName()]['last_sync']->toDateTime() >= $process->getTimestamp()->toDateTime()) {
                     $this->logger->warning('source object with given import filter is not unique (multiple data objects found), skip update resource', [
                         'category' => get_class($this),
                     ]);
@@ -148,7 +161,7 @@ class ImportWorkflow extends Workflow
                     return true;
                 }
 
-                $collection->changeObject($exists, $mapped, $simulate, $endpoints);
+                $collection->changeObject($exists, $mapped, $simulate, $endpoint);
 
                 return true;
 
@@ -179,7 +192,7 @@ class ImportWorkflow extends Workflow
     /**
      * Create object relations.
      */
-    protected function importRelations(DataObjectInterface $object, array $data, bool $simulate, array $endpoints = []): bool
+    protected function importRelations(DataObjectInterface $object, array $data, bool $simulate, array $endpoint = []): bool
     {
         $this->logger->debug('find relationships to be imported for object ['.$object->getId().']', [
             'category' => get_class($this),
@@ -223,7 +236,7 @@ class ImportWorkflow extends Workflow
                         $ep = $this->endpoint->getName();
 
                         $list = [
-                            join('/', [$namespace, $collection, $ep]) => $endpoints[$ep],
+                            join('/', [$namespace, $collection, $ep]) => $endpoint,
                         ];
 
                         $object->createOrUpdateRelation($relative, $context, $simulate, $list);

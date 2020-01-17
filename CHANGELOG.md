@@ -2,8 +2,14 @@
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Jan 17 15:17:22 CET 2020
 
+### Bugfixes
+* Fixed possible state conflict between processes which are running at the same time
+
 ### Changes
 * Added more logging for update/delete operations
+
+### Features
+* Added workflow name and process id to endpoint states within a DataObject
 
 
 ## 1.0.0-beta55

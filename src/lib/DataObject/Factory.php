@@ -158,7 +158,7 @@ class Factory
     /**
      * Create.
      */
-    public function create(CollectionInterface $collection, array $object, bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
+    public function create(CollectionInterface $collection, array $object, bool $simulate = false, ?array $endpoint = null): ObjectIdInterface
     {
         $collection->getSchema()->validate((array) $object['data']);
 
@@ -170,6 +170,16 @@ class Factory
 
         if ($this->has($collection, $object['name'])) {
             throw new Exception\NotUnique('data object '.$object['name'].' does already exists');
+        }
+
+        $endpoints = [];
+        if ($endpoints !== null) {
+            $name = $endpoint['name'];
+            unset($endpoint['name']);
+
+            $endpoints = [
+                $name => $endpoint,
+            ];
         }
 
         $object = [
@@ -185,13 +195,20 @@ class Factory
     /**
      * Update.
      */
-    public function update(CollectionInterface $collection, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoints = null): bool
+    public function update(CollectionInterface $collection, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoint = null): bool
     {
         $collection->getSchema()->validate((array) $data['data']);
 
-        if ($endpoints !== null) {
+        if ($endpoint !== null) {
+            $name = $endpoint['name'];
+            unset($endpoint['name']);
+
             $existing = $object->getEndpoints();
-            $data['endpoints'] = array_replace_recursive($existing, $endpoints);
+            if (isset($existing[$name])) {
+                $endpoint = array_replace_recursive($existing[$name], $endpoint);
+            }
+
+            $data['endpoints.'.$name] = $endpoint;
         }
 
         $this->logger->debug('update data object ['.$object->getId().'] in collection ['.$collection->getIdentifier().'] including endpoint data', [
