@@ -107,7 +107,6 @@ class Sync extends AbstractJob
         $this->scheduler = $scheduler;
         $this->logger = $logger;
         $this->db = $db;
-        $this->timestamp = new UTCDateTime();
     }
 
     /**
@@ -115,6 +114,7 @@ class Sync extends AbstractJob
      */
     public function start(): bool
     {
+        $this->timestamp = new UTCDateTime();
         $this->namespace = $this->namespace_factory->getOne($this->data['namespace']);
 
         foreach ($this->data['collections'] as $collections) {
@@ -490,7 +490,9 @@ class Sync extends AbstractJob
      */
     protected function garbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, bool $simulate = false, bool $ignore = false): bool
     {
-        $this->logger->info('start garbage collector workflows from data type ['.$collection->getIdentifier().']', [
+        $this->logger->info('start garbage collector workflows from data type [{timestamp}] for data objects older than [{timestamp}] (last_sync)', [
+            'timestamp' => $this->timestamp,
+            'identifier' => $collection->getIdentifier(),
             'category' => get_class($this),
         ]);
 
@@ -560,6 +562,11 @@ class Sync extends AbstractJob
         $collection = $endpoint->getCollection()->getName();
         $ep = $endpoint->getName();
         $key = join('/', [$namespace, $collection, $ep]);
+
+        $this->info('mark all relation data objects older than [{timestamp}] (last_sync) as garbage', [
+            'class' => get_class($this),
+            'timestamp' => $this->timestamp,
+        ]);
 
         $filter = [
             'endpoints.'.$key.'.last_sync' => [

@@ -179,8 +179,10 @@ class Factory
 
         $result = $collection->updateOne(['_id' => $resource->getId()], $op);
 
-        $this->logger->info('updated resource ['.$resource->getId().'] in ['.$collection->getCollectionName().']', [
+        $this->logger->info('updated [{modified}/{match}] resource ['.$resource->getId().'] in ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
+            'match' => $result->getMatchedCount(),
+            'modified' => $result->getModifiedCount(),
         ]);
 
         return true;
@@ -200,6 +202,12 @@ class Factory
         }
 
         $result = $collection->deleteOne(['_id' => $id]);
+
+        $this->logger->info('removed [{deleted}/{match}] resource ['.$id.'] in ['.$collection->getCollectionName().']', [
+            'category' => get_class($this),
+            'match' => $result->getMatchedCount(),
+            'deleted' => $result->getDeletedCount(),
+        ]);
 
         return true;
     }

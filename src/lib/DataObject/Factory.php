@@ -194,6 +194,11 @@ class Factory
             $data['endpoints'] = array_replace_recursive($existing, $endpoints);
         }
 
+        $this->logger->debug('update data object ['.$object->getId().'] in collection ['.$collection->getIdentifier().'] including endpoint data', [
+            'class' => get_class($this),
+            'endpoints' => $data['endpoints'],
+        ]);
+
         return $this->resource_factory->updateIn($this->db->{$collection->getCollection()}, $object, $data, $simulate);
     }
 

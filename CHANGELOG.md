@@ -1,3 +1,11 @@
+## 1.0.0-beta56
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Jan 17 15:17:22 CET 2020
+
+### Changes
+* Added more logging for update/delete operations
+
+
 ## 1.0.0-beta55
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Dec 16 10:41:22 CET 2019
