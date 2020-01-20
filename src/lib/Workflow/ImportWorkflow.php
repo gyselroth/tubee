@@ -49,13 +49,10 @@ class ImportWorkflow extends Workflow
                 $resource = Map::map($this->attribute_map, $map, ['data' => $object->getData()], $process->getTimestamp());
                 $object->getCollection()->changeObject($object, $resource, $simulate, [
                     'name' => $this->endpoint->getName(),
-                    'cleanup' => [
-                        'last_sync' => $process->getTimestamp(),
-                        'last_successful_sync' => $process->getTimestamp(),
-                        'process' => $process->getId(),
-                        'workflow' => $this->getName(),
-                        'success' => true,
-                    ],
+                    'last_garbage_sync' => $process->getTimestamp(),
+                    'process' => $process->getId(),
+                    'workflow' => $this->getName(),
+                    'success' => true,
                 ]);
 
                 $this->importRelations($object, $map, $simulate);

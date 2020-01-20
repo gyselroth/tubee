@@ -198,6 +198,7 @@ class Factory
     public function update(CollectionInterface $collection, DataObjectInterface $object, array $data, bool $simulate = false, ?array $endpoint = null): bool
     {
         $collection->getSchema()->validate((array) $data['data']);
+        unset($data['endpoints']);
 
         if ($endpoint !== null) {
             $name = $endpoint['name'];
@@ -213,7 +214,7 @@ class Factory
 
         $this->logger->debug('update data object ['.$object->getId().'] in collection ['.$collection->getIdentifier().'] including endpoint data', [
             'class' => get_class($this),
-            'endpoints' => $data['endpoints'],
+            'endpoints' => $endpoint,
         ]);
 
         return $this->resource_factory->updateIn($this->db->{$collection->getCollection()}, $object, $data, $simulate);

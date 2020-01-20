@@ -75,6 +75,8 @@ class DataObject extends AbstractResource implements DataObjectInterface
                 foreach ($endpoints as &$endpoint) {
                     $endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
                     $endpoint['last_successful_sync'] = isset($endpoint['last_successful_sync']) ? $endpoint['last_successful_sync']->toDateTime()->format('c') : null;
+                    $endpoint['last_garbage_sync'] = isset($endpoint['last_garbage_sync']) ? $endpoint['last_garbage_sync']->toDateTime()->format('c') : null;
+                    $endpoint['process'] = isset($endpoint['process']) ? (string) $endpoint['process'] : null;
                     $endpoint['success'] = isset($endpoint['success']) ? $endpoint['success'] : null;
                     $endpoint['garbage'] = isset($endpoint['garbage']) ? $endpoint['garbage'] : false;
                     $endpoint['result'] = isset($endpoint['result']) ? $endpoint['result'] : null;

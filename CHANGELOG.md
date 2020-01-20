@@ -10,6 +10,7 @@
 
 ### Features
 * Added workflow name and process id to endpoint states within a DataObject
+* Added endpoint states to history record
 
 
 ## 1.0.0-beta55

@@ -43,10 +43,6 @@ Psr\Log\LoggerInterface:
   arguments:
     name: default
   calls:
-    file:
-      method: pushHandler
-      arguments:
-        handler: '{file}'
     stderr:
       method: pushHandler
       arguments:
@@ -63,14 +59,6 @@ Psr\Log\LoggerInterface:
         format: "%datetime% [%context.category%,%level_name%]: %message% %context.params% %context.exception%\n"
       calls:
         - method: includeStacktraces
-    file:
-      use: Monolog\Handler\StreamHandler
-      arguments:
-        stream: '{ENV(TUBEE_LOG_DIR,/tmp)}/out.log'
-        level: "{ENV(TUBEE_LOG_LEVEL,300)}"
-      calls:
-        formatter:
-          method: setFormatter
     stderr:
       use: Monolog\Handler\StreamHandler
       arguments:
