@@ -172,7 +172,7 @@ class Factory
             throw new Exception\NotUnique('data object '.$object['name'].' does already exists');
         }
 
-        $endpoints = [];
+        $endpoints = null;
         if ($endpoint !== null) {
             $name = $endpoint['name'];
             unset($endpoint['name']);
@@ -209,7 +209,15 @@ class Factory
                 $endpoint = array_replace_recursive($existing[$name], $endpoint);
             }
 
-            $data['endpoints.'.$name] = $endpoint;
+            //v1.0.0-beta56 fix, endpoints has been set to [] instead null
+            $source = $object->toArray()['endpoints'] ?? null;
+            if ($source === []) {
+                $data['endpoints'] = [
+                    $name => $endpoint,
+                ];
+            } else {
+                $data['endpoints.'.$name] = $endpoint;
+            }
         }
 
         $this->logger->debug('update data object ['.$object->getId().'] in collection ['.$collection->getIdentifier().'] including endpoint data', [

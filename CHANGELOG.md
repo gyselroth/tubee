@@ -1,3 +1,11 @@
+## 1.0.0-beta58
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jan 21 14:10:22 CET 2020
+
+### Bugfixes
+* MongoDB\Driver\Exception\BulkWriteException: Cannot create field 'eco-relation-csv' in element {endpoints: []}
+
+
 ## 1.0.0-beta57
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jan 21 11:38:22 CET 2020
