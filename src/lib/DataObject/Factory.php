@@ -173,7 +173,7 @@ class Factory
         }
 
         $endpoints = [];
-        if ($endpoints !== null) {
+        if ($endpoint !== null) {
             $name = $endpoint['name'];
             unset($endpoint['name']);
 

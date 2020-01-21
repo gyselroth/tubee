@@ -1,3 +1,11 @@
+## 1.0.0-beta57
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jan 21 11:38:22 CET 2020
+
+### Bugfixes
+* MongoDB\Driver\Exception\InvalidArgumentException: invalid document for insert: empty key post add data object into collection
+
+
 ## 1.0.0-beta56
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Jan 17 15:17:22 CET 2020
