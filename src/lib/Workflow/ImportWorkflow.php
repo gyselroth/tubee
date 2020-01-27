@@ -219,6 +219,11 @@ class ImportWorkflow extends Workflow
                 $definition['map']['to'] => ['$in' => (array) $data[$definition['name']]],
             ]);
 
+            $identifiers = [];
+            foreach ($definition['identifiers'] ?? [] as $attribute) {
+                $identifiers[] = [$attribute => $data[$attribute] ?? null];
+            }
+
             foreach ($relatives as $relative) {
                 $this->logger->debug('ensure relation state ['.$definition['map']['ensure'].'] for relation to ['.$relative->getId().']', [
                     'category' => get_class($this),
@@ -236,7 +241,7 @@ class ImportWorkflow extends Workflow
                             join('/', [$namespace, $collection, $ep]) => $endpoint,
                         ];
 
-                        $object->createOrUpdateRelation($relative, $context, $simulate, $list);
+                        $object->createOrUpdateRelation($relative, $identifiers, $context, $simulate, $list);
 
                     break;
                     default:

@@ -1,3 +1,11 @@
+## 1.0.0-beta59
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jan 27 15:25:24 CET 2020
+
+### Changes
+* Introduction of Workflow attribute map map.identifiers to uniquely match a relation and update only that one
+
+
 ## 1.0.0-beta58
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jan 21 14:10:22 CET 2020

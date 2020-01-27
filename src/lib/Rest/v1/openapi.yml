@@ -5321,6 +5321,11 @@ components:
               - exists
               - last
               - absent
+            identifers:
+              type: array
+              default: []
+              items:
+                type: string
             context:
               type: array
               default: []
