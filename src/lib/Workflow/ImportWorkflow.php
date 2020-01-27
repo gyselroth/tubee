@@ -220,8 +220,10 @@ class ImportWorkflow extends Workflow
             ]);
 
             $identifiers = [];
-            foreach ($definition['identifiers'] ?? [] as $attribute) {
-                $identifiers[] = [$attribute => $data[$attribute] ?? null];
+            foreach ($definition['map']['identifiers'] ?? [] as $attribute) {
+                if (array_key_exists($attribute, $data)) {
+                    $identifiers[$attribute] = $data[$attribute];
+                }
             }
 
             foreach ($relatives as $relative) {

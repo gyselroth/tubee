@@ -14,8 +14,8 @@ services:
     links:
       - mongodb3
     environment:
-      - CONFIG=/mnt/config.yaml
-      - MONGODB_URI=mongodb://mongodb3:27017
+      - MDBEXPORTER_CONFIG=/mnt/config.yaml
+      - MDBEXPORTER_MONGODB_URI=mongodb://mongodb3:27017
     volumes:
       -  ./config/mongodb-metrics:/mnt
   mongodb-endpoint:
