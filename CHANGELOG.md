@@ -1,3 +1,13 @@
+## 1.0.0-beta61
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jan 28 14:43:24 CET 2020
+
+### Bugfixes
+* Fixes delete DataObjectRelation uncaught exception Argument 1 passed to Tubee\DataObjectRelation\Factory::deleteOne() must be an instance of Tubee\DataObjectRelation\DataObjectRelationInterface
+
+
+## 1.0.0-beta59
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 ## 1.0.0-beta60
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jan 28 13:23:24 CET 2020
