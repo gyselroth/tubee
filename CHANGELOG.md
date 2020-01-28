@@ -1,3 +1,11 @@
+## 1.0.0-beta60
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jan 28 13:23:24 CET 2020
+
+### Changes
+* Fixes identifier matching in relation attributes (workflow)
+
+
 ## 1.0.0-beta59
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Mon Jan 27 15:25:24 CET 2020

@@ -263,7 +263,7 @@ class Factory
                 ['$and' => $relations],
                 ['$or' => [
                     ['data.identifiers' => $identifiers],
-                    ['data.key' => ['$exists' => false]],
+                    ['data.identifiers' => ['$exists' => false]],
                 ]],
             ],
         ];
