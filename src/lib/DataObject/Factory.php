@@ -211,7 +211,7 @@ class Factory
 
             //v1.0.0-beta56 fix, endpoints has been set to [] instead null
             $source = $object->toArray()['endpoints'] ?? null;
-            if ($source === []) {
+            if ($source === [] || $source === null) {
                 $data['endpoints'] = [
                     $name => $endpoint,
                 ];

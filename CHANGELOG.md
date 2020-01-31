@@ -1,3 +1,11 @@
+## 1.0.0-beta62
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Jan 31 08:14:21 CET 2020
+
+### Bugfixes
+* Fixed workflow updates to manually added DataObjects MongoDB\Driver\Exception\BulkWriteException: Cannot create field 'ep-name' in element {endpoints: null} 
+
+
 ## 1.0.0-beta61
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jan 28 14:43:24 CET 2020
