@@ -59,36 +59,7 @@ abstract class AbstractRest extends AbstractEndpoint
      */
     public function setup(bool $simulate = false): EndpointInterface
     {
-        if (isset($this->resource['data']['resource']['auth']) && $this->resource['data']['resource']['auth'] === 'oauth2') {
-            $oauth = $this->resource['data']['resource']['oauth2'];
-
-            $this->logger->debug('fetch access_token from ['.$oauth['token_endpoint'].']', [
-                'category' => get_class($this),
-            ]);
-
-            $response = $this->client->post($oauth['token_endpoint'], [
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                    'client_id' => $oauth['client_id'],
-                    'client_secret' => $oauth['client_secret'],
-                    'scope' => $oauth['scope'],
-                ],
-            ]);
-
-            $this->logger->debug('fetch access_token ended with status ['.$response->getStatusCode().']', [
-                'category' => get_class($this),
-            ]);
-
-            $body = json_decode($response->getBody()->getContents(), true);
-
-            if (isset($body['access_token'])) {
-                $this->access_token = $body['access_token'];
-            } else {
-                throw new RestException\AccessTokenNotAvailable('No access_token in token_endpoint response');
-            }
-        }
-
-        $response = $this->client->get('', $this->getRequestOptions());
+        $response = $this->client->get('');
 
         return $this;
     }
@@ -102,9 +73,9 @@ abstract class AbstractRest extends AbstractEndpoint
         $this->logChange($uri, $diff);
 
         if ($simulate === false) {
-            $this->client->patch($uri, $this->getRequestOptions([
+            $this->client->patch($uri, [
                 'json' => $diff,
-            ]));
+            ]);
         }
 
         return null;
@@ -119,7 +90,7 @@ abstract class AbstractRest extends AbstractEndpoint
         $this->logDelete($uri);
 
         if ($simulate === false) {
-            $response = $this->client->delete($uri, $this->getRequestOptions());
+            $response = $this->client->delete($uri);
         }
 
         return true;
@@ -133,9 +104,9 @@ abstract class AbstractRest extends AbstractEndpoint
         $this->logCreate($object);
 
         if ($simulate === false) {
-            $result = $this->client->post('', $this->getRequestOptions([
+            $result = $this->client->post('', [
                 'json' => $object,
-            ]));
+            ]);
 
             $body = json_decode($result->getBody()->getContents(), true);
 
@@ -202,23 +173,6 @@ abstract class AbstractRest extends AbstractEndpoint
         }
 
         return $data;
-    }
-
-    /**
-     * Get headers.
-     */
-    protected function getRequestOptions(array $options = []): array
-    {
-        if ($this->access_token) {
-            return array_merge($options, [
-                'headers' => [
-                    'Accept' => 'application/json',
-                    'Authorization' => "Bearer {$this->access_token}",
-                ],
-            ]);
-        }
-
-        return $options;
     }
 
     /**

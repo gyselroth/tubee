@@ -45,7 +45,6 @@ interface EndpointInterface extends ResourceInterface
         Json::KIND => Json::class,
         Xml::KIND => Xml::class,
         Mongodb::KIND => Mongodb::class,
-        Moodle::KIND => Moodle::class,
         Mysql::KIND => Mysql::class,
         Image::KIND => Image::class,
         Ucs::KIND => Ucs::class,

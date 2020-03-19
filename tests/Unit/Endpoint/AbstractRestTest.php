@@ -36,72 +36,73 @@ class AbstractRestTest extends TestCase
         $ep->setup();
     }
 
-    public function testSetupAuthOAuth2ClientCredentials()
-    {
-        $body = $this->createMock(StreamInterface::class);
-        $body->method('getContents')
-            ->willReturn(json_encode(['access_token' => 'foo']));
-
-        $response = $this->createMock(ResponseInterface::class);
-        $response->method('getBody')
-            ->willReturn($body);
-
-        $client = $this->createMock(Client::class);
-        $client->expects($this->at(0))->method('__call')
-            ->with(
-                $this->equalTo('post')
-            )->willReturn($response);
-
-        $client->expects($this->at(1))->method('__call')
-            ->with(
-                $this->equalTo('get')
-            )->willReturn($response);
-
-        $ep = $this->getMockForAbstractClass(AbstractRest::class, [
-            'foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-                'data' => [
-                    'resource' => [
-                        'auth' => 'oauth2',
-                        'oauth2' => [
-                            'token_endpoint' => 'foo',
-                            'client_id' => 'foo',
-                            'client_secret' => 'foo',
-                            'scope' => 'test',
+    /*
+        public function testSetupAuthOAuth2ClientCredentials()
+        {
+            $body = $this->createMock(StreamInterface::class);
+            $body->method('getContents')
+                ->willReturn(json_encode(['access_token' => 'foo']));
+    
+            $response = $this->createMock(ResponseInterface::class);
+            $response->method('getBody')
+                ->willReturn($body);
+    
+            $client = $this->createMock(Client::class);
+            $client->expects($this->at(0))->method('__call')
+                ->with(
+                    $this->equalTo('post')
+                )->willReturn($response);
+    
+            $client->expects($this->at(1))->method('__call')
+                ->with(
+                    $this->equalTo('get')
+                )->willReturn($response);
+    
+            $ep = $this->getMockForAbstractClass(AbstractRest::class, [
+                'foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+                    'data' => [
+                        'resource' => [
+                            'auth' => 'oauth2',
+                            'oauth2' => [
+                                'token_endpoint' => 'foo',
+                                'client_id' => 'foo',
+                                'client_secret' => 'foo',
+                                'scope' => 'test',
+                            ],
                         ],
                     ],
                 ],
-            ],
-        ]);
-
-        $ep->setup();
-    }
-
-    public function testSetupAuthOAuth2ClientCredentialsNoToken()
-    {
-        $this->expectException(RestException\AccessTokenNotAvailable::class);
-        $client = $this->getMockClient('post', [
-            'foo' => 'foo',
-        ]);
-
-        $ep = $this->getMockForAbstractClass(AbstractRest::class, [
-            'foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
-                'data' => [
-                    'resource' => [
-                        'auth' => 'oauth2',
-                        'oauth2' => [
-                            'token_endpoint' => 'foo',
-                            'client_id' => 'foo',
-                            'client_secret' => 'foo',
-                            'scope' => 'test',
+            ]);
+    
+            $ep->setup();
+        }
+    
+        public function testSetupAuthOAuth2ClientCredentialsNoToken()
+        {
+            $this->expectException(RestException\AccessTokenNotAvailable::class);
+            $client = $this->getMockClient('post', [
+                'foo' => 'foo',
+            ]);
+    
+            $ep = $this->getMockForAbstractClass(AbstractRest::class, [
+                'foo', EndpointInterface::TYPE_DESTINATION, $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+                    'data' => [
+                        'resource' => [
+                            'auth' => 'oauth2',
+                            'oauth2' => [
+                                'token_endpoint' => 'foo',
+                                'client_id' => 'foo',
+                                'client_secret' => 'foo',
+                                'scope' => 'test',
+                            ],
                         ],
                     ],
                 ],
-            ],
-        ]);
-
-        $ep->setup();
-    }
-
+            ]);
+    
+            $ep->setup();
+        }
+     */
     /*
         public function testGetDiffNoChange()
         {

@@ -1,3 +1,11 @@
+## 1.0.0-beta63
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Mar 19 13:31:21 CET 2020
+
+### Bugfixes
+* Long running processes with MicrosoftGraphEndpoint ends in multiple 401 errors #69
+
+
 ## 1.0.0-beta62
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Jan 31 08:14:21 CET 2020
@@ -14,8 +22,6 @@
 * Fixes delete DataObjectRelation uncaught exception Argument 1 passed to Tubee\DataObjectRelation\Factory::deleteOne() must be an instance of Tubee\DataObjectRelation\DataObjectRelationInterface
 
 
-## 1.0.0-beta59
-**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 ## 1.0.0-beta60
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jan 28 13:23:24 CET 2020
