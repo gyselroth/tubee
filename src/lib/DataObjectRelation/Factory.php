@@ -221,7 +221,7 @@ class Factory
     /**
      * Create or update realation.
      */
-    public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
+    public function createOrUpdate(DataObjectInterface $object_1, DataObjectInterface $object_2, array $identifiers = [], array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
         $relations = [
             [
@@ -252,14 +252,23 @@ class Factory
                         'object' => $relations[1]['data.relation.object'],
                     ],
                 ],
+                'identifiers' => $identifiers,
                 'context' => $context,
             ],
             'namespace' => $object_1->getCollection()->getResourceNamespace()->getName(),
         ];
 
-        $exists = $this->db->{self::COLLECTION_NAME}->findOne([
-            '$and' => $relations,
-        ]);
+        $query = [
+            '$and' => [
+                ['$and' => $relations],
+                ['$or' => [
+                    ['data.identifiers' => $identifiers],
+                    ['data.identifiers' => ['$exists' => false]],
+                ]],
+            ],
+        ];
+
+        $exists = $this->db->{self::COLLECTION_NAME}->findOne($query);
 
         if ($endpoints !== null) {
             $resource['endpoints'] = $endpoints;
@@ -268,6 +277,7 @@ class Factory
         if ($exists !== null) {
             $update = $exists['data'];
             $update['context'] = $context;
+            $update['identifiers'] = $identifiers;
 
             $data = [
                 'data' => $update,

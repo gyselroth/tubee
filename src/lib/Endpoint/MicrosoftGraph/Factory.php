@@ -11,11 +11,11 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint\MicrosoftGraph;
 
-use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\MicrosoftGraph;
+use Tubee\Endpoint\Rest\Factory as RestFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
@@ -25,24 +25,7 @@ class Factory
      */
     public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow_factory, LoggerInterface $logger): EndpointInterface
     {
-        $options = [
-            'base_uri' => $resource['data']['resource']['base_uri'],
-        ];
-
-        if (isset($resource['data']['resource']['auth']) && $resource['data']['resource']['auth'] === 'basic') {
-            $options['auth'] = [];
-
-            if (isset($resource['data']['resource']['basic']['username'])) {
-                $options['auth'][] = $resource['data']['resource']['basic']['username'];
-            }
-
-            if (isset($resource['data']['resource']['basic']['password'])) {
-                $options['auth'][] = $resource['data']['resource']['basic']['password'];
-            }
-        }
-
-        $options = array_merge($resource['data']['resource']['request_options'], $options);
-        $client = new Client($options);
+        $client = RestFactory::buildClient($resource, $logger);
 
         return new MicrosoftGraph($resource['name'], $resource['data']['type'], $client, $collection, $workflow_factory, $logger, $resource);
     }

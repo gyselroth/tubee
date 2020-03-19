@@ -9,8 +9,20 @@ services:
       - LDAP_ADMIN_PASSWORD=admin
     ports:
       - "3899:389"
+  tubee-db-metrics:
+    image: raffis/mongodb-query-exporter:latest
+    environment:
+      - MDBEXPORTER_CONFIG=/mnt/config.yaml
+      - MDBEXPORTER_MONGODB_URI=mongodb://mongodb3:27017
+      - MDBEXPORTER_LOG_LEVEL=debug
+    volumes:
+      -  ./config/mongodb-metrics:/mnt
+    ports:
+      - "9412:9412"
   mongodb-endpoint:
     image: mongo:3.6.0
+    ports:
+      - "27017:27017"
   mariadb-endpoint:
     image: mariadb
     environment:

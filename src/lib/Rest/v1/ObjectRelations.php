@@ -129,8 +129,9 @@ class ObjectRelations
      */
     public function delete(ServerRequestInterface $request, Identity $identity, string $namespace, string $relation): ResponseInterface
     {
-        $collection = $this->namespace_factory->getOne($namespace);
-        $this->relation_factory->deleteOne($namespace, $relation);
+        $namespace = $this->namespace_factory->getOne($namespace);
+        $relative = $this->relation_factory->getOne($namespace, $relation);
+        $this->relation_factory->deleteOne($relative);
 
         return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }

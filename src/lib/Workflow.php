@@ -11,9 +11,9 @@ declare(strict_types=1);
 
 namespace Tubee;
 
-use MongoDB\BSON\UTCDateTime;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use Tubee\Async\Sync;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\Endpoint\EndpointInterface;
@@ -184,12 +184,17 @@ class Workflow extends AbstractResource implements WorkflowInterface
     /**
      * Update object.
      */
-    protected function updateObject(DataObjectInterface $object, bool $simulate, UTCDateTime $ts, ?string $result, array $status): bool
+    protected function updateObject(DataObjectInterface $object, bool $simulate, Sync $process, ?string $result, array $status): bool
     {
-        $status['last_sync'] = $ts;
+        $status = array_merge([
+            'name' => $this->endpoint->getName(),
+            'last_sync' => $process->getTimestamp(),
+            'process' => $process->getId(),
+            'workflow' => $this->getName(),
+        ], $status);
 
         if ($status['success'] === true) {
-            $status['last_successful_sync'] = $ts;
+            $status['last_successful_sync'] = $process->getTimestamp();
         }
 
         if ($result !== null) {
@@ -207,11 +212,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
             ];
         }
 
-        $endpoints = [
-            $this->endpoint->getName() => $status,
-        ];
-
-        $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $endpoints);
+        $this->endpoint->getCollection()->changeObject($object, $object->toArray(), $simulate, $status);
 
         return true;
     }

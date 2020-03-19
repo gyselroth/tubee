@@ -65,7 +65,7 @@ class OdataRest extends AbstractRest
      */
     public function count(?array $query = null): int
     {
-        $options = $this->getRequestOptions();
+        $options = [];
         $query = $this->transformQuery($query);
 
         if ($query !== null) {
@@ -83,7 +83,7 @@ class OdataRest extends AbstractRest
      */
     public function getAll(?array $query = null): Generator
     {
-        $options = $this->getRequestOptions();
+        $options = [];
         $query = $this->transformQuery($query);
         $this->logGetAll($query);
 
@@ -110,7 +110,7 @@ class OdataRest extends AbstractRest
         $filter = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
-        $options = $this->getRequestOptions();
+        $options = [];
         $options['query']['$filter'] = $filter;
         $attributes[] = $this->identifier;
         $options['query']['$select'] = join(',', $attributes);

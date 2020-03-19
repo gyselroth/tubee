@@ -168,7 +168,7 @@ class Factory
 
             $op['$set']['changed'] = new UTCDateTime();
             $op += [
-                '$addToSet' => ['history' => array_intersect_key($resource->toArray(), array_flip(['data', 'version', 'changed', 'description']))],
+                '$addToSet' => ['history' => array_intersect_key($resource->toArray(), array_flip(['data', 'version', 'changed', 'description', 'endpoints']))],
                 '$inc' => ['version' => 1],
             ];
         }
@@ -179,8 +179,10 @@ class Factory
 
         $result = $collection->updateOne(['_id' => $resource->getId()], $op);
 
-        $this->logger->info('updated resource ['.$resource->getId().'] in ['.$collection->getCollectionName().']', [
+        $this->logger->info('updated [{modified}/{match}] resource ['.$resource->getId().'] in ['.$collection->getCollectionName().']', [
             'category' => get_class($this),
+            'match' => $result->getMatchedCount(),
+            'modified' => $result->getModifiedCount(),
         ]);
 
         return true;
@@ -200,6 +202,10 @@ class Factory
         }
 
         $result = $collection->deleteOne(['_id' => $id]);
+
+        $this->logger->info('removed resource ['.$id.'] in ['.$collection->getCollectionName().']', [
+            'category' => get_class($this),
+        ]);
 
         return true;
     }

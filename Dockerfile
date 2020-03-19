@@ -73,7 +73,6 @@ COPY src/.container.config.php /usr/share/tubee/src
 COPY src/cgi-bin/cli.php /usr/share/tubee/bin/console/tubeecli
 COPY src/httpdocs /usr/share/tubee/bin/httpdocs
 COPY config/config.yaml.dist /etc/tubee/
-COPY config/config.yaml.docker.dist /etc/tubee/config.docker.yaml
 RUN ln -s /usr/share/tubee/bin/console/tubeecli /usr/bin/tubeecli
 
 RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \

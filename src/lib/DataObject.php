@@ -75,6 +75,8 @@ class DataObject extends AbstractResource implements DataObjectInterface
                 foreach ($endpoints as &$endpoint) {
                     $endpoint['last_sync'] = $endpoint['last_sync']->toDateTime()->format('c');
                     $endpoint['last_successful_sync'] = isset($endpoint['last_successful_sync']) ? $endpoint['last_successful_sync']->toDateTime()->format('c') : null;
+                    $endpoint['last_garbage_sync'] = isset($endpoint['last_garbage_sync']) ? $endpoint['last_garbage_sync']->toDateTime()->format('c') : null;
+                    $endpoint['process'] = isset($endpoint['process']) ? (string) $endpoint['process'] : null;
                     $endpoint['success'] = isset($endpoint['success']) ? $endpoint['success'] : null;
                     $endpoint['garbage'] = isset($endpoint['garbage']) ? $endpoint['garbage'] : false;
                     $endpoint['result'] = isset($endpoint['result']) ? $endpoint['result'] : null;
@@ -131,9 +133,9 @@ class DataObject extends AbstractResource implements DataObjectInterface
     /**
      * Add or update relation.
      */
-    public function createOrUpdateRelation(DataObjectInterface $object, array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
+    public function createOrUpdateRelation(DataObjectInterface $object, array $identifiers = [], array $context = [], bool $simulate = false, ?array $endpoints = null): ObjectIdInterface
     {
-        return $this->relation_factory->createOrUpdate($this, $object, $context, $simulate, $endpoints);
+        return $this->relation_factory->createOrUpdate($this, $object, $identifiers, $context, $simulate, $endpoints);
     }
 
     /**
