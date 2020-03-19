@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "58116d62fd4baaf77ad789a89bd10be6",
+    "content-hash": "e44b8c857a59cb0b669d8baffc50be63",
     "packages": [
         {
             "name": "bramus/ansi-php",
