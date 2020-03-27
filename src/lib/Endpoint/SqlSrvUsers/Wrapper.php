@@ -109,16 +109,18 @@ class Wrapper
     /**
      * query.
      */
-    public function query(string $query): void
+    public function query(string $query, bool $simulate): void
     {
         $this->logger->debug('execute sqlsrv query ['.$query.']', [
             'category' => get_class($this)
         ]);
 
-        $result = sqlsrv_query($this->resource, $query);
+        if (!$simulate) {
+            $result = sqlsrv_query($this->resource, $query);
 
-        if (!$result) {
-            throw new Exception\InvalidQuery('failed to execute sqlsrv query with error '.sqlsrv_errors()[0]['message']);
+            if (!$result) {
+                throw new Exception\InvalidQuery('failed to execute sqlsrv query with error '.sqlsrv_errors()[0]['message']);
+            }
         }
     }
 
