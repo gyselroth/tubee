@@ -63,27 +63,37 @@ class SqlSrvUsers extends AbstractEndpoint
     public const ATTRUSERROLES = 'userRoles';
 
     /**
-     * Password.
-     */
-    public const ATTRPWD = 'password';
-
-    /**
      * Disabled.
      */
     public const ATTRDISABLED = 'disabled';
+
+    /**
+     * PrincipalType.
+     */
+    public const ATTRPRINCIPALTYPE = 'principalType';
+
+    /**
+     * PrincipalTypeSQL.
+     */
+    public const PRINCIPALTYPESQL = 'SQL_LOGIN';
+
+    /**
+     * PrincipalTypeWindows.
+     */
+    public const PRINCIPALTYPEWINDOWS = 'WINDOWS_USER';
 
     /**
      * UserQuery.
      */
     public const USERQUERY =
         'SELECT * FROM ('
-        . ' SELECT loginData.principal_id, loginData.name as loginName, loginData.is_disabled as disabled, userData.name as sqlName,'
+        . ' SELECT loginData.principal_id, loginData.type_desc AS principalType, loginData.name as loginName, loginData.is_disabled as disabled, userData.name as sqlName,'
         . ' STRING_AGG(roles.name,\', \') AS userRoles'
         . ' FROM master.sys.sql_logins as loginData'
         . ' LEFT JOIN sys.database_principals as userData ON loginData.sid = userData.sid'
         . ' LEFT JOIN sys.database_role_members as memberRole ON userData.principal_id = memberRole.member_principal_id'
         . ' LEFT JOIN sys.database_principals as roles ON roles.principal_id = memberRole.role_principal_id'
-        . ' GROUP BY loginData.principal_id, loginData.name, loginData.is_disabled, userData.name'
+        . ' GROUP BY loginData.principal_id, loginData.type_desc, loginData.name, loginData.is_disabled, userData.name'
         . ') AS data';
 
     /**
@@ -93,7 +103,6 @@ class SqlSrvUsers extends AbstractEndpoint
         self::ATTRLOGINNAME,
         self::ATTRSQLNAME,
         self::ATTRUSERROLES,
-        self::ATTRPWD,
         self::ATTRDISABLED
     ];
 
@@ -318,46 +327,45 @@ class SqlSrvUsers extends AbstractEndpoint
 
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
-//        self::ATTRLOGINNAME,
-//        self::ATTRUSERROLES,
-//        self::ATTRPWD,
-//        self::ATTRDISABLED
+        if ($diff === []) {
+            $this->logger->debug('object on endpoint is already up2date', [
+                'category' => get_class($this),
+            ]);
+
+            return null;
+        }
 
         $endpoint_object = $endpoint_object->getData();
-        $loginName       = $object['loginName'];
-        $sqlName         = $object['sqlName'];
+        $loginName       = $object[self::ATTRLOGINNAME] ?? null;
+        $sqlName         = $object[self::ATTRSQLNAME] ?? null;
 
         foreach ($diff as $key => $attr) {
             switch ($attr['attrib']) {
                 case self::ATTRSQLNAME:
-                    $sqlName = $this->sqlUser($simulate, (int)$attr['data']['action'], $loginName, $attr['data']['value'] ?? null, $endpoint_object[self::ATTRSQLNAME]);
+                    $sqlName = $this->changeSqlUser($simulate, (int)$attr['data']['action'], $loginName, $endpoint_object[self::ATTRSQLNAME] ?? null, $attr['data']['value'] ?? null);
                     break;
                 case self::ATTRLOGINNAME:
-                    // $loginName = 'newLoginName';
+                    $this->changeLoginName($simulate, (int)$attr['data']['action'], $endpoint_object[self::ATTRLOGINNAME], $endpoint_object[self::ATTRPRINCIPALTYPE], $attr['data']['value'] ?? null, $sqlName);
                     break;
                 case self::ATTRUSERROLES:
-                    $this->userRoles($simulate, $sqlName, (int)$attr['data']['action'], $attr['data']['value'] ?? [], $endpoint_object[self::ATTRUSERROLES] ?? []);
+                    $this->changeUserRoles($simulate, $sqlName, (int)$attr['data']['action'], $attr['data']['value'] ?? [], $endpoint_object[self::ATTRUSERROLES] ?? []);
+                    break;
+                case self::ATTRDISABLED:
+                    $value = (bool)$attr['data']['value'];
+
+                    if ($value === true) {
+                        $this->disableLogin($loginName, $simulate);
+                    } elseif ($value === false) {
+                        $this->enableLogin($loginName, $simulate);
+                    }
                     break;
                 default:
-                    $this->logger->error('abc' . print_r($attr['attrib'], true), [
+                    $this->logger->error('unknown attribute ' . print_r($attr['attrib'], true), [
                         'class' => get_class($this)
                     ]);
                     break;
             }
         }
-
-
-        throw new Exception\UnsupportedEndpointOperation('endpoint ' . get_class($this) . ' does not support change() yet');
-//        $values = array_values(array_intersect_key($object, $diff));
-//        list($filter, $fv) = $endpoint_object->getFilter();
-//        $values = array_merge($values, $fv);
-//
-//        $this->logChange($filter, $diff);
-//        $query = 'UPDATE '.$this->table.' SET '.implode(',', $diff).' WHERE '.$filter;
-//
-//        if ($simulate === false) {
-//            $this->socket->prepareValues($query, $values);
-//        }
 
         return null;
     }
@@ -391,29 +399,32 @@ class SqlSrvUsers extends AbstractEndpoint
         return $object;
     }
 
-    protected function sqlUser(bool $simulate, int $action, string $loginName, string $newName = null, string $objectName = null): string
+    protected function changeSqlUser(bool $simulate, int $action, ?string $loginName, ?string $objectName = null, ?string $newName = null): ?string
     {
+        if ($loginName === null) {
+            $this->logger->error('no ' . self::ATTRLOGINNAME . ' given while changing sql user', [
+                'class' => get_class($this)
+            ]);
+
+            return $objectName;
+        }
+
         switch ($action) {
             case AttributeMapInterface::ACTION_REPLACE:
                 if ($newName === null) {
-                    throw new NoUsername('no attribute ' . self::ATTRLOGINNAME . ' found in data object');
+                    throw new NoUsername('no attribute ' . self::ATTRSQLNAME . ' found in data object');
                 }
 
                 if ($objectName === null) {
                     $query = $this->createSqlUserQuery($newName, $loginName);
-                } elseif ($objectName !== $newName) {
-                    $query = $this->updateSqlUserQuery($objectName, $newName);
                 } else {
-                    $this->logger->info('sql user is already up2date', [
-                        'class' => get_class($this),
-                    ]);
-
-                    return $newName;
+                    $query = $this->renameSqlUserQuery($objectName, $newName);
                 }
+
                 break;
             case AttributeMapInterface::ACTION_REMOVE:
                 if ($objectName === null) {
-                    return '';
+                    return null;
                 }
                 $query = $this->dropSqlUserQuery($objectName);
                 break;
@@ -423,6 +434,7 @@ class SqlSrvUsers extends AbstractEndpoint
 
         try {
             $this->socket->query($query, $simulate);
+
             return $newName;
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to modify sql user with query ' . $query, [
@@ -430,12 +442,20 @@ class SqlSrvUsers extends AbstractEndpoint
                 'exception' => $e,
             ]);
 
-            return $newName;
+            return $objectName;
         }
     }
 
-    protected function userRoles(bool $simulate, string $name, int $action, array $newRoles, array $objectRoles): void
+    protected function changeUserRoles(bool $simulate, ?string $name, int $action, array $newRoles, array $objectRoles): void
     {
+        if ($name === null) {
+            $this->logger->error('no sql name is given while changing user roles', [
+                'class' => get_class($this)
+            ]);
+
+            return;
+        }
+
         switch ($action) {
             case AttributeMapInterface::ACTION_REPLACE:
                 $rolesToAdd = [];
@@ -460,6 +480,49 @@ class SqlSrvUsers extends AbstractEndpoint
                 break;
             default:
                 throw new InvalidArgumentException('unknown diff action ' . $action . ' given');
+        }
+    }
+
+    protected function changeLoginName(bool $simulate, int $action, string $objectName, string $type, ?string $newName = null, ?string $sqlUser = null): void
+    {
+        $dropLogin = false;
+
+        switch ($action) {
+            case AttributeMapInterface::ACTION_REPLACE:
+                if ($newName === null) {
+                    throw new NoUsername('no attribute ' . self::ATTRLOGINNAME . ' found in data object');
+                }
+
+                if ($type === self::PRINCIPALTYPESQL) {
+                    $query = $this->renameLoginQuery($objectName, $newName);
+                } elseif ($type === self::PRINCIPALTYPEWINDOWS) {
+                    // rename windows user
+                } else {
+                    throw new InvalidArgumentException('unknown principal type ' . $type . ' given');
+                }
+
+                break;
+            case AttributeMapInterface::ACTION_REMOVE:
+                if ($objectName === null) {
+                    return;
+                }
+                $query     = $this->dropLoginQuery($objectName);
+                $dropLogin = true;
+                break;
+            default:
+                throw new InvalidArgumentException('unknown diff action ' . $action . ' given');
+        }
+
+        try {
+            if ($dropLogin) {
+                $this->socket->query($this->dropSqlUserQuery($sqlUser), $simulate);
+            }
+            $this->socket->query($query, $simulate);
+        } catch (InvalidQuery $e) {
+            $this->logger->error('failed to modify login with query ' . $query, [
+                'class'     => get_class($this),
+                'exception' => $e,
+            ]);
         }
     }
 
@@ -502,26 +565,27 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     protected function createSqlUserQuery(string $name, string $loginName): string
     {
-        return 'CREATE USER ['.htmlentities($name, ENT_QUOTES).'] FOR LOGIN [' . htmlentities($loginName, ENT_QUOTES) . ']';
+        return 'CREATE USER [' . htmlentities($name, ENT_QUOTES) . '] FOR LOGIN [' . htmlentities($loginName, ENT_QUOTES) . ']';
     }
 
-    protected function updateSqlUserQuery(string $oldName, string $newName): string
+    protected function renameSqlUserQuery(string $oldName, string $newName): string
     {
-        return 'ALTER USER ['.htmlentities($oldName, ENT_QUOTES).'] WITH NAME = [' . htmlentities($newName, ENT_QUOTES) . ']';
+        return 'ALTER USER [' . htmlentities($oldName, ENT_QUOTES) . '] WITH NAME = [' . htmlentities($newName, ENT_QUOTES) . ']';
     }
 
     protected function dropSqlUserQuery(string $name): string
     {
-        return 'DROP USER [' .htmlentities($name, ENT_QUOTES).']';
+        return 'DROP USER [' . htmlentities($name, ENT_QUOTES) . ']';
     }
 
     /**
      * Add user to given role.
      */
-    protected function addRoles(string $name, array $roles, bool $simulate): bool {
+    protected function addRoles(string $name, array $roles, bool $simulate): bool
+    {
         foreach ($roles as $role) {
             try {
-                $query = 'EXEC sp_addrolemember '.htmlentities($role, ENT_QUOTES).', ['.htmlentities($name, ENT_QUOTES).']';
+                $query = 'EXEC sp_addrolemember ' . htmlentities($role, ENT_QUOTES) . ', [' . htmlentities($name, ENT_QUOTES) . ']';
 
                 $this->socket->query($query, $simulate);
             } catch (InvalidQuery $e) {
@@ -545,7 +609,7 @@ class SqlSrvUsers extends AbstractEndpoint
                     continue;
                 }
 
-                $query = 'EXEC sp_droprolemember '.htmlentities($role, ENT_QUOTES).', ['.htmlentities($name, ENT_QUOTES).']';
+                $query = 'EXEC sp_droprolemember ' . htmlentities($role, ENT_QUOTES) . ', [' . htmlentities($name, ENT_QUOTES) . ']';
 
                 $this->socket->query($query, $simulate);
             } catch (InvalidQuery $e) {
@@ -561,19 +625,41 @@ class SqlSrvUsers extends AbstractEndpoint
         return true;
     }
 
+    protected function dropLoginQuery(string $name): string
+    {
+        return 'DROP LOGIN [' . htmlentities($name, ENT_QUOTES) . ']';
+    }
+
+    protected function renameLoginQuery(string $oldName, string $newName): string
+    {
+        return 'ALTER LOGIN [' . htmlentities($oldName, ENT_QUOTES) . '] WITH NAME = [' . htmlentities($newName, ENT_QUOTES) . ']';
+    }
+
     /**
      * Disable login.
      */
-    protected function disableLogin(string $name, bool $simulate): void
+    protected function disableLogin(?string $name, bool $simulate): void
     {
+        if ($name === null) {
+            $this->logger->error('no login name is given while disable login', [
+                'class' => get_class($this)
+            ]);
+        }
+
         $this->socket->query('ALTER LOGIN ['.htmlentities($name, ENT_QUOTES).'] DISABLE', $simulate);
     }
 
     /**
      * Enable login.
      */
-    protected function enableLogin(string $name, bool $simulate): void
+    protected function enableLogin(?string $name, bool $simulate): void
     {
+        if ($name === null) {
+            $this->logger->error('no login name is given while enable login', [
+                'class' => get_class($this)
+            ]);
+        }
+
         $this->socket->query('ALTER LOGIN ['.$name.'] ENABLE', $simulate);
     }
 
