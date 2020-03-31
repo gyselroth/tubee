@@ -1,4 +1,5 @@
 ## 1.0.0-beta64
+<<<<<<< HEAD
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed Apr 08 03:39:21 CEST 2020
 
