@@ -91,7 +91,15 @@ class Wrapper
      */
     public function initialize(): Wrapper
     {
+        $this->logger->debug('connect to sql server ['.$this->host.'] and use table ['.$this->dbname.']', [
+            'category' => get_class($this),
+        ]);
+
         $this->resource = sqlsrv_connect($this->host.', '.$this->port, ['Database' => $this->dbname ?? '', 'UID' => $this->username ?? '', 'PWD' => $this->passwd ?? '']);
+
+        if ($this->resource === false) {
+            throw new Exception\InvalidQuery('failed to connect to sql server ['.$this->host.'] with error '.sqlsrv_errors()[0]['message']);
+        }
 
         return $this;
     }

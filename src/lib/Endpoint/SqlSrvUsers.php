@@ -40,7 +40,7 @@ class SqlSrvUsers extends AbstractEndpoint
     /**
      * LoginTable.
      */
-    public const LOGINTABLE = 'master.sys.sql_logins';
+    public const LOGINTABLE = 'master.sys.server_principals';
 
     /**
      * LoginName.
@@ -80,7 +80,7 @@ class SqlSrvUsers extends AbstractEndpoint
     /**
      * PrincipalTypeWindows.
      */
-    public const PRINCIPALTYPEWINDOWS = 'WINDOWS_USER';
+    public const PRINCIPALTYPEWINDOWS = 'WINDOWS_LOGIN';
 
     /**
      * UserQuery.
@@ -89,7 +89,7 @@ class SqlSrvUsers extends AbstractEndpoint
         'SELECT * FROM ('
         . ' SELECT loginData.principal_id, loginData.type_desc AS principalType, loginData.name as loginName, loginData.is_disabled as disabled, userData.name as sqlName,'
         . ' STRING_AGG(roles.name,\', \') AS userRoles'
-        . ' FROM master.sys.sql_logins as loginData'
+        . ' FROM '.self::LOGINTABLE.' as loginData'
         . ' LEFT JOIN sys.database_principals as userData ON loginData.sid = userData.sid'
         . ' LEFT JOIN sys.database_role_members as memberRole ON userData.principal_id = memberRole.member_principal_id'
         . ' LEFT JOIN sys.database_principals as roles ON roles.principal_id = memberRole.role_principal_id'
@@ -235,7 +235,7 @@ class SqlSrvUsers extends AbstractEndpoint
 
         try {
             if (isset($object['mechanism']) && $object['mechanism'] === 'windows') {
-                $query = $this->createWindowsLogin($loginName, $object['domain'] ?? '');
+                $query = $this->createWindowsLogin($loginName);
             } else {
                 $query = $this->createLocalLogin($loginName, $object['password'], $object[self::ATTRHASTOCHANGEPWD] ?? true);
             }
@@ -283,7 +283,30 @@ class SqlSrvUsers extends AbstractEndpoint
 
     public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
-        throw new Exception\UnsupportedEndpointOperation('endpoint ' . get_class($this) . ' does not support delete() yet');
+        $sqlUserQuery = '';
+        $endpoint_object = $endpoint_object->getData();
+
+        if (isset($endpoint_object[self::ATTRSQLNAME])) {
+            $sqlUserQuery = $this->dropSqlUserQuery($endpoint_object[self::ATTRSQLNAME]);
+        }
+
+        $loginQuery = $this->dropLoginQuery($endpoint_object[self::ATTRLOGINNAME]);
+
+        try {
+            if ($sqlUserQuery !== '') {
+                $this->socket->query($sqlUserQuery, $simulate);
+            }
+            $this->socket->query($loginQuery, $simulate);
+
+            return true;
+        } catch (InvalidQuery $e) {
+            $this->logger->error('failed to delete object with query', [
+                'class'     => get_class($this),
+                'exception' => $e,
+            ]);
+
+            return false;
+        }
     }
 
     public function getDiff(AttributeMapInterface $map, array $diff): array
@@ -541,9 +564,9 @@ class SqlSrvUsers extends AbstractEndpoint
     /**
      * Create windows login query.
      */
-    protected function createWindowsLogin(string $name, string $domain): string
+    protected function createWindowsLogin(string $name): string
     {
-        return "CREATE LOGIN [" . htmlentities($domain, ENT_QUOTES) . "\\" . htmlentities($name, ENT_QUOTES) . "] FROM WINDOWS";
+        return "CREATE LOGIN [" . htmlentities($name, ENT_QUOTES) . "] FROM WINDOWS";
     }
 
     /**
@@ -641,7 +664,7 @@ class SqlSrvUsers extends AbstractEndpoint
     protected function disableLogin(?string $name, bool $simulate): void
     {
         if ($name === null) {
-            $this->logger->error('no login name is given while disable login', [
+            $this->logger->error('no login name is given while disabling login', [
                 'class' => get_class($this)
             ]);
         }
@@ -655,7 +678,7 @@ class SqlSrvUsers extends AbstractEndpoint
     protected function enableLogin(?string $name, bool $simulate): void
     {
         if ($name === null) {
-            $this->logger->error('no login name is given while enable login', [
+            $this->logger->error('no login name is given while enabling login', [
                 'class' => get_class($this)
             ]);
         }
