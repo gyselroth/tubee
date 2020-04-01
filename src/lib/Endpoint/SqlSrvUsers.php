@@ -70,25 +70,16 @@ class SqlSrvUsers extends AbstractEndpoint
     /**
      * PrincipalType.
      */
-    public const ATTRPRINCIPALTYPE = 'principalType';
-
-    /**
-     * PrincipalTypeSQL.
-     */
-    public const PRINCIPALTYPESQL = 'SQL_LOGIN';
-
-    /**
-     * PrincipalTypeWindows.
-     */
-    public const PRINCIPALTYPEWINDOWS = 'WINDOWS_LOGIN';
+    public const ATTRPRINCIPALTYPE = 'type_desc';
 
     /**
      * UserQuery.
      */
     public const USERQUERY =
         'SELECT * FROM ('
-        . ' SELECT loginData.principal_id, loginData.type_desc AS principalType, loginData.name as loginName, loginData.is_disabled as disabled, userData.name as sqlName,'
-        . ' STRING_AGG(roles.name,\', \') AS userRoles'
+        . ' SELECT loginData.principal_id, loginData.type_desc AS '.self::ATTRPRINCIPALTYPE.', loginData.name as '.self::ATTRLOGINNAME.','
+        . 'loginData.is_disabled as '.self::ATTRDISABLED.', userData.name as '.self::ATTRSQLNAME.','
+        . ' STRING_AGG(roles.name,\', \') AS '.self::ATTRUSERROLES
         . ' FROM '.self::LOGINTABLE.' as loginData'
         . ' LEFT JOIN sys.database_principals as userData ON loginData.sid = userData.sid'
         . ' LEFT JOIN sys.database_role_members as memberRole ON userData.principal_id = memberRole.member_principal_id'
@@ -151,7 +142,7 @@ class SqlSrvUsers extends AbstractEndpoint
         try {
             $result = $this->socket->prepareValues($sql, $values);
 
-            return (int)$this->socket->getQueryResult($result)['count'];
+            return (int)$this->socket->getQueryResult($result)[0]['count'];
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to count number of objects from endpoint', [
                 'class'     => get_class($this),
@@ -516,13 +507,7 @@ class SqlSrvUsers extends AbstractEndpoint
                     throw new NoUsername('no attribute ' . self::ATTRLOGINNAME . ' found in data object');
                 }
 
-                if ($type === self::PRINCIPALTYPESQL) {
-                    $query = $this->renameLoginQuery($objectName, $newName);
-                } elseif ($type === self::PRINCIPALTYPEWINDOWS) {
-                    // rename windows user
-                } else {
-                    throw new InvalidArgumentException('unknown principal type ' . $type . ' given');
-                }
+                $query = $this->renameLoginQuery($objectName, $newName);
 
                 break;
             case AttributeMapInterface::ACTION_REMOVE:
