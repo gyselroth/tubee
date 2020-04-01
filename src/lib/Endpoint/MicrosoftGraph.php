@@ -82,7 +82,7 @@ class MicrosoftGraph extends OdataRest
      */
     public function getAll(?array $query = null): Generator
     {
-        $options = $this->getRequestOptions();
+        $options = [];
         $query = $this->transformQuery($query);
         $this->logGetAll($query);
 
@@ -174,9 +174,9 @@ class MicrosoftGraph extends OdataRest
             $this->logChange($uri, $diff);
 
             if (count($diff) !== 0 && $simulate === false) {
-                $this->client->patch($uri, $this->getRequestOptions([
+                $this->client->patch($uri, [
                     'json' => $diff,
-                ]));
+                ]);
             }
         } else {
             $request = [];
@@ -208,7 +208,7 @@ class MicrosoftGraph extends OdataRest
         $filter = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
-        $options = $this->getRequestOptions();
+        $options = [];
         $options['query']['$filter'] = $filter;
         $attributes[] = $this->identifier;
         $options['query']['$select'] = join(',', $attributes);
@@ -336,9 +336,9 @@ class MicrosoftGraph extends OdataRest
             ]);
 
             if ($simulate === false) {
-                $response = $this->client->post(self::BATCH_ENDPOINT, $this->getRequestOptions([
+                $response = $this->client->post(self::BATCH_ENDPOINT, [
                     'json' => $chunk,
-                ]));
+                ]);
 
                 $results = array_merge($results, $this->validateBatchResponse($response, $throw));
             }
@@ -401,7 +401,6 @@ class MicrosoftGraph extends OdataRest
             ],
         ];
 
-        $options = $this->getRequestOptions();
         $this->logger->debug('fetch group members from batch request [{requests}]', [
             'class' => get_class($this),
             'requests' => $requests,
@@ -427,8 +426,7 @@ class MicrosoftGraph extends OdataRest
                     $id = $response['id'];
                     $response = $response['body'];
                     while (isset($response['@odata.nextLink'])) {
-                        $options = $this->getRequestOptions();
-                        $response = $this->decodeResponse($this->client->get($response['@odata.nextLink'], $options));
+                        $response = $this->decodeResponse($this->client->get($response['@odata.nextLink']));
                         $set[$id] = array_merge($set[$id], array_column($response[$this->container], 'id'));
                     }
 

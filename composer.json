@@ -26,6 +26,7 @@
             "url": "https://github.com/raffis/smb"
         }
     ],
+    "minimum-stability": "dev",
     "require": {
         "php": ">=7.2",
         "psr/log": "^1.0.0",
@@ -39,7 +40,7 @@
         "mongodb/mongodb": "1.4.*",
         "ulrichsg/getopt-php": "^3.0",
         "zendframework/zend-mail": "2.9.*",
-        "gyselroth/mongodb-php-task-scheduler": "^3.2.2",
+        "gyselroth/mongodb-php-task-scheduler": "^4.0.0-alpha2",
         "hassankhan/config": "^2.0.0",
         "symfony/yaml": "~3.1",
         "monolog/monolog": "^2.0.0-beta1",
@@ -86,7 +87,7 @@
     },
     "require-dev": {
         "phpv8/v8js-stubs": "^1.4.1",
-        "friendsofphp/php-cs-fixer": "*",
+        "friendsofphp/php-cs-fixer": "^2.16.1",
         "phpunit/phpunit": "^5.7.0",
         "phpstan/phpstan": "^0.11.19"
     }

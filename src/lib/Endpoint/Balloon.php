@@ -60,7 +60,7 @@ class Balloon extends AbstractRest
     {
         $query = $this->transformQuery($query);
 
-        $options = $this->getRequestOptions();
+        $options = [];
         $options['query'] = [
             'query' => $query,
         ];
@@ -78,7 +78,7 @@ class Balloon extends AbstractRest
         $query = $this->transformQuery($query);
         $this->logGetAll($query);
 
-        $options = $this->getRequestOptions();
+        $options = [];
         $options['query'] = [
             'query' => $query,
         ];
@@ -102,7 +102,7 @@ class Balloon extends AbstractRest
         $filter = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
-        $options = $this->getRequestOptions();
+        $options = [];
         $options['query'] = [
             'query' => stripslashes($filter),
         ];

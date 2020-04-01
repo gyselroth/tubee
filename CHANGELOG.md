@@ -1,3 +1,11 @@
+## 1.0.0-beta64
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Mar 19 13:31:21 CET 2020
+
+### Bugfixes
+* Do not throw Exception if root dir is not readable during LocalFileSystem storage initialization
+
+
 ## 1.0.0-beta62
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Fri Jan 31 08:14:21 CET 2020
@@ -14,8 +22,53 @@
 * Fixes delete DataObjectRelation uncaught exception Argument 1 passed to Tubee\DataObjectRelation\Factory::deleteOne() must be an instance of Tubee\DataObjectRelation\DataObjectRelationInterface
 
 
+## 1.0.0-beta60
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jan 28 13:23:24 CET 2020
+
+### Changes
+* Fixes identifier matching in relation attributes (workflow)
+
+
 ## 1.0.0-beta59
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Mon Jan 27 15:25:24 CET 2020
+
+### Changes
+* Introduction of Workflow attribute map map.identifiers to uniquely match a relation and update only that one
+
+
+## 1.0.0-beta58
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jan 21 14:10:22 CET 2020
+
+### Bugfixes
+* MongoDB\Driver\Exception\BulkWriteException: Cannot create field 'eco-relation-csv' in element {endpoints: []}
+
+## 1.0.0-beta63
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Thu Mar 19 13:31:21 CET 2020
+
+### Bugfixes
+* Long running processes with MicrosoftGraphEndpoint ends in multiple 401 errors #69
+
+
+## 1.0.0-beta62
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Fri Jan 31 08:14:21 CET 2020
+
+### Bugfixes
+* Fixed workflow updates to manually added DataObjects MongoDB\Driver\Exception\BulkWriteException: Cannot create field 'ep-name' in element {endpoints: null} 
+
+
+## 1.0.0-beta61
+**Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
+**Date**: Tue Jan 28 14:43:24 CET 2020
+
+### Bugfixes
+* Fixes delete DataObjectRelation uncaught exception Argument 1 passed to Tubee\DataObjectRelation\Factory::deleteOne() must be an instance of Tubee\DataObjectRelation\DataObjectRelationInterface
+
+
 ## 1.0.0-beta60
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Tue Jan 28 13:23:24 CET 2020

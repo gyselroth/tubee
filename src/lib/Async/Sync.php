@@ -304,10 +304,7 @@ class Sync extends AbstractJob
         $i = 0;
 
         foreach ($collection->getObjects($filter) as $id => $object) {
-            if ($total !== 0) {
-                $this->updateProgress($i / $total * 100);
-            }
-
+            $this->updateProgress(($total === 0) ? 0 : $i / $total * 100);
             ++$i;
             $this->logger->debug('process ['.$i.'] export for object ['.(string) $id.'] - [{fields}] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
@@ -423,10 +420,7 @@ class Sync extends AbstractJob
             $total = $ep->count($filter);
 
             foreach ($ep->getAll($filter) as $id => $object) {
-                if ($total !== 0) {
-                    $this->updateProgress($i / $total * 100);
-                }
-
+                $this->updateProgress(($total === 0) ? 0 : $i / $total * 100);
                 ++$i;
                 $this->logger->debug('process object ['.$i.'] import for object ['.$object->getId().'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
