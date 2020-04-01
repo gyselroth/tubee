@@ -29,18 +29,6 @@ services:
       - MYSQL_DATABASE=admin
       - MYSQL_ROOT_PASSWORD=admin
       - MYSQL_USER=admin
-  moodle-endpoint:
-    image: jhardison/moodle:latest
-    links:
-      - moodle-db
-    environment:
-      - MOODLE_URL=http://localhost:8080
-  moodle-db:
-    image: mysql:latest
-    environment:
-      - MYSQL_DATABASE=moodle
-      - MYSQL_ROOT_PASSWORD=moodle
-      - MYSQL_USER=moodle
   balloon:
     image: gyselroth/balloon:2.3.3
     links:
