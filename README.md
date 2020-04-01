@@ -5,7 +5,6 @@
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/gyselroth/tubee/badges/quality-score.png)](https://scrutinizer-ci.com/g/gyselroth/tubee)
 [![Code Coverage](https://scrutinizer-ci.com/g/gyselroth/tubee/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/tubee/?branch=master)
 [![GitHub release](https://img.shields.io/github/release/gyselroth/tubee.svg)](https://github.com/gyselroth/tubee/releases)
-[ ![Download](https://api.bintray.com/packages/gyselroth/tubee/tubee/images/download.svg)](https://bintray.com/gyselroth/tubee/tubee/_latestVersion) 
 
 tubee is a data management engine with proxy capabilities for other services and its core feature is the possibility to synchronize data between multiple services (endpoints) such as databases, ldap server, file formats, web applications and more. Everything can be fully automated using tubee. You may specify different synchronization workflows and defined custom attribute mappings. Create scripted attributes, conditions, synchronization jobs and more. tubee can be used to automatically synchronize your objecs between multiple endpoints. This can be everything in its nature, for example synchronize user accounts from an XML file to Active Directory and MongoDB. Do whatever you have to do.
 
