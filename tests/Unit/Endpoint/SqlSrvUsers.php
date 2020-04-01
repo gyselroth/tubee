@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Endpoint\SqlSrvUsers\Wrapper;
 use Tubee\Endpoint\SqlSrvUsers;
+use Tubee\Endpoint\SqlSrvUsers\Wrapper;
 use Tubee\Endpoint\SqlSrvUsers\Wrapper as SqlSrvWrapper;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -50,10 +50,11 @@ class SqlSrvUsersTest extends TestCase
         $efilter = '(foo= ? AND foobar= ?) AND (bar= ? AND barf= ?)';
         $evalues = ['bar', 'foobar', 'foo', 'barf'];
 
-        [$filter, $values] = $sqlSrvUsers->transformQuery($query);
+        list($filter, $values) = $sqlSrvUsers->transformQuery($query);
         $this->assertSame($efilter, $filter);
         $this->assertSame($evalues, $values);
     }
+
 //
 //    public function testTransformIsNull()
 //    {

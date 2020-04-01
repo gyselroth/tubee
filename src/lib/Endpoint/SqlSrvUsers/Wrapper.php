@@ -11,9 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint\SqlSrvUsers;
 
-use PHPStan\Type\ResourceType;
 use Psr\Log\LoggerInterface;
-use Tubee\Endpoint\EndpointInterface;
 
 class Wrapper
 {
@@ -104,9 +102,6 @@ class Wrapper
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function close(bool $simulate = false): Wrapper
     {
         sqlsrv_close($this->resource);
@@ -120,7 +115,7 @@ class Wrapper
     public function query(string $query, bool $simulate): void
     {
         $this->logger->debug('execute sqlsrv query ['.$query.']', [
-            'category' => get_class($this)
+            'category' => get_class($this),
         ]);
 
         if (!$simulate) {
@@ -159,7 +154,7 @@ class Wrapper
     {
         $return = [];
 
-        while($row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
+        while ($row = sqlsrv_fetch_array($query, SQLSRV_FETCH_ASSOC)) {
             $return[] = $row;
         }
 
