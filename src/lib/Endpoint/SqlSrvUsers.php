@@ -65,7 +65,7 @@ class SqlSrvUsers extends AbstractEndpoint
     /**
      * PrincipalType.
      */
-    public const ATTRPRINCIPALTYPE = 'type_desc';
+    public const ATTRPRINCIPALTYPE = 'typeDesc';
 
     /**
      * UserQuery.
