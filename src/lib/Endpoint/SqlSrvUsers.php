@@ -134,9 +134,9 @@ class SqlSrvUsers extends AbstractEndpoint
         list($filter, $values) = $this->transformQuery($query);
 
         if ($filter === null) {
-            $sql = 'SELECT COUNT(*) as count FROM (' . self::USERQUERY . ')';
+            $sql = 'SELECT COUNT(*) as count FROM ('.self::USERQUERY.')';
         } else {
-            $sql = 'SELECT COUNT(*) as count FROM (' . self::USERQUERY.' WHERE '.$filter.') AS count';
+            $sql = 'SELECT COUNT(*) as count FROM ('.self::USERQUERY.' WHERE '.$filter.') AS count';
         }
 
         try {
