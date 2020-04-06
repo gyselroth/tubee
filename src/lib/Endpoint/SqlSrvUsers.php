@@ -134,15 +134,15 @@ class SqlSrvUsers extends AbstractEndpoint
         list($filter, $values) = $this->transformQuery($query);
 
         if ($filter === null) {
-            $sql = self::USERQUERY;
+            $sql = 'SELECT COUNT(*) as count FROM (' . self::USERQUERY . ')';
         } else {
-            $sql = self::USERQUERY.' WHERE '.$filter;
+            $sql = 'SELECT COUNT(*) as count FROM (' . self::USERQUERY.' WHERE '.$filter.') AS count';
         }
 
         try {
             $result = $this->socket->prepareValues($sql, $values);
 
-            return (int) count($this->socket->getQueryResult($result));
+            return (int) $this->socket->getQueryResult($result)[0]['count'];
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to count number of objects from endpoint', [
                 'class' => get_class($this),
