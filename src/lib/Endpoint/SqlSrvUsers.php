@@ -374,8 +374,9 @@ class SqlSrvUsers extends AbstractEndpoint
 
                     break;
                 default:
-                    $this->logger->error('unknown attribute '.print_r($attr['attrib'], true), [
+                    $this->logger->error('unknown attribute [{attr}]', [
                         'class' => get_class($this),
+                        'attr' => $attr['attrib'],
                     ]);
 
                     break;
@@ -419,8 +420,9 @@ class SqlSrvUsers extends AbstractEndpoint
     protected function changeSqlUser(bool $simulate, int $action, ?string $login_name, ?string $object_name = null, ?string $new_name = null): ?string
     {
         if ($login_name === null) {
-            $this->logger->error('no '.self::ATTRLOGINNAME.' given while changing sql user', [
+            $this->logger->error('no [{attr}] given while changing sql user', [
                 'class' => get_class($this),
+                'attr' => self::ATTRLOGINNAME,
             ]);
 
             return $object_name;
@@ -455,9 +457,10 @@ class SqlSrvUsers extends AbstractEndpoint
 
             return $new_name;
         } catch (InvalidQuery $e) {
-            $this->logger->error('failed to modify sql user with query '.$query, [
+            $this->logger->error('failed to modify sql user with query [{attr}]', [
                 'class' => get_class($this),
                 'exception' => $e,
+                'attr' => $query,
             ]);
 
             return $object_name;
@@ -533,9 +536,10 @@ class SqlSrvUsers extends AbstractEndpoint
             }
             $this->socket->query($query, $simulate);
         } catch (InvalidQuery $e) {
-            $this->logger->error('failed to modify login with query '.$query, [
+            $this->logger->error('failed to modify login with query [{attr}]', [
                 'class' => get_class($this),
                 'exception' => $e,
+                'attr' => $query,
             ]);
         }
     }
