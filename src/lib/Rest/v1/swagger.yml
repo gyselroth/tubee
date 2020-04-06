@@ -3682,6 +3682,7 @@ definitions:
               - BalloonEndpoint
               - OdataRestEndpoint
               - UcsEndpoint
+              - SqlSrvUsersEndpoint
           data:
             type: "object"
             properties:

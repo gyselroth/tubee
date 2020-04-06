@@ -131,18 +131,18 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function count(?array $query = null): int
     {
-        list($filter, $values) = $this->transformQuery($query);
+        [$filter, $values] = $this->transformQuery($query);
 
         if ($filter === null) {
-            $sql = 'SELECT COUNT(*) as count FROM '.self::LOGINTABLE;
+            $sql = self::USERQUERY;
         } else {
-            $sql = 'SELECT COUNT(*) as count FROM '.self::LOGINTABLE.' WHERE '.$filter;
+            $sql = self::USERQUERY.' WHERE '.$filter;
         }
 
         try {
             $result = $this->socket->prepareValues($sql, $values);
 
-            return (int) $this->socket->getQueryResult($result)[0]['count'];
+            return (int) count($this->socket->getQueryResult($result));
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to count number of objects from endpoint', [
                 'class' => get_class($this),
@@ -158,7 +158,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getAll(?array $query = null): Generator
     {
-        list($filter, $values) = $this->transformQuery($query);
+        [$filter, $values] = $this->transformQuery($query);
         $this->logGetAll($filter);
 
         if ($filter === null) {
@@ -194,7 +194,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        list($filter, $values) = $query = $this->transformQuery($this->getFilterOne($object));
+        [$filter, $values] = $query = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
         $sql = self::USERQUERY.' WHERE '.$filter;
@@ -220,14 +220,15 @@ class SqlSrvUsers extends AbstractEndpoint
         $this->logCreate($object);
         $login_name = $this->getNameByAttribute($object, self::ATTRLOGINNAME);
 
-        if ($simulate === true) {
-            return null;
-        }
-
         try {
+            $this->socket->beginTransaction();
             if (isset($object['mechanism']) && $object['mechanism'] === 'windows') {
                 $query = $this->createWindowsLogin($login_name);
             } else {
+                if (!isset($object['password']) || $object['password'] === '') {
+                    throw new AttributeNotResolvable('attribute password not found in object');
+                }
+
                 $query = $this->createLocalLogin($login_name, $object['password'], $object[self::ATTRHASTOCHANGEPWD] ?? true);
             }
 
@@ -236,8 +237,6 @@ class SqlSrvUsers extends AbstractEndpoint
             if (isset($object['disabled']) && $object['disabled'] === true) {
                 $this->disableLogin($login_name, $simulate);
             }
-
-            $principal_id = $this->getPrincipalId($login_name);
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to create new login user', [
                 'class' => get_class($this),
@@ -269,13 +268,16 @@ class SqlSrvUsers extends AbstractEndpoint
             ]);
         }
 
-        return (string) $principal_id;
+        $this->socket->commit();
+
+        return (string) $this->getPrincipalId($login_name);
     }
 
     public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
         $sql_user_query  = '';
         $endpoint_object = $endpoint_object->getData();
+        $this->socket->beginTransaction();
 
         if (isset($endpoint_object[self::ATTRSQLNAME])) {
             $sql_user_query = $this->dropSqlUserQuery($endpoint_object[self::ATTRSQLNAME]);
@@ -288,6 +290,7 @@ class SqlSrvUsers extends AbstractEndpoint
                 $this->socket->query($sql_user_query, $simulate);
             }
             $this->socket->query($login_query, $simulate);
+            $this->socket->commit();
 
             return true;
         } catch (InvalidQuery $e) {
@@ -341,17 +344,10 @@ class SqlSrvUsers extends AbstractEndpoint
 
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
-        if ($diff === []) {
-            $this->logger->debug('object on endpoint is already up2date', [
-                'category' => get_class($this),
-            ]);
-
-            return null;
-        }
-
         $endpoint_object = $endpoint_object->getData();
         $login_name = $object[self::ATTRLOGINNAME] ?? null;
         $sql_name = $object[self::ATTRSQLNAME] ?? null;
+        $this->socket->beginTransaction();
 
         foreach ($diff as $key => $attr) {
             switch ($attr['attrib']) {
@@ -386,6 +382,7 @@ class SqlSrvUsers extends AbstractEndpoint
             }
         }
 
+        $this->socket->commit();
         return null;
     }
 
@@ -679,12 +676,17 @@ class SqlSrvUsers extends AbstractEndpoint
         $this->socket->query('ALTER LOGIN ['.$name.'] ENABLE', $simulate);
     }
 
-    protected function getPrincipalId(string $name)
+    protected function getPrincipalId(string $name): int
     {
         $query = 'SELECT principal_id FROM '.self::LOGINTABLE.' WHERE name = ?';
         $result = $this->socket->prepareValues($query, [htmlentities($name, ENT_QUOTES)]);
         $result = $this->socket->getQueryResult($result)[0];
 
-        return $result['principal_id'];
+        if (is_int($result['principal_id'])) {
+            return $result['principal_id'];
+        }
+
+        throw new Exception\AttributeNotResolvable('could not resolve principal_id of object with name '.$name);
+
     }
 }
