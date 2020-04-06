@@ -22,38 +22,38 @@ use Tubee\Workflow\Factory as WorkflowFactory;
 
 class SqlSrvUsersTest extends TestCase
 {
-    public function testSetupDefaultSettings()
-    {
-        $wrapper = $this->createMock(SqlSrvWrapper::class);
-        $sqlSrvUsers = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $wrapper, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
-        $sqlSrvUsers->setup();
-    }
-
-    public function testShutdown()
-    {
-        $wrapper = $this->createMock(SqlSrvWrapper::class);
-        $sqlSrvUsers = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $wrapper, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
-        $sqlSrvUsers->shutdown();
-    }
-
-    public function testTransformAndQuery()
-    {
-        $sqlSrvUsers = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $this->createMock(Wrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
-
-        $query = [
-            '$and' => [
-                ['foo' => 'bar', 'foobar' => 'foobar'],
-                ['bar' => 'foo', 'barf' => 'barf'],
-            ],
-        ];
-
-        $efilter = '(foo= ? AND foobar= ?) AND (bar= ? AND barf= ?)';
-        $evalues = ['bar', 'foobar', 'foo', 'barf'];
-
-        list($filter, $values) = $sqlSrvUsers->transformQuery($query);
-        $this->assertSame($efilter, $filter);
-        $this->assertSame($evalues, $values);
-    }
+//    public function testSetupDefaultSettings()
+//    {
+//        $wrapper = $this->createMock(SqlSrvWrapper::class);
+//        $sqlSrvUsers = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $wrapper, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+//        $sqlSrvUsers->setup();
+//    }
+//
+//    public function testShutdown()
+//    {
+//        $wrapper = $this->createMock(SqlSrvWrapper::class);
+//        $sqlSrvUsers = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $wrapper, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+//        $sqlSrvUsers->shutdown();
+//    }
+//
+//    public function testTransformAndQuery()
+//    {
+//        $sqlSrvUsers = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, 'foobar', $this->createMock(Wrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+//
+//        $query = [
+//            '$and' => [
+//                ['foo' => 'bar', 'foobar' => 'foobar'],
+//                ['bar' => 'foo', 'barf' => 'barf'],
+//            ],
+//        ];
+//
+//        $efilter = '(foo= ? AND foobar= ?) AND (bar= ? AND barf= ?)';
+//        $evalues = ['bar', 'foobar', 'foo', 'barf'];
+//
+//        list($filter, $values) = $sqlSrvUsers->transformQuery($query);
+//        $this->assertSame($efilter, $filter);
+//        $this->assertSame($evalues, $values);
+//    }
 
 //
 //    public function testTransformIsNull()
