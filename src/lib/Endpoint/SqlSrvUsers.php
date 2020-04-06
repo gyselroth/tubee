@@ -226,7 +226,7 @@ class SqlSrvUsers extends AbstractEndpoint
                 $query = $this->createWindowsLogin($login_name);
             } else {
                 if (!isset($object['password']) || $object['password'] === '') {
-                    throw new AttributeNotResolvable('attribute password not found in object');
+                    throw new Exception\AttributeNotResolvable('attribute password not found in object');
                 }
 
                 $query = $this->createLocalLogin($login_name, $object['password'], $object[self::ATTRHASTOCHANGEPWD] ?? true);
