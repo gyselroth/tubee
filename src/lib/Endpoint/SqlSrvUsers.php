@@ -131,7 +131,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function count(?array $query = null): int
     {
-        [$filter, $values] = $this->transformQuery($query);
+        list($filter, $values) = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = self::USERQUERY;
@@ -158,7 +158,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getAll(?array $query = null): Generator
     {
-        [$filter, $values] = $this->transformQuery($query);
+        list($filter, $values) = $this->transformQuery($query);
         $this->logGetAll($filter);
 
         if ($filter === null) {
@@ -194,7 +194,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        [$filter, $values] = $query = $this->transformQuery($this->getFilterOne($object));
+        list($filter, $values) = $query = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
         $sql = self::USERQUERY.' WHERE '.$filter;
@@ -275,7 +275,7 @@ class SqlSrvUsers extends AbstractEndpoint
 
     public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
-        $sql_user_query  = '';
+        $sql_user_query = '';
         $endpoint_object = $endpoint_object->getData();
         $this->socket->beginTransaction();
 
@@ -383,6 +383,7 @@ class SqlSrvUsers extends AbstractEndpoint
         }
 
         $this->socket->commit();
+
         return null;
     }
 
@@ -687,6 +688,5 @@ class SqlSrvUsers extends AbstractEndpoint
         }
 
         throw new Exception\AttributeNotResolvable('could not resolve principal_id of object with name '.$name);
-
     }
 }

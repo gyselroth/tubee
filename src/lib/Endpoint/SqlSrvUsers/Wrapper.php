@@ -76,12 +76,12 @@ class Wrapper
      */
     public function __construct(string $host, LoggerInterface $logger, string $dbname = null, ?string $username = null, ?string $passwd = null, int $port = 1433)
     {
-        $this->logger   = $logger;
-        $this->host     = $host;
+        $this->logger = $logger;
+        $this->host = $host;
         $this->username = $username;
-        $this->passwd   = $passwd;
-        $this->dbname   = $dbname;
-        $this->port     = $port;
+        $this->passwd = $passwd;
+        $this->dbname = $dbname;
+        $this->port = $port;
     }
 
     /**
@@ -89,14 +89,14 @@ class Wrapper
      */
     public function initialize(): Wrapper
     {
-        $this->logger->debug('connect to sql server [' . $this->host . '] and use table [' . $this->dbname . ']', [
+        $this->logger->debug('connect to sql server ['.$this->host.'] and use table ['.$this->dbname.']', [
             'category' => get_class($this),
         ]);
 
-        $this->resource = sqlsrv_connect($this->host . ', ' . $this->port, ['Database' => $this->dbname ?? '', 'UID' => $this->username ?? '', 'PWD' => $this->passwd ?? '']);
+        $this->resource = sqlsrv_connect($this->host.', '.$this->port, ['Database' => $this->dbname ?? '', 'UID' => $this->username ?? '', 'PWD' => $this->passwd ?? '']);
 
         if ($this->resource === false) {
-            throw new Exception\InvalidQuery('failed to connect to sql server [' . $this->host . '] with error ' . sqlsrv_errors()[0]['message']);
+            throw new Exception\InvalidQuery('failed to connect to sql server ['.$this->host.'] with error '.sqlsrv_errors()[0]['message']);
         }
 
         return $this;
@@ -116,7 +116,7 @@ class Wrapper
         ]);
 
         if (sqlsrv_begin_transaction($this->resource) === false) {
-            throw new Exception\InvalidQuery('failed to start transaction on host [' . $this->host . '] with error ' . sqlsrv_errors()[0]['message']);
+            throw new Exception\InvalidQuery('failed to start transaction on host ['.$this->host.'] with error '.sqlsrv_errors()[0]['message']);
         }
     }
 
