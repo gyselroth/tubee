@@ -665,12 +665,12 @@ class SqlSrvUsersTest extends TestCase
         ];
 
         $object = [
-            'sqlName' => 'sqlname'
+            'sqlName' => 'sqlname',
         ];
 
         $mock = $this->createMock(Wrapper::class);
-        $mock->expects($this->at(1))->method('query')->with('DROP USER [sqlname]');
-        $mock->expects($this->at(2))->method('query')->with('DROP LOGIN [foobar]');
+        $mock->expects($this->at(2))->method('query')->with('DROP USER [sqlname]');
+        $mock->expects($this->at(3))->method('query')->with('DROP LOGIN [foobar]');
 
         $ep_object = $this->createMock(EndpointObjectInterface::class);
         $ep_object->method('getData')->willReturn($ep_object_data);
@@ -735,6 +735,260 @@ class SqlSrvUsersTest extends TestCase
             'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
         ]);
         $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, [], $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeUserRolesAddOneRole()
+    {
+        $diff = [
+            [
+                'attrib' => 'userRoles',
+                'data' => [
+                    'action' => 0,
+                    'value' => [
+                        'foorole',
+                        'barrole',
+                    ]
+                ],
+            ],
+        ];
+
+        $ep_object_data = [
+            'userRoles' => ['foorole'],
+        ];
+
+        $object = [
+            'sqlName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->once())->method('query')->with('EXEC sp_addrolemember barrole, [foobar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeUserRolesAddTwoRole()
+    {
+        $diff = [
+            [
+                'attrib' => 'userRoles',
+                'data' => [
+                    'action' => 0,
+                    'value' => [
+                        'foorole',
+                        'barrole',
+                    ]
+                ],
+            ],
+        ];
+
+        $ep_object_data = [
+            'userRoles' => [],
+        ];
+
+        $object = [
+            'sqlName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->at(1))->method('query')->with('EXEC sp_addrolemember foorole, [foobar]');
+        $mock->expects($this->at(2))->method('query')->with('EXEC sp_addrolemember barrole, [foobar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeUserRolesAddTwoRemoveOneRole()
+    {
+        $diff = [
+            [
+                'attrib' => 'userRoles',
+                'data' => [
+                    'action' => 0,
+                    'value' => [
+                        'foorole',
+                        'barrole',
+                    ]
+                ],
+            ],
+        ];
+
+        $ep_object_data = [
+            'userRoles' => ['foobarrole'],
+        ];
+
+        $object = [
+            'sqlName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->at(1))->method('query')->with('EXEC sp_addrolemember foorole, [foobar]');
+        $mock->expects($this->at(2))->method('query')->with('EXEC sp_addrolemember barrole, [foobar]');
+        $mock->expects($this->at(3))->method('query')->with('EXEC sp_droprolemember foobarrole, [foobar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeUserRolesAddOneRemoveTwoRole()
+    {
+        $diff = [
+            [
+                'attrib' => 'userRoles',
+                'data' => [
+                    'action' => 0,
+                    'value' => [
+                        'foorole',
+                    ]
+                ],
+            ],
+        ];
+
+        $ep_object_data = [
+            'userRoles' => [
+                'foobarrole',
+                'barrole',
+            ],
+        ];
+
+        $object = [
+            'sqlName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->at(1))->method('query')->with('EXEC sp_addrolemember foorole, [foobar]');
+        $mock->expects($this->at(2))->method('query')->with('EXEC sp_droprolemember foobarrole, [foobar]');
+        $mock->expects($this->at(3))->method('query')->with('EXEC sp_droprolemember barrole, [foobar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeUserRolesRemoveOne()
+    {
+        $diff = [
+            [
+                'attrib' => 'userRoles',
+                'data' => [
+                    'action' => 1,
+                ],
+            ],
+        ];
+
+        $ep_object_data = [
+            'userRoles' => [
+                'foorole',
+            ],
+        ];
+
+        $object = [
+            'sqlName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->once())->method('query')->with('EXEC sp_droprolemember foorole, [foobar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeUserRolesRemoveTwo()
+    {
+        $diff = [
+            [
+                'attrib' => 'userRoles',
+                'data' => [
+                    'action' => 1,
+                ],
+            ],
+        ];
+
+        $ep_object_data = [
+            'userRoles' => [
+                'foorole',
+                'barrole',
+            ],
+        ];
+
+        $object = [
+            'sqlName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->at(1))->method('query')->with('EXEC sp_droprolemember foorole, [foobar]');
+        $mock->expects($this->at(2))->method('query')->with('EXEC sp_droprolemember barrole, [foobar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeUserRolesUnknownDiff()
+    {
+        $diff = [
+            [
+                'attrib' => 'userRoles',
+                'data' => [
+                    'action' => 3,
+                ],
+            ],
+        ];
+
+        $object = [
+            'sqlName' => 'foobar',
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn([]);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Wrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
 
         $this->assertEquals(null, $result);
     }
