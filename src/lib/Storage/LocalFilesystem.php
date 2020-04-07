@@ -37,6 +37,10 @@ class LocalFilesystem implements StorageInterface
     {
         $this->root = $root;
         $this->logger = $logger;
+
+        if (!is_readable($root) || !is_dir($root)) {
+            throw new Exception\RootDirectoryNotFound('given root directory '.$root.' is not readable');
+        }
     }
 
     /**
