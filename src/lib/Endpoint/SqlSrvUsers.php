@@ -519,9 +519,6 @@ class SqlSrvUsers extends AbstractEndpoint
 
                 break;
             case AttributeMapInterface::ACTION_REMOVE:
-                if ($object_name === null) {
-                    return;
-                }
                 $query = $this->dropLoginQuery($object_name);
                 $drop_login = true;
 
@@ -531,10 +528,12 @@ class SqlSrvUsers extends AbstractEndpoint
         }
 
         try {
-            if ($drop_login) {
+            $this->socket->beginTransaction();
+            if ($drop_login && $sql_user !== null) {
                 $this->socket->query($this->dropSqlUserQuery($sql_user), $simulate);
             }
             $this->socket->query($query, $simulate);
+            $this->socket->commit();
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to modify login with query [{attr}]', [
                 'class' => get_class($this),
