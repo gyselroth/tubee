@@ -669,8 +669,8 @@ class SqlSrvUsersTest extends TestCase
         ];
 
         $mock = $this->createMock(Wrapper::class);
-        $mock->expects($this->at(2))->method('query')->with('DROP USER [sqlname]');
-        $mock->expects($this->at(3))->method('query')->with('DROP LOGIN [foobar]');
+        $mock->expects($this->at(1))->method('query')->with('DROP USER [sqlname]');
+        $mock->expects($this->at(2))->method('query')->with('DROP LOGIN [foobar]');
 
         $ep_object = $this->createMock(EndpointObjectInterface::class);
         $ep_object->method('getData')->willReturn($ep_object_data);
@@ -749,7 +749,7 @@ class SqlSrvUsersTest extends TestCase
                     'value' => [
                         'foorole',
                         'barrole',
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -786,7 +786,7 @@ class SqlSrvUsersTest extends TestCase
                     'value' => [
                         'foorole',
                         'barrole',
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -824,7 +824,7 @@ class SqlSrvUsersTest extends TestCase
                     'value' => [
                         'foorole',
                         'barrole',
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -862,7 +862,7 @@ class SqlSrvUsersTest extends TestCase
                     'action' => 0,
                     'value' => [
                         'foorole',
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -986,6 +986,64 @@ class SqlSrvUsersTest extends TestCase
         $ep_object->method('getData')->willReturn([]);
 
         $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Wrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeDisable()
+    {
+        $diff = [
+            [
+                'attrib' => 'disabled',
+                'data' => [
+                    'value' => true,
+                ],
+            ],
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->once())->method('query')->with('ALTER LOGIN [foobar] DISABLE');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn([]);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeEnable()
+    {
+        $diff = [
+            [
+                'attrib' => 'disabled',
+                'data' => [
+                    'value' => false,
+                ],
+            ],
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->once())->method('query')->with('ALTER LOGIN [foobar] ENABLE');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn([]);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
             'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
         ]);
         $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);

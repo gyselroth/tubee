@@ -528,12 +528,10 @@ class SqlSrvUsers extends AbstractEndpoint
         }
 
         try {
-            $this->socket->beginTransaction();
             if ($drop_login && $sql_user !== null) {
                 $this->socket->query($this->dropSqlUserQuery($sql_user), $simulate);
             }
             $this->socket->query($query, $simulate);
-            $this->socket->commit();
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to modify login with query [{attr}]', [
                 'class' => get_class($this),
