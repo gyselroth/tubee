@@ -19,6 +19,8 @@ use Tubee\Endpoint\EndpointInterface;
 use Tubee\Endpoint\Exception\AttributeNotResolvable as AttributeNotResolvable;
 use Tubee\Endpoint\SqlSrvUsers;
 use Tubee\Endpoint\SqlSrvUsers\Exception\InvalidQuery as InvalidQuery;
+use Tubee\Endpoint\SqlSrvUsers\Exception\NoUsername;
+use InvalidArgumentException;
 use Tubee\Endpoint\SqlSrvUsers\Wrapper;
 use Tubee\Endpoint\SqlSrvUsers\Wrapper as SqlSrvWrapper;
 use Tubee\EndpointObject\EndpointObjectInterface;
@@ -54,7 +56,7 @@ class SqlSrvUsersTest extends TestCase
         $efilter = '(foo= ? AND foobar= ?) AND (bar= ? AND barf= ?)';
         $evalues = ['bar', 'foobar', 'foo', 'barf'];
 
-        list($filter, $values) = $sqlSrvUsers->transformQuery($query);
+        [$filter, $values] = $sqlSrvUsers->transformQuery($query);
         $this->assertSame($efilter, $filter);
         $this->assertSame($evalues, $values);
     }
@@ -383,8 +385,8 @@ class SqlSrvUsersTest extends TestCase
             'loginName' => 'foobar',
             'sqlName' => 'bar',
             'foo' => 'bar',
-            'userRoles' => 'foobarroles',
             'disabled' => true,
+            'userRoles' => 'foobarroles',
         ];
 
         $ediff = [
@@ -400,4 +402,194 @@ class SqlSrvUsersTest extends TestCase
         $result = $ep->getDiff($this->createMock(AttributeMapInterface::class), $diff);
         $this->assertSame($ediff, $result);
     }
+
+    public function testChangeSqlUserMissingName()
+    {
+        $diff = [
+            [
+                'attrib' => 'sqlName',
+                'data' => [
+                    'action' => 0,
+                    'value' => null
+                ]
+            ]
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $ep_object_data = [
+            'sqlName' => 'foobar',
+        ];
+
+        $this->expectException(NoUsername::class);
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Wrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeCreateSqlUser()
+    {
+        $ep_object_data = [
+            'sqlName' => null,
+        ];
+
+        $diff = [
+            [
+                'attrib' => 'sqlName',
+                'data' => [
+                    'action' => 0,
+                    'value' => 'bar'
+                ]
+            ]
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->once())->method('query')->with('CREATE USER [bar] FOR LOGIN [foobar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeSqlUser()
+    {
+        $ep_object_data = [
+            'sqlName' => 'foo',
+        ];
+
+        $diff = [
+            [
+                'attrib' => 'sqlName',
+                'data' => [
+                    'action' => 0,
+                    'value' => 'bar'
+                ]
+            ]
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->once())->method('query')->with('ALTER USER [foo] WITH NAME = [bar]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeDropSqlUser()
+    {
+        $ep_object_data = [
+            'sqlName' => 'foo',
+        ];
+
+        $diff = [
+            [
+                'attrib' => 'sqlName',
+                'data' => [
+                    'action' => 1,
+                    'value' => 'bar',
+                ]
+            ]
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $mock = $this->createMock(Wrapper::class);
+        $mock->expects($this->once())->method('query')->with('DROP USER [foo]');
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($ep_object_data);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $mock, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeDropSqlUserMissingObject()
+    {
+        $diff = [
+            [
+                'attrib' => 'sqlName',
+                'data' => [
+                    'action' => 1,
+                ]
+            ]
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn([]);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Wrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+    public function testChangeSqlUserUnknownDiff()
+    {
+        $diff = [
+            [
+                'attrib' => 'sqlName',
+                'data' => [
+                    'action' => 3,
+                ]
+            ]
+        ];
+
+        $object = [
+            'loginName' => 'foobar',
+        ];
+
+        $this->expectException(InvalidArgumentException::class);
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn([]);
+
+        $ep = new SqlSrvUsers('foo', EndpointInterface::TYPE_DESTINATION, $this->createMock(Wrapper::class), $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => '{"uid":"foo"}']],
+        ]);
+        $result = $ep->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+
+        $this->assertEquals(null, $result);
+    }
+
+
 }
