@@ -3682,6 +3682,7 @@ definitions:
               - BalloonEndpoint
               - OdataRestEndpoint
               - UcsEndpoint
+              - SqlSrvUsersEndpoint
           data:
             type: "object"
             properties:
@@ -3817,6 +3818,47 @@ definitions:
                   options:
                     description: "More ldap specific settings (http://php.net/manual/en/function.ldap-set-option.php)."
                     type: object
+  core.v1.SqlSrvUsersEndpoint:
+    description: "MSSQL User endpoint"
+    allOf:
+      - $ref: '#/definitions/core.v1.Endpoint'
+      - type: object
+        properties:
+          kind:
+            description: "The type of endpoint. Always SqlSrvUsersEndpoint."
+            type: "string"
+            default: "SqlSrvUsersEndpoint"
+          data:
+            properties:
+              resource:
+                description: "Holds the relevant options of how to connect to the endpoint."
+                type: "object"
+                properties:
+                  host:
+                    description: "MSSQL Server."
+                    type: string
+                  username:
+                    description: "Username if required."
+                    type: string
+                  password:
+                    description: "Password if required."
+                    type: string
+                  dbname:
+                    description: "Database."
+                    type: string
+                  port:
+                    description: "Specifies the port number to attempt to connect to the MSSQL server."
+                    type: integer
+                options:
+                  type: object
+                  default:
+                    identifier: principal_id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: principal_id
+                      description: Endpoint resource identifier.
+                      type: string
   core.v1.OdataRestEndpoint:
     description: "OData REST API endpoint (Compatible with Microsoft graph (Office365 and more) and other OData compatible api's)"
     allOf:

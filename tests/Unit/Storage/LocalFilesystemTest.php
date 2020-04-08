@@ -27,12 +27,6 @@ class LocalFilesystemTest extends TestCase
         $this->storage = new LocalFilesystem(__DIR__.'/Mock', $this->createMock(LoggerInterface::class));
     }
 
-    public function testRootNotFound()
-    {
-        $this->expectException(Exception\RootDirectoryNotFound::class);
-        new LocalFilesystem(__DIR__.'/foo', $this->createMock(LoggerInterface::class));
-    }
-
     public function testOpenReadStreams()
     {
         $streams = $this->storage->openReadStreams('*');

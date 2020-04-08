@@ -11,3 +11,4 @@ data
 .phpstan.lock
 .phpunit.lock
 .php_cs.cache
+.idea

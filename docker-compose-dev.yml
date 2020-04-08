@@ -9,8 +9,15 @@ services:
       - LDAP_ADMIN_PASSWORD=admin
     ports:
       - "3899:389"
+  sql-srv-endpoint:
+    image: mcr.microsoft.com/mssql/server
+    environment:
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
+    ports:
+      - "5434:1433"
   tubee-db-metrics:
-    image: raffis/mongodb-query-exporter:latest
+    image: raffis/mongodb-query-exporter:1.0.0-beta2
     environment:
       - MDBEXPORTER_CONFIG=/mnt/config.yaml
       - MDBEXPORTER_MONGODB_URI=mongodb://mongodb3:27017
@@ -29,6 +36,18 @@ services:
       - MYSQL_DATABASE=admin
       - MYSQL_ROOT_PASSWORD=admin
       - MYSQL_USER=admin
+  moodle-endpoint:
+    image: jhardison/moodle:latest
+    links:
+      - moodle-db
+    environment:
+      - MOODLE_URL=http://localhost:8080
+  moodle-db:
+    image: mysql:latest
+    environment:
+      - MYSQL_DATABASE=moodle
+      - MYSQL_ROOT_PASSWORD=moodle
+      - MYSQL_USER=moodle
   balloon:
     image: gyselroth/balloon:2.3.3
     links:
@@ -62,7 +81,7 @@ services:
   tubee-dev:
     image: gyselroth/tubee:latest-dev
     ports:
-      - "8095:8095"
+      - "8095:80"
       - "8090:443"
     entrypoint: sh -c "make -C /srv/www/tubee deps; php /srv/www/tubee/src/cgi-bin/cli.php upgrade -i; service nginx start && php-fpm"
     volumes:
