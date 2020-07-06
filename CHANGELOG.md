@@ -1,3 +1,10 @@
+## 1.0.0-beta65
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon Jul 06 12:00:00 CEST 2020
+
+### Bugfixes
+* Fixed json to move ucs objects
+
 ## 1.0.0-beta64
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed Apr 08 03:39:21 CEST 2020

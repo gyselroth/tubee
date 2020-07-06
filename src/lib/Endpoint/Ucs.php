@@ -440,9 +440,13 @@ class Ucs extends AbstractEndpoint
             $this->parse($this->client->post($url, $this->getRequestOptions([
                 'json' => [
                     'options' => [
-                        'container' => $container,
+                        [
+                            'options' => [
+                                'container' => $container,
+                            ],
+                            'object' => $current_dn,
+                        ],
                     ],
-                    'object' => $current_dn,
                 ],
             ])));
         }
