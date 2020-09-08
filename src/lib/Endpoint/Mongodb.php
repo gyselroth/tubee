@@ -89,7 +89,7 @@ class Mongodb extends AbstractEndpoint
                 ];
         }
 
-        return null;
+        return [];
     }
 
     /**
@@ -101,8 +101,8 @@ class Mongodb extends AbstractEndpoint
         $this->logGetAll($filter);
 
         $i = 0;
-        foreach ($this->pool->find($this->transformQuery($query)) as $data) {
-            yield $this->build($data);
+        foreach ($this->pool->find($filter) as $data) {
+            yield $this->build(json_decode(json_encode($data), true));
             ++$i;
         }
 

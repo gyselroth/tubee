@@ -1,3 +1,10 @@
+## 1.0.0-beta66
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Sep 08 15:15:00 CEST 2020
+
+### Bugfixes
+* Fixed 'Cannot unpack array' error when creating a MongodbEndpoint source-ep
+
 ## 1.0.0-beta65
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Mon Jul 06 12:00:00 CEST 2020

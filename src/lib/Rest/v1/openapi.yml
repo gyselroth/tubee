@@ -4910,9 +4910,14 @@ components:
             data:
               type: object
               required:
+              - database
               - collection
               - resource
               properties:
+                database:
+                  description: The name of the MongoDB database where the collection is located
+                    at.
+                  type: string
                 collection:
                   description: The name of the MongoDB collection where the data is located
                     at.

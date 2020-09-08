@@ -26,8 +26,8 @@ class Factory
     public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
         $options = $resource['data']['resource'];
-        $mongodb = new Client(...$options);
+        $mongodb = new Client($options['uri'], $options['uri_options'], $options['driver_options']);
 
-        return new MongodbEndpoint($resource['name'], $resource['data']['type'], $mongodb->selectCollection($resource['data']['collection']), $collection, $workflow, $logger, $resource);
+        return new MongodbEndpoint($resource['name'], $resource['data']['type'], $mongodb->selectCollection($resource['data']['database'], $resource['data']['collection']), $collection, $workflow, $logger, $resource);
     }
 }
