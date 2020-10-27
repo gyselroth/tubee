@@ -38,6 +38,16 @@ class SqlSrvUsers extends AbstractEndpoint
     public const LOGINTABLE = 'master.sys.server_principals';
 
     /**
+     * DefaultDatabase
+     */
+    public const DEFAULTDATABASE = 'master';
+
+    /**
+     * DefaultLanguage
+     */
+    public const DEFAULTLANGUAGE = 'us_english';
+
+    /**
      * LoginName.
      */
     public const ATTRLOGINNAME = 'loginName';
@@ -68,18 +78,30 @@ class SqlSrvUsers extends AbstractEndpoint
     public const ATTRPRINCIPALTYPE = 'typeDesc';
 
     /**
+     * Database.
+     */
+    public const ATTRDATABASE = 'defaultDatabase';
+
+    /**
+     * Language.
+     */
+    public const ATTRLANGUAGE = 'defaultLanguage';
+
+    /**
      * UserQuery.
      */
     public const USERQUERY =
         'SELECT * FROM ('
         .' SELECT loginData.principal_id, loginData.type_desc AS '.self::ATTRPRINCIPALTYPE.', loginData.name as '.self::ATTRLOGINNAME.','
         .'loginData.is_disabled as '.self::ATTRDISABLED.', userData.name as '.self::ATTRSQLNAME.','
-        .' STRING_AGG(roles.name,\', \') AS '.self::ATTRUSERROLES
+        .' STRING_AGG(roles.name,\', \') AS '.self::ATTRUSERROLES.', loginData.default_database_name as '.self::ATTRDATABASE
+        .', loginData.default_language_name AS '.self::ATTRLANGUAGE
         .' FROM '.self::LOGINTABLE.' as loginData'
         .' LEFT JOIN sys.database_principals as userData ON loginData.sid = userData.sid'
         .' LEFT JOIN sys.database_role_members as memberRole ON userData.principal_id = memberRole.member_principal_id'
         .' LEFT JOIN sys.database_principals as roles ON roles.principal_id = memberRole.role_principal_id'
-        .' GROUP BY loginData.principal_id, loginData.type_desc, loginData.name, loginData.is_disabled, userData.name'
+        .' GROUP BY loginData.principal_id, loginData.type_desc, loginData.name, loginData.is_disabled, userData.name,'
+        . 'loginData.default_database_name, loginData.default_language_name'
         .') AS data';
 
     /**
@@ -90,6 +112,8 @@ class SqlSrvUsers extends AbstractEndpoint
         self::ATTRSQLNAME,
         self::ATTRUSERROLES,
         self::ATTRDISABLED,
+        self::ATTRDATABASE,
+        self::ATTRLANGUAGE
     ];
 
     /**
@@ -131,7 +155,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function count(?array $query = null): int
     {
-        list($filter, $values) = $this->transformQuery($query);
+        [$filter, $values] = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = 'SELECT COUNT(*) as count FROM ('.self::USERQUERY.')';
@@ -158,7 +182,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getAll(?array $query = null): Generator
     {
-        list($filter, $values) = $this->transformQuery($query);
+        [$filter, $values] = $this->transformQuery($query);
         $this->logGetAll($filter);
 
         if ($filter === null) {
@@ -194,7 +218,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        list($filter, $values) = $query = $this->transformQuery($this->getFilterOne($object));
+        [$filter, $values] = $query = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
         $sql = self::USERQUERY.' WHERE '.$filter;
@@ -234,8 +258,16 @@ class SqlSrvUsers extends AbstractEndpoint
 
             $this->socket->query($query, $simulate);
 
-            if (isset($object['disabled']) && $object['disabled'] === true) {
+            if (isset($object['disabled']) && (bool)$object['disabled'] === true) {
                 $this->disableLogin($login_name, $simulate);
+            }
+
+            if (isset($object[self::ATTRDATABASE])) {
+                $this->setDatabase($login_name, $simulate, $object[self::ATTRDATABASE] ?? null);
+            }
+
+            if (isset($object[self::ATTRLANGUAGE])) {
+                $this->setLanguage($login_name, $simulate, $object[self::ATTRLANGUAGE] ?? null);
             }
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to create new login user', [
@@ -372,6 +404,12 @@ class SqlSrvUsers extends AbstractEndpoint
                         $this->enableLogin($login_name, $simulate);
                     }
 
+                    break;
+                case self::ATTRDATABASE:
+                    $this->setDatabase($login_name, $simulate, $attr['data']['value'] ?? null);
+                    break;
+                case self::ATTRLANGUAGE:
+                    $this->setLanguage($login_name, $simulate, $attr['data']['value'] ?? null);
                     break;
                 default:
                     $this->logger->error('unknown attribute [{attr}]', [
@@ -662,6 +700,42 @@ class SqlSrvUsers extends AbstractEndpoint
         }
 
         $this->socket->query('ALTER LOGIN ['.htmlentities($name, ENT_QUOTES).'] DISABLE', $simulate);
+    }
+
+    /**
+     * Set database
+     */
+    protected function setDatabase(?string $name, bool $simulate, ?string $database): void
+    {
+        if ($name === null) {
+            $this->logger->error('no login name is given while set default database', [
+                'class' => get_class($this),
+            ]);
+        }
+
+        if ($database === null) {
+            $database = self::DEFAULTDATABASE;
+        }
+
+        $this->socket->query('ALTER LOGIN ['.htmlentities($name, ENT_QUOTES).'] WITH DEFAULT_DATABASE = ['.htmlentities($database, ENT_QUOTES).']', $simulate);
+    }
+
+    /**
+     * Set language
+     */
+    protected function setLanguage(?string $name, bool $simulate, ?string $language): void
+    {
+        if ($name === null) {
+            $this->logger->error('no login name is given while set default language', [
+                'class' => get_class($this),
+            ]);
+        }
+
+        if ($language === null) {
+            $language = self::DEFAULTLANGUAGE;
+        }
+
+        $this->socket->query('ALTER LOGIN ['.htmlentities($name, ENT_QUOTES).'] WITH DEFAULT_LANGUAGE = ['.htmlentities($language, ENT_QUOTES).']', $simulate);
     }
 
     /**

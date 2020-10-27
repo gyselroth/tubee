@@ -1,3 +1,10 @@
+## 1.0.0-beta67
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Oct 27 09:00:00 CEST 2020
+
+### Features
+* SqlSrvUsersEndpoint: added option to set default database and default language 
+
 ## 1.0.0-beta66
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue Sep 08 15:15:00 CEST 2020
