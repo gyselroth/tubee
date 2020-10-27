@@ -38,12 +38,12 @@ class SqlSrvUsers extends AbstractEndpoint
     public const LOGINTABLE = 'master.sys.server_principals';
 
     /**
-     * DefaultDatabase
+     * DefaultDatabase.
      */
     public const DEFAULTDATABASE = 'master';
 
     /**
-     * DefaultLanguage
+     * DefaultLanguage.
      */
     public const DEFAULTLANGUAGE = 'us_english';
 
@@ -101,7 +101,7 @@ class SqlSrvUsers extends AbstractEndpoint
         .' LEFT JOIN sys.database_role_members as memberRole ON userData.principal_id = memberRole.member_principal_id'
         .' LEFT JOIN sys.database_principals as roles ON roles.principal_id = memberRole.role_principal_id'
         .' GROUP BY loginData.principal_id, loginData.type_desc, loginData.name, loginData.is_disabled, userData.name,'
-        . 'loginData.default_database_name, loginData.default_language_name'
+        .'loginData.default_database_name, loginData.default_language_name'
         .') AS data';
 
     /**
@@ -113,7 +113,7 @@ class SqlSrvUsers extends AbstractEndpoint
         self::ATTRUSERROLES,
         self::ATTRDISABLED,
         self::ATTRDATABASE,
-        self::ATTRLANGUAGE
+        self::ATTRLANGUAGE,
     ];
 
     /**
@@ -155,7 +155,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function count(?array $query = null): int
     {
-        [$filter, $values] = $this->transformQuery($query);
+        list($filter, $values) = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = 'SELECT COUNT(*) as count FROM ('.self::USERQUERY.')';
@@ -182,7 +182,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getAll(?array $query = null): Generator
     {
-        [$filter, $values] = $this->transformQuery($query);
+        list($filter, $values) = $this->transformQuery($query);
         $this->logGetAll($filter);
 
         if ($filter === null) {
@@ -218,7 +218,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        [$filter, $values] = $query = $this->transformQuery($this->getFilterOne($object));
+        list($filter, $values) = $query = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
         $sql = self::USERQUERY.' WHERE '.$filter;
@@ -258,7 +258,7 @@ class SqlSrvUsers extends AbstractEndpoint
 
             $this->socket->query($query, $simulate);
 
-            if (isset($object['disabled']) && (bool)$object['disabled'] === true) {
+            if (isset($object['disabled']) && (bool) $object['disabled'] === true) {
                 $this->disableLogin($login_name, $simulate);
             }
 
@@ -407,9 +407,11 @@ class SqlSrvUsers extends AbstractEndpoint
                     break;
                 case self::ATTRDATABASE:
                     $this->setDatabase($login_name, $simulate, $attr['data']['value'] ?? null);
+
                     break;
                 case self::ATTRLANGUAGE:
                     $this->setLanguage($login_name, $simulate, $attr['data']['value'] ?? null);
+
                     break;
                 default:
                     $this->logger->error('unknown attribute [{attr}]', [
@@ -703,7 +705,7 @@ class SqlSrvUsers extends AbstractEndpoint
     }
 
     /**
-     * Set database
+     * Set database.
      */
     protected function setDatabase(?string $name, bool $simulate, ?string $database): void
     {
@@ -721,7 +723,7 @@ class SqlSrvUsers extends AbstractEndpoint
     }
 
     /**
-     * Set language
+     * Set language.
      */
     protected function setLanguage(?string $name, bool $simulate, ?string $language): void
     {
