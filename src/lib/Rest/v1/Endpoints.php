@@ -126,7 +126,7 @@ class Endpoints
         $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
         $this->endpoint_factory->deleteOne($collection, $endpoint);
 
-        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+        return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
 
     /**

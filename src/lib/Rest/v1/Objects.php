@@ -187,7 +187,7 @@ class Objects
         $collection = $this->namespace_factory->getOne($namespace)->getCollection($collection);
         $this->object_factory->deleteOne($collection, $object);
 
-        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+        return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
 
     /**
