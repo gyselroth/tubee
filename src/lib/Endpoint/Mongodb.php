@@ -117,7 +117,7 @@ class Mongodb extends AbstractEndpoint
         $this->logCreate($object);
 
         if ($simulate === false) {
-            return (string) $this->pool->insertOne($object);
+            return (string) $this->pool->insertOne($object)->getInsertedId();
         }
 
         return null;
