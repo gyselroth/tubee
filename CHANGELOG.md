@@ -1,3 +1,10 @@
+## 1.0.0-beta68
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Feb 15 16:00:00 CEST 2021
+
+### Bugfixes
+* MongodbEndpoint: fixed type cast error 
+
 ## 1.0.0-beta67
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue Oct 27 10:10:00 CEST 2020

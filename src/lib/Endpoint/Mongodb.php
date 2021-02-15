@@ -65,7 +65,7 @@ class Mongodb extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
         }
 
-        return $this->build(array_shift($result), $filter);
+        return $this->build(json_decode(json_encode(array_shift($result)), true), $filter);
     }
 
     /**
