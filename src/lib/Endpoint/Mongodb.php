@@ -134,7 +134,7 @@ class Mongodb extends AbstractEndpoint
             $this->pool->updateOne($endpoint_object->getFilter(), $diff);
         }
 
-        return (string) $endpoint_object['_id'];
+        return (string) $endpoint_object->getId();
     }
 
     /**

@@ -104,6 +104,7 @@ class Mysql extends AbstractSqlDatabase
 
         while ($row = $result->fetch_assoc()) {
             yield $this->build($row);
+            ++$i;
         }
 
         return $i;

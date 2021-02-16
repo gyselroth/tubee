@@ -1,9 +1,10 @@
 ## 1.0.0-beta68
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Tue Feb 15 16:50:00 CEST 2021
+**Date**: Tue Feb 16 12:00:00 CEST 2021
 
 ### Bugfixes
-* MongodbEndpoint: return id of inserted object 
+* MongodbEndpoint: return id of inserted object
+* MongodbEndpoint: return id of changed object
 
 ## 1.0.0-beta67
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
