@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
   libzip-dev \
   libicu-dev \
   libsmbclient-dev \
-  apt-transport-https \
+  apt-transport-https=1.4.10 \
   libmagickwand-dev \
   unixodbc-dev \
   build-essential \
