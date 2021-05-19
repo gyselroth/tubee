@@ -4408,6 +4408,7 @@ components:
                 - OdataRestEndpoint
                 - UcsEndpoint
                 - MicrosoftGraphEndpoint
+                - SqlSrvUsersEndpoint
             namespace:
               description: The resource namespace
               type: string
@@ -4626,6 +4627,58 @@ components:
                         (http://php.net/manual/en/function.ldap-set-option.php).
                       type: object
                       default: {}
+    core.v1.SqlSrvUsersEndpoint:
+      description: MSSQL User endpoint
+      allOf:
+        - $ref: "#/components/schemas/core.v1.Endpoint"
+        - type: object
+          properties:
+            kind:
+              description: The type of endpoint. Always SqlSrvUsersEndpoint.
+              type: string
+              default: SqlSrvUsersEndpoint
+            data:
+              type: object
+              required:
+                - resource
+              properties:
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required:
+                    - host
+                  properties:
+                    host:
+                      description: MSSQL Server
+                      type: string
+                    username:
+                      description: Username if required.
+                      type: string
+                      nullable: true
+                      default: null
+                    password:
+                      description: Password if required.
+                      type: string
+                      nullable: true
+                      default: null
+                    dbname:
+                      description: Database.
+                      type: string
+                      nullable: false
+                    port:
+                      description: Specifies the port number to attempt to connect to the MSSQL server.
+                      type: integer
+                      default: 1433
+                options:
+                  type: object
+                  default:
+                    identifier: principal_id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: principal_id
+                      description: Endpoint resource identifier.
+                      type: string
     core.v1.MicrosoftGraphEndpoint:
       description: Microsoft graph API
       allOf:
@@ -4857,9 +4910,14 @@ components:
             data:
               type: object
               required:
+              - database
               - collection
               - resource
               properties:
+                database:
+                  description: The name of the MongoDB database where the collection is located
+                    at.
+                  type: string
                 collection:
                   description: The name of the MongoDB collection where the data is located
                     at.

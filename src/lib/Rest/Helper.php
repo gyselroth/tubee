@@ -76,9 +76,9 @@ class Helper
 
         $stream = new StreamIterator($cursor, function ($resource) use ($request, $options) {
             if ($this->tell() === 0) {
-                echo  '[';
+                echo '[';
             } else {
-                echo  ',';
+                echo ',';
             }
 
             echo json_encode($resource->decorate($request), $options);
@@ -90,9 +90,9 @@ class Helper
             flush();
         }, function (\Throwable $e) {
             if ($this->tell() === 0) {
-                echo  '[';
+                echo '[';
             } else {
-                echo  ',';
+                echo ',';
             }
 
             echo json_encode([
@@ -123,9 +123,9 @@ class Helper
 
         $stream = new StreamIterator($cursor, function ($event) use ($request, $options) {
             if ($this->tell() === 0) {
-                echo  '[';
+                echo '[';
             } else {
-                echo  ',';
+                echo ',';
             }
 
             echo json_encode([
@@ -140,9 +140,9 @@ class Helper
             flush();
         }, function (\Throwable $e) {
             if ($this->tell() === 0) {
-                echo  '[';
+                echo '[';
             } else {
-                echo  ',';
+                echo ',';
             }
 
             echo json_encode(['ADDED', [

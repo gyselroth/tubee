@@ -9,13 +9,12 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\Mongodb;
+namespace Tubee\Endpoint\SqlSrvUsers;
 
-use MongoDB\Client;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Endpoint\Mongodb as MongodbEndpoint;
+use Tubee\Endpoint\SqlSrvUsers as SqlSrvUsersEndpoint;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Factory
@@ -26,8 +25,8 @@ class Factory
     public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger): EndpointInterface
     {
         $options = $resource['data']['resource'];
-        $mongodb = new Client($options['uri'], $options['uri_options'], $options['driver_options']);
+        $wrapper = new Wrapper($options['host'], $logger, $options['dbname'], $options['username'], $options['password'], $options['port']);
 
-        return new MongodbEndpoint($resource['name'], $resource['data']['type'], $mongodb->selectCollection($resource['data']['database'], $resource['data']['collection']), $collection, $workflow, $logger, $resource);
+        return new SqlSrvUsersEndpoint($resource['name'], $resource['data']['type'], $wrapper, $collection, $workflow, $logger, $resource);
     }
 }

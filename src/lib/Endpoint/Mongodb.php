@@ -65,7 +65,7 @@ class Mongodb extends AbstractEndpoint
             throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
         }
 
-        return $this->build(array_shift($result), $filter);
+        return $this->build(json_decode(json_encode(array_shift($result)), true), $filter);
     }
 
     /**
@@ -89,7 +89,7 @@ class Mongodb extends AbstractEndpoint
                 ];
         }
 
-        return null;
+        return [];
     }
 
     /**
@@ -101,8 +101,8 @@ class Mongodb extends AbstractEndpoint
         $this->logGetAll($filter);
 
         $i = 0;
-        foreach ($this->pool->find($this->transformQuery($query)) as $data) {
-            yield $this->build($data);
+        foreach ($this->pool->find($filter) as $data) {
+            yield $this->build(json_decode(json_encode($data), true));
             ++$i;
         }
 
@@ -117,7 +117,7 @@ class Mongodb extends AbstractEndpoint
         $this->logCreate($object);
 
         if ($simulate === false) {
-            return (string) $this->pool->insertOne($object);
+            return (string) $this->pool->insertOne($object)->getInsertedId();
         }
 
         return null;
@@ -134,7 +134,7 @@ class Mongodb extends AbstractEndpoint
             $this->pool->updateOne($endpoint_object->getFilter(), $diff);
         }
 
-        return (string) $endpoint_object['_id'];
+        return (string) $endpoint_object->getId();
     }
 
     /**

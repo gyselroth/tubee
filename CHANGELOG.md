@@ -1,3 +1,40 @@
+## 1.0.0-beta68
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Feb 16 12:00:00 CEST 2021
+
+### Bugfixes
+* MongodbEndpoint: return id of inserted object
+* MongodbEndpoint: return id of changed object
+
+## 1.0.0-beta67
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Oct 27 10:10:00 CEST 2020
+
+### Features
+* SqlSrvUsersEndpoint: added option to set default database and default language 
+
+## 1.0.0-beta66
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Sep 08 15:15:00 CEST 2020
+
+### Bugfixes
+* Fixed 'Cannot unpack array' error when creating a MongodbEndpoint source-ep
+
+## 1.0.0-beta65
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon Jul 06 12:00:00 CEST 2020
+
+### Bugfixes
+* Fixed json to move ucs objects
+
+## 1.0.0-beta64
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Apr 08 03:39:21 CEST 2020
+
+### Features
+* Added endpoint MSSQLUsers to manager user base on a Microsoft SQL server
+
+
 ## 1.0.0-beta63
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Thu Mar 19 13:31:21 CET 2020

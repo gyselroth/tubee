@@ -49,6 +49,7 @@ interface EndpointInterface extends ResourceInterface
         Image::KIND => Image::class,
         Ucs::KIND => Ucs::class,
         MicrosoftGraph::KIND => MicrosoftGraph::class,
+        SqlSrvUsers::KIND => SqlSrvUsers::class,
     ];
 
     /**

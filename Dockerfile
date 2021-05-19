@@ -52,8 +52,8 @@ RUN pecl install mongodb \
     && pecl install apcu \
     && pecl install imagick \
     && pecl install smbclient \
-    && pecl install sqlsrv \
-    && pecl install pdo_sqlsrv \
+    && pecl install sqlsrv-5.8.1 \
+    && pecl install pdo_sqlsrv-5.8.1 \
     && docker-php-ext-enable mongodb apcu imagick smbclient pcntl sqlsrv pdo_sqlsrv mysqli
 
 RUN mkdir /etc/ssl/tubee \

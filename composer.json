@@ -82,7 +82,8 @@
         "ext-mysqli": "*",
         "ext-pdo": "*",
         "ext-imagick": "*",
-        "ext-xml": "*"
+        "ext-xml": "*",
+        "ext-sqlsrv":  "*"
     },
     "require-dev": {
         "phpv8/v8js-stubs": "^1.4.1",

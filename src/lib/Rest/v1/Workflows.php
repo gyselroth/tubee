@@ -119,7 +119,7 @@ class Workflows
         $endpoint = $namespace->getCollection($collection)->getEndpoint($endpoint);
         $this->workflow_factory->deleteOne($endpoint, $workflow);
 
-        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+        return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
 
     /**

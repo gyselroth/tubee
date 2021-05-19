@@ -133,7 +133,7 @@ class ObjectRelations
         $relative = $this->relation_factory->getOne($namespace, $relation);
         $this->relation_factory->deleteOne($relative);
 
-        return(new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
+        return (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT);
     }
 
     /**

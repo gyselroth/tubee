@@ -49,7 +49,7 @@ abstract class AbstractFile extends AbstractEndpoint
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, string $file, StorageInterface $storage, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, ?Iterable $resource = [])
+    public function __construct(string $name, string $type, string $file, StorageInterface $storage, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, ?iterable $resource = [])
     {
         $this->storage = $storage;
         $this->file = $file;

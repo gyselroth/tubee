@@ -131,7 +131,7 @@ class ExportWorkflow extends Workflow
             ]);
 
         if (isset($exists->getData()[$this->endpoint->getResourceIdentifier()])) {
-            return  $exists->getData()[$this->endpoint->getResourceIdentifier()];
+            return $exists->getData()[$this->endpoint->getResourceIdentifier()];
         }
 
         return null;
