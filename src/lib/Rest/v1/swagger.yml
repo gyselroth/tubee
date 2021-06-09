@@ -3578,6 +3578,13 @@ definitions:
                     description: "The number of secconds after the job should be executed again. The default is only run once."
                     type: "integer"
                     default: 0
+                  interval_reference:
+                    description: "You may specify if the interval refers to the start or the end of the previous job. The default is 'end' which means the interval refers to the end time of the previous job. When you define 'start' the interval refers to the start time of the previous job. The default is 'end'."
+                    type: "string"
+                    default: "end"
+                    enum:
+                      - start
+                      - end
                   retry:
                     description: "The number of times a failed job should be restarted. The default is never."
                     type: "integer"
