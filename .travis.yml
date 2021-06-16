@@ -11,8 +11,8 @@ cache:
 addons:
   apt:
     packages:
-    - ImageMagick-devel
     - imagemagick
+    - libmagickwand-dev
     - unixodbc-dev
 before_install:
 - echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
