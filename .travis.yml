@@ -11,8 +11,7 @@ cache:
 addons:
   apt:
     packages:
-    - libodbc1
-    - odbcinst
+    - ImageMagick-devel
     - imagemagick
     - unixodbc-dev
 before_install:
