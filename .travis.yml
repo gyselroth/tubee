@@ -46,7 +46,7 @@ after_deploy:
 - ! 'if [ "$TRAVIS_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
   -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
   token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
-  "https://api.travis-ci.org/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
+  "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 env:
   global:
     secure: lGrT8095L0RrzH7EuGAtc++qYG9CJlVAyj1mdaPAtOg34FmZkrEAgJ1RFtucj4FvtQhxFwQFbqnMIIhh7i0aHysaWVbYa5mnKxVdC5Z64KsQ8z/nwlm9o2uKUqbn18kjDui/aKLd5NLIpmkh56O+PrLgGAZHb2YwmPHosWjHcyN3yNKpXiwV+NRiLqWl6OhQ8Y47FUXX3o8WsJMMY+4MNvmuEtia5OE3l+1ioybYRobF3TYRiDIYSmBzafyAUK9NiUscbtR3eMuqual+pqRm/QN1ZKzgEWSsZ74DZHgRNsyX8/CI0UbCTwtiCazNEbQSVRQfOQOUyMlyJooZdYIZHFJs1PRoQDr+21JWye+I7s+PunLihJrQHfFy7HS9RgNyE2nGjVdYabo5kM7dUMmJ3RIJ6/v0GYW4LRmxbaIEzWfwD5T1d6kYUHV/i55/C853qpnk3vNryKvPyAiap37MeP+n/XmkmozuPnjr9J1plus4EGuxs9vcLJUaWL1zW1hrhO603LB4PFdxDfXErwH7cZoljcUcHcmPb3+VXHMfqdgUnf9A0iG0PK9IOvO2VJzZpz4wpx38lQ+qPG2yXN6Z6w8fuN3YFZiqepMCBbJCY/De7UDPtlsmwMftU2+mU4zUXH+Lro4lrv2QsJx5QCRVkAOqYadMiTX9o4Ff6Qpr0vY=

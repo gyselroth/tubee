@@ -1,6 +1,6 @@
 # tubee
 
-[![Build Status](https://travis-ci.org/gyselroth/tubee.svg)](https://travis-ci.org/gyselroth/tubee)
+[![Build Status](https://travis-ci.com/gyselroth/tubee.svg)](https://travis-ci.com/gyselroth/tubee)
  [![GitHub license](https://img.shields.io/badge/license-GPL3-blue.svg)](https://raw.githubusercontent.com/gyselroth/tubee/master/LICENSE)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/gyselroth/tubee/badges/quality-score.png)](https://scrutinizer-ci.com/g/gyselroth/tubee)
 [![Code Coverage](https://scrutinizer-ci.com/g/gyselroth/tubee/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/gyselroth/tubee/?branch=master)
