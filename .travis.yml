@@ -11,7 +11,8 @@ cache:
 addons:
   apt:
     packages:
-    - libmagickcore-6.q16-2-extra
+    - libodbc1
+    - odbcinst
     - imagemagick
     - unixodbc-dev
 before_install:
