@@ -12,8 +12,8 @@ jobs:
       - run:
           name: before_install
           command: |
-            sudo echo "extension = apcu.so" >> /usr/local/etc/php/php.ini
-            sudo echo "extension = mongodb.so" >> /usr/local/etc/php/php.ini
+            echo -e "extension = apcu.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
+            echo -e "extension = mongodb.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
             pecl install imagick
             pecl install sqlsrv-5.8.1
             export version=$CIRCLE_TAG
