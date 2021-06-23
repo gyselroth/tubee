@@ -25,7 +25,7 @@ jobs:
           keys:
             - composer-v1-{{ checksum "composer.lock" }}
             - composer-v1-
-      - run: composer install -n --prefer-dist
+      - run: composer update
       - save_cache:
           key: composer-v1-{{ checksum "composer.lock" }}
           paths:
