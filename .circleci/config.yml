@@ -8,10 +8,12 @@ jobs:
       - checkout
       - run:
           name: packages
-          command: sudo apt update && sudo apt install -y imagemagick unixodbc-dev libmagickwand-dev
+          command: sudo apt update && sudo apt install -y imagemagick unixodbc-dev libmagickwand-dev libldap2-dev
       - run:
           name: before_install
           command: |
+            sudo docker-php-ext-install ldap pcntl sysvmsg
+            sudo ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so
             sudo pecl install mongodb
             sudo pecl install apcu
             sudo pecl install imagick
@@ -25,11 +27,6 @@ jobs:
           keys:
             - composer-v1-{{ checksum "composer.lock" }}
             - composer-v1-
-      - run: composer update
-      - save_cache:
-          key: composer-v1-{{ checksum "composer.lock" }}
-          paths:
-            - vendor
       - run:
           name: script
           command: |
@@ -38,6 +35,10 @@ jobs:
       - run:
           name: before_deploy
           command: if [[ "$version" == *"-"* ]]; then export docker_tag=latest-unstable; else export docker_tag=latest; fi;
+     - save_cache:
+         key: composer-v1-{{ checksum "composer.lock" }}
+         paths:
+           - vendor
       - run:
           name: after_deploy
           command: |
