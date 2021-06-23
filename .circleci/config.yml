@@ -9,7 +9,7 @@ jobs:
       - run:
           name: packages
           command: |
-            - sudo apt-get update && apt-get install -y imagemagick unixodbc-dev
+            - sudo apt update && apt install -y imagemagick unixodbc-dev
       - run:
           name: before_install
           command: |
