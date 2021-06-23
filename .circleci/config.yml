@@ -12,10 +12,12 @@ jobs:
       - run:
           name: before_install
           command: |
+            sudo pecl install mongodb
+            sudo pecl install apcu
+            sudo pecl install imagick
+            sudo pecl install sqlsrv-5.8.1
             echo -e "extension = apcu.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
             echo -e "extension = mongodb.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            pecl install imagick
-            pecl install sqlsrv-5.8.1
             export version=$CIRCLE_TAG
             if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
             if [ "$version" == "" ]; then version=$CIRCLE_BUILD_NUM; fi;
