@@ -12,13 +12,13 @@ jobs:
       - run:
           name: before_install
           command: |
-            - echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-            - echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
-            - pecl install imagick
-            - pecl install sqlsrv-5.8.1
-            - export version=$CIRCLE_TAG
-            - if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
-            - if [ "$version" == "" ]; then version=$CIRCLE_BUILD_NUM; fi;
+            echo "extension = apcu.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+            echo "extension = mongodb.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
+            pecl install imagick
+            pecl install sqlsrv-5.8.1
+            export version=$CIRCLE_TAG
+            if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
+            if [ "$version" == "" ]; then version=$CIRCLE_BUILD_NUM; fi;
       - restore_cache:
           keys:
             - composer-v1-{{ checksum "composer.lock" }}
@@ -31,19 +31,19 @@ jobs:
       - run:
           name: script
           command: |
-            - make VERSION=$version
-            - if [ "$CIRCLE_TAG" != "" ]; then docker build -t gyselroth/tubee:$version .; fi
+            make VERSION=$version
+            if [ "$CIRCLE_TAG" != "" ]; then docker build -t gyselroth/tubee:$version .; fi
       - run:
           name: before_deploy
           command: if [[ "$version" == *"-"* ]]; then export docker_tag=latest-unstable; else export docker_tag=latest; fi;
       - run:
           name: after_deploy
           command: |
-            - test "$CIRCLE_TAG" != "" && version=${$CIRCLE_TAG:1};
-            - test "$CIRCLE_TAG" != "" && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-            - test "$CIRCLE_TAG" != "" && docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
-            - test "$CIRCLE_TAG" != "" && docker push gyselroth/tubee:$version
-            - test "$CIRCLE_TAG" != "" && docker push gyselroth/tubee:$docker_tag
+            test "$CIRCLE_TAG" != "" && version=${$CIRCLE_TAG:1};
+            test "$CIRCLE_TAG" != "" && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+            test "$CIRCLE_TAG" != "" && docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
+            test "$CIRCLE_TAG" != "" && docker push gyselroth/tubee:$version
+            test "$CIRCLE_TAG" != "" && docker push gyselroth/tubee:$docker_tag
 #            - ! 'if [ "$CIRCLE_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
 #              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
 #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
