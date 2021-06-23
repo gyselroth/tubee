@@ -8,7 +8,7 @@ jobs:
       - checkout
       - run:
           name: packages
-          command: sudo apt update && apt install -y imagemagick unixodbc-dev
+          command: sudo apt update && sudo apt install -y imagemagick unixodbc-dev
       - run:
           name: before_install
           command: |
