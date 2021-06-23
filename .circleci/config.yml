@@ -35,7 +35,7 @@ jobs:
       - run:
           name: before_deploy
           command: if [[ "$version" == *"-"* ]]; then export docker_tag=latest-unstable; else export docker_tag=latest; fi;
-     - save_cache:
+      - save_cache:
          key: composer-v1-{{ checksum "composer.lock" }}
          paths:
            - vendor
