@@ -63,7 +63,7 @@ Please make sure that you always specify the number of your issue starting with 
 ## Pull Request
 You are absolutely welcome to submit a pull request which references an open issue. Please make sure you're follwing coding standards 
 and be sure all your modifications pass the build.
-[![Build Status](https://travis-ci.com/gyselroth/tubee.svg?branch=dev)](https://travis-ci.com/gyselroth/tubee)
+[![Build Status](https://circleci.com/gh/gyselroth/tubee.svg?style=svg)](https://circleci.com/gh/gyselroth/tubee)
 
 ## Code of Conduct
 Please note that this project is released with a [Contributor Code of Conduct](https://github.com/gyselroth/tubee/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
