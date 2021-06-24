@@ -62,14 +62,14 @@ jobs:
   #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
   #              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 
-workflows:
-  build-deploy:
-    jobs:
+#workflows:
+#  build-deploy:
+#    jobs:
 #      - build:
 #          filters:
 #            tags:
 #              only: /.*/
-      - release:
-          filters:
-            tags:
-              only: /^v.*/
+#      - release:
+#          filters:
+#            tags:
+#              only: /^v.*/
