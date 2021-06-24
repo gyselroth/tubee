@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: gyselroth/php7.2-fpm-circleci
+      - image: gyselroth/tubee:php7.2-fpm-circleci
     steps:
       - checkout
       - run:
