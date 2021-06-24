@@ -3,29 +3,12 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/php:7.2-fpm
+      - image: gyselroth/php7.2-fpm-circleci
     steps:
       - checkout
       - run:
-          name: packages
-          command: sudo apt update && sudo apt install -y imagemagick unixodbc-dev libmagickwand-dev libldap2-dev
-      - run:
           name: before_install
           command: |
-            sudo docker-php-ext-install ldap pcntl sysvmsg mysqli
-            sudo ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so
-            sudo pecl install mongodb
-            sudo pecl install apcu
-            sudo pecl install imagick
-            sudo pecl install sqlsrv-5.8.1
-            echo -e "extension = apcu.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            echo -e "extension = mongodb.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            echo -e "extension = imagick.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            echo -e "extension = sqlsrv.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            echo -e "extension = xdebug.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            echo -e "xdebug.mode = coverage" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            echo -e "xdebug.mode = coverage" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
-            echo 'memory_limit = -1' | sudo tee -a /usr/local/etc/php/conf.d/docker-php-memlimit.ini > /dev/null
             export version=$CIRCLE_TAG
             if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
             if [ "$version" == "" ]; then version=$CIRCLE_BUILD_NUM; fi;
@@ -48,6 +31,7 @@ jobs:
       - run:
           name: after_deploy
           command: |
+            echo "$CIRCLE_TAG"
             test "$CIRCLE_TAG" != "" && version=${$CIRCLE_TAG:1};
             test "$CIRCLE_TAG" != "" && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
             test "$CIRCLE_TAG" != "" && docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
