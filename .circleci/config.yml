@@ -4,6 +4,11 @@ defaults: &defaults
     docker:
       - image: gyselroth/tubee:php7.2-fpm-circleci
 
+only-deploy-tags: &only-deploy-tags
+  filters:
+    tags:
+      only: /^v.*/
+
 jobs:
   build:
     <<: *defaults
@@ -62,14 +67,14 @@ jobs:
   #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
   #              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 
-#workflows:
-#  build-deploy:
-#    jobs:
-#      - build:
-#          filters:
-#            tags:
-#              only: /.*/
-#      - release:
-#          filters:
-#            tags:
-#              only: /^v.*/
+workflows:
+  version: 2
+  # This runs on non-tag pushes
+  untagged-build:
+    jobs:
+      - build
+  # This only runs on deploy tags and not branches
+  tagged-build:
+    jobs:
+      - release:
+          <<: *only-deploy-tags
