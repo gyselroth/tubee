@@ -1,9 +1,37 @@
 version: 2.1
 
-jobs:
-  build:
+defaults: &defaults
     docker:
       - image: gyselroth/tubee:php7.2-fpm-circleci
+
+jobs:
+  build:
+    <<: *defaults
+
+    working_directory: /tmp
+    steps:
+      - checkout
+      - run:
+          name: before_install
+          command: |
+            export version="$CIRCLE_BUILD_NUM"
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.lock" }}
+            - composer-v1-
+      - run:
+          name: script
+          command: |
+            make VERSION=$version
+      - save_cache:
+          key: composer-v1-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
+
+  release:
+    <<: *defaults
+
+    working_directory: /tmp
     steps:
       - checkout
       - run:
@@ -28,32 +56,33 @@ jobs:
          key: composer-v1-{{ checksum "composer.lock" }}
          paths:
            - vendor
+      - store_artifacts:
+          path: /tmp/dist
       - run:
-          name: after_deploy
+          name: release
           command: |
-            if [ -n "$CIRCLE_TAG" ];
-            then
-              version=${"$CIRCLE_TAG":1};
-              docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
-              docker push gyselroth/tubee:$version
-              docker push gyselroth/tubee:$docker_tag
-            fi
-#            - ! 'if [ "$CIRCLE_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
-#              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
-#              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
-#              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
+            version=${"$CIRCLE_TAG":1};
+            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+            docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
+            docker push gyselroth/tubee:$version
+            docker push gyselroth/tubee:$docker_tag
+  #            - ! 'if [ "$CIRCLE_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
+  #              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
+  #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
+  #              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
+
 workflows:
-  build-and-release:
+  build:
     jobs:
       #--------------- BUILD ---------------#
       - build:
           name: build
           filters:
             tags:
-              only: /^v.*/
-      #--------------- DEPLOY ---------------#
+              only: /.*/
+      #--------------- RELEASE ---------------#
       - release:
-          name: release
-          requires:
-            - build
+          name: build-and-release
+          filters:
+            tags:
+              only: /^v-*/
