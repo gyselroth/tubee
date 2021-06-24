@@ -31,12 +31,14 @@ jobs:
       - run:
           name: after_deploy
           command: |
-            echo "$CIRCLE_TAG"
-            test "$CIRCLE_TAG" != "" && version=${$CIRCLE_TAG:1};
-            test "$CIRCLE_TAG" != "" && docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-            test "$CIRCLE_TAG" != "" && docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
-            test "$CIRCLE_TAG" != "" && docker push gyselroth/tubee:$version
-            test "$CIRCLE_TAG" != "" && docker push gyselroth/tubee:$docker_tag
+            if [ -n "$CIRCLE_TAG" ];
+            then
+              version=${"$CIRCLE_TAG":1};
+              docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
+              docker push gyselroth/tubee:$version
+              docker push gyselroth/tubee:$docker_tag
+            fi
 #            - ! 'if [ "$CIRCLE_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
 #              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
 #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
