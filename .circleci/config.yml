@@ -8,7 +8,7 @@ jobs:
   build:
     <<: *defaults
 
-    working_directory: /tmp
+    working_directory: /tmp/tubee
     steps:
       - checkout
       - run:
@@ -31,7 +31,7 @@ jobs:
   release:
     <<: *defaults
 
-    working_directory: /tmp
+    working_directory: /tmp/tubee
     steps:
       - checkout
       - run:
@@ -57,32 +57,29 @@ jobs:
          paths:
            - vendor
       - store_artifacts:
-          path: /tmp/dist
+          path: /tmp/tubee/dist
       - run:
           name: release
           command: |
             version=${"$CIRCLE_TAG":1};
-            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
-            docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
-            docker push gyselroth/tubee:$version
-            docker push gyselroth/tubee:$docker_tag
+            echo $version;
+#            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+#            docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
+#            docker push gyselroth/tubee:$version
+#            docker push gyselroth/tubee:$docker_tag
   #            - ! 'if [ "$CIRCLE_TAG" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
   #              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
   #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
   #              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 
 workflows:
-  build:
+  build-deploy:
     jobs:
-      #--------------- BUILD ---------------#
       - build:
-          name: build
           filters:
             tags:
               only: /.*/
-      #--------------- RELEASE ---------------#
       - release:
-          name: build-and-release
           filters:
             tags:
-              only: /^v-*/
+              only: /^v.*/
