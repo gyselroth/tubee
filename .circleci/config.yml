@@ -39,7 +39,8 @@ jobs:
           command: |
 #            if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
 #            if [ "$version" == "" ]; then version="${CIRCLE_BUILD_NUM}"; fi;
-            make VERSION="${CIRCLE_TAG}"
+            version="${CIRCLE_TAG}"
+            make VERSION=$version
 #            if [ "$CIRCLE_TAG" != "" ]; then docker build -t gyselroth/tubee:$version .; fi
       - save_cache:
          key: composer-v1-{{ checksum "composer.lock" }}
