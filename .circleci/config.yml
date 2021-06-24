@@ -8,21 +8,17 @@ jobs:
   build:
     <<: *defaults
 
-    working_directory: /tmp/tubee
+    working_directory: /app
     steps:
       - checkout
-      - run:
-          name: before_install
-          command: |
-            export version="$CIRCLE_BUILD_NUM"
       - restore_cache:
           keys:
             - composer-v1-{{ checksum "composer.lock" }}
             - composer-v1-
       - run:
-          name: script
+          name: make
           command: |
-            make VERSION=$version
+            make VERSION="$CIRCLE_BUILD_NUM"
       - save_cache:
           key: composer-v1-{{ checksum "composer.lock" }}
           paths:
@@ -31,37 +27,31 @@ jobs:
   release:
     <<: *defaults
 
-    working_directory: /tmp/tubee
+    working_directory: /app
     steps:
       - checkout
-      - run:
-          name: before_install
-          command: |
-            export version=$CIRCLE_TAG
-            if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
-            if [ "$version" == "" ]; then version=$CIRCLE_BUILD_NUM; fi;
       - restore_cache:
           keys:
             - composer-v1-{{ checksum "composer.lock" }}
             - composer-v1-
       - run:
-          name: script
+          name: make
           command: |
-            make VERSION=$version
-            if [ "$CIRCLE_TAG" != "" ]; then docker build -t gyselroth/tubee:$version .; fi
-      - run:
-          name: before_deploy
-          command: if [[ "$version" == *"-"* ]]; then export docker_tag=latest-unstable; else export docker_tag=latest; fi;
+#            if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
+#            if [ "$version" == "" ]; then version=$CIRCLE_BUILD_NUM; fi;
+            make VERSION="$CIRCLE_TAG"
+#            if [ "$CIRCLE_TAG" != "" ]; then docker build -t gyselroth/tubee:$version .; fi
       - save_cache:
          key: composer-v1-{{ checksum "composer.lock" }}
          paths:
            - vendor
       - store_artifacts:
-          path: /tmp/tubee/dist
+          path: /app/dist
       - run:
           name: release
           command: |
-            version=${"$CIRCLE_TAG":1};
+            if [[ "$CIRCLE_TAG" == *"-"* ]]; then export docker_tag=latest-unstable; else export docker_tag=latest; fi;
+            version="$CIRCLE_TAG";
             echo $version;
 #            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 #            docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
@@ -75,10 +65,10 @@ jobs:
 workflows:
   build-deploy:
     jobs:
-      - build:
-          filters:
-            tags:
-              only: /.*/
+#      - build:
+#          filters:
+#            tags:
+#              only: /.*/
       - release:
           filters:
             tags:
