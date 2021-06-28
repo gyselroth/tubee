@@ -15,11 +15,13 @@ jobs:
       - run:
           name: make
           command: |
-            if [[ "${CIRCLE_TAG}" -n ]];
+            echo $CIRCLE_TAG;
+            echo $CIRCLE_BUILD_NUM;
+            if [[ $CIRCLE_TAG -n ]];
             then
-              version="${CIRCLE_BUILD_NUM}";
+              version=$CIRCLE_BUILD_NUM;
             else
-              version="${CIRCLE_TAG}";
+              version=$CIRCLE_TAG;
               version=${version:1};
             fi;
 
