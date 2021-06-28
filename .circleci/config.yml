@@ -60,15 +60,52 @@ jobs:
 #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
 #              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 
+  deploy:
+    docker:
+      - image: gyselroth/tubee:php7.2-fpm-circleci
+
+    working_directory: /tmp/tubee
+    steps:
+      - run:
+          name: release
+          command: |
+            if [ -z "${CIRCLE_TAG}"];
+            then
+              version=$CIRCLE_BUILD_NUM;
+            else
+              version=$CIRCLE_TAG;
+              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
+              if [ "${version}" == "" ]; then version=${CIRCLE_BUILD_NUM}; fi;
+            fi;
+
+            if [[ "$version" == *"-"* ]]; then docker_tag=latest-unstable; else docker_tag=latest; fi;
+
+            if [ "$CIRCLE_TAG" != "" ];
+            then
+              docker build -t gyselroth/tubee:$version .;
+              docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
+              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
+            fi;
+  #              docker push gyselroth/tubee:$version
+  #              docker push gyselroth/tubee:$docker_tag
+
+
+  #            - ! 'if [ "${CIRCLE_TAG}" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
+  #              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
+  #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
+  #              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
+
 workflows:
   version: 2
-  untagged-build:
-    jobs:
-      - build
-  tagged-build:
+  build-n-deploy:
     jobs:
       - build:
           filters:
             tags:
+              only: /.*/
+      - deploy:
+          requires:
+            - build
+          filters:
+            tags:
               only: /^v.*/
-
