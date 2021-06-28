@@ -17,7 +17,7 @@ jobs:
           command: |
             echo $CIRCLE_TAG;
             echo $CIRCLE_BUILD_NUM;
-            if [[ $CIRCLE_TAG -n ]];
+            if $CIRCLE_TAG -n;
             then
               version=$CIRCLE_BUILD_NUM;
             else
