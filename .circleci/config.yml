@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: gyselroth/tubee:php7.2-fpm-circleci
 
-    working_directory: /app
+    working_directory: /tmp/tubee
     steps:
       - checkout
       - restore_cache:
@@ -32,7 +32,7 @@ jobs:
          paths:
            - vendor
       - store_artifacts:
-          path: /app/dist
+          path: /tmp/tubee/dist
 #      - run:
 #          name: release
 #          command: |
