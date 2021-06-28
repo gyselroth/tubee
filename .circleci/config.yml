@@ -50,9 +50,11 @@ jobs:
               docker build -t gyselroth/tubee:$version .;
               docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
               docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
+            fi;
 #              docker push gyselroth/tubee:$version
 #              docker push gyselroth/tubee:$docker_tag
-            fi;
+
+
 #            - ! 'if [ "${CIRCLE_TAG}" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
 #              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
 #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
