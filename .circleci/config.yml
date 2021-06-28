@@ -1,18 +1,10 @@
 version: 2.1
 
-defaults: &defaults
+jobs:
+  build-and-release:
     docker:
       - image: gyselroth/tubee:php7.2-fpm-circleci
 
-only-deploy-tags: &only-deploy-tags
-  filters:
-    tags:
-      only: /^v.*/
-
-jobs:
-  build:
-    <<: *defaults
-
     working_directory: /app
     steps:
       - checkout
@@ -23,26 +15,15 @@ jobs:
       - run:
           name: make
           command: |
-            make VERSION="${CIRCLE_BUILD_NUM}"
-      - save_cache:
-          key: composer-v1-{{ checksum "composer.lock" }}
-          paths:
-            - vendor
+            if [[ "${CIRCLE_TAG}" -n ]];
+            then
+              version="${CIRCLE_BUILD_NUM}";
+            else
+              version="${CIRCLE_TAG}";
+              version=${version:1};
+            fi;
 
-  release:
-    <<: *defaults
-
-    working_directory: /app
-    steps:
-      - checkout
-      - restore_cache:
-          keys:
-            - composer-v1-{{ checksum "composer.lock" }}
-            - composer-v1-
-      - run:
-          name: make
-          command: |
-            make VERSION="${CIRCLE_TAG}"
+            make VERSION=$version
 #            if [[ "${version:0:1}" == "v" ]]; then version=${version:1}; fi;
 #            if [ "$version" == "" ]; then version="${CIRCLE_BUILD_NUM}"; fi;
 #            if [ "$CIRCLE_TAG" != "" ]; then docker build -t gyselroth/tubee:$version .; fi
@@ -55,9 +36,9 @@ jobs:
       - run:
           name: release
           command: |
-            if [[ "${CIRCLE_TAG}" == *"-"* ]]; then export docker_tag=latest-unstable; else export docker_tag=latest; fi;
-            version="${CIRCLE_TAG}";
-            echo $version;
+#            if [[ "${CIRCLE_TAG}" == *"-"* ]]; then export docker_tag=latest-unstable; else export docker_tag=latest; fi;
+#            version="${CIRCLE_TAG}";
+#            echo $version;
 #            docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
 #            docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag
 #            docker push gyselroth/tubee:$version
@@ -69,12 +50,6 @@ jobs:
 
 workflows:
   version: 2
-  # This runs on non-tag pushes
-  untagged-build:
+  build:
     jobs:
-      - build
-  # This only runs on deploy tags and not branches
-  tagged-build:
-    jobs:
-      - release:
-          <<: *only-deploy-tags
+      - release
