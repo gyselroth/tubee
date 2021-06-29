@@ -4,17 +4,17 @@ defaults: &defaults
   docker:
     - image: gyselroth/tubee:php7.2-fpm-circleci
 
-working_directory: &working_directory
+workspace_root: &workspace_root
   /tmp/tubee
 
 attach_workspace: &attach_workspace
   attach_workspace:
-    at: *working_directory
+    at: *workspace_root
 
 jobs:
   build:
     <<: *defaults
-    <<: *working_directory
+    working_directory: *workspace_root
     steps:
       - checkout
       - restore_cache:
