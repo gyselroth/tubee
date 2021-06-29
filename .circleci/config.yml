@@ -33,7 +33,8 @@ jobs:
               if [ "${version}" == "" ]; then version=${CIRCLE_BUILD_NUM}; fi;
             fi;
 
-            echo "extension = mongodb.so" | sudo tee -a /temp/tubee/dest/test.txt > /dev/null \
+            mkdir dist;
+            echo "extension = mongodb.so" | sudo tee -a /tmp/tubee/dist/test.txt > /dev/null;
 #            make VERSION=$version
 #      - save_cache:
 #         key: composer-v1-{{ checksum "composer.lock" }}
