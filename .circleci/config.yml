@@ -17,10 +17,10 @@ jobs:
     working_directory: *workspace_root
     steps:
       - checkout
-      - restore_cache:
-          keys:
-            - composer-v1-{{ checksum "composer.lock" }}
-            - composer-v1-
+#      - restore_cache:
+#          keys:
+#            - composer-v1-{{ checksum "composer.lock" }}
+#            - composer-v1-
       - run:
           name: build
           command: |
@@ -33,41 +33,42 @@ jobs:
               if [ "${version}" == "" ]; then version=${CIRCLE_BUILD_NUM}; fi;
             fi;
 
-            make VERSION=$version
-      - save_cache:
-         key: composer-v1-{{ checksum "composer.lock" }}
-         paths:
-           - vendor
-      - store_artifacts:
-          path: /tmp/tubee/dist
+#            make VERSION=$version
+            echo "extension = mongodb.so" | sudo tee -a /temp/tubee/dest/test.txt > /dev/null \
+#      - save_cache:
+#         key: composer-v1-{{ checksum "composer.lock" }}
+#         paths:
+#           - vendor
+#      - store_artifacts:
+#          path: /tmp/tubee/dist
       - persist_to_workspace:
-          root: /tmp
+          root: .
           paths:
-            - tubee
+            - dist/*
 
-  deploy:
-    <<: *defaults
-    working_directory: *workspace_root
-
-    steps:
-      - *attach_workspace
-      - setup_remote_docker:
-          version: 19.03.13
-      - run:
-          name: deploy
-          command: |
-            if [ "$CIRCLE_TAG" != "" ];
-            then
-              version=$CIRCLE_TAG;
-              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
-              if [[ "$version" == *"-"* ]]; then docker_tag=latest-unstable; else docker_tag=latest; fi;
-
-              docker build -t gyselroth/tubee:$version .;
-              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
-              docker push gyselroth/tubee:$version
-              docker push gyselroth/tubee:$docker_tag
-            fi;
+#  deploy:
+#    <<: *defaults
+#    working_directory: *workspace_root
+#
+#    steps:
+#      - *attach_workspace
+#      - setup_remote_docker:
+#          version: 19.03.13
+#      - run:
+#          name: deploy
+#          command: |
+#            if [ "$CIRCLE_TAG" != "" ];
+#            then
+#              version=$CIRCLE_TAG;
+#              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
+#              if [[ "$version" == *"-"* ]]; then docker_tag=latest-unstable; else docker_tag=latest; fi;
+#
+#              docker build -t gyselroth/tubee:$version .;
+#              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+#              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
+#              docker push gyselroth/tubee:$version
+#              docker push gyselroth/tubee:$docker_tag
+#            fi;
 
   publish-github-release:
     docker:
@@ -78,12 +79,14 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            if [ "$CIRCLE_TAG" != "" ];
-            then
-              version=$CIRCLE_TAG;
-              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
-              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 $VERSION ./dist/
-            fi;
+#            if [ "$CIRCLE_TAG" != "" ];
+#            then
+#              version=$CIRCLE_TAG;
+#              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
+#              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 $VERSION ./dist/
+#            fi;
+            ls -la;
+            ls -la dist;
 
 workflows:
   version: 2
@@ -93,12 +96,12 @@ workflows:
           filters:
             tags:
               only: /.*/
-      - deploy:
-          requires:
-            - build
-          filters:
-            tags:
-              only: /^v.*/
+#      - deploy:
+#          requires:
+#            - build
+#          filters:
+#            tags:
+#              only: /^v.*/
       - publish-github-release:
           requires:
             - build
