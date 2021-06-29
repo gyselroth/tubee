@@ -1,14 +1,20 @@
 version: 2.1
 
 defaults: &defaults
-  working_directory: /tmp/tubee
   docker:
     - image: gyselroth/tubee:php7.2-fpm-circleci
+
+working_directory: &working_directory
+  /tmp/tubee
+
+attach_workspace: &attach_workspace
+  attach_workspace:
+    at: *working_directory
 
 jobs:
   build:
     <<: *defaults
-
+    <<: *working_directory
     steps:
       - checkout
       - restore_cache:
@@ -34,46 +40,47 @@ jobs:
            - vendor
       - store_artifacts:
           path: /tmp/tubee/dist
+      - persist_to_workspace:
+          root: /tmp
+          paths:
+            - tubee
 
   deploy:
     <<: *defaults
 
     steps:
-      - checkout
+      - *attach_workspace
       - setup_remote_docker:
           version: 19.03.13
-      - restore_cache:
-          keys:
-            - composer-v1-{{ checksum "composer.lock" }}
-            - composer-v1-
-      - run:
-          name: composer update
-          command: composer update
-      - save_cache:
-          key: composer-v1-{{ checksum "composer.lock" }}
-          paths:
-            - vendor
       - run:
           name: deploy
           command: |
-            if [ -z "${CIRCLE_TAG}"];
-            then
-              version=$CIRCLE_BUILD_NUM;
-            else
-              version=$CIRCLE_TAG;
-              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
-              if [ "${version}" == "" ]; then version=${CIRCLE_BUILD_NUM}; fi;
-            fi;
-
-            if [[ "$version" == *"-"* ]]; then docker_tag=latest-unstable; else docker_tag=latest; fi;
-
             if [ "$CIRCLE_TAG" != "" ];
             then
+              version=$CIRCLE_TAG;
+              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
+              if [[ "$version" == *"-"* ]]; then docker_tag=latest-unstable; else docker_tag=latest; fi;
+
               docker build -t gyselroth/tubee:$version .;
               echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
               docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
               docker push gyselroth/tubee:$version
               docker push gyselroth/tubee:$docker_tag
+            fi;
+
+  publish-github-release:
+    docker:
+      - image: cibuilds/github:0.10
+    steps:
+      - *attach_workspace
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            if [ "$CIRCLE_TAG" != "" ];
+            then
+              version=$CIRCLE_TAG;
+              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
+              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 $VERSION ./dist/
             fi;
 
 workflows:
@@ -87,6 +94,13 @@ workflows:
       - deploy:
           requires:
             - build
+          filters:
+            tags:
+              only: /^v.*/
+      - publish-github-release:
+          requires:
+            - build
+            - deploy
           filters:
             tags:
               only: /^v.*/
