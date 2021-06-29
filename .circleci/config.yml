@@ -1,11 +1,14 @@
 version: 2.1
 
+defaults: &defaults
+  working_directory: /tmp/tubee
+  docker:
+    - image: gyselroth/tubee:php7.2-fpm-circleci
+
 jobs:
   build:
-    docker:
-      - image: gyselroth/tubee:php7.2-fpm-circleci
+    <<: *defaults
 
-    working_directory: /tmp/tubee
     steps:
       - checkout
       - restore_cache:
@@ -13,7 +16,7 @@ jobs:
             - composer-v1-{{ checksum "composer.lock" }}
             - composer-v1-
       - run:
-          name: build-and-deploy
+          name: build
           command: |
             if [ -z "${CIRCLE_TAG}"];
             then
@@ -31,43 +34,15 @@ jobs:
            - vendor
       - store_artifacts:
           path: /tmp/tubee/dist
-      - run:
-          name: release
-          command: |
-            if [ -z "${CIRCLE_TAG}"];
-            then
-              version=$CIRCLE_BUILD_NUM;
-            else
-              version=$CIRCLE_TAG;
-              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
-              if [ "${version}" == "" ]; then version=${CIRCLE_BUILD_NUM}; fi;
-            fi;
-
-            if [[ "$version" == *"-"* ]]; then docker_tag=latest-unstable; else docker_tag=latest; fi;
-
-            if [ "$CIRCLE_TAG" != "" ];
-            then
-              docker build -t gyselroth/tubee:$version .;
-              docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
-            fi;
-#              docker push gyselroth/tubee:$version
-#              docker push gyselroth/tubee:$docker_tag
-
-
-#            - ! 'if [ "${CIRCLE_TAG}" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
-#              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
-#              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
-#              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 
   deploy:
-    docker:
-      - image: gyselroth/tubee:php7.2-fpm-circleci
+    <<: *defaults
 
-    working_directory: /tmp/tubee
     steps:
+      - setup_remote_docker:
+          version: 19.03.13
       - run:
-          name: release
+          name: deploy
           command: |
             if [ -z "${CIRCLE_TAG}"];
             then
@@ -83,9 +58,10 @@ jobs:
             if [ "$CIRCLE_TAG" != "" ];
             then
               docker build -t gyselroth/tubee:$version .;
-              docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD";
-              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
+              echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+              docker tag gyselroth/tubee:$version;
             fi;
+#                docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
   #              docker push gyselroth/tubee:$version
   #              docker push gyselroth/tubee:$docker_tag
 
