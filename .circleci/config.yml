@@ -42,6 +42,17 @@ jobs:
       - checkout
       - setup_remote_docker:
           version: 19.03.13
+      - restore_cache:
+          keys:
+            - composer-v1-{{ checksum "composer.lock" }}
+            - composer-v1-
+      - run:
+          name: composer update
+          command: composer update
+      - save_cache:
+          key: composer-v1-{{ checksum "composer.lock" }}
+          paths:
+            - vendor
       - run:
           name: deploy
           command: |
@@ -58,21 +69,12 @@ jobs:
 
             if [ "$CIRCLE_TAG" != "" ];
             then
-              echo $version;
-              echo $docker_tag;
               docker build -t gyselroth/tubee:$version .;
               echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
-              docker tag gyselroth/tubee:$version;
+              docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
+              docker push gyselroth/tubee:$version
+              docker push gyselroth/tubee:$docker_tag
             fi;
-#                docker tag gyselroth/tubee:$version gyselroth/tubee:$docker_tag;
-  #              docker push gyselroth/tubee:$version
-  #              docker push gyselroth/tubee:$docker_tag
-
-
-  #            - ! 'if [ "${CIRCLE_TAG}" != "" ]; then curl -s -X POST -H ''Content-Type: application/json''
-  #              -H ''Accept: application/json'' -H ''Travis-API-Version: 3'' -H "Authorization:
-  #              token $TRAVIS_API_TOKEN" -d ''{"request":{"message":"trigger build", "branch":"master"}}''
-  #              "https://api.travis-ci.com/repo/gyselroth%2Ftubee-sdk-typescript-node/requests"; fi'
 
 workflows:
   version: 2
