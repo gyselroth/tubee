@@ -94,13 +94,9 @@ jobs:
       - run:
           name: "Publish Release on GitHub"
           command: |
-            ls -la;
-            ls -la dist;
             if [ "$CIRCLE_TAG" != "" ];
             then
-              version=$CIRCLE_TAG;
-              if [ "${version:0:1}" == "v" ]; then version=${CIRCLE_TAG:1}; fi;
-              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 $VERSION ./dist/
+              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME -c $CIRCLE_SHA1 $CIRCLE_TAG ./dist/
             fi;
 
 workflows:
