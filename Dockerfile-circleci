@@ -1,0 +1,24 @@
+FROM circleci/php:7.2-fpm
+
+RUN sudo apt update && sudo apt install -y \
+  imagemagick \
+  unixodbc-dev \
+  libmagickwand-dev \
+  libldap2-dev
+
+RUN sudo docker-php-ext-install ldap pcntl sysvmsg mysqli
+RUN sudo ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so
+
+RUN sudo pecl install mongodb \
+  && sudo pecl install apcu \
+  && sudo pecl install imagick \
+  && sudo pecl install sqlsrv-5.8.1
+
+RUN echo "extension = apcu.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null \
+  && echo "extension = mongodb.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null \
+  && echo "extension = imagick.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null \
+  && echo "extension = sqlsrv.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null \
+  && echo "extension = xdebug.so" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null \
+  && echo "xdebug.mode = coverage" | sudo tee -a /usr/local/etc/php/php.ini > /dev/null
+
+RUN echo 'memory_limit = -1' | sudo tee -a /usr/local/etc/php/conf.d/docker-php-memlimit.ini > /dev/null
