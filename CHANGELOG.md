@@ -1,6 +1,6 @@
-## 1.1.0-beta1
+## 1.1.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Tue July 06 09:40:00 CEST 2021
+**Date**: Tue July 06 10:45:00 CEST 2021
 
 ### Changes
 * Task-Scheduler: integrated new interval_reference feature of gyselroth/php-task-scheduler (v3.3.0)
