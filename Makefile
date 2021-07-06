@@ -117,7 +117,7 @@ $(COMPOSER_TARGET) $(PHPCS_FIXER_SCRIPT) $(PHPUNIT_SCRIPT) $(PHPSTAN_SCRIPT): $(
 phpcs: $(PHPCS_CHECK_TARGET)
 
 $(PHPCS_CHECK_TARGET): $(PHPCS_FIXER_SCRIPT) $(PHP_FILES) $(COMPOSER_LOCK)
-	$(PHP_BIN) $(PHPCS_FIXER_SCRIPT)  fix --config=.php_cs.dist -v --dry-run --allow-risky=yes --stop-on-violation --using-cache=no
+	$(PHP_BIN) $(PHPCS_FIXER_SCRIPT)  fix --config=.php-cs-fixer.dist.php -v --dry-run --allow-risky=yes --stop-on-violation --using-cache=no
 	@touch $@
 
 .PHONY: test

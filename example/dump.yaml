@@ -44,6 +44,7 @@ data:
   options:
     at: 0
     interval: 3600
+    interval_reference: end
     retry: 0
     retry_interval: 0
     timeout: 0
@@ -432,6 +433,7 @@ data:
   options:
     at: 0
     interval: 3600
+    interval_reference: end
     retry: 0
     retry_interval: 0
     timeout: 0

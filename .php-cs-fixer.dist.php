@@ -3,11 +3,11 @@
 $header = <<<'EOF'
 tubee
 
-@copyright   Copryright (c) 2017-2019 gyselroth GmbH (https://gyselroth.com)
+@copyright   Copryright (c) 2017-2021 gyselroth GmbH (https://gyselroth.com)
 @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
 EOF;
-
-$config = PhpCsFixer\Config::create()
+$config = (new PhpCsFixer\Config());
+$config
     ->setRiskyAllowed(true)
     ->setRules([
         '@PSR1' => true,
@@ -21,13 +21,13 @@ $config = PhpCsFixer\Config::create()
         'declare_strict_types' => true,
         'dir_constant' => true,
         'function_to_constant' => true,
-        'header_comment' => ['header' => $header, 'commentType' => 'PHPDoc'],
+        'header_comment' => ['header' => $header, 'comment_type' => 'PHPDoc'],
         'heredoc_to_nowdoc' => true,
         'list_syntax' => ['syntax' => 'long'],
-        'method_argument_space' => ['ensure_fully_multiline' => true],
-        'no_extra_consecutive_blank_lines' => ['tokens' => ['break', 'continue', 'extra', 'return', 'throw', 'use', 'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block']],
+        'method_argument_space' => ['on_multiline' => 'ensure_fully_multiline'],
+        'no_extra_blank_lines' => ['tokens' => ['break', 'continue', 'extra', 'return', 'throw', 'use', 'parenthesis_brace_block', 'square_brace_block', 'curly_brace_block']],
         'no_null_property_initialization' => true,
-        'no_short_echo_tag' => true,
+        'echo_tag_syntax' => true,
         'no_superfluous_elseif' => true,
         'no_superfluous_phpdoc_tags' => true,
         'no_unneeded_curly_braces' => true,
