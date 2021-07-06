@@ -1,9 +1,9 @@
-## v1.1.0-alpha.1
+## 1.1.0-beta1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Wed Jun 16 16:15:00 CEST 2021
+**Date**: Tue July 06 09:40:00 CEST 2021
 
-### Features
-* Taskscheduler: integrated interval_reverence for jobs
+### Changes
+* Task-Scheduler: integrated new interval_reference feature of gyselroth/php-task-scheduler (v3.3.0)
 
 ## 1.0.0-beta68
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
