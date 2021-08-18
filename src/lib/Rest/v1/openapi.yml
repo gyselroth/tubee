@@ -4148,6 +4148,7 @@ components:
                     interval_reference: end
                     retry: 0
                     retry_interval: 0
+                    timeout: 0
                   properties:
                     at:
                       description: Holds a unix timestamp at what time the job should be

@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   description: ""
-  version: "1.0.0-beta5"
+  version: "1.0.0"
   title: "Tubee API"
   termsOfService: ""
   contact:
@@ -3575,7 +3575,7 @@ definitions:
                     format: "integer"
                     default: 0
                   interval:
-                    description: "The number of secconds after the job should be executed again. The default is only run once."
+                    description: "The number of seconds after the job should be executed again. The default is only run once."
                     type: "integer"
                     default: 0
                   interval_reference:
@@ -3590,8 +3590,12 @@ definitions:
                     type: "integer"
                     default: 0
                   retry_interval:
-                    description: "The number of secconds beween failed job retries. The default is 300 (5min)."
+                    description: "The number of seconds between failed job retries. The default is 300 (5min)."
                     type: "integer"
+                    default: 0
+                  timeout:
+                    description: "Maximum runtime of a job (process). By default there is no timeout. This option should be handled carefully."
+                    type: integer
                     default: 0
   core.v1.Logs:
     description: "A list of logs."
