@@ -1,7 +1,7 @@
 swagger: "2.0"
 info:
   description: ""
-  version: "1.0.0-beta5"
+  version: "1.0.0"
   title: "Tubee API"
   termsOfService: ""
   contact:
