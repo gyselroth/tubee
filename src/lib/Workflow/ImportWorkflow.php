@@ -18,6 +18,7 @@ use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Exception as DataObjectException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Helper;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Workflow;
 
 class ImportWorkflow extends Workflow
@@ -63,6 +64,38 @@ class ImportWorkflow extends Workflow
         }
 
         return false;
+    }
+
+    public function relationCleanup($relation, Sync $process, ResourceNamespaceInterface $namespace, bool $simulate = false): bool
+    {
+        if ($this->checkCondition($relation) === false) {
+            return false;
+        }
+
+        $attributes = Helper::associativeArrayToPath($relation);
+
+        $map = $this->attribute_map->map($attributes, $process->getTimestamp());
+        $this->logger->info('mapped object attributes [{map}] for cleanup', [
+            'category' => get_class($this),
+            'map' => array_keys($map),
+        ]);
+
+        $relationObject = $this->relation_factory->getOne($namespace, $relation['name']);
+
+        foreach ($map as $attr) {
+            if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
+                $this->relation_factory->deleteOne($relationObject, $simulate);
+
+                return true;
+            }
+        }
+
+        $this->logger->error('sandro ' . print_r($relation['name'], true), []);
+        $this->logger->error('sandro123 ' . print_r($map, true), []);
+
+        $test = $this->relation_factory->update($relationObject, $map);
+
+        return $test;
     }
 
     /**

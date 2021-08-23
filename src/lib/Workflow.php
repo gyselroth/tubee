@@ -16,6 +16,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\Async\Sync;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\DataObject\DataObjectInterface;
+use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Resource\AbstractResource;
 use Tubee\Resource\AttributeResolver;
@@ -79,9 +80,16 @@ class Workflow extends AbstractResource implements WorkflowInterface
     protected $v8;
 
     /**
+     * Data object relation factory.
+     *
+     * @var DataObjectRelationFactory
+     */
+    protected $relation_factory;
+
+    /**
      * Initialize.
      */
-    public function __construct(string $name, string $ensure, V8Engine $v8, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $ensure, V8Engine $v8, AttributeMapInterface $attribute_map, EndpointInterface $endpoint, LoggerInterface $logger, DataObjectRelationFactory $relation_factory, array $resource = [])
     {
         $this->name = $name;
         $this->ensure = $ensure;
@@ -91,6 +99,7 @@ class Workflow extends AbstractResource implements WorkflowInterface
         $this->logger = $logger;
         $this->resource = $resource;
         $this->condition = $resource['data']['condition'];
+        $this->relation_factory = $relation_factory;
     }
 
     /**

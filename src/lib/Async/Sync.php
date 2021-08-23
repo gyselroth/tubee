@@ -556,7 +556,7 @@ class Sync extends AbstractJob
             }
         }
 
-        $this->relationGarbageCollector($collection, $endpoint, $workflows);
+        $this->relationGarbageCollector($collection, $endpoint, $workflows, $simulate);
 
         return true;
     }
@@ -564,12 +564,12 @@ class Sync extends AbstractJob
     /**
      * Relation garbage collector.
      */
-    protected function relationGarbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, $workflows)
+    protected function relationGarbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, $workflows, $simulate)
     {
-        $namespace = $endpoint->getCollection()->getResourceNamespace()->getName();
-        $collection = $endpoint->getCollection()->getName();
+        $namespace = $endpoint->getCollection()->getResourceNamespace();
+        $collection = $endpoint->getCollection();
         $ep = $endpoint->getName();
-        $key = join('/', [$namespace, $collection, $ep]);
+        $key = join('/', [$namespace->getName(), $collection->getName(), $ep]);
 
         $this->logger->info('mark all relation data objects older than [{timestamp}] (last_sync) as garbage', [
             'class' => get_class($this),
@@ -586,13 +586,39 @@ class Sync extends AbstractJob
             'endpoints.'.$key.'.garbage' => true,
         ]]);
 
-        foreach ($workflows as $workflow) {
-            foreach ($workflow->getAttributeMap()->getMap() as $attr) {
-                if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
-                    $this->db->relations->deleteMany(['endpoints.'.$key.'.garbage' => true]);
+        $garbageRelations = $this->db->relations->find(['endpoints.'.$key.'.garbage' => true])->toArray();
+
+        $i = 0;
+        foreach ($garbageRelations as $relation) {
+            ++$i;
+            $this->logger->debug('process ['.$i.'] garbage workflows for garbage relation ['.$relation['name'].'] from data type ['.$collection->getIdentifier().']', [
+                'category' => get_class($this),
+            ]);
+
+            try {
+                foreach ($workflows as $workflow) {
+                    $this->logger->debug('start workflow ['.$workflow->getIdentifier().'] for the current garbage relation', [
+                        'category' => get_class($this),
+                    ]);
+
+                    $this->logger->error('workflow ' . $workflow->getIdentifier(), []);
+                    if ($workflow->relationCleanup($relation, $this, $namespace, $simulate) === true) {
+                        $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the current garbage object, skip any further workflows for the current garbage object', [
+                            'category' => get_class($this),
+                        ]);
+
+                        break;
+                    }
                 }
+            } catch (\Exception $e) {
+                $this->logger->error('failed execute garbage collector for relation ['.$relation['name'].'] from collection ['.$collection->getIdentifier().']', [
+                    'category' => get_class($this),
+                    'exception' => $e,
+                ]);
             }
         }
+
+        return true;
     }
 
     /**

@@ -16,6 +16,7 @@ use MongoDB\BSON\ObjectIdInterface;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap;
+use Tubee\DataObjectRelation\Factory as DataObjectRelationFactory;
 use Tubee\Endpoint\EndpointInterface;
 use Tubee\Resource\Factory as ResourceFactory;
 use Tubee\V8\Engine as V8Engine;
@@ -43,6 +44,13 @@ class Factory
     protected $resource_factory;
 
     /**
+     * Data object relation factory.
+     *
+     * @var DataObjectRelationFactory
+     */
+    protected $relation_factory;
+
+    /**
      * V8 engine.
      *
      * @var V8Engine
@@ -59,10 +67,11 @@ class Factory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, ResourceFactory $resource_factory, V8Engine $v8, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory,  DataObjectRelationFactory $relation_factory, V8Engine $v8, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->resource_factory = $resource_factory;
+        $this->relation_factory = $relation_factory;
         $this->v8 = $v8;
         $this->logger = $logger;
     }
@@ -194,7 +203,7 @@ class Factory
             break;
         }
 
-        return $this->resource_factory->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $resource));
+        return $this->resource_factory->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $this->relation_factory, $resource));
     }
 
     /**
