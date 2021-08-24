@@ -12,6 +12,7 @@ declare(strict_types=1);
 namespace Tubee\Workflow;
 
 use MongoDB\BSON\UTCDateTimeInterface;
+use MongoDB\Collection;
 use Tubee\Async\Sync;
 use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
@@ -66,7 +67,7 @@ class ImportWorkflow extends Workflow
         return false;
     }
 
-    public function relationCleanup($relation, Sync $process, ResourceNamespaceInterface $namespace, bool $simulate = false): bool
+    public function relationCleanup(Collection $collection, $relation, Sync $process, ResourceNamespaceInterface $namespace, bool $simulate = false): bool
     {
         if ($this->checkCondition($relation) === false) {
             return false;
@@ -90,12 +91,9 @@ class ImportWorkflow extends Workflow
             }
         }
 
-        $this->logger->error('sandro ' . print_r($relation['name'], true), []);
-        $this->logger->error('sandro123 ' . print_r($map, true), []);
+        $update = (array) Map::map($this->attribute_map, $map, ['data' => $relationObject->getData()], $process->getTimestamp());
 
-        $test = $this->relation_factory->update($relationObject, $map);
-
-        return $test;
+        return $this->resource_factory->updateIn($collection, $relationObject, $update, $simulate);
     }
 
     /**

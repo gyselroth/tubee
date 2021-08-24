@@ -67,7 +67,7 @@ class Factory
     /**
      * Initialize.
      */
-    public function __construct(Database $db, ResourceFactory $resource_factory,  DataObjectRelationFactory $relation_factory, V8Engine $v8, LoggerInterface $logger)
+    public function __construct(Database $db, ResourceFactory $resource_factory, DataObjectRelationFactory $relation_factory, V8Engine $v8, LoggerInterface $logger)
     {
         $this->db = $db;
         $this->resource_factory = $resource_factory;
@@ -203,7 +203,7 @@ class Factory
             break;
         }
 
-        return $this->resource_factory->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $this->relation_factory, $resource));
+        return $this->resource_factory->initResource(new $class($resource['name'], $resource['data']['ensure'], $this->v8, $map, $endpoint, $this->logger, $this->resource_factory, $this->relation_factory, $resource));
     }
 
     /**

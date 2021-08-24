@@ -601,8 +601,8 @@ class Sync extends AbstractJob
                         'category' => get_class($this),
                     ]);
 
-                    $this->logger->error('workflow ' . $workflow->getIdentifier(), []);
-                    if ($workflow->relationCleanup($relation, $this, $namespace, $simulate) === true) {
+                    $this->logger->error('workflow '.$workflow->getIdentifier(), []);
+                    if ($workflow->relationCleanup($this->db->{'relations'}, $relation, $this, $namespace, $simulate) === true) {
                         $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the current garbage object, skip any further workflows for the current garbage object', [
                             'category' => get_class($this),
                         ]);
