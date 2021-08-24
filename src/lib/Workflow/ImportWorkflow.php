@@ -17,6 +17,7 @@ use Tubee\Async\Sync;
 use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Exception as DataObjectException;
+use Tubee\Endpoint\EndpointInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Helper;
 use Tubee\ResourceNamespace\ResourceNamespaceInterface;
@@ -67,13 +68,16 @@ class ImportWorkflow extends Workflow
         return false;
     }
 
-    public function relationCleanup(Collection $collection, $relation, Sync $process, ResourceNamespaceInterface $namespace, bool $simulate = false): bool
+    public function relationCleanup(Collection $collection, $relation, Sync $process, ResourceNamespaceInterface $namespace, EndpointInterface $endpoint, bool $simulate = false): bool
     {
         if ($this->checkCondition($relation) === false) {
             return false;
         }
 
         $attributes = Helper::associativeArrayToPath($relation);
+        $co = $endpoint->getCollection()->getName();
+        $endpoint = $endpoint->getName();
+        $key = join('/', [$namespace->getName(), $co, $endpoint]);
 
         $map = $this->attribute_map->map($attributes, $process->getTimestamp());
         $this->logger->info('mapped object attributes [{map}] for cleanup', [
@@ -92,6 +96,15 @@ class ImportWorkflow extends Workflow
         }
 
         $update = (array) Map::map($this->attribute_map, $map, ['data' => $relationObject->getData()], $process->getTimestamp());
+        $update[$key] = [
+            'name' => $endpoint,
+            'last_sync' => $process->getTimestamp(),
+            'last_successful_sync' => $process->getTimestamp(),
+            'process' => $process->getId(),
+            'workflow' => $this->getName(),
+            'success' => true,
+            'garbage' => true,
+        ];
 
         return $this->resource_factory->updateIn($collection, $relationObject, $update, $simulate);
     }

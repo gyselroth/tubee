@@ -33,8 +33,6 @@ class Map
             }
 
             $exists = isset($mongodb_object[$name]);
-
-            var_dump($name);
             if ($value['ensure'] === WorkflowInterface::ENSURE_EXISTS && $exists === true) {
                 continue;
             }

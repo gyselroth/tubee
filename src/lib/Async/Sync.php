@@ -568,8 +568,7 @@ class Sync extends AbstractJob
     {
         $namespace = $endpoint->getCollection()->getResourceNamespace();
         $collection = $endpoint->getCollection();
-        $ep = $endpoint->getName();
-        $key = join('/', [$namespace->getName(), $collection->getName(), $ep]);
+        $key = join('/', [$namespace->getName(), $collection->getName(), $endpoint->getName()]);
 
         $this->logger->info('mark all relation data objects older than [{timestamp}] (last_sync) as garbage', [
             'class' => get_class($this),
@@ -602,7 +601,7 @@ class Sync extends AbstractJob
                     ]);
 
                     $this->logger->error('workflow '.$workflow->getIdentifier(), []);
-                    if ($workflow->relationCleanup($this->db->{'relations'}, $relation, $this, $namespace, $simulate) === true) {
+                    if ($workflow->relationCleanup($this->db->{'relations'}, $relation, $this, $namespace, $endpoint, $simulate) === true) {
                         $this->logger->debug('workflow ['.$workflow->getIdentifier().'] executed for the current garbage object, skip any further workflows for the current garbage object', [
                             'category' => get_class($this),
                         ]);
