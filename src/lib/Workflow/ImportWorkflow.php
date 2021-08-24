@@ -68,26 +68,18 @@ class ImportWorkflow extends Workflow
         return false;
     }
 
-    public function relationCleanup(Collection $collection, $relation, Sync $process, ResourceNamespaceInterface $namespace, EndpointInterface $endpoint, bool $simulate = false): bool
+    public function relationCleanup(Collection $collection, $relation, Sync $process, ResourceNamespaceInterface $namespace, EndpointInterface $endpoint, $workflow, bool $simulate = false): bool
     {
         if ($this->checkCondition($relation) === false) {
             return false;
         }
 
-        $attributes = Helper::associativeArrayToPath($relation);
         $co = $endpoint->getCollection()->getName();
         $endpoint = $endpoint->getName();
         $key = join('/', [$namespace->getName(), $co, $endpoint]);
-
-        $map = $this->attribute_map->map($attributes, $process->getTimestamp());
-        $this->logger->info('mapped object attributes [{map}] for cleanup', [
-            'category' => get_class($this),
-            'map' => array_keys($map),
-        ]);
-
         $relationObject = $this->relation_factory->getOne($namespace, $relation['name']);
 
-        foreach ($map as $attr) {
+        foreach ($workflow->getAttributeMap()->getMap() as $attr) {
             if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
                 $this->relation_factory->deleteOne($relationObject, $simulate);
 
@@ -95,8 +87,16 @@ class ImportWorkflow extends Workflow
             }
         }
 
+        $attributes = Helper::associativeArrayToPath($relation);
+        $map = $this->attribute_map->map($attributes, $process->getTimestamp());
+
+        $this->logger->info('mapped object attributes [{map}] for cleanup', [
+            'category' => get_class($this),
+            'map' => array_keys($map),
+        ]);
+
         $update = (array) Map::map($this->attribute_map, $map, ['data' => $relationObject->getData()], $process->getTimestamp());
-        $update[$key] = [
+        $update['endpoints'][$key] = [
             'name' => $endpoint,
             'last_sync' => $process->getTimestamp(),
             'last_successful_sync' => $process->getTimestamp(),
