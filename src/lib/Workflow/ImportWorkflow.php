@@ -83,11 +83,16 @@ class ImportWorkflow extends Workflow
 
         $relationObject = $this->relation_factory->getOne($namespace, $relation['name']);
 
-        foreach ($map as $attr) {
+        foreach ($map as $key => $attr) {
             if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
                 $this->relation_factory->deleteOne($relationObject, $simulate);
 
                 return true;
+            }
+
+            if (strpos($key, 'data.') !== false) {
+                unset($map[$key]);
+                $map[str_replace('data.', 'context.', $key)] = $attr;
             }
         }
 
