@@ -75,6 +75,14 @@ class ImportWorkflow extends Workflow
         }
 
         $relationObject = $this->relation_factory->getOne($namespace, $relation['name']);
+        $dataObject = $relationObject->getDataObjectByRelation($relationObject, $endpoint->getCollection());
+        $dataObject->getCollection()->changeObject($dataObject, ['data' => $dataObject->getData()], $simulate, [
+            'name' => $this->endpoint->getName(),
+            'last_garbage_sync' => $process->getTimestamp(),
+            'process' => $process->getId(),
+            'workflow' => $this->getName(),
+            'success' => true,
+        ]);
 
         foreach ($workflow->getAttributeMap()->getMap() as $attr) {
             if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
@@ -83,8 +91,6 @@ class ImportWorkflow extends Workflow
                 return true;
             }
         }
-
-        $dataObject = $relationObject->getDataObjectByRelation($relationObject, $endpoint->getCollection());
 
         $co = $endpoint->getCollection()->getName();
         $endpoint = $endpoint->getName();
@@ -111,15 +117,6 @@ class ImportWorkflow extends Workflow
             'success' => true,
             'garbage' => true,
         ];
-
-        $resource = Map::map($this->attribute_map, $map, ['data' => $dataObject->getData()], $process->getTimestamp());
-        $dataObject->getCollection()->changeObject($dataObject, $resource, $simulate, [
-            'name' => $this->endpoint->getName(),
-            'last_garbage_sync' => $process->getTimestamp(),
-            'process' => $process->getId(),
-            'workflow' => $this->getName(),
-            'success' => true,
-        ]);
 
         return $this->resource_factory->updateIn($collection, $relationObject, $update, $simulate);
     }
