@@ -84,6 +84,8 @@ class ImportWorkflow extends Workflow
             }
         }
 
+        $dataObject = $relationObject->getDataObjectByRelation($relationObject, $endpoint->getCollection());
+
         $co = $endpoint->getCollection()->getName();
         $endpoint = $endpoint->getName();
         $key = join('/', [$namespace->getName(), $co, $endpoint]);
@@ -109,6 +111,15 @@ class ImportWorkflow extends Workflow
             'success' => true,
             'garbage' => true,
         ];
+
+        $resource = Map::map($this->attribute_map, $map, ['data' => $dataObject->getData()], $process->getTimestamp());
+        $dataObject->getCollection()->changeObject($dataObject, $resource, $simulate, [
+            'name' => $this->endpoint->getName(),
+            'last_garbage_sync' => $process->getTimestamp(),
+            'process' => $process->getId(),
+            'workflow' => $this->getName(),
+            'success' => true,
+        ]);
 
         return $this->resource_factory->updateIn($collection, $relationObject, $update, $simulate);
     }

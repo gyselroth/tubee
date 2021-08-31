@@ -532,12 +532,8 @@ class Sync extends AbstractJob
     /**
      * Object garbage collector.
      */
-    protected function objectGarbageCollector(EndpointInterface $endpoint, CollectionInterface $collection, $workflows, $simulate, $ignore)
+    protected function objectGarbageCollector(EndpointInterface $endpoint, CollectionInterface $collection, $workflows, $simulate, $ignore): bool
     {
-        $this->logger->error('object', [
-            'category' => get_class($this),
-        ]);
-
         $filter = [
             'endpoints.'.$endpoint->getName().'.last_sync' => [
                 '$lt' => $this->timestamp,
@@ -587,12 +583,8 @@ class Sync extends AbstractJob
     /**
      * Relation garbage collector.
      */
-    protected function relationGarbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, $workflows, $simulate)
+    protected function relationGarbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, $workflows, $simulate): bool
     {
-        $this->logger->error('relation', [
-            'category' => get_class($this),
-        ]);
-
         $namespace = $endpoint->getCollection()->getResourceNamespace();
         $collection = $endpoint->getCollection();
         $key = join('/', [$namespace->getName(), $collection->getName(), $endpoint->getName()]);
