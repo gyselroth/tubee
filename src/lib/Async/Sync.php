@@ -498,9 +498,43 @@ class Sync extends AbstractJob
      */
     protected function garbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, bool $simulate = false, bool $ignore = false): bool
     {
-        $this->logger->info('start garbage collector workflows from data type [{timestamp}] for data objects older than [{timestamp}] (last_sync)', [
+        $this->logger->info('start garbage collector workflows from data type [{identifier}] for data objects older than [{timestamp}] (last_sync)', [
             'timestamp' => $this->timestamp,
             'identifier' => $collection->getIdentifier(),
+            'category' => get_class($this),
+        ]);
+
+        $workflows = iterator_to_array($endpoint->getWorkflows(['kind' => 'GarbageWorkflow']));
+        if (count($workflows) === 0) {
+            $this->logger->info('no garbage workflows available in ['.$endpoint->getIdentifier().'], skip garbage collection', [
+                'category' => get_class($this),
+            ]);
+
+            return false;
+        }
+
+        $relationObject = false;
+        foreach ($workflows as $workflow) {
+            foreach ($workflow->getAttributeMap()->getMap() as $attr) {
+                if ($attr['name'] === 'relationObject' || (isset($attr['map']) && $attr['map']['ensure'] === 'absent')) {
+                    $relationObject = true;
+                }
+            }
+        }
+
+        if ($relationObject) {
+            return $this->relationGarbageCollector($collection, $endpoint, $workflows, $simulate);
+        }
+
+        return $this->objectGarbageCollector($endpoint, $collection, $workflows, $simulate, $ignore);
+    }
+
+    /**
+     * Object garbage collector.
+     */
+    protected function objectGarbageCollector(EndpointInterface $endpoint, CollectionInterface $collection, $workflows, $simulate, $ignore)
+    {
+        $this->logger->error('object', [
             'category' => get_class($this),
         ]);
 
@@ -513,15 +547,6 @@ class Sync extends AbstractJob
         $this->db->{$collection->getCollection()}->updateMany($filter, ['$set' => [
             'endpoints.'.$endpoint->getName().'.garbage' => true,
         ]]);
-
-        $workflows = iterator_to_array($endpoint->getWorkflows(['kind' => 'GarbageWorkflow']));
-        if (count($workflows) === 0) {
-            $this->logger->info('no garbage workflows available in ['.$endpoint->getIdentifier().'], skip garbage collection', [
-                'category' => get_class($this),
-            ]);
-
-            return false;
-        }
 
         $i = 0;
         foreach ($collection->getObjects($filter, false) as $id => $object) {
@@ -556,8 +581,6 @@ class Sync extends AbstractJob
             }
         }
 
-        $this->relationGarbageCollector($collection, $endpoint, $workflows, $simulate);
-
         return true;
     }
 
@@ -566,6 +589,10 @@ class Sync extends AbstractJob
      */
     protected function relationGarbageCollector(CollectionInterface $collection, EndpointInterface $endpoint, $workflows, $simulate)
     {
+        $this->logger->error('relation', [
+            'category' => get_class($this),
+        ]);
+
         $namespace = $endpoint->getCollection()->getResourceNamespace();
         $collection = $endpoint->getCollection();
         $key = join('/', [$namespace->getName(), $collection->getName(), $endpoint->getName()]);

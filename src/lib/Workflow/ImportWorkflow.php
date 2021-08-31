@@ -74,9 +74,6 @@ class ImportWorkflow extends Workflow
             return false;
         }
 
-        $co = $endpoint->getCollection()->getName();
-        $endpoint = $endpoint->getName();
-        $key = join('/', [$namespace->getName(), $co, $endpoint]);
         $relationObject = $this->relation_factory->getOne($namespace, $relation['name']);
 
         foreach ($workflow->getAttributeMap()->getMap() as $attr) {
@@ -87,6 +84,10 @@ class ImportWorkflow extends Workflow
             }
         }
 
+        $co = $endpoint->getCollection()->getName();
+        $endpoint = $endpoint->getName();
+        $key = join('/', [$namespace->getName(), $co, $endpoint]);
+
         $attributes = Helper::associativeArrayToPath($relation);
         $map = $this->attribute_map->map($attributes, $process->getTimestamp());
 
@@ -96,10 +97,13 @@ class ImportWorkflow extends Workflow
         ]);
 
         $update = (array) Map::map($this->attribute_map, $map, ['data' => $relationObject->getData()], $process->getTimestamp());
+        $endpointData = $relationObject->toArray()['endpoints'][$key];
+
         $update['endpoints'][$key] = [
             'name' => $endpoint,
-            'last_sync' => $process->getTimestamp(),
-            'last_successful_sync' => $process->getTimestamp(),
+            'last_sync' => $endpointData['last_sync'],
+            'last_successful_sync' => $endpointData['last_successful_sync'],
+            'last_garbage_sync' => $process->getTimestamp(),
             'process' => $process->getId(),
             'workflow' => $this->getName(),
             'success' => true,
