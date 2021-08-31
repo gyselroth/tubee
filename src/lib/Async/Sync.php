@@ -523,8 +523,16 @@ class Sync extends AbstractJob
         }
 
         if ($relationObject) {
+            $this->logger->info('run garbage workflows for relations', [
+                'category' => get_class($this),
+            ]);
+
             return $this->relationGarbageCollector($collection, $endpoint, $workflows, $simulate);
         }
+
+        $this->logger->info('run garbage workflows for DataObjects', [
+            'category' => get_class($this),
+        ]);
 
         return $this->objectGarbageCollector($endpoint, $collection, $workflows, $simulate, $ignore);
     }
