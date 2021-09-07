@@ -332,7 +332,9 @@ class Factory
      */
     public function deleteOne(DataObjectRelationInterface $relation, bool $simulate = false): bool
     {
-        $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $relation->getId());
+        if (!$simulate) {
+            $this->resource_factory->deleteFrom($this->db->{self::COLLECTION_NAME}, $relation->getId());
+        }
 
         return true;
     }

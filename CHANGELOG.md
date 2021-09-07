@@ -1,3 +1,10 @@
+## 1.2.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Sep 07 15:30:00 CEST 2021
+
+### Changes
+* GarbageWorflow: Allow condition configuration for relation objects    
+
 ## 1.1.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue July 06 10:45:00 CEST 2021

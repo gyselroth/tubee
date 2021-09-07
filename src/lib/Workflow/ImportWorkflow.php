@@ -12,12 +12,15 @@ declare(strict_types=1);
 namespace Tubee\Workflow;
 
 use MongoDB\BSON\UTCDateTimeInterface;
+use MongoDB\Collection;
 use Tubee\Async\Sync;
 use Tubee\Collection\CollectionInterface;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\DataObject\Exception as DataObjectException;
+use Tubee\Endpoint\EndpointInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Helper;
+use Tubee\ResourceNamespace\ResourceNamespaceInterface;
 use Tubee\Workflow;
 
 class ImportWorkflow extends Workflow
@@ -63,6 +66,59 @@ class ImportWorkflow extends Workflow
         }
 
         return false;
+    }
+
+    public function relationCleanup(Collection $collection, $relation, Sync $process, ResourceNamespaceInterface $namespace, EndpointInterface $endpoint, $workflow, bool $simulate = false): bool
+    {
+        if ($this->checkCondition($relation) === false) {
+            return false;
+        }
+
+        $relationObject = $this->relation_factory->getOne($namespace, $relation['name']);
+        $dataObject = $relationObject->getDataObjectByRelation($relationObject, $endpoint->getCollection());
+        $dataObject->getCollection()->changeObject($dataObject, ['data' => $dataObject->getData()], $simulate, [
+            'name' => $this->endpoint->getName(),
+            'last_garbage_sync' => $process->getTimestamp(),
+            'process' => $process->getId(),
+            'workflow' => $this->getName(),
+            'success' => true,
+        ]);
+
+        foreach ($workflow->getAttributeMap()->getMap() as $attr) {
+            if (isset($attr['map']) && $attr['map']['ensure'] === 'absent') {
+                $this->relation_factory->deleteOne($relationObject, $simulate);
+
+                return true;
+            }
+        }
+
+        $co = $endpoint->getCollection()->getName();
+        $endpoint = $endpoint->getName();
+        $key = join('/', [$namespace->getName(), $co, $endpoint]);
+
+        $attributes = Helper::associativeArrayToPath($relation);
+        $map = $this->attribute_map->map($attributes, $process->getTimestamp());
+
+        $this->logger->info('mapped object attributes [{map}] for cleanup', [
+            'category' => get_class($this),
+            'map' => array_keys($map),
+        ]);
+
+        $update = (array) Map::map($this->attribute_map, $map, ['data' => $relationObject->getData()], $process->getTimestamp());
+        $endpointData = $relationObject->toArray()['endpoints'][$key];
+
+        $update['endpoints'][$key] = [
+            'name' => $endpoint,
+            'last_sync' => $endpointData['last_sync'],
+            'last_successful_sync' => $endpointData['last_successful_sync'],
+            'last_garbage_sync' => $process->getTimestamp(),
+            'process' => $process->getId(),
+            'workflow' => $this->getName(),
+            'success' => true,
+            'garbage' => true,
+        ];
+
+        return $this->resource_factory->updateIn($collection, $relationObject, $update, $simulate);
     }
 
     /**

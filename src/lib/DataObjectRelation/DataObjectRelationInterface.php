@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\DataObjectRelation;
 
+use Tubee\Collection;
 use Tubee\DataObject\DataObjectInterface;
 use Tubee\Resource\ResourceInterface;
 
@@ -25,4 +26,9 @@ interface DataObjectRelationInterface extends ResourceInterface
      * Get data object.
      */
     public function getDataObject(): ?DataObjectInterface;
+
+    /**
+     * Get data object by relation.
+     */
+    public function getDataObjectByRelation(DataObjectRelationInterface $relation, Collection $collection): ?DataObjectInterface;
 }
