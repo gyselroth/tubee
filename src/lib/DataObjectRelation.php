@@ -76,4 +76,18 @@ class DataObjectRelation extends AbstractResource implements DataObjectRelationI
     {
         return $this->object;
     }
+
+    public function getDataObjectByRelation(DataObjectRelationInterface $relation, Collection $collection): ?DataObjectInterface
+    {
+        $relationData = $relation->getData();
+        if (isset($relationData['relation'])) {
+            foreach ($relationData['relation'] as $object) {
+                if (isset($object['collection']) && $object['collection'] === $collection->getName()) {
+                    return $collection->getObject(['name' => $object['object']]);
+                }
+            }
+        }
+
+        return null;
+    }
 }
