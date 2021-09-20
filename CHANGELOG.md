@@ -1,3 +1,10 @@
+## 1.2.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon Sep 20 11:30:00 CEST 2021
+
+### Bugfixes
+* MicrosoftGraph: Merge existing and new members/owners properly when ensure merge is configured
+
 ## 1.2.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue Sep 07 15:30:00 CEST 2021
