@@ -1,7 +1,7 @@
 version: '3'
 services:
-  mongodb3:
-    image: mongo:3.6.0
+  mongodb4:
+    image: mongo:4.4.4
     entrypoint: [ "/usr/bin/mongod", "--bind_ip_all", "--replSet", "rs0" ]
   openldap-endpoint:
     image: osixia/openldap:latest
@@ -20,14 +20,14 @@ services:
     image: raffis/mongodb-query-exporter:1.0.0-beta2
     environment:
       - MDBEXPORTER_CONFIG=/mnt/config.yaml
-      - MDBEXPORTER_MONGODB_URI=mongodb://mongodb3:27017
+      - MDBEXPORTER_MONGODB_URI=mongodb://mongodb4:27017
       - MDBEXPORTER_LOG_LEVEL=debug
     volumes:
       -  ./config/mongodb-metrics:/mnt
     ports:
       - "9412:9412"
   mongodb-endpoint:
-    image: mongo:3.6.0
+    image: mongo:4.4.4
     ports:
       - "27017:27017"
   mariadb-endpoint:
@@ -51,10 +51,10 @@ services:
   balloon:
     image: gyselroth/balloon:2.3.3
     links:
-      - mongodb3
+      - mongodb4
     entrypoint: php-fpm
     environment:
-      - BALLOON_MONGODB_URI=mongodb://mongodb3:27017
+      - BALLOON_MONGODB_URI=mongodb://mongodb4:27017
   ucs-endpoint:
     image: univention/ucs-master-amd64:4.2-2
     hostname: master
@@ -87,9 +87,9 @@ services:
     volumes:
       - .:/srv/www/tubee
     links:
-      - mongodb3
+      - mongodb4
       - openldap-endpoint
       - balloon-endpoint
       - ucs-endpoint
     environment:
-      - TUBEE_MONGODB_URI=mongodb://mongodb3:27017
+      - TUBEE_MONGODB_URI=mongodb://mongodb4:27017
