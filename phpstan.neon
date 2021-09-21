@@ -1,8 +1,8 @@
 parameters:
-    autoload_directories:
+    scanDirectories:
         - %rootDir%/../../../src/lib
         - %rootDir%/../../../tests
-    autoload_files:
+    bootstrapFiles:
         - %rootDir%/../../../tests/Unit/Bootstrap.php
     ignoreErrors:
         - '#^Class MongoDB\\BSON\\UTCDateTime constructor invoked with 0 parameters, 1 required\.#'
@@ -11,11 +11,15 @@ parameters:
         - '#Function apc_store not found#'
         - '#Function apc_fetch not found#'
         - '#Tubee\\Endpoint\\Pdo\\Wrapper\:\:__construct\(\) does not call parent constructor from PDO#'
-        - '#Call to an undefined method Tubee\\Resource\\Factory::build()#'
+        - '#Call to an undefined method Tubee\\Resource\\Factory::build\(\)#'
         - '#Tubee\\Endpoint\\Mysql\\Wrapper\:\:__construct\(\) does not call parent constructor from mysqli#'
         - '#Tubee\\Rest\\Helper#'
         - '#Access to an undefined property Tubee\\V8\\Engine::\$logger#'
         - '#Access to an undefined property Tubee\\V8\\Engine::\$crypt#'
+        - '#Method Tubee\\Endpoint\\Xml::getOne\(\) should return Tubee\\EndpointObject\\EndpointObjectInterface but return statement is missing.#'
+        - '#Method Tubee\\Rest\\Middlewares\\Acl::process\(\) should return Psr\\Http\\Message\\ResponseInterface but return statement is missing.#'
+        - message: '#Undefined variable: \$this#'
+          path: src/lib/Rest/Helper.php
     reportUnmatchedIgnoredErrors: false
 includes:
-    - vendor/phpstan/phpstan/conf/config.level1.neon
+    - phar://vendor/phpstan/phpstan/phpstan.phar/conf/config.level1.neon

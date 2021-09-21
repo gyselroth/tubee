@@ -77,14 +77,9 @@ class AttributeMap implements AttributeMapInterface
     public function map(array $data): array
     {
         $this->v8->object = $data;
-        $attrv = null;
 
         $result = [];
         foreach ($this->map as $value) {
-            if (isset($attrv)) {
-                unset($attrv);
-            }
-
             $attr = $value['name'];
 
             if (isset($value['ensure'])) {

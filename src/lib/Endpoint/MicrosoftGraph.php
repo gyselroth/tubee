@@ -20,6 +20,7 @@ use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\MicrosoftGraph\Exception as GraphException;
 use Tubee\Endpoint\OdataRest\QueryTransformer;
 use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Helper;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class MicrosoftGraph extends OdataRest
@@ -118,7 +119,7 @@ class MicrosoftGraph extends OdataRest
         $id = parent::create($map, $object, $simulate);
 
         if ($this->isGroupEndpoint()) {
-            $requests = $this->getMemberChangeBatchRequests($id, $new, []);
+            $requests = $this->getMemberChangeBatchRequests($id, $new, [], $map->getMap());
         }
 
         if ($this->isGroupEndpoint() && isset($object['resourceProvisioningOptions']) && in_array('Team', $object['resourceProvisioningOptions'])) {
@@ -166,7 +167,7 @@ class MicrosoftGraph extends OdataRest
                 ];
             }
 
-            $requests = array_merge($requests, $this->getMemberChangeBatchRequests($id, $diff, $endpoint_object));
+            $requests = array_merge($requests, $this->getMemberChangeBatchRequests($id, $diff, $endpoint_object, $map->getMap()));
             unset($diff['members'], $diff['owners']);
         }
 
@@ -257,7 +258,7 @@ class MicrosoftGraph extends OdataRest
     /**
      * Get member batch requests.
      */
-    protected function getMemberChangeBatchRequests(string $id, array $diff, array $endpoint_object): array
+    protected function getMemberChangeBatchRequests(string $id, array $diff, array $endpoint_object, array $map): array
     {
         $requests = [];
 
@@ -293,15 +294,19 @@ class MicrosoftGraph extends OdataRest
                 ];
             }
 
-            foreach ($remove as $member) {
-                $requests[] = [
-                    'id' => 'remove-'.$type.'-'.$member,
-                    'method' => 'DELETE',
-                    'url' => '/groups/'.$id.'/'.$type.'/'.$member.'/$ref',
-                     'headers' => [
-                        'Content-Type' => 'application/json',
-                    ],
-                ];
+            $array_key = Helper::searchArray($type, 'name', $map);
+
+            if ($array_key !== null && $map[$array_key]['ensure'] !== 'merge') {
+                foreach ($remove as $member) {
+                    $requests[] = [
+                        'id' => 'remove-'.$type.'-'.$member,
+                        'method' => 'DELETE',
+                        'url' => '/groups/'.$id.'/'.$type.'/'.$member.'/$ref',
+                        'headers' => [
+                            'Content-Type' => 'application/json',
+                        ],
+                    ];
+                }
             }
         }
 
