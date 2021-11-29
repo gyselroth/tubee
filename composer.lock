@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a910d6b5a57f557e932af9fef2877565",
+    "content-hash": "480d9faa3d3710680b98b9ca3e149963",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -980,16 +980,16 @@
         },
         {
             "name": "gyselroth/mongodb-php-task-scheduler",
-            "version": "v4.0.0-alpha5",
+            "version": "v4.0.0-alpha6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/php-task-scheduler.git",
-                "reference": "e6ee3ec1fce93f51556a45642c1a219e64136957"
+                "reference": "ad524beea57b0eced456a67575b338205c06ae38"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/e6ee3ec1fce93f51556a45642c1a219e64136957",
-                "reference": "e6ee3ec1fce93f51556a45642c1a219e64136957",
+                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/ad524beea57b0eced456a67575b338205c06ae38",
+                "reference": "ad524beea57b0eced456a67575b338205c06ae38",
                 "shasum": ""
             },
             "require": {
@@ -1034,7 +1034,7 @@
                 "mongodb",
                 "task-scheduler"
             ],
-            "time": "2021-11-24T14:10:09+00:00"
+            "time": "2021-11-29T11:25:18+00:00"
         },
         {
             "name": "gyselroth/stream-iterator",
