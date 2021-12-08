@@ -84,7 +84,7 @@ class Process extends AbstractResource implements ProcessInterface
                 'parent' => $parent,
                 'next' => $this->resource['options']['at'] === 0 ? null : (new DateTime('@'.(string) $this->resource['options']['at']))->format('c'),
                 'estimated' => $estimated === null ? null : $estimated->format('c'),
-                'started' => $this->resource['status'] === 0 ? null : $this->resource['started']->toDateTime()->format('c'),
+                'started' => $this->resource['status'] === 0 || $this->resource['status'] === 5 ? null : $this->resource['started']->toDateTime()->format('c'),
                 'ended' => $this->resource['status'] <= 2 || $this->resource['status'] === 5 ? null : $this->resource['ended']->toDateTime()->format('c'),
                 'result' => JobInterface::STATUS_MAP[$this->resource['status']],
                 'code' => $this->resource['status'],
