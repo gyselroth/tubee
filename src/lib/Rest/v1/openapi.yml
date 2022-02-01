@@ -4728,6 +4728,9 @@ components:
                       description: Base uri to resources (Like
                         https://rest.api/v1/resources).
                       type: string
+                    container:
+                      description: Key of array which contains the data in REST response
+                      type: string
                     request_options:
                       description: Advanced request options, see
                         http://docs.guzzlephp.org/en/stable/request-options.html
