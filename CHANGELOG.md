@@ -1,3 +1,10 @@
+## 1.3.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Feb 02 16:00:00 CEST 2022
+
+### Changes
+* OdataRest: Allow to set rest data container manually via endpoint configuration
+
 ## 1.2.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Mon Sep 20 11:30:00 CEST 2021
