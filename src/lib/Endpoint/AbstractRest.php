@@ -36,7 +36,7 @@ abstract class AbstractRest extends AbstractEndpoint
      *
      * @var string
      */
-    protected $container;
+    protected $container = null;
 
     /**
      * Access token.
@@ -160,7 +160,7 @@ abstract class AbstractRest extends AbstractEndpoint
     {
         $data = $this->decodeResponse($response);
 
-        if (isset($this->container)) {
+        if (isset($this->container) && $this->container !== null) {
             if (isset($data[$this->container])) {
                 $data = $data[$this->container];
             } else {
