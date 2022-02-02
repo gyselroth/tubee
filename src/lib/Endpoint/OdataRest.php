@@ -30,9 +30,9 @@ class OdataRest extends AbstractRest
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [], ?string $container = null)
     {
-        $this->container = 'value';
+        $this->setContainer($container);
         parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }
 
@@ -134,5 +134,10 @@ class OdataRest extends AbstractRest
         }
 
         return $this->build(array_shift($data), $filter);
+    }
+
+    protected function setContainer(?string $container): void
+    {
+        $this->container = $container;
     }
 }
