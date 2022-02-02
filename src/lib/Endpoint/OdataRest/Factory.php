@@ -25,7 +25,7 @@ class Factory
      */
     public static function build(array $resource, CollectionInterface $collection, WorkflowFactory $workflow_factory, LoggerInterface $logger): EndpointInterface
     {
-        $client    = RestFactory::buildClient($resource, $logger);
+        $client = RestFactory::buildClient($resource, $logger);
         $container = $resource['data']['resource']['container'] ?? null;
 
         return new OdataRest($resource['name'], $resource['data']['type'], $client, $collection, $workflow_factory, $logger, $resource, $container);

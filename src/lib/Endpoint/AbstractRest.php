@@ -36,7 +36,7 @@ abstract class AbstractRest extends AbstractEndpoint
      *
      * @var string
      */
-    protected $container = null;
+    protected $container;
 
     /**
      * Access token.
