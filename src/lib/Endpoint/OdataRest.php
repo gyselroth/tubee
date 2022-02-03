@@ -17,9 +17,9 @@ use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\OdataRest\QueryTransformer;
+use Tubee\Endpoint\Rest\Exception as RestException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
-use Tubee\Endpoint\Rest\Exception as RestException;
 
 class OdataRest extends AbstractRest
 {
