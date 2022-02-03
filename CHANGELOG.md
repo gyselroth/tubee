@@ -3,7 +3,7 @@
 **Date**: Thu Feb 03 12:00:00 CEST 2022
 
 ### Bugfixes
-* PHP-settings: Changed memory_limit to 256M
+* PHP-settings: Changed memory_limit to 512M
 
 ## 1.3.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
