@@ -1,3 +1,17 @@
+## 1.3.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Feb 03 11:00:00 CEST 2022
+
+### Bugfixes
+* PHP-settings: Changed memory_limit to 256M
+
+## 1.3.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Feb 02 16:00:00 CEST 2022
+
+### Changes
+* OdataRest: Allow to set rest data container manually via endpoint configuration
+
 ## 1.2.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Mon Sep 20 11:30:00 CEST 2021
@@ -10,7 +24,7 @@
 **Date**: Tue Sep 07 15:30:00 CEST 2021
 
 ### Changes
-* GarbageWorflow: Allow condition configuration for relation objects    
+* GarbageWorflow: Allow condition configuration for relation objects
 
 ## 1.1.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
@@ -32,7 +46,7 @@
 **Date**: Tue Oct 27 10:10:00 CEST 2020
 
 ### Features
-* SqlSrvUsersEndpoint: added option to set default database and default language 
+* SqlSrvUsersEndpoint: added option to set default database and default language
 
 ## 1.0.0-beta66
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
@@ -69,7 +83,7 @@
 **Date**: Fri Jan 31 08:14:21 CET 2020
 
 ### Bugfixes
-* Fixed workflow updates to manually added DataObjects MongoDB\Driver\Exception\BulkWriteException: Cannot create field 'ep-name' in element {endpoints: null} 
+* Fixed workflow updates to manually added DataObjects MongoDB\Driver\Exception\BulkWriteException: Cannot create field 'ep-name' in element {endpoints: null}
 
 
 ## 1.0.0-beta61
@@ -169,7 +183,7 @@
 **Date**: Wed Dec 04 15:58:21 CET 2019
 
 ### Bugfixes
-* Do not send notifications from child processes 
+* Do not send notifications from child processes
 
 
 ## 1.0.0-beta51
@@ -282,7 +296,7 @@
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Thu Jul 18 10:36:23 CEST 2019
 
-* CORE: [FIX] A Throwable exception (TypeError) might lead to multiple loggers and therefore the wrong process id gets attached to logs 
+* CORE: [FIX] A Throwable exception (TypeError) might lead to multiple loggers and therefore the wrong process id gets attached to logs
 * CORE: [FIX] MicrosoftGraphEndpoint: Remove group member/owner ends in "Write requests are only supported on contained entities"
 * CORE: [FIX] MicrosoftGraphEndpoint: Resolve all group members/owners (limit of 100 resources)
 * CORE: [FIX] MicrosoftGraphEndpoint: Do not throw exception if /groups/{group}/team fails
@@ -338,7 +352,7 @@
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed Jul 11 15:42:11 CEST 2019
 
-* CORE: [FIX] last_sync/last_successful_sync have an old timestamp #53 
+* CORE: [FIX] last_sync/last_successful_sync have an old timestamp #53
 
 
 ## 1.0.0-beta31
@@ -459,14 +473,14 @@
 **Date**: Thu May 23 10:26:12 CEST 2019
 
 * CORE: [FIX] encode found export object, fixes MongoDB\Driver\Exception\InvalidArgumentException: invalid document for insert: keys cannot begin with "$"
-* CORE: [FIX] added missing simulate field to Job resource in swagger specs 
+* CORE: [FIX] added missing simulate field to Job resource in swagger specs
 
 
 ## 1.0.0-beta15
 **Maintainer**: Raffael Sahli <sahli@gyselroth.com>\
 **Date**: Wed May 22 12:26:12 CEST 2019
 
-* CORE: [FIX] do not throw Exception\ImportConditionNotMet if multiple data objects were found, sync relations first and log a warning instead 
+* CORE: [FIX] do not throw Exception\ImportConditionNotMet if multiple data objects were found, sync relations first and log a warning instead
 * CORE: [FIX] Wrong debug log: total counter is less than the current DataObject #40
 * CORE: [FIX] pdo endpoint (mssql) generates wrong filter #39
 * CORE: [FIX] Do not throw an exception during query for an non existing mssql field #38

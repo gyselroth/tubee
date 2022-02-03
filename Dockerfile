@@ -78,5 +78,8 @@ RUN ln -s /usr/share/tubee/bin/console/tubeecli /usr/bin/tubeecli
 RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \
   && echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf
 
+RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
+    && sed -i -e "s/^ *memory_limit.*/memory_limit = 256M/g" /usr/local/etc/php/php.ini
+
 ENV TUBEE_PATH /usr/share/tubee
 ENV TUBEE_CONFIG_DIR /etc/tubee
