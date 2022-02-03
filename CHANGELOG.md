@@ -1,3 +1,10 @@
+## 1.3.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Feb 03 16:00:00 CEST 2022
+
+### Bugfixes
+* OdataRest: Get correct amount of endpoint objects
+
 ## 1.3.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Thu Feb 03 12:00:00 CEST 2022

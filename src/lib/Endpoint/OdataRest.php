@@ -17,6 +17,7 @@ use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\OdataRest\QueryTransformer;
+use Tubee\Endpoint\Rest\Exception as RestException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -72,10 +73,17 @@ class OdataRest extends AbstractRest
             $options['query']['$filter'] = $query;
         }
 
-        $options['query']['$count'] = true;
         $response = $this->client->get('', $options);
+        $data = $this->decodeResponse($response);
+        if (isset($this->container) && $this->container !== null) {
+            if (isset($data[$this->container])) {
+                $data = $data[$this->container];
+            } else {
+                throw new RestException\InvalidContainer('specified container '.$this->container.' does not exists in response');
+            }
+        }
 
-        return (int) $this->decodeResponse($response);
+        return count($data);
     }
 
     /**
