@@ -1,6 +1,6 @@
 ## 1.3.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Thu Feb 03 11:00:00 CEST 2022
+**Date**: Thu Feb 03 12:00:00 CEST 2022
 
 ### Bugfixes
 * PHP-settings: Changed memory_limit to 256M

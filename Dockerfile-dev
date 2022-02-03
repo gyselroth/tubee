@@ -12,18 +12,17 @@ RUN apt-get update && apt-get install -y \
   libssl-dev \
   libzip-dev \
   libicu-dev \
-  libreoffice \
   libsmbclient-dev \
-  gnupg \
-  strace \
   apt-transport-https=1.4.10 \
   libmagickwand-dev \
   unixodbc-dev \
   build-essential \
   curl \
+  gnupg \
   git \
   chrpath \
   python \
+  smbclient \
   libglib2.0-dev \
   ca-certificates-java \
   && rm -rf /var/lib/apt/lists/*
@@ -34,7 +33,7 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql17 wget dialog  \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.a /usr/lib/ \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.so /usr/lib/ \
-    && wget http://security.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u11_amd64.deb \
+    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
     && dpkg -i *.deb
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -87,7 +86,7 @@ RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \
   && echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf
 
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
-    && sed -i -e "s/^ *memory_limit.*/memory_limit = 256M/g" /usr/local/etc/php/php.ini
+    && sed -i -e "s/^ *memory_limit.*/memory_limit = 512M/g" /usr/local/etc/php/php.ini
 
 EXPOSE 80 443 9000
 
