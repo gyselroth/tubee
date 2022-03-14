@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: ""
-  version: 1.0.0
+  version: 1.1.0
   title: Tubee API
   termsOfService: ""
   contact:
@@ -4727,6 +4727,9 @@ components:
                     base_uri:
                       description: Base uri to resources (Like
                         https://rest.api/v1/resources).
+                      type: string
+                    container:
+                      description: Key of array which contains the data in REST response
                       type: string
                     request_options:
                       description: Advanced request options, see

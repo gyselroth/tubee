@@ -17,6 +17,7 @@ use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\OdataRest\QueryTransformer;
+use Tubee\Endpoint\Rest\Exception as RestException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -30,9 +31,9 @@ class OdataRest extends AbstractRest
     /**
      * Init endpoint.
      */
-    public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
+    public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [], ?string $container = null)
     {
-        $this->container = 'value';
+        $this->setContainer($container);
         parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }
 
@@ -72,10 +73,17 @@ class OdataRest extends AbstractRest
             $options['query']['$filter'] = $query;
         }
 
-        $options['query']['$count'] = true;
         $response = $this->client->get('', $options);
+        $data = $this->decodeResponse($response);
+        if (isset($this->container) && $this->container !== null) {
+            if (isset($data[$this->container])) {
+                $data = $data[$this->container];
+            } else {
+                throw new RestException\InvalidContainer('specified container '.$this->container.' does not exists in response');
+            }
+        }
 
-        return (int) $this->decodeResponse($response);
+        return count($data);
     }
 
     /**
@@ -134,5 +142,10 @@ class OdataRest extends AbstractRest
         }
 
         return $this->build(array_shift($data), $filter);
+    }
+
+    protected function setContainer(?string $container): void
+    {
+        $this->container = $container;
     }
 }
