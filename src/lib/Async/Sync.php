@@ -17,6 +17,7 @@ use Monolog\Handler\MongoDBHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\AbstractJob;
+use TaskScheduler\JobInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
@@ -40,6 +41,12 @@ class Sync extends AbstractJob
         'critical' => Logger::CRITICAL,
         'alert' => Logger::ALERT,
         'emergency' => Logger::EMERGENCY,
+    ];
+
+    public const PENDING_JOBS = [
+        JobInterface::STATUS_WAITING,
+        JobInterface::STATUS_POSTPONED,
+        JobInterface::STATUS_PROCESSING,
     ];
 
     /**
@@ -156,7 +163,10 @@ class Sync extends AbstractJob
             $i = 0;
             foreach ($this->stack as $proc) {
                 ++$i;
-                $proc->wait();
+                if (in_array($this->scheduler->getJob($proc->getId())->getStatus(), self::PENDING_JOBS)) {
+                    $proc->wait();
+                }
+
                 $this->updateProgress($i / count($this->stack) * 100);
 
                 $record = $this->db->{$this->scheduler->getJobQueue()}->findOne([
