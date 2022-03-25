@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "723cef619c1548c1bf9035824e94cee6",
+    "content-hash": "a80e41173a22abdc4f7d743cb467dd13",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -1023,16 +1023,16 @@
         },
         {
             "name": "gyselroth/mongodb-php-task-scheduler",
-            "version": "v4.0.0-beta5",
+            "version": "v4.0.0-beta6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/php-task-scheduler.git",
-                "reference": "6d846449922b854fe3929e0a81b389c232c210c8"
+                "reference": "39c962c1b74ad374919ca0d060444fc38ed51aa7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/6d846449922b854fe3929e0a81b389c232c210c8",
-                "reference": "6d846449922b854fe3929e0a81b389c232c210c8",
+                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/39c962c1b74ad374919ca0d060444fc38ed51aa7",
+                "reference": "39c962c1b74ad374919ca0d060444fc38ed51aa7",
                 "shasum": ""
             },
             "require": {
@@ -1077,7 +1077,11 @@
                 "mongodb",
                 "task-scheduler"
             ],
-            "time": "2022-03-23T10:11:49+00:00"
+            "support": {
+                "issues": "https://github.com/gyselroth/php-task-scheduler/issues",
+                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.0.0-beta6"
+            },
+            "time": "2022-03-25T09:07:07+00:00"
         },
         {
             "name": "gyselroth/stream-iterator",
@@ -2481,16 +2485,16 @@
         },
         {
             "name": "paragonie/sodium_compat",
-            "version": "v1.17.0",
+            "version": "v1.17.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/sodium_compat.git",
-                "reference": "c59cac21abbcc0df06a3dd18076450ea4797b321"
+                "reference": "ac994053faac18d386328c91c7900f930acadf1e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/c59cac21abbcc0df06a3dd18076450ea4797b321",
-                "reference": "c59cac21abbcc0df06a3dd18076450ea4797b321",
+                "url": "https://api.github.com/repos/paragonie/sodium_compat/zipball/ac994053faac18d386328c91c7900f930acadf1e",
+                "reference": "ac994053faac18d386328c91c7900f930acadf1e",
                 "shasum": ""
             },
             "require": {
@@ -2559,7 +2563,11 @@
                 "secret-key cryptography",
                 "side-channel resistant"
             ],
-            "time": "2021-08-10T02:43:50+00:00"
+            "support": {
+                "issues": "https://github.com/paragonie/sodium_compat/issues",
+                "source": "https://github.com/paragonie/sodium_compat/tree/v1.17.1"
+            },
+            "time": "2022-03-23T19:32:04+00:00"
         },
         {
             "name": "php-jsonpatch/php-jsonpatch",
