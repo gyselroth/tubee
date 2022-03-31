@@ -43,12 +43,6 @@ class Sync extends AbstractJob
         'emergency' => Logger::EMERGENCY,
     ];
 
-    public const PENDING_JOBS = [
-        JobInterface::STATUS_WAITING,
-        JobInterface::STATUS_POSTPONED,
-        JobInterface::STATUS_PROCESSING,
-    ];
-
     /**
      * ResourceNamespace factory.
      *
@@ -163,7 +157,7 @@ class Sync extends AbstractJob
             $i = 0;
             foreach ($this->stack as $proc) {
                 ++$i;
-                if (in_array($this->scheduler->getJob($proc->getId())->getStatus(), self::PENDING_JOBS)) {
+                if (in_array($this->scheduler->getJob($proc->getId())->getStatus(), JobInterface::PENDING_JOBS)) {
                     $proc->wait();
                 }
 
@@ -206,6 +200,16 @@ class Sync extends AbstractJob
 
         foreach ($endpoints as $endpoint) {
             if (count($all_endpoints) > 1 || count($all_collections) > 1) {
+                $parentJob = $this->scheduler->getJob($this->getId())->toArray();
+
+                if (in_array($parentJob['status'], JobInterface::FAILED_JOBS)) {
+                    $this->logger->debug('parent job ['.$parentJob['_id'].'] not running anymore. do not add new child job', [
+                        'category' => get_class($this),
+                    ]);
+
+                    continue;
+                }
+
                 $data = $this->data;
                 $data = array_merge($data, [
                     'collections' => [$collection->getName()],

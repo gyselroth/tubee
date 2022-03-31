@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a80e41173a22abdc4f7d743cb467dd13",
+    "content-hash": "12b2e92d358da93b073624c70790fba7",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -1023,16 +1023,16 @@
         },
         {
             "name": "gyselroth/mongodb-php-task-scheduler",
-            "version": "v4.0.0-beta6",
+            "version": "v4.0.0-beta9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/php-task-scheduler.git",
-                "reference": "39c962c1b74ad374919ca0d060444fc38ed51aa7"
+                "reference": "661db58a13b01a0551857fe45c76a381e1ab084b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/39c962c1b74ad374919ca0d060444fc38ed51aa7",
-                "reference": "39c962c1b74ad374919ca0d060444fc38ed51aa7",
+                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/661db58a13b01a0551857fe45c76a381e1ab084b",
+                "reference": "661db58a13b01a0551857fe45c76a381e1ab084b",
                 "shasum": ""
             },
             "require": {
@@ -1077,11 +1077,7 @@
                 "mongodb",
                 "task-scheduler"
             ],
-            "support": {
-                "issues": "https://github.com/gyselroth/php-task-scheduler/issues",
-                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.0.0-beta6"
-            },
-            "time": "2022-03-25T09:07:07+00:00"
+            "time": "2022-03-31T13:50:01+00:00"
         },
         {
             "name": "gyselroth/stream-iterator",
@@ -2779,16 +2775,16 @@
         },
         {
             "name": "phpdocumentor/type-resolver",
-            "version": "1.6.0",
+            "version": "1.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpDocumentor/TypeResolver.git",
-                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706"
+                "reference": "77a32518733312af16a44300404e945338981de3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/93ebd0014cab80c4ea9f5e297ea48672f1b87706",
-                "reference": "93ebd0014cab80c4ea9f5e297ea48672f1b87706",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/77a32518733312af16a44300404e945338981de3",
+                "reference": "77a32518733312af16a44300404e945338981de3",
                 "shasum": ""
             },
             "require": {
@@ -2821,7 +2817,7 @@
                 }
             ],
             "description": "A PSR-5 based resolver of Class names, Types and Structural Element Names",
-            "time": "2022-01-04T19:58:01+00:00"
+            "time": "2022-03-15T21:29:03+00:00"
         },
         {
             "name": "phpspec/prophecy",
