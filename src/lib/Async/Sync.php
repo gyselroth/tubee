@@ -202,7 +202,7 @@ class Sync extends AbstractJob
             if (count($all_endpoints) > 1 || count($all_collections) > 1) {
                 $parentJob = $this->scheduler->getJob($this->getId())->toArray();
 
-                if (in_array($parentJob['status'], JobInterface::FAILED_JOBS)) {
+                if (isset($parentJob['status']) && in_array($parentJob['status'], JobInterface::FAILED_JOBS)) {
                     $this->logger->debug('parent job ['.$parentJob['_id'].'] not running anymore. do not add new child job', [
                         'category' => get_class($this),
                     ]);

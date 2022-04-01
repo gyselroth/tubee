@@ -87,7 +87,7 @@ class SyncTest extends TestCase
             ->with(Sync::class, $data);
 
         $data['collections'] = ['foo'];
-        $scheduler->expects($this->at(1))
+        $scheduler->expects($this->at(2))
             ->method('addJob')
             ->with(Sync::class, $data);
 
@@ -171,19 +171,19 @@ class SyncTest extends TestCase
 
         $data['collections'] = ['bar'];
         $data['endpoints'] = ['bar'];
-        $scheduler->expects($this->at(1))
-            ->method('addJob')
-            ->with(Sync::class, $data);
-
-        $data['collections'] = ['foo'];
-        $data['endpoints'] = ['foo'];
         $scheduler->expects($this->at(2))
             ->method('addJob')
             ->with(Sync::class, $data);
 
         $data['collections'] = ['foo'];
+        $data['endpoints'] = ['foo'];
+        $scheduler->expects($this->at(4))
+            ->method('addJob')
+            ->with(Sync::class, $data);
+
+        $data['collections'] = ['foo'];
         $data['endpoints'] = ['bar'];
-        $scheduler->expects($this->at(3))
+        $scheduler->expects($this->at(6))
             ->method('addJob')
             ->with(Sync::class, $data);
 
@@ -232,19 +232,19 @@ class SyncTest extends TestCase
 
         $data['collections'] = ['foo'];
         $data['endpoints'] = ['foo'];
-        $scheduler->expects($this->at(1))
+        $scheduler->expects($this->at(2))
             ->method('addJob')
             ->with(Sync::class, $data);
 
         $data['collections'] = ['bar'];
         $data['endpoints'] = ['bar'];
-        $scheduler->expects($this->at(2))
+        $scheduler->expects($this->at(4))
             ->method('addJob')
             ->with(Sync::class, $data);
 
         $data['collections'] = ['foo'];
         $data['endpoints'] = ['bar'];
-        $scheduler->expects($this->at(3))
+        $scheduler->expects($this->at(6))
             ->method('addJob')
             ->with(Sync::class, $data);
 
