@@ -111,8 +111,8 @@ class Job extends AbstractResource implements JobInterface
                     'last_process' => [
                         'process' => (string) $process['_id'],
                         'next' => $process['options']['at'] === 0 ? null : (new DateTime('@'.(string) $process['options']['at']))->format('c'),
-                        'started' => $process['status'] === null ? null : $process['started']->toDateTime()->format('c'),
-                        'ended' => $process['status'] === null ? null : $process['ended']->toDateTime()->format('c'),
+                        'started' => $process['started'] === null ? null : $process['started']->toDateTime()->format('c'),
+                        'ended' => $process['ended'] === null ? null : $process['ended']->toDateTime()->format('c'),
                         'result' => TaskJobInterface::STATUS_MAP[$process['status']],
                         'code' => $process['status'],
                     ],
