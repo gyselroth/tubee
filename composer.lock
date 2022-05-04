@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f84ece5f0f8071568bd3c2795eefdf0b",
+    "content-hash": "240ae2b4550d42d649bf27de84858a11",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -1101,16 +1101,16 @@
         },
         {
             "name": "gyselroth/mongodb-php-task-scheduler",
-            "version": "v4.0.0-beta13",
+            "version": "v4.0.0-beta14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/php-task-scheduler.git",
-                "reference": "fb861f93b41b780c9afad03cb04bc4365f7e8a08"
+                "reference": "b1d9d5833aefdd351e8069482d9a6dfbec163377"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/fb861f93b41b780c9afad03cb04bc4365f7e8a08",
-                "reference": "fb861f93b41b780c9afad03cb04bc4365f7e8a08",
+                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/b1d9d5833aefdd351e8069482d9a6dfbec163377",
+                "reference": "b1d9d5833aefdd351e8069482d9a6dfbec163377",
                 "shasum": ""
             },
             "require": {
@@ -1157,9 +1157,9 @@
             ],
             "support": {
                 "issues": "https://github.com/gyselroth/php-task-scheduler/issues",
-                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.0.0-beta13"
+                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.0.0-beta14"
             },
-            "time": "2022-05-04T10:42:27+00:00"
+            "time": "2022-05-04T14:45:58+00:00"
         },
         {
             "name": "gyselroth/stream-iterator",
