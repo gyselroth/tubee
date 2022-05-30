@@ -17,6 +17,7 @@ use Monolog\Handler\MongoDBHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 use TaskScheduler\AbstractJob;
+use TaskScheduler\JobInterface;
 use TaskScheduler\Scheduler;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
@@ -156,7 +157,10 @@ class Sync extends AbstractJob
             $i = 0;
             foreach ($this->stack as $proc) {
                 ++$i;
-                $proc->wait();
+                if (in_array($this->scheduler->getJob($proc->getId())->getStatus(), JobInterface::PENDING_JOBS)) {
+                    $proc->wait();
+                }
+
                 $this->updateProgress($i / count($this->stack) * 100);
 
                 $record = $this->db->{$this->scheduler->getJobQueue()}->findOne([
@@ -196,6 +200,16 @@ class Sync extends AbstractJob
 
         foreach ($endpoints as $endpoint) {
             if (count($all_endpoints) > 1 || count($all_collections) > 1) {
+                $parentJob = $this->scheduler->getJob($this->getId())->toArray();
+
+                if (isset($parentJob['status']) && in_array($parentJob['status'], JobInterface::FAILED_JOBS)) {
+                    $this->logger->debug('parent job ['.$parentJob['_id'].'] not running anymore. do not add new child job', [
+                        'category' => get_class($this),
+                    ]);
+
+                    continue;
+                }
+
                 $data = $this->data;
                 $data = array_merge($data, [
                     'collections' => [$collection->getName()],
@@ -304,10 +318,7 @@ class Sync extends AbstractJob
         $i = 0;
 
         foreach ($collection->getObjects($filter) as $id => $object) {
-            if ($total !== 0) {
-                $this->updateProgress($i / $total * 100);
-            }
-
+            $this->updateProgress(($total === 0) ? 0 : $i / $total * 100);
             ++$i;
             $this->logger->debug('process ['.$i.'] export for object ['.(string) $id.'] - [{fields}] from data type ['.$collection->getIdentifier().']', [
                 'category' => get_class($this),
@@ -423,10 +434,7 @@ class Sync extends AbstractJob
             $total = $ep->count($filter);
 
             foreach ($ep->getAll($filter) as $id => $object) {
-                if ($total !== 0) {
-                    $this->updateProgress($i / $total * 100);
-                }
-
+                $this->updateProgress(($total === 0) ? 0 : $i / $total * 100);
                 ++$i;
                 $this->logger->debug('process object ['.$i.'] import for object ['.$object->getId().'] into data type ['.$collection->getIdentifier().']', [
                     'category' => get_class($this),
