@@ -57,7 +57,7 @@ class Cli extends AbstractBootstrap
      */
     public function process(): Cli
     {
-        $this->getopt->addOption(['v', 'verbose', GetOpt::NO_ARGUMENT, 'Verbose']);
+        $this->getopt->addOption(['v', 'verbose', GetOpt::OPTIONAL_ARGUMENT, 'Verbose']);
         $this->getopt->addOption(['h', 'help', GetOpt::NO_ARGUMENT, 'Help']);
 
         $this->getopt->addCommands([
@@ -151,12 +151,12 @@ class Cli extends AbstractBootstrap
     /**
      * Configure cli logger.
      */
-    protected function configureLogger(?int $level = null): self
+    protected function configureLogger($level = null): self
     {
-        if (null === $level) {
+        if (null === $level || 1 === $level) {
             $level = 400;
         } else {
-            $level = (4 - $level) * 100;
+            $level = (4 - strlen($level)) * 100;
         }
 
         //$formatter = new ColoredLineFormatter();

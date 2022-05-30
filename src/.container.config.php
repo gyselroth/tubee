@@ -219,7 +219,7 @@ return [
                 'use' => Monolog\Handler\StreamHandler::class,
                 'arguments' => [
                     'stream' => 'php://stderr',
-                    'level' => 600,
+                    'level' => 100,
                 ],
                 'calls' => [
                     'formatter' => [

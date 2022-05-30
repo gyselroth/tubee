@@ -203,24 +203,27 @@ class Factory
         ];
 
         if ($data['data']['active'] === true) {
-            $this->scheduler->addJobOnce(Sync::class, $task, $task['options']);
+            $newJobId = $this->scheduler->addJobOnce(Sync::class, $task, $task['options'])->getId();
         } else {
-            $procs = $this->scheduler->getJobs([
-                'data.namespace' => $resource->getResourceNamespace()->getName(),
-                'data.job' => $resource->getName(),
-                'status' => ['$lt' => 3],
-            ]);
+            $newJobId = null;
+        }
 
-            foreach ($procs as $proc) {
-                try {
-                    $this->scheduler->cancelJob($proc->getId());
-                } catch (\Exception $e) {
-                    $this->logger->error('failed to cancel job [{job}]', [
-                        'category' => get_class($this),
-                        'exception' => $e,
-                        'job' => $proc->getId(),
-                    ]);
-                }
+        $procs = $this->scheduler->getJobs([
+            'data.namespace' => $resource->getResourceNamespace()->getName(),
+            'data.job' => $resource->getName(),
+            '_id' => ['$ne' => $newJobId],
+            'status' => ['$lt' => 3],
+        ]);
+
+        foreach ($procs as $proc) {
+            try {
+                $this->scheduler->cancelJob($proc->getId());
+            } catch (\Exception $e) {
+                $this->logger->error('failed to cancel job [{job}]', [
+                    'category' => get_class($this),
+                    'exception' => $e,
+                    'job' => $proc->getId(),
+                ]);
             }
         }
 
