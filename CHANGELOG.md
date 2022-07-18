@@ -1,3 +1,10 @@
+## 2.0.6
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon July 18 12:05:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.7)
+
 ## 2.0.5
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue July 05 11:35:00 CEST 2022
