@@ -1,3 +1,10 @@
+## 2.0.8
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Aug 18 15:20:00 CEST 2022
+
+### Bugfix
+* UCS-Endpoint: bugfix when move and rename object at same time 
+
 ## 2.0.7
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Mon July 18 14:20:00 CEST 2022
