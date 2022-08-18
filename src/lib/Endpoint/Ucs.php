@@ -206,7 +206,7 @@ class Ucs extends AbstractEndpoint
         $url = $this->client->getConfig('base_uri').'/command/udm/put';
         $endpoint_object = $endpoint_object->getData();
         $dn = $this->getResourceId($object, $endpoint_object);
-        $diff[self::ATTR_DN] = $dn;
+        $diff[self::ATTR_DN] = $endpoint_object[self::ATTR_DN];
 
         $this->logChange($dn, $diff);
         $map_parent = substr($dn, strpos($dn, ',') + 1);
@@ -214,6 +214,7 @@ class Ucs extends AbstractEndpoint
 
         if ($ep_parent !== $map_parent) {
             $this->moveUcsObject($endpoint_object[self::ATTR_DN], $map_parent, $simulate);
+            $diff[self::ATTR_DN] = $this->getOne(['map' => $object])->getData()[self::ATTR_DN];
         }
 
         if ($simulate === false) {
@@ -227,6 +228,11 @@ class Ucs extends AbstractEndpoint
 
             $result = array_shift($result);
             $this->verifyWriteResult($result);
+
+            if ($dn !== $diff[self::ATTR_DN]) {
+                $this->logger->error('getOne again');
+                return $this->getOne(['map' => $object])->getData()[self::ATTR_DN];
+            }
 
             return $dn;
         }
