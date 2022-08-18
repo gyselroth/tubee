@@ -230,8 +230,6 @@ class Ucs extends AbstractEndpoint
             $this->verifyWriteResult($result);
 
             if ($dn !== $diff[self::ATTR_DN]) {
-                $this->logger->error('getOne again');
-
                 return $this->getOne(['map' => $object])->getData()[self::ATTR_DN];
             }
 

@@ -608,7 +608,7 @@ class UcsTest extends TestCase
 
     public function testMoveObject()
     {
-        $response = [
+        $response_from_move = [
             'result' => [
                 [
                     '$dn$' => 'uid=foo,ou=bar',
@@ -616,9 +616,31 @@ class UcsTest extends TestCase
                 ],
             ],
         ];
-        $client = $this->getMockClient($response);
-        $client->expects($this->exactly(2))->method('__call');
-        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class));
+        $response_after_rename = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'foo' => 'foo',
+                    'bar' => 'bar',
+                ],
+            ],
+        ];
+
+        $response1 = $this->getMockResponse($response_from_move);
+        $response2 = $this->getMockResponse($response_after_rename);
+
+        $client = $this->createMock(Client::class);
+
+        $client->expects($this->atLeastOnce())
+            ->method('__call')->with($this->equalTo('post'))
+            ->willReturnOnConsecutiveCalls($response1, $response2, $response2, $response1);
+
+        $client->expects($this->exactly(4))->method('__call');
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => json_encode([
+                'foo' => 'foo',
+            ])]],
+        ]);
         $object = [
             '$dn$' => 'uid=foo,ou=bar',
             'foo' => 'foo',
@@ -626,6 +648,76 @@ class UcsTest extends TestCase
 
         $data = [
             '$dn$' => 'uid=foo,ou=foo,ou=foobar',
+            'foo' => 'foo',
+        ];
+
+        $ep_object = $this->createMock(EndpointObjectInterface::class);
+        $ep_object->method('getData')->willReturn($data);
+
+        $diff = [];
+
+        $result = $ucs->change($this->createMock(AttributeMapInterface::class), $diff, $object, $ep_object);
+        $this->assertSame('uid=foo,ou=bar', $result);
+    }
+
+    public function testMoveAndRenameObject()
+    {
+        $response_from_move = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo_bar,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+        $response_after_move = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo_bar,ou=bar',
+                    'foo' => 'foo',
+                ],
+            ],
+        ];
+        $response_from_rename = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'success' => true,
+                ],
+            ],
+        ];
+        $final_response = [
+            'result' => [
+                [
+                    '$dn$' => 'uid=foo,ou=bar',
+                    'foo' => 'foo',
+                ],
+            ],
+        ];
+
+        $response1 = $this->getMockResponse($response_from_move);
+        $response2 = $this->getMockResponse($response_after_move);
+        $response3 = $this->getMockResponse($response_from_rename);
+        $response4 = $this->getMockResponse($final_response);
+        $client = $this->createMock(Client::class);
+
+        $client->expects($this->atLeastOnce())
+            ->method('__call')->with($this->equalTo('post'))
+            ->willReturnOnConsecutiveCalls($response1, $response2, $response2, $response3, $response4, $response4);
+
+        $client->expects($this->exactly(6))->method('__call');
+        $ucs = new Ucs('foo', EndpointInterface::TYPE_DESTINATION, 'users/user', $client, $this->createMock(CollectionInterface::class), $this->createMock(WorkflowFactory::class), $this->createMock(LoggerInterface::class), [
+            'data' => ['options' => ['filter_one' => json_encode([
+                'foo' => 'foo',
+            ])]],
+        ]);
+        $object = [
+            '$dn$' => 'uid=foo,ou=bar',
+            'foo' => 'foo',
+        ];
+
+        $data = [
+            '$dn$' => 'uid=foo_bar,ou=foobar,ou=foo',
             'foo' => 'foo',
         ];
 
@@ -655,5 +747,18 @@ class UcsTest extends TestCase
             )->willReturn($response);
 
         return $client;
+    }
+
+    protected function getMockResponse($response = [])
+    {
+        $body = $this->createMock(StreamInterface::class);
+        $body->method('getContents')
+            ->willReturn(json_encode($response));
+
+        $response = $this->createMock(ResponseInterface::class);
+        $response->method('getBody')
+            ->willReturn($body);
+
+        return $response;
     }
 }
