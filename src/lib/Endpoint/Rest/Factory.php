@@ -101,14 +101,22 @@ class Factory
             'category' => __CLASS__,
         ]);
 
-        $response = $client->post($oauth['token_endpoint'], [
-            'form_params' => [
-                'grant_type' => 'client_credentials',
-                'client_id' => $oauth['client_id'],
-                'client_secret' => $oauth['client_secret'],
-                'scope' => $oauth['scope'],
-            ],
-        ]);
+        try {
+            $response = $client->post($oauth['token_endpoint'], [
+                'form_params' => [
+                    'grant_type' => 'client_credentials',
+                    'client_id' => $oauth['client_id'],
+                    'client_secret' => $oauth['client_secret'],
+                    'scope' => $oauth['scope'],
+                ],
+            ]);
+        } catch (\Exception $e) {
+            $logger->error('failed to fetch access_token with message: '.$e->getMessage(), [
+                'category' => __CLASS__,
+            ]);
+
+            throw new Exception\AccessTokenNotAvailable('access_token could not be fetched');
+        }
 
         $logger->debug('fetch access_token ended with status ['.$response->getStatusCode().']', [
             'category' => __CLASS__,
