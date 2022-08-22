@@ -11,7 +11,6 @@ declare(strict_types=1);
 
 namespace Tubee\Endpoint\Rest;
 
-use _PHPStan_76800bfb5\Composer\CaBundle\CaBundle;
 use GuzzleHttp\Client;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
