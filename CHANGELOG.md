@@ -1,3 +1,10 @@
+## 2.0.9
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon Aug 22 11:00:00 CEST 2022
+
+### Bugfix
+* Rest: catch exception when requesting an access_token 
+
 ## 2.0.8
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Thu Aug 18 15:20:00 CEST 2022
