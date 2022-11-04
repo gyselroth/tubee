@@ -160,7 +160,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function count(?array $query = null): int
     {
-        [$filter, $values] = $this->transformQuery($query);
+        list($filter, $values) = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = 'SELECT COUNT(*) as count FROM ('.self::USERQUERY.')';
@@ -187,7 +187,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getAll(?array $query = null): Generator
     {
-        [$filter, $values] = $this->transformQuery($query);
+        list($filter, $values) = $this->transformQuery($query);
         $this->logGetAll($filter);
 
         if ($filter === null) {
@@ -223,7 +223,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        [$filter, $values] = $query = $this->transformQuery($this->getFilterOne($object));
+        list($filter, $values) = $query = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
         $sql = self::USERQUERY.' WHERE '.$filter;
@@ -624,6 +624,7 @@ class SqlSrvUsers extends AbstractEndpoint
     protected function getAllSqlUsersBySid(string $sid): array
     {
         $return = [];
+
         try {
             $sql = "SELECT ''?'' as db, name FROM sys.database_principals WHERE sid = ".$sid."'";
 
@@ -633,7 +634,6 @@ class SqlSrvUsers extends AbstractEndpoint
                     'name' => $value['name'],
                 ];
             }
-
         } catch (InvalidQuery $e) {
             $this->logger->error('failed to get sql users for login', [
                 'class' => get_class($this),
