@@ -180,4 +180,30 @@ class Wrapper
 
         return $return;
     }
+
+    public function queryOnAllDbs(string $query, bool $simulate): array
+    {
+        $result = [];
+        $sql = "EXEC sp_msforeachdb 'USE [?] $query";
+
+        $this->logger->debug('execute sqlsrv query on all databases ['.$sql.']', [
+            'category' => get_class($this),
+        ]);
+
+        if (!$simulate) {
+            $stmt = sqlsrv_query($this->resource, $sql);
+
+            if (!$stmt) {
+                throw new Exception\InvalidQuery('failed to execute sqlsrv query with error '.sqlsrv_errors()[0]['message']);
+            }
+
+            do {
+                while ($row = sqlsrv_fetch_array($stmt)) {
+                    $result[] = $row;
+                }
+            } while (sqlsrv_next_result($stmt));
+        }
+
+        return $result;
+    }
 }
