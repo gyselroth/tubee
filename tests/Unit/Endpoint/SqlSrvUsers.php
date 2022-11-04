@@ -311,11 +311,25 @@ class SqlSrvUsersTest extends TestCase
         $ep_object_data = [
             'loginName' => 'foobar',
             'sqlName' => 'bar',
+            'user_id' => 'foo-bar',
+        ];
+
+        $all_sql_users = [
+            0 => [
+                'db' => 'foo-foo',
+                'name' => 'foo',
+            ],
+            1 => [
+                'db' => 'bar-bar',
+                'name' => 'bar',
+            ],
         ];
 
         $mock = $this->createMock(Wrapper::class);
-        $mock->expects($this->at(1))->method('query')->with('DROP USER [bar]');
-        $mock->expects($this->at(2))->method('query')->with('DROP LOGIN [foobar]');
+        $mock->method('queryOnAllDbs')->willReturn($all_sql_users);
+        $mock->expects($this->at(2))->method('query')->with('USE [foo-foo] DROP USER [foo]');
+        $mock->expects($this->at(3))->method('query')->with('USE [bar-bar] DROP USER [bar]');
+        $mock->expects($this->at(4))->method('query')->with('DROP LOGIN [foobar]');
 
         $ep_object = $this->createMock(EndpointObjectInterface::class);
         $ep_object->method('getData')->willReturn($ep_object_data);
@@ -332,9 +346,11 @@ class SqlSrvUsersTest extends TestCase
     {
         $ep_object_data = [
             'loginName' => 'foobar',
+            'user_id' => 'foo-bar',
         ];
 
         $mock = $this->createMock(Wrapper::class);
+        $mock->method('queryOnAllDbs')->willReturn([]);
         $mock->expects($this->once())->method('query')->with('DROP LOGIN [foobar]');
 
         $ep_object = $this->createMock(EndpointObjectInterface::class);
@@ -352,6 +368,7 @@ class SqlSrvUsersTest extends TestCase
     {
         $ep_object_data = [
             'loginName' => 'foobar',
+            'user_id' => 'foo-bar',
         ];
 
         $mock = $this->createMock(Wrapper::class);
