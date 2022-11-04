@@ -1,3 +1,11 @@
+## 2.1.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 04 16:30:00 CEST 2022
+
+### Changes
+* SqlSrvUsersEndpoint: delete associated SQL-users on all databases when deleting SQL-Login
+* Task-Scheduler: updated task-scheduler to latest version
+
 ## 2.0.9
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Mon Aug 22 11:00:00 CEST 2022
