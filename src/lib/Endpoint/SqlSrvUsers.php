@@ -88,6 +88,11 @@ class SqlSrvUsers extends AbstractEndpoint
     public const ATTRLANGUAGE = 'defaultLanguage';
 
     /**
+     * User SID.
+     */
+    public const ATTRSID = 'user_id';
+
+    /**
      * UserQuery.
      */
     public const USERQUERY =
@@ -95,13 +100,13 @@ class SqlSrvUsers extends AbstractEndpoint
         .' SELECT loginData.principal_id, loginData.type_desc AS '.self::ATTRPRINCIPALTYPE.', loginData.name as '.self::ATTRLOGINNAME.','
         .'loginData.is_disabled as '.self::ATTRDISABLED.', userData.name as '.self::ATTRSQLNAME.','
         .' STRING_AGG(roles.name,\', \') AS '.self::ATTRUSERROLES.', loginData.default_database_name as '.self::ATTRDATABASE
-        .', loginData.default_language_name AS '.self::ATTRLANGUAGE
+        .', loginData.default_language_name AS '.self::ATTRLANGUAGE.', master.dbo.fn_varbintohexstr(loginData.sid) AS '.self::ATTRSID
         .' FROM '.self::LOGINTABLE.' as loginData'
         .' LEFT JOIN sys.database_principals as userData ON loginData.sid = userData.sid'
         .' LEFT JOIN sys.database_role_members as memberRole ON userData.principal_id = memberRole.member_principal_id'
         .' LEFT JOIN sys.database_principals as roles ON roles.principal_id = memberRole.role_principal_id'
         .' GROUP BY loginData.principal_id, loginData.type_desc, loginData.name, loginData.is_disabled, userData.name,'
-        .'loginData.default_database_name, loginData.default_language_name'
+        .'loginData.default_database_name, loginData.default_language_name, loginData.sid'
         .') AS data';
 
     /**
@@ -155,7 +160,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function count(?array $query = null): int
     {
-        list($filter, $values) = $this->transformQuery($query);
+        [$filter, $values] = $this->transformQuery($query);
 
         if ($filter === null) {
             $sql = 'SELECT COUNT(*) as count FROM ('.self::USERQUERY.')';
@@ -182,7 +187,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getAll(?array $query = null): Generator
     {
-        list($filter, $values) = $this->transformQuery($query);
+        [$filter, $values] = $this->transformQuery($query);
         $this->logGetAll($filter);
 
         if ($filter === null) {
@@ -218,7 +223,7 @@ class SqlSrvUsers extends AbstractEndpoint
      */
     public function getOne(array $object, array $attributes = []): EndpointObjectInterface
     {
-        list($filter, $values) = $query = $this->transformQuery($this->getFilterOne($object));
+        [$filter, $values] = $query = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
         $sql = self::USERQUERY.' WHERE '.$filter;
@@ -307,19 +312,17 @@ class SqlSrvUsers extends AbstractEndpoint
 
     public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
     {
-        $sql_user_query = '';
         $endpoint_object = $endpoint_object->getData();
         $this->socket->beginTransaction();
 
-        if (isset($endpoint_object[self::ATTRSQLNAME])) {
-            $sql_user_query = $this->dropSqlUserQuery($endpoint_object[self::ATTRSQLNAME]);
-        }
-
+        $sqlUsers = $this->getAllSqlUsersBySid($endpoint_object[self::ATTRSID]);
         $login_query = $this->dropLoginQuery($endpoint_object[self::ATTRLOGINNAME]);
 
         try {
-            if ($sql_user_query !== '') {
-                $this->socket->query($sql_user_query, $simulate);
+            if ($sqlUsers !== []) {
+                foreach ($sqlUsers as $user) {
+                    $this->socket->query('USE ['.$user['db'].'] '.$this->dropSqlUserQuery($user['name']), $simulate);
+                }
             }
             $this->socket->query($login_query, $simulate);
             $this->socket->commit();
@@ -613,6 +616,34 @@ class SqlSrvUsers extends AbstractEndpoint
         }
 
         return $query;
+    }
+
+    /**
+     * Get all SQL-users with given SID.
+     */
+    protected function getAllSqlUsersBySid(string $sid): array
+    {
+        $return = [];
+        try {
+            $sql = "SELECT ''?'' as db, name FROM sys.database_principals WHERE sid = ".$sid."'";
+
+            foreach ($this->socket->queryOnAllDbs($sql, false) as $value) {
+                $return[] = [
+                    'db' => $value['db'],
+                    'name' => $value['name'],
+                ];
+            }
+
+        } catch (InvalidQuery $e) {
+            $this->logger->error('failed to get sql users for login', [
+                'class' => get_class($this),
+                'exception' => $e,
+            ]);
+
+            return [];
+        }
+
+        return $return;
     }
 
     /**
