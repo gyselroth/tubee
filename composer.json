@@ -34,7 +34,7 @@
         "ext-curl": "*",
         "ext-apcu": "*",
         "ext-json":  "*",
-        "gyselroth/micro-auth": "^1.0.0-alpha5",
+        "gyselroth/micro-auth": "^1.0.0-alpha7",
         "gyselroth/micro-container": "^2.3.3",
         "psr/http-factory": "^1.0.0",
         "psr/container": "^1.0.0",
