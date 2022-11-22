@@ -33,6 +33,7 @@ data:
   notification:
     enabled: false
     receiver: []
+    identifier: []
   collections:
     - 'news'
   endpoints:
@@ -256,6 +257,7 @@ data:
   notification:
     enabled: false
     receiver: []
+    identifier: []
   collections:
     - 'accounts'
   endpoints:
@@ -422,6 +424,7 @@ data:
   notification:
     enabled: false
     receiver: []
+    identifier: []
   collections:
     - 'accounts'
   endpoints:

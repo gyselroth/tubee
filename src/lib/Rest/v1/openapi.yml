@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: ""
-  version: 1.1.0
+  version: 1.2.0
   title: Tubee API
   termsOfService: ""
   contact:
@@ -4053,6 +4053,7 @@ components:
                 notification:
                   enabled: false
                   receiver: []
+                  identifier: []
                 collections: []
                 endpoints: []
                 filter: null
@@ -4073,6 +4074,7 @@ components:
                   default:
                     enabled: false
                     receiver: []
+                    identifier: []
                   properties:
                     enabled:
                       description: You may enable mail notification for a given job.
@@ -4081,6 +4083,10 @@ components:
                     receiver:
                       description: A list of mail adresses which the notification should be
                         sent to. This option has no affect if notification is
+                        disabled.
+                    identifier:
+                      description: A list of dataobject attributes which should be added to the notification mail
+                        when dataobject can't be synced. This option has no affect if notification is
                         disabled.
                       type: array
                       items:
