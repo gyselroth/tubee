@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\Async;
 
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use MongoDB\Database;
 use Monolog\Handler\MongoDBHandler;
@@ -72,6 +73,13 @@ class Sync extends AbstractJob
     protected $error_count = 0;
 
     /**
+     * Failed objects.
+     *
+     * @var array
+     */
+    protected $failed_objects = [];
+
+    /**
      * Start timestamp.
      *
      * @var UTCDateTime
@@ -127,8 +135,6 @@ class Sync extends AbstractJob
             $this->loopCollections($collections, $endpoints);
         }
 
-        $this->notify();
-
         return true;
     }
 
@@ -138,6 +144,66 @@ class Sync extends AbstractJob
     public function getTimestamp(): ?UTCDateTime
     {
         return $this->timestamp;
+    }
+
+    public function notification(int $status, array $job): void
+    {
+        if ($this->checkReceiver($job['data'], $job['_id'])) {
+            $namespace = $job['data']['namespace'];
+            $collections = implode(', ', $job['data']['collections']);
+            $endpoints = implode(', ', $job['data']['endpoints']);
+
+            switch ($status) {
+                case JobInterface::STATUS_DONE:
+                    $subject = '['.$namespace.']: sync process ended successfully';
+                    $body = "Hi there\n\nThe sync process on collections [$collections] and endpoints [$endpoints] ended successfully.";
+
+                    if ($job['data']['error_count'] === 0) {
+                        $body = $body."\n\nThe process finished with no errors.";
+                    } else {
+                        $error_count = $job['data']['error_count'];
+                        $body = $body."\n\nThe process ended with $error_count errors: \n - ".implode(", \n - ", $job['data']['failed_objects']);
+                    }
+
+                    break;
+                case JobInterface::STATUS_FAILED:
+                    $subject = '['.$namespace.']: sync process failed';
+                    $body = "Hi there\n\nThe sync process on collections [$collections] and endpoints [$endpoints] failed. Check tubee log for further information";
+
+                    break;
+                case JobInterface::STATUS_CANCELED:
+                    $subject = '['.$namespace.']: sync process canceled';
+                    $body = "Hi there\n\nThe sync process on collections [$collections] and endpoints [$endpoints] was canceled. Check tubee log for further information";
+
+                    break;
+                case JobInterface::STATUS_TIMEOUT:
+                    $subject = '['.$namespace.']: sync process ran into timeout';
+                    $body = "Hi there\n\nThe sync process on collections [$collections] and endpoints [$endpoints] ran into a timeout.";
+
+                    break;
+                default:
+                    return;
+            }
+
+            $body = $body."\n\n\n".'Process ID: ['.$job['_id'].']';
+            $body = $body."\nDate: [".date('d.m.Y H:i:s', time()).']';
+
+            $mail = (new Message())
+                ->setSubject($subject)
+                ->setBody($body)
+                ->setEncoding('UTF-8');
+
+            foreach ($job['data']['notification']['receiver'] as $receiver) {
+                $mail->setTo($receiver);
+                $this->logger->debug('send process notification ['.$job['_id'].'] to ['.$receiver.']', [
+                    'category' => get_class($this),
+                ]);
+
+                $this->scheduler->addJob(Mail::class, $mail->toString(), [
+                    Scheduler::OPTION_RETRY => 1,
+                ]);
+            }
+        }
     }
 
     /**
@@ -168,6 +234,7 @@ class Sync extends AbstractJob
                 ]);
 
                 $this->error_count += $record['data']['error_count'] ?? 0;
+                $this->failed_objects += $record['data']['failed_objects'] ?? [];
                 $this->increaseErrorCount();
             }
 
@@ -184,7 +251,10 @@ class Sync extends AbstractJob
             '_id' => $this->getId(),
             'data.error_count' => ['$exists' => true],
         ], [
-            '$set' => ['data.error_count' => $this->error_count],
+            '$set' => [
+                'data.error_count' => $this->error_count,
+                'data.failed_objects' => $this->failed_objects,
+            ],
         ]);
 
         return $this;
@@ -357,8 +427,8 @@ class Sync extends AbstractJob
                             continue 2;
                         }
                         $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $id.'], condition does not match or unusable ensure', [
-                                'category' => get_class($this),
-                            ]);
+                            'category' => get_class($this),
+                        ]);
                     }
 
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
@@ -366,6 +436,16 @@ class Sync extends AbstractJob
                     ]);
                 } catch (\Throwable $e) {
                     ++$this->error_count;
+                    $failed_object = $object->toArray();
+
+                    if (isset($this->data['notification']['identifier'])) {
+                        foreach ($this->data['notification']['identifier'] as $object_identifier) {
+                            if (isset($failed_object['data'][$object_identifier])) {
+                                $this->failed_objects[] = $failed_object['data'][$object_identifier];
+                                break;
+                            }
+                        }
+                    }
 
                     $this->logger->error('failed export object to destination endpoint ['.$identifier.']', [
                         'category' => get_class($this),
@@ -455,8 +535,8 @@ class Sync extends AbstractJob
                             continue 2;
                         }
                         $this->logger->debug('skip workflow ['.$workflow->getIdentifier().'] for object ['.(string) $object->getId().'], condition does not match or unusable ensure', [
-                                'category' => get_class($this),
-                            ]);
+                            'category' => get_class($this),
+                        ]);
                     }
 
                     $this->logger->debug('no workflow were executed within endpoint ['.$identifier.'] for the current object', [
@@ -464,6 +544,16 @@ class Sync extends AbstractJob
                     ]);
                 } catch (\Throwable $e) {
                     ++$this->error_count;
+                    $failed_object = $object->toArray();
+
+                    if (isset($this->data['notification']['identifier'])) {
+                        foreach ($this->data['notification']['identifier'] as $object_identifier) {
+                            if (isset($failed_object['data'][$object_identifier])) {
+                                $this->failed_objects[] = $failed_object['data'][$object_identifier];
+                                break;
+                            }
+                        }
+                    }
 
                     $this->logger->error('failed import data object from source endpoint ['.$identifier.']', [
                         'category' => get_class($this),
@@ -654,50 +744,22 @@ class Sync extends AbstractJob
         return true;
     }
 
-    /**
-     * Notify.
-     */
-    protected function notify(): bool
+    protected function checkReceiver(array $job_data, ObjectId $job_id): bool
     {
-        if ($this->data['notification']['enabled'] === false) {
-            $this->logger->debug('skip notifiaction for process ['.$this->getId().'], notification is disabled', [
+        if ($job_data['notification']['enabled'] === false) {
+            $this->logger->debug('skip notification for process ['.$job_id.'], notification is disabled', [
                 'category' => get_class($this),
             ]);
 
             return false;
         }
 
-        if (count($this->data['notification']['receiver']) === 0) {
-            $this->logger->debug('skip notifiaction for process ['.$this->getId().'], no receiver configured', [
-                'category' => get_class($this),
-            ]);
-        }
-
-        $iso = $this->timestamp->toDateTime()->format('c');
-
-        if ($this->error_count === 0) {
-            $subject = 'Good job! The job finished with no errors';
-            $body = "Hi there\n\nThe sync process ".(string) $this->getId()." started at $iso finished with no errors.";
-        } else {
-            $subject = "Job ended with $this->error_count errors";
-            $body = "Hi there\n\nThe sync process ".(string) $this->getId()." started at $iso ended with $this->error_count errors.";
-        }
-
-        $mail = (new Message())
-          ->setSubject($subject)
-          ->setBody($body)
-          ->setEncoding('UTF-8');
-
-        foreach ($this->data['notification']['receiver'] as $receiver) {
-            $mail->setTo($receiver);
-
-            $this->logger->debug('send process notification ['.$this->getId().'] to ['.$receiver.']', [
+        if (count($job_data['notification']['receiver']) === 0) {
+            $this->logger->debug('skip notification for process ['.$job_id.'], no receiver configured', [
                 'category' => get_class($this),
             ]);
 
-            $this->scheduler->addJob(Mail::class, $mail->toString(), [
-                Scheduler::OPTION_RETRY => 1,
-            ]);
+            return false;
         }
 
         return true;
