@@ -442,6 +442,7 @@ class Sync extends AbstractJob
                         foreach ($this->data['notification']['identifier'] as $object_identifier) {
                             if (isset($failed_object['data'][$object_identifier])) {
                                 $this->failed_objects[] = $failed_object['data'][$object_identifier];
+
                                 break;
                             }
                         }
@@ -550,6 +551,7 @@ class Sync extends AbstractJob
                         foreach ($this->data['notification']['identifier'] as $object_identifier) {
                             if (isset($failed_object['data'][$object_identifier])) {
                                 $this->failed_objects[] = $failed_object['data'][$object_identifier];
+
                                 break;
                             }
                         }
