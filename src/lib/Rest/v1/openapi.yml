@@ -4091,7 +4091,6 @@ components:
                       type: array
                       items:
                         type: string
-                        format: email
                       default:
                         []
                 collections:
