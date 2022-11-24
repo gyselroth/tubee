@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: ""
-  version: 1.2.1
+  version: 1.2.2
   title: Tubee API
   termsOfService: ""
   contact:
@@ -4089,8 +4089,6 @@ components:
                         when dataobject can't be synced. This option has no affect if notification is
                         disabled.
                       type: array
-                      items:
-                        type: string
                       default:
                         []
                 collections:
