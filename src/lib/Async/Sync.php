@@ -150,8 +150,8 @@ class Sync extends AbstractJob
     {
         if ($this->checkReceiver($job['data'], $job['_id'])) {
             $namespace = $job['data']['namespace'];
-            $collections = implode(', ', $job['data']['collections']);
-            $endpoints = implode(', ', $job['data']['endpoints']);
+            $collections = implode(', ', $this->getArrayDataByKey($job['data'], 'collections'));
+            $endpoints = implode(', ', $this->getArrayDataByKey($job['data'], 'endpoints'));
 
             switch ($status) {
                 case JobInterface::STATUS_DONE:
@@ -765,5 +765,24 @@ class Sync extends AbstractJob
         }
 
         return true;
+    }
+
+    protected function getArrayDataByKey(array $jobData, string $key): array
+    {
+        $return = [];
+
+        foreach ($jobData as $index => $value) {
+            if ($index === $key) {
+                foreach ($value as $data) {
+                    if (is_array($data)) {
+                        $return = array_merge($return, $this->getArrayDataByKey([$key => $data], $key));
+                    } else {
+                        $return[] = $data;
+                    }
+                }
+            }
+        }
+
+        return $return;
     }
 }

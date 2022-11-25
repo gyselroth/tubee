@@ -1,3 +1,10 @@
+## 2.2.0-beta3
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 25 16:15:00 CEST 2022
+
+### Bugfix
+* Notification: send correct list of endpoints and collections
+
 ## 2.2.0-beta2
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Nov 25 14:15:00 CEST 2022
