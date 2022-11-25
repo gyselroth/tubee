@@ -1,3 +1,97 @@
+## 2.2.0-beta1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 25 09:30:00 CEST 2022
+
+### Feature
+* Task-Scheduler: updated task-scheduler to latest version
+* Job Notification: implemented custom notification method to inform about job state
+* Job Notification: implemented job identifier to include failed DataObjects into notification mail
+
+## 2.1.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 18 15:40:00 CEST 2022
+
+### Bugfix
+* Updated micro-auth package to new version (v1.0.0-alpha7)
+
+## 2.1.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 04 16:30:00 CEST 2022
+
+### Changes
+* SqlSrvUsersEndpoint: delete associated SQL-users on all databases when deleting SQL-Login
+* Task-Scheduler: updated task-scheduler to latest version
+
+## 2.0.9
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon Aug 22 11:00:00 CEST 2022
+
+### Bugfix
+* Rest: catch exception when requesting an access_token
+
+## 2.0.8
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Aug 18 15:20:00 CEST 2022
+
+### Bugfix
+* UCS-Endpoint: bugfix when move and rename object at same time
+
+## 2.0.7
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon July 18 14:20:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.8)
+
+## 2.0.6
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon July 18 12:05:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.7)
+
+## 2.0.5
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue July 05 11:35:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.6)
+
+## 2.0.4
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu July 01 13:30:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.5)
+
+## 2.0.3
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Jun 29 10:10:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.4)
+
+## 2.0.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Jun 21 09:15:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.3)
+
+## 2.0.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Jun 09 09:45:00 CEST 2022
+
+### Bugfix
+* Updated to new php-scheduler version (v4.0.2)
+
+## 2.0.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon May 30 16:20:00 CEST 2022
+
+### Feature
+* Updated to new php-scheduler version (v4.0.0)
+
 ## 1.3.2
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Thu Feb 03 16:00:00 CEST 2022
