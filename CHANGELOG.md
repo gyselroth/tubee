@@ -1,3 +1,10 @@
+## 2.2.0-beta2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 25 14:15:00 CEST 2022
+
+### Feature
+* Task-Scheduler: updated task-scheduler to latest version (v4.0.14)
+
 ## 2.2.0-beta1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Nov 25 09:30:00 CEST 2022
