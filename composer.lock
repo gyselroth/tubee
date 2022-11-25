@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b4132cab423748b02c2d5210bc09eb6",
+    "content-hash": "c2e279e515c9e7dd3e27e3bd860e2f37",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -1145,16 +1145,16 @@
         },
         {
             "name": "gyselroth/mongodb-php-task-scheduler",
-            "version": "v4.0.13",
+            "version": "v4.0.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/php-task-scheduler.git",
-                "reference": "16be6d350bf7748a4e6adbda32cb50c201155337"
+                "reference": "d686b08669e24d8a854f3392d5b1313bf6fb623d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/16be6d350bf7748a4e6adbda32cb50c201155337",
-                "reference": "16be6d350bf7748a4e6adbda32cb50c201155337",
+                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/d686b08669e24d8a854f3392d5b1313bf6fb623d",
+                "reference": "d686b08669e24d8a854f3392d5b1313bf6fb623d",
                 "shasum": ""
             },
             "require": {
@@ -1170,7 +1170,7 @@
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "*",
-                "helmich/mongomock": "dev-master#1c770a1",
+                "helmich/mongomock": "dev-master#6925c67",
                 "phpstan/phpstan": "^0.8.5",
                 "phpunit/phpunit": "^8.5"
             },
@@ -1201,9 +1201,9 @@
             ],
             "support": {
                 "issues": "https://github.com/gyselroth/php-task-scheduler/issues",
-                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.0.13"
+                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.0.14"
             },
-            "time": "2022-11-22T11:32:07+00:00"
+            "time": "2022-11-25T12:47:28+00:00"
         },
         {
             "name": "gyselroth/stream-iterator",
