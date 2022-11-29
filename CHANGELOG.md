@@ -1,3 +1,26 @@
+## 2.2.0-beta3
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 25 16:15:00 CEST 2022
+
+### Bugfix
+* Notification: send correct list of endpoints and collections
+
+## 2.2.0-beta2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 25 14:15:00 CEST 2022
+
+### Feature
+* Task-Scheduler: updated task-scheduler to latest version (v4.0.14)
+
+## 2.2.0-beta1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Nov 25 09:30:00 CEST 2022
+
+### Feature
+* Task-Scheduler: updated task-scheduler to latest version
+* Job Notification: implemented custom notification method to inform about job state
+* Job Notification: implemented job identifier to include failed DataObjects into notification mail
+
 ## 2.1.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Nov 18 15:40:00 CEST 2022
@@ -18,14 +41,14 @@
 **Date**: Mon Aug 22 11:00:00 CEST 2022
 
 ### Bugfix
-* Rest: catch exception when requesting an access_token 
+* Rest: catch exception when requesting an access_token
 
 ## 2.0.8
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Thu Aug 18 15:20:00 CEST 2022
 
 ### Bugfix
-* UCS-Endpoint: bugfix when move and rename object at same time 
+* UCS-Endpoint: bugfix when move and rename object at same time
 
 ## 2.0.7
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
