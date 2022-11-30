@@ -1,3 +1,10 @@
+## 2.2.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Nov 30 15:45:00 CEST 2022
+
+### Bugfix
+* load only object data when object failed to sync
+
 ## 2.2.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue Nov 29 15:15:00 CEST 2022
