@@ -436,12 +436,12 @@ class Sync extends AbstractJob
                     ]);
                 } catch (\Throwable $e) {
                     ++$this->error_count;
-                    $failed_object = $object->toArray();
+                    $failed_object = $object->getData();
 
                     if (isset($this->data['notification']['identifier'])) {
                         foreach ($this->data['notification']['identifier'] as $object_identifier) {
-                            if (isset($failed_object['data'][$object_identifier])) {
-                                $this->failed_objects[] = $failed_object['data'][$object_identifier];
+                            if (isset($failed_object[$object_identifier])) {
+                                $this->failed_objects[] = $failed_object[$object_identifier];
 
                                 break;
                             }
@@ -545,12 +545,12 @@ class Sync extends AbstractJob
                     ]);
                 } catch (\Throwable $e) {
                     ++$this->error_count;
-                    $failed_object = $object->toArray();
+                    $failed_object = $object->getData();
 
                     if (isset($this->data['notification']['identifier'])) {
                         foreach ($this->data['notification']['identifier'] as $object_identifier) {
-                            if (isset($failed_object['data'][$object_identifier])) {
-                                $this->failed_objects[] = $failed_object['data'][$object_identifier];
+                            if (isset($failed_object[$object_identifier])) {
+                                $this->failed_objects[] = $failed_object[$object_identifier];
 
                                 break;
                             }
