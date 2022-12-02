@@ -1,3 +1,10 @@
+## 2.2.2-beta1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Dez 02 16:15:00 CEST 2022
+
+### Bugfix
+* Maintain process status of done processes when deleting job
+
 ## 2.2.0-beta3
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Nov 25 16:15:00 CEST 2022
