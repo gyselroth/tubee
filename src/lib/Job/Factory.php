@@ -108,6 +108,7 @@ class Factory
         $tasks = $this->scheduler->getJobs([
             'data.namespace' => $namespace->getName(),
             'data.job' => $name,
+            'status' => ['$lt' => 3],
         ]);
 
         foreach ($tasks as $task) {
