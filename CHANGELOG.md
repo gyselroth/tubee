@@ -1,3 +1,11 @@
+## 2.2.2-beta2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Dez 08 18:45:00 CEST 2022
+
+### Bugfix
+* Run notification method when status is >=3
+* Updated to new php-scheduler version (v4.0.15-beta1)
+
 ## 2.2.2-beta1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Dez 02 16:15:00 CEST 2022
