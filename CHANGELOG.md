@@ -1,3 +1,11 @@
+## 2.2.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Dez 13 13:30:00 CEST 2022
+
+### Bugfix
+* Return notification status
+* Force new worker to spawn for notification jobs
+
 ## 2.2.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed Nov 30 15:45:00 CEST 2022
