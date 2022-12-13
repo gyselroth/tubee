@@ -146,7 +146,7 @@ class Sync extends AbstractJob
         return $this->timestamp;
     }
 
-    public function notification(int $status, array $job): void
+    public function notification(int $status, array $job): bool
     {
         if ($status >= 3 && $this->checkReceiver($job['data'], $job['_id'])) {
             $namespace = $job['data']['namespace'];
@@ -182,7 +182,7 @@ class Sync extends AbstractJob
 
                     break;
                 default:
-                    return;
+                    return false;
             }
 
             $body = $body."\n\n\n".'Process ID: ['.$job['_id'].']';
@@ -201,9 +201,14 @@ class Sync extends AbstractJob
 
                 $this->scheduler->addJob(Mail::class, $mail->toString(), [
                     Scheduler::OPTION_RETRY => 1,
+                    Scheduler::OPTION_FORCE_SPAWN => true,
                 ]);
             }
+
+            return true;
         }
+
+        return false;
     }
 
     /**
