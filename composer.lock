@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "1bae2c342a168b188de53fad88c40682",
+    "content-hash": "7973250802e42e03aef63105a87bec5a",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -1029,16 +1029,16 @@
         },
         {
             "name": "gyselroth/micro-auth",
-            "version": "v1.0.0-alpha7",
+            "version": "v1.0.0-alpha8",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/micro-auth.git",
-                "reference": "68f6b142fef6e5fa80b4795f1bf17eccfec3ed4f"
+                "reference": "440ab34f7dfd24ca30093e1409e50bbfd4ddde78"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/micro-auth/zipball/68f6b142fef6e5fa80b4795f1bf17eccfec3ed4f",
-                "reference": "68f6b142fef6e5fa80b4795f1bf17eccfec3ed4f",
+                "url": "https://api.github.com/repos/gyselroth/micro-auth/zipball/440ab34f7dfd24ca30093e1409e50bbfd4ddde78",
+                "reference": "440ab34f7dfd24ca30093e1409e50bbfd4ddde78",
                 "shasum": ""
             },
             "require": {
@@ -1084,9 +1084,9 @@
             ],
             "support": {
                 "issues": "https://github.com/gyselroth/micro-auth/issues",
-                "source": "https://github.com/gyselroth/micro-auth/tree/v1.0.0-alpha7"
+                "source": "https://github.com/gyselroth/micro-auth/tree/v1.0.0-alpha8"
             },
-            "time": "2022-11-18T14:14:40+00:00"
+            "time": "2022-12-16T11:13:27+00:00"
         },
         {
             "name": "gyselroth/micro-container",
@@ -6325,16 +6325,16 @@
         },
         {
             "name": "doctrine/lexer",
-            "version": "2.0.0",
+            "version": "2.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/doctrine/lexer.git",
-                "reference": "3cf140b81e55d5d640f73367d829db7e3023ef69"
+                "reference": "39ab8fcf5a51ce4b85ca97c7a7d033eb12831124"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/doctrine/lexer/zipball/3cf140b81e55d5d640f73367d829db7e3023ef69",
-                "reference": "3cf140b81e55d5d640f73367d829db7e3023ef69",
+                "url": "https://api.github.com/repos/doctrine/lexer/zipball/39ab8fcf5a51ce4b85ca97c7a7d033eb12831124",
+                "reference": "39ab8fcf5a51ce4b85ca97c7a7d033eb12831124",
                 "shasum": ""
             },
             "require": {
@@ -6383,7 +6383,7 @@
             ],
             "support": {
                 "issues": "https://github.com/doctrine/lexer/issues",
-                "source": "https://github.com/doctrine/lexer/tree/2.0.0"
+                "source": "https://github.com/doctrine/lexer/tree/2.1.0"
             },
             "funding": [
                 {
@@ -6399,7 +6399,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-12-11T10:51:23+00:00"
+            "time": "2022-12-14T08:49:07+00:00"
         },
         {
             "name": "friendsofphp/php-cs-fixer",
