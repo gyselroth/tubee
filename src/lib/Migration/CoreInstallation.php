@@ -154,8 +154,8 @@ class CoreInstallation implements DeltaInterface
         $this->db->logs->createIndex(['endpoint' => 1, 'collection' => 1, 'namespace' => 1]);
         $this->db->logs->createIndex(['data.context.object' => 1, 'collection' => 1, 'namespace' => 1]);
 
-        //remove taskscheduler jobs after 10 days
-        $this->db->taskscheduler->createIndex(['created' => 1], ['expireAfterSeconds' => 864000]);
+        //remove taskscheduler jobs after 5 days
+        $this->db->taskscheduler->createIndex(['created' => 1], ['expireAfterSeconds' => 432000]);
 
         return true;
     }
