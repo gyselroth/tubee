@@ -5,6 +5,7 @@ use Composer\Autoload\ClassLoader as Composer;
 use Micro\Auth\Auth;
 use Micro\Container\Container;
 use MongoDB\Client;
+use Tubee\Rest\Middlewares\CorsHandler;
 use Tubee\User\AuthAdapter;
 use MongoDB\Database;
 use Psr\Log\LoggerInterface;
@@ -58,6 +59,7 @@ return [
                 '{'.ExceptionHandler::class.'}',
                 '{'.JsonPayload::class.'}',
                 '{'.QueryDecoder::class.'}',
+                '{'.CorsHandler::class.'}',
                 '{'.FastRoute::class.'}',
                 '{'.AuthMiddleware::class.'}',
                 '{'.AclMiddleware::class.'}',
