@@ -56,14 +56,14 @@ class ExceptionHandler implements MiddlewareInterface
         try {
             return $handler->handle($request);
         } catch (\Throwable $e) {
-            return $this->sendException($e);
+            return $this->sendException($e, $request);
         }
     }
 
     /**
      * Sends a exception response to the client.
      */
-    public function sendException(Throwable $exception): ResponseInterface
+    public function sendException(Throwable $exception, ServerRequestInterface $request): ResponseInterface
     {
         $message = $exception->getMessage();
         $class = get_class($exception);
@@ -97,9 +97,12 @@ class ExceptionHandler implements MiddlewareInterface
             'exception' => $exception,
         ]);
 
-        return new UnformattedResponse(
-            (new Response())->withStatus($http_code),
-            $body
-        );
+        $response = (new Response())->withStatus($http_code);
+
+        if (!empty($request->getHeader('origin'))) {
+            $response = $response->withHeader('Access-Control-Allow-Origin', '*');
+        }
+
+        return new UnformattedResponse($response, $body);
     }
 }
