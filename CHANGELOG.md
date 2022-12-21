@@ -1,3 +1,10 @@
+## 2.3.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Dez 21 14:45:00 CEST 2022
+
+### Bugfix
+* Added CORS to exception handler (pull request from ewaldkleefstra)
+
 ## 2.3.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue Dez 20 13:50:00 CEST 2022
