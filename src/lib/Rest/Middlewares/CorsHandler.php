@@ -44,8 +44,8 @@ class CorsHandler implements MiddlewareInterface
             return new UnformattedResponse(
                 (new Response())->withStatus(StatusCodeInterface::STATUS_NO_CONTENT)
                     ->withHeader('Access-Control-Allow-Origin', '*')
+                    ->withHeader('Access-Control-Allow-Headers', '*')
                     ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS')
-                    ->withHeader('Access-Control-Allow-Headers', 'Authorization')
                     ->withHeader('Access-Control-Max-Age', '86400'),
                 []
             );
