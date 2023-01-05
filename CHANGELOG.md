@@ -1,3 +1,10 @@
+## 2.3.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Jan 05 18:45:00 CEST 2023
+
+### Bugfix
+* CORS allow all headers (pull request from ewaldkleefstra)
+
 ## 2.3.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed Dez 21 14:45:00 CEST 2022
