@@ -1,3 +1,11 @@
+## 2.4.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Sat Feb 25 00:20:00 CEST 2023
+
+### Bugfix
+* Removed notification feature (implemented in v2.2.0) due to side effects
+* Task-Scheduler: downgraded to v4.0.11
+
 ## 2.3.2
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Thu Jan 05 18:45:00 CEST 2023
