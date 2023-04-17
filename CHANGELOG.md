@@ -1,35 +1,57 @@
-## 2.2.2-beta2
+## 2.4.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Thu Dez 08 18:45:00 CEST 2022
+**Date**: Sat Feb 25 00:20:00 CEST 2023
 
 ### Bugfix
-* Run notification method when status is >=3
-* Updated to new php-scheduler version (v4.0.15-beta1)
+* Removed notification feature (implemented in v2.2.0) due to side effects
+* Task-Scheduler: downgraded to v4.0.11
 
-## 2.2.2-beta1
+## 2.3.2
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Fri Dez 02 16:15:00 CEST 2022
+**Date**: Thu Jan 05 18:45:00 CEST 2023
 
 ### Bugfix
-* Maintain process status of done processes when deleting job
+* CORS allow all headers (pull request from ewaldkleefstra)
 
-## 2.2.0-beta3
+## 2.3.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Fri Nov 25 16:15:00 CEST 2022
+**Date**: Wed Dez 21 14:45:00 CEST 2022
 
 ### Bugfix
-* Notification: send correct list of endpoints and collections
+* Added CORS to exception handler (pull request from ewaldkleefstra)
 
-## 2.2.0-beta2
+## 2.3.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Fri Nov 25 14:15:00 CEST 2022
+**Date**: Tue Dez 20 13:50:00 CEST 2022
 
 ### Feature
-* Task-Scheduler: updated task-scheduler to latest version (v4.0.14)
+* Added CORS handler (pull request from ewaldkleefstra)
 
-## 2.2.0-beta1
+## 2.2.3
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Fri Nov 25 09:30:00 CEST 2022
+**Date**: Fri Dez 16 12:30:00 CEST 2022
+
+### Bugfix
+* Updated micro-auth package to new version (v1.0.0-alpha8)
+
+## 2.2.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Dez 13 13:30:00 CEST 2022
+
+### Bugfix
+* Return notification status
+* Force new worker to spawn for notification jobs
+
+## 2.2.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Nov 30 15:45:00 CEST 2022
+
+### Bugfix
+* load only object data when object failed to sync
+
+## 2.2.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Tue Nov 29 15:15:00 CEST 2022
 
 ### Feature
 * Task-Scheduler: updated task-scheduler to latest version
