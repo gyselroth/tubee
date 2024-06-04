@@ -379,6 +379,12 @@ class SqlSrvUsers extends AbstractEndpoint
 
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
+        if ($diff === []) {
+            $this->logger->debug('no differences found. skip change process');
+
+            return null;
+        }
+
         $endpoint_object = $endpoint_object->getData();
         $login_name = $object[self::ATTRLOGINNAME] ?? null;
         $sql_name = $object[self::ATTRSQLNAME] ?? null;
