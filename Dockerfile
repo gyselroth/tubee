@@ -34,7 +34,8 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql17 wget dialog \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.a /usr/lib/ \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.so /usr/lib/ \
-    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
+#    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
+    && wget http://archive.debian.org/debian-archive/debian-security/pool/updates/main/o/openssl//libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
     && dpkg -i *.deb
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -51,9 +52,11 @@ ENV LC_ALL en_US.UTF-8
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so
 RUN docker-php-ext-install ldap xml opcache curl zip intl sockets pcntl sysvmsg mysqli
 
-RUN pecl install mongodb \
+RUN pecl install mongodb-1.16.2 \
+# TODO: use mongodb on php 7.4
     && pecl install apcu \
-    && pecl install imagick \
+    && pecl install imagick-3.4.4 \
+# TODO: use imagick on php 7.4
     && pecl install smbclient \
     && pecl install sqlsrv-5.8.1 \
     && pecl install pdo_sqlsrv-5.8.1 \
