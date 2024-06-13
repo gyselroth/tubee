@@ -1,6 +1,9 @@
 FROM gyselroth/tubee:php7.2-fpm-v8js
 
 RUN mkdir -p /usr/share/man/man1/ && echo TLS_REQCERT never > /etc/ldap/ldap.conf
+RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
+RUN sed -i -e 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list
+RUN sed -i -e '/stretch-updates/d' /etc/apt/sources.list
 
 RUN apt-get update && apt-get install -y \
   libldb-dev \
