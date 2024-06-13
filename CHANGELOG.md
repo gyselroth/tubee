@@ -1,3 +1,10 @@
+## 2.4.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Jun 13 15:15:00 CEST 2024
+
+### Bugfix
+* SqlSrvUsers Endpoint: abort change process if no change needs to be made
+
 ## 2.4.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Sat Feb 25 00:20:00 CEST 2023
