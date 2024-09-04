@@ -1,9 +1,16 @@
-## 2.5.0-beta1
+## 2.4.2-beta1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
-**Date**: Mon Apr 17 15:50:00 CEST 2023
+**Date**: Mon Sep 04 15:00:00 CEST 2024
 
 ### Feature
-* Task-Scheduler: updated to v4.0.15 for testing purposes
+* Task-Scheduler: updated to v4.0.16
+
+## 2.4.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Jun 13 15:15:00 CEST 2024
+
+### Bugfix
+* SqlSrvUsers Endpoint: abort change process if no change needs to be made
 
 ## 2.4.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
