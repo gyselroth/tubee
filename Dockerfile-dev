@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y \
   smbclient \
   libglib2.0-dev \
   ca-certificates-java \
+  vim \
   && rm -rf /var/lib/apt/lists/*
 
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
