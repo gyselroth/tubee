@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "afc5e1ff5f64e328f034b97f76d68618",
+    "content-hash": "07d112553836b3487e2e959429fb695d",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -1083,16 +1083,16 @@
         },
         {
             "name": "gyselroth/micro-auth",
-            "version": "v1.1.0-alpha1",
+            "version": "v1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/micro-auth.git",
-                "reference": "e1135cfdc34ec64d71a586ed32a38e32d3e89478"
+                "reference": "f64586228012153b6d7002b393733677fc501068"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/micro-auth/zipball/e1135cfdc34ec64d71a586ed32a38e32d3e89478",
-                "reference": "e1135cfdc34ec64d71a586ed32a38e32d3e89478",
+                "url": "https://api.github.com/repos/gyselroth/micro-auth/zipball/f64586228012153b6d7002b393733677fc501068",
+                "reference": "f64586228012153b6d7002b393733677fc501068",
                 "shasum": ""
             },
             "require": {
@@ -1139,9 +1139,9 @@
             ],
             "support": {
                 "issues": "https://github.com/gyselroth/micro-auth/issues",
-                "source": "https://github.com/gyselroth/micro-auth/tree/v1.1.0-alpha1"
+                "source": "https://github.com/gyselroth/micro-auth/tree/v1.1.0"
             },
-            "time": "2024-10-11T08:22:22+00:00"
+            "time": "2024-10-17T11:14:59+00:00"
         },
         {
             "name": "gyselroth/micro-container",
@@ -7998,8 +7998,8 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "icewind/smb": 20,
-        "helmich/mongomock": 20
+        "helmich/mongomock": 20,
+        "icewind/smb": 20
     },
     "prefer-stable": true,
     "prefer-lowest": false,
@@ -8010,6 +8010,6 @@
         "ext-apcu": "*",
         "ext-json": "*"
     },
-    "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "platform-dev": {},
+    "plugin-api-version": "2.6.0"
 }
