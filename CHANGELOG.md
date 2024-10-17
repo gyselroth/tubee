@@ -1,3 +1,11 @@
+## 2.4.3
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Okt 17 15:00:00 CEST 2024
+
+### Feature
+* Task-Scheduler: downgraded to v4.0.11
+* Micro-Auth: updated to v1.1.0
+
 ## 2.4.2
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Tue Sep 24 14:30:00 CEST 2024
