@@ -18,6 +18,7 @@ use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
+use Tubee\Helper;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
 class Mongodb extends AbstractEndpoint
@@ -28,6 +29,11 @@ class Mongodb extends AbstractEndpoint
      * Kind.
      */
     public const KIND = 'MongodbEndpoint';
+
+    /**
+     * Identifier for ObjectId
+     */
+    public const IDENTIFIERFOROBJECTID = '$oid';
 
     /**
      * Collection.
@@ -52,6 +58,11 @@ class Mongodb extends AbstractEndpoint
     {
         $result = [];
         $filter = $this->getFilterOne($object);
+
+        if (strpos($this->getFilterOneAsString($object), self::IDENTIFIERFOROBJECTID) !== false) {
+            $filter = Helper::searchKeyInArrayAndReplaceValueByObjectId(self::IDENTIFIERFOROBJECTID, $filter);
+        }
+
         $this->logGetOne($filter);
 
         foreach ($this->pool->find($filter) as $data) {
