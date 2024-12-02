@@ -1,3 +1,11 @@
+## 2.5.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon Dec 02 22:00:00 CEST 2024
+
+### Feature
+* MongoDB Endpoint: extended filter_one to search for MongoDB\BSON\ObjectId
+* Implemented isoDate core function (MongoDB\BSON\UTCDateTime)
+
 ## 2.4.4
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Nov 01 16:20:00 CEST 2024
