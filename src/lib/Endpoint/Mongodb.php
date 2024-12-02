@@ -31,7 +31,7 @@ class Mongodb extends AbstractEndpoint
     public const KIND = 'MongodbEndpoint';
 
     /**
-     * Identifier for ObjectId
+     * Identifier for ObjectId.
      */
     public const IDENTIFIERFOROBJECTID = '$oid';
 
