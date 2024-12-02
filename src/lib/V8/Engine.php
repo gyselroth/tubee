@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\V8;
 
+use MongoDB\BSON\UTCDateTime;
 use Psr\Log\LoggerInterface;
 use V8Js;
 
@@ -85,6 +86,14 @@ class Engine extends V8Js
             mt_rand(0, 0xffff),
             mt_rand(0, 0xffff)
         );
+    }
+
+    /**
+     * Create MongoDB\BSON\UTCDateTime.
+     */
+    public function isoDate($miliseconds = null): UTCDateTime
+    {
+        return new UTCDateTime($miliseconds);
     }
 
     /**
