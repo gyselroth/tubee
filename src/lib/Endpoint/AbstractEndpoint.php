@@ -321,6 +321,15 @@ abstract class AbstractEndpoint extends AbstractResource implements EndpointInte
         return Helper::jsonDecode(stripslashes($this->parseAttribute($this->filter_one, $object)), true);
     }
 
+    public function getFilterOneAsString(array $object): ?string
+    {
+        if ($this->filter_one === null) {
+            return null;
+        }
+
+        return stripslashes($this->parseAttribute($this->filter_one, $object));
+    }
+
     /**
      * {@inheritdoc}
      */

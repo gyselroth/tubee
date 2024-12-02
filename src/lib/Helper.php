@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Tubee;
 
+use MongoDB\BSON\ObjectId;
+
 class Helper
 {
     /**
@@ -138,5 +140,28 @@ class Helper
         }
 
         return null;
+    }
+
+    /**
+     * Search key in multidimensional array and replace its value it by ObjectId.
+     */
+    public static function searchKeyInArrayAndReplaceValueByObjectId(string $expectedKey, array $array): array
+    {
+        foreach ($array as $key => $item) {
+            if (is_array($item)) {
+                foreach ($item as $s_key => $s_value) {
+                    if (is_array($s_value)) {
+                        $s_sub_key = key($s_value);
+                        if (isset($s_value[$s_sub_key][$expectedKey])) {
+                            $array[$key][$s_key][$s_sub_key] = new ObjectId($s_value[$s_sub_key][$expectedKey]);
+                        }
+                    } elseif ($s_key === $expectedKey) {
+                        $array[$key] = new ObjectId($s_value);
+                    }
+                }
+            }
+        }
+
+        return $array;
     }
 }
