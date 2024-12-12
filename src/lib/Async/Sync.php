@@ -346,7 +346,7 @@ class Sync extends AbstractJob
             return [];
         }
 
-        return (array) Helper::jsonDecode($this->data['filter']);
+        return (array) Helper::jsonDecode(stripslashes($this->data['filter']));
     }
 
     /**
@@ -400,6 +400,10 @@ class Sync extends AbstractJob
 
         $total = $collection->countObjects($filter);
         $i = 0;
+
+        $this->logger->debug('export a total amount of ['.$total.'] objects to endpoint', [
+            'category' => get_class($this),
+        ]);
 
         foreach ($collection->getObjects($filter) as $id => $object) {
             $this->updateProgress(($total === 0) ? 0 : $i / $total * 100);
