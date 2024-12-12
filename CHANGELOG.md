@@ -1,3 +1,10 @@
+## 2.5.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Thu Dec 12 22:30:00 CEST 2024
+
+### Bugfix
+* Stripslashes when read filter out of job config
+
 ## 2.5.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Mon Dec 02 22:00:00 CEST 2024
