@@ -57,7 +57,8 @@ RUN pecl install mongodb-1.16.2 \
     && pecl install apcu \
     && pecl install imagick-3.4.4 \
 # TODO: use imagick on php 7.4
-    && pecl install smbclient \
+    && pecl install smbclient-1.1.2 \
+# TODO: use smbclient on php 7.4
     && pecl install sqlsrv-5.8.1 \
     && pecl install pdo_sqlsrv-5.8.1 \
     && docker-php-ext-enable mongodb apcu imagick smbclient pcntl sqlsrv pdo_sqlsrv mysqli
