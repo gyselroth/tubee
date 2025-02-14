@@ -11,6 +11,7 @@ declare(strict_types=1);
 
 namespace Tubee\V8;
 
+use MongoDB\BSON\ObjectId;
 use MongoDB\BSON\UTCDateTime;
 use Psr\Log\LoggerInterface;
 use V8Js;
@@ -94,6 +95,14 @@ class Engine extends V8Js
     public function isoDate($miliseconds = null): UTCDateTime
     {
         return new UTCDateTime($miliseconds);
+    }
+
+    /**
+     * Create MongoDB\BSON\ObjectId.
+     */
+    public function objectId(string $id = null): ObjectId
+    {
+        return new ObjectId($id);
     }
 
     /**
