@@ -1,3 +1,10 @@
+## 2.6.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Feb 14 15:30:00 CEST 2025
+
+### Feature
+* Implemented objectId core function (MongoDB\BSON\ObjectId)
+
 ## 2.5.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Thu Dec 12 22:30:00 CEST 2024
