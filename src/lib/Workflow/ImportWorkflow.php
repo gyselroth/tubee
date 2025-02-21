@@ -49,7 +49,7 @@ class ImportWorkflow extends Workflow
             break;
             default:
             case WorkflowInterface::ENSURE_LAST:
-                $resource = Map::map($this->attribute_map, $map, ['data' => $object->getData()], $process->getTimestamp());
+                $resource = Map::map($this->attribute_map, $map, ['data' => $object->getData()]);
                 $object->getCollection()->changeObject($object, $resource, $simulate, [
                     'name' => $this->endpoint->getName(),
                     'last_garbage_sync' => $process->getTimestamp(),
@@ -104,7 +104,7 @@ class ImportWorkflow extends Workflow
             'map' => array_keys($map),
         ]);
 
-        $update = (array) Map::map($this->attribute_map, $map, ['data' => $relationObject->getData()], $process->getTimestamp());
+        $update = (array) Map::map($this->attribute_map, $map, ['data' => $relationObject->getData()]);
         $endpointData = $relationObject->toArray()['endpoints'][$key];
 
         $update['endpoints'][$key] = [
@@ -187,7 +187,7 @@ class ImportWorkflow extends Workflow
             break;
             default:
             case WorkflowInterface::ENSURE_LAST:
-                $mapped = Map::map($this->attribute_map, $map, ['data' => $exists->getData()], $process->getTimestamp());
+                $mapped = Map::map($this->attribute_map, $map, ['data' => $exists->getData()]);
                 $endpoint = [
                     'name' => $this->endpoint->getName(),
                     'last_sync' => $process->getTimestamp(),
