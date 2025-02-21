@@ -1,3 +1,10 @@
+## 2.6.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Feb 21 12:00:00 CEST 2025
+
+### Bugfix
+* Array import (ImportWorkflow)
+
 ## 2.6.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Feb 14 15:30:00 CEST 2025
