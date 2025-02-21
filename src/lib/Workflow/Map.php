@@ -46,13 +46,12 @@ class Map
                     }
 
                     $i = 0;
-                    foreach($object as $okey => $ovalue) {
+                    foreach ($object as $okey => $ovalue) {
                         if ($okey === $name.'.'.$i) {
                             $mongodb_object[$name.'.'.$i] = $ovalue;
                             ++$i;
                         }
                     }
-
                 } elseif ($value['ensure'] === WorkflowInterface::ENSURE_ABSENT && isset($mongodb_object[$name.'.0']) || !isset($object[$name.'.0']) && isset($mongodb_object[$name.'.0'])) {
                     $i = 0;
 
