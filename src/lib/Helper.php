@@ -125,7 +125,32 @@ class Helper
      */
     public static function arrayEqual(array $a1, array $a2): bool
     {
-        return !array_diff($a1, $a2) && !array_diff($a2, $a1);
+        return !self::diffMultiArray($a1, $a2) && !self::diffMultiArray($a2, $a1);
+    }
+
+    public static function diffMultiArray(array $array1, array $array2): array
+    {
+        $result = [];
+
+        foreach ($array1 as $key => $a1) {
+            if (!array_key_exists($key, $array2)) {
+                $result[$key] = $a1;
+
+                continue;
+            }
+
+            $a2 = $array2[$key];
+            if (is_array($a1)) {
+                $recc_array = self::diffMultiArray($a1, $a2);
+                if (!empty($recc_array)) {
+                    $result[$key] = $recc_array;
+                }
+            } elseif ($a1 != $a2) {
+                $result[$key] = $a1;
+            }
+        }
+
+        return $result;
     }
 
     /**
