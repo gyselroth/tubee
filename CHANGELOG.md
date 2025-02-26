@@ -1,3 +1,10 @@
+## 2.6.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Feb 26 16:30:00 CEST 2025
+
+### Bugfix
+* Check multidimensional when calculate array diff
+
 ## 2.6.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Feb 21 12:00:00 CEST 2025
