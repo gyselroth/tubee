@@ -1,3 +1,10 @@
+## 2.6.3
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Mar 05 16:00:00 CEST 2025
+
+### Bugfix
+* Umlaut fix for balloon endpoint filter
+
 ## 2.6.2
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed Feb 26 16:30:00 CEST 2025
