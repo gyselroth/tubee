@@ -44,7 +44,7 @@ class Balloon extends AbstractRest
         }
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                return json_encode($query);
+                return json_encode($query, JSON_UNESCAPED_UNICODE);
             }
 
             return '{"$and":['.stripslashes($this->filter_all).', '.json_encode($query).']}';
