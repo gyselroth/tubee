@@ -11,16 +11,16 @@ info:
     url: "https://opensource.org/licenses/MIT"
 basePath: "/"
 schemes:
-- "https"
+  - "https"
 paths:
   /api:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get api entrypoint"
       operationId: "getApi"
       produces:
-      - "application/json"
+        - "application/json"
       responses:
         200:
           description: "Api"
@@ -29,11 +29,11 @@ paths:
   /api/v1:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get api entrypoint"
       operationId: "getV1"
       produces:
-      - "application/json"
+        - "application/json"
       responses:
         200:
           description: "Api"
@@ -42,50 +42,50 @@ paths:
   /api/v1/namespaces:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get namespaces"
       description: "A namespace is a logical group of collections"
       operationId: "getNamespaces"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of namespaces"
@@ -95,16 +95,16 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Add namespace"
       operationId: "addNamespace"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Namespace"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Namespace"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -115,25 +115,25 @@ paths:
   /api/v1/namespaces/{namespace}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get specific namespace"
       description: "A namespace is a logical group of collections"
       operationId: "getNamespace"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
       responses:
         200:
           description: "Namespace"
@@ -145,17 +145,17 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete specific namespace"
       operationId: "deleteNamespace"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -165,21 +165,21 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace namespace"
       operationId: "replaceNamespace"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Namespace"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Namespace"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -193,25 +193,25 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch namespace as rfc6902 request"
       operationId: "updateNamespace"
       description: "Update specific attributes of a namespace"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        description: "Namespace"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          description: "Namespace"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Namespace"
@@ -224,55 +224,55 @@ paths:
   /api/v1/namespaces/{namespace}/collections:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get collections"
       description: "A collection is collection of data objects of a specific type"
       operationId: "getCollections"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of collections"
@@ -284,21 +284,21 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Add collection"
       operationId: "addCollection"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-           $ref: "#/definitions/core.v1.Collection"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Collection"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -311,30 +311,30 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get specific collection"
       description: "A collection is collection of dataobjects of a specific type"
       operationId: "getCollection"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
       responses:
         200:
           description: "Collection"
@@ -346,22 +346,22 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete specific collection"
       operationId: "deleteCollection"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -371,26 +371,26 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace collection"
       operationId: "replaceCollection"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Collection"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Collection"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -404,30 +404,30 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch collection as rfc6902 request"
       description: "Update specific attributes of a collection"
       operationId: "updateCollection"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        description: "Collection"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          description: "Collection"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Collection"
@@ -440,59 +440,59 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/logs:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get logs of a collection"
       operationId: "getCollectionLogs"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Job"
@@ -505,27 +505,27 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/logs/{log}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get a single collection log"
       operationId: "getCollectionLog"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "log"
-        description: "Log id"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "log"
+          description: "Log id"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Log"
@@ -538,60 +538,60 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get endpoints"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoints"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of endpoints"
@@ -603,26 +603,26 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Add Endpoint"
       operationId: "addEndpoint"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          type: object
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            type: object
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -635,35 +635,35 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get specific endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpoint"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
       responses:
         200:
           description: "Endpoint"
@@ -675,27 +675,27 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete specific endpoint"
       operationId: "deleteEndpoint"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -705,31 +705,31 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace endppoint"
       operationId: "replaceEndpoint"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Endpoint"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Endpoint"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -743,35 +743,35 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch collection as rfc6902 request"
       description: "Update specific attributes of a endpoint"
       operationId: "updateEndpoint"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        description: "Collection"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          description: "Collection"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Endpoint"
@@ -784,64 +784,64 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get logs of an endpoint"
       operationId: "getEndpointLogs"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Job"
@@ -854,32 +854,32 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/logs/{log}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get a single endpoint log"
       operationId: "getEndpointLog"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "log"
-        description: "Log id"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "log"
+          description: "Log id"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Log"
@@ -892,65 +892,65 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get endpoint workflows"
       description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflows"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of workflows"
@@ -960,31 +960,31 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Add worfklow to endpoint"
       operationId: "addWorkflow"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Workflow"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Workflow"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -997,40 +997,40 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/workflows/{workflow}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get specifc endpoint workflow"
       description: "A workflow is an action how to import/export a collection and with what attribute map"
       operationId: "getWorkflow"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "workflow"
-        description: "Workflow name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "workflow"
+          description: "Workflow name"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
       responses:
         200:
           description: "Workflow"
@@ -1042,32 +1042,32 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete specific workflow from"
       operationId: "deleteWorkflow"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "workflow"
-        description: "Workflow name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "workflow"
+          description: "Workflow name"
+          required: true
+          type: "string"
       responses:
         204:
           description: "If successful the server will respond with 204 No Content"
@@ -1077,36 +1077,36 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace workflow"
       operationId: "replaceWorkflow"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "workflow"
-        description: "Workflow name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Workflow"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "workflow"
+          description: "Workflow name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Workflow"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -1120,40 +1120,40 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch workflow as rfc6902 request"
       description: "Update specific attributes of a workflow"
       operationId: "updateWorkflow"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "workflow"
-        description: "Workflow name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        description: "Workflow"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "workflow"
+          description: "Workflow name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          description: "Workflow"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "Workflow"
@@ -1166,35 +1166,35 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get specific object"
       description: "Get an object of a specific collection"
       operationId: "getObject"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object ID"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
       responses:
         200:
           description: "Data object"
@@ -1204,37 +1204,37 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch object as rfc6902 request"
       description: "Update specific attributes of an object"
       operationId: "updateObject"
       consumes:
-      - "application/json-patch+json"
+        - "application/json-patch+json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        description: "Object"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object ID"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          description: "Object"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -1250,39 +1250,39 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Replace or create object"
       description: "Replace all data attributes of an object (Or create one if not exists)"
       operationId: "replaceObject"
       consumes:
-      - "application/json"
+        - "application/json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "write"
-        description: "If true, the objects gets synced to all configured destination endpoints"
-        required: false
-        type: "boolean"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.DataObject"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object ID"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "write"
+          description: "If true, the objects gets synced to all configured destination endpoints"
+          required: false
+          type: "boolean"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.DataObject"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -1302,30 +1302,30 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete object"
       description: "Delete a specific object"
       operationId: "deleteObject"
       consumes:
-      - "application/json"
+        - "application/json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object ID"
+          required: true
+          type: "string"
       responses:
         202:
           description: "If write argument is true the server will respond with 202 Accepted since this is an asynchronous request."
@@ -1340,65 +1340,65 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get relative objects of an object"
       description: "Get all objects the object is related to"
       operationId: "getObjectRelations"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object name"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Object relatives"
@@ -1411,32 +1411,32 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/relations/{relation}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get single relative object of an object"
       operationId: "getObjectRelation"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relation"
-        description: "Relation name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "relation"
+          description: "Relation name"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Object relation"
@@ -1449,55 +1449,55 @@ paths:
   /api/v1/namespaces/{namespace}/relations:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get data object relations"
       description: "Get data object relations"
       operationId: "getRelations"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Object relatives"
@@ -1509,21 +1509,21 @@ paths:
           description: "Resource not found"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Add new object relation"
       operationId: "addRelation"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.ObjectRelation"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.ObjectRelation"
       responses:
         200:
           description: "Object relation"
@@ -1536,22 +1536,22 @@ paths:
   /api/v1/namespaces/{namespace}/relations/{relation}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get single relation"
       operationId: "getRelation"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relation"
-        description: "Relation"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "relation"
+          description: "Relation"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Object relation"
@@ -1563,32 +1563,32 @@ paths:
           description: "Resource not found"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch relation as rfc6902 request"
       description: "Update specific attributes of a relation"
       operationId: "updateRelation"
       consumes:
-      - "application/json-patch+json"
+        - "application/json-patch+json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relation"
-        description: "Relation"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        description: "Object"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "relation"
+          description: "Relation"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          description: "Object"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -1600,26 +1600,26 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Replace object relation"
       operationId: "replaceRelation"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relation"
-        description: "Relation"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.ObjectRelation"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "relation"
+          description: "Relation"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.ObjectRelation"
       responses:
         200:
           description: "Object relation"
@@ -1631,22 +1631,22 @@ paths:
           description: "Resource not found"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete object relation"
       operationId: "deleteObjectRelation"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "relation"
-        description: "Relation"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "relation"
+          description: "Relation"
+          required: true
+          type: "string"
       responses:
         204:
           description: "No body if successfully deleted"
@@ -1657,65 +1657,65 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/endpoints/{endpoint}/objects:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get objects from endpoint"
       description: "An endpoint is either of type source or destination and defines an import/export destination"
       operationId: "getEndpointObjects"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "endpoint"
-        description: "Endpoint"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "endpoint"
+          description: "Endpoint"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of objects"
@@ -1728,65 +1728,65 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/history:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get object history"
       description: "Get the history of all modifications from a specific object"
       operationId: "getObjectHistory"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object ID"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Object history"
@@ -1799,64 +1799,64 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get logs of an object"
       operationId: "getObjectLogs"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object ID"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Job"
@@ -1869,32 +1869,32 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects/{object}/logs/{log}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get a single object log"
       operationId: "getObjectLog"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "object"
-        description: "Object ID"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "log"
-        description: "Log id"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "object"
+          description: "Object ID"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "log"
+          description: "Log id"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Log"
@@ -1907,60 +1907,60 @@ paths:
   /api/v1/namespaces/{namespace}/collections/{collection}/objects:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get objects of a specific collection"
       description: "A object is a data object from a specifc collection"
       operationId: "getObjects"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of objects"
@@ -1972,28 +1972,28 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Add a new object of a specifc collection"
       operationId: "addObject"
       consumes:
-      - "application/json"
+        - "application/json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "collection"
-        description: "Collection"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.DataObject"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "collection"
+          description: "Collection"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.DataObject"
       responses:
         201:
           description: "If successful the server will respond with 201 Created"
@@ -2010,55 +2010,55 @@ paths:
   /api/v1/namespaces/{namespace}/secrets:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get secrets"
       description: "An secret holds secret data which should not get exposed and is specially encrypted on the server. A secret can be injected into other resources."
       operationId: "getSecrets"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of secrets"
@@ -2068,21 +2068,21 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create a new secret"
       operationId: "addSecret"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Secret"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Secret"
       responses:
         201:
           description: "The created secret"
@@ -2093,22 +2093,22 @@ paths:
   /api/v1/namespaces/{namespace}/secrets/{secret}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get secret by name"
       operationId: "getSecret"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "secret"
-        description: "secret name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "secret"
+          description: "secret name"
+          required: true
+          type: "string"
       responses:
         200:
           description: "secret"
@@ -2120,31 +2120,31 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch secret as rfc6902 request"
       operationId: "updateSecret"
       consumes:
-      - "application/json-patch+json"
+        - "application/json-patch+json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "secret"
-        description: "secret name"
-        required: true
-        type: "string"
-      - in: body
-        name: "job"
-        description: "secret json patch"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "secret"
+          description: "secret name"
+          required: true
+          type: "string"
+        - in: body
+          name: "job"
+          description: "secret json patch"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated secret"
@@ -2154,26 +2154,26 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace an secret"
       operationId: "replaceSecret"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "secret"
-        description: "secret name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Secret"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "secret"
+          description: "secret name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Secret"
       responses:
         201:
           description: "The created secret"
@@ -2183,22 +2183,22 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete secret by name"
       operationId: "deleteSecret"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "secret"
-        description: "secret name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "secret"
+          description: "secret name"
+          required: true
+          type: "string"
       responses:
         204:
           description: "Server responds with 204 No Content if secret removal was successful"
@@ -2209,50 +2209,50 @@ paths:
   /api/v1/users:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get users"
       description: "An User defines what role is granted access to what resource"
       operationId: "getUsers"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of users"
@@ -2262,16 +2262,16 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create a new User"
       operationId: "addUser"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.User"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.User"
       responses:
         201:
           description: "The created User"
@@ -2282,17 +2282,17 @@ paths:
   /api/v1/users/{User}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get User by name"
       operationId: "getUser"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "User"
-        description: "User name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "User"
+          description: "User name"
+          required: true
+          type: "string"
       responses:
         200:
           description: "User"
@@ -2304,26 +2304,26 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch User as rfc6902 request"
       operationId: "updateUser"
       consumes:
-      - "application/json-patch+json"
+        - "application/json-patch+json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "User"
-        description: "User name"
-        required: true
-        type: "string"
-      - in: body
-        name: "job"
-        description: "User json patch"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "User"
+          description: "User name"
+          required: true
+          type: "string"
+        - in: body
+          name: "job"
+          description: "User json patch"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated User"
@@ -2333,21 +2333,21 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace an User"
       operationId: "replaceUser"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "User"
-        description: "User name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.User"
+        - in: "path"
+          name: "User"
+          description: "User name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.User"
       responses:
         201:
           description: "The created User"
@@ -2357,17 +2357,17 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete User by name"
       operationId: "deleteUser"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "User"
-        description: "User name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "User"
+          description: "User name"
+          required: true
+          type: "string"
       responses:
         204:
           description: "Server responds with 204 No Content if User removal was successful"
@@ -2378,50 +2378,50 @@ paths:
   /api/v1/access-rules:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get access rules"
       description: "An access rule defines what role is granted access to what resource"
       operationId: "getAccessRules"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of access rules"
@@ -2431,16 +2431,16 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create a new access rule"
       operationId: "addAccessRule"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.AccessRule"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.AccessRule"
       responses:
         201:
           description: "The created access rule"
@@ -2451,17 +2451,17 @@ paths:
   /api/v1/access-rules/{access-rule}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get access rule by name"
       operationId: "getAccessRule"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-rule"
-        description: "Access rule name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "access-rule"
+          description: "Access rule name"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Acccess rule"
@@ -2473,26 +2473,26 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch access rule as rfc6902 request"
       operationId: "updateAccessRule"
       consumes:
-      - "application/json-patch+json"
+        - "application/json-patch+json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-rule"
-        description: "Access rule name"
-        required: true
-        type: "string"
-      - in: body
-        name: "job"
-        description: "Access rule json patch"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "access-rule"
+          description: "Access rule name"
+          required: true
+          type: "string"
+        - in: body
+          name: "job"
+          description: "Access rule json patch"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated access rule"
@@ -2502,21 +2502,21 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace an access rule"
       operationId: "replaceAccessRule"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-rule"
-        description: "Access rule name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.AccessRule"
+        - in: "path"
+          name: "access-rule"
+          description: "Access rule name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.AccessRule"
       responses:
         201:
           description: "The created access rule"
@@ -2526,17 +2526,17 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete access-rule by name"
       operationId: "deleteAccessRule"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-rule"
-        description: "Access rule name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "access-rule"
+          description: "Access rule name"
+          required: true
+          type: "string"
       responses:
         204:
           description: "Server responds with 204 No Content if access rule removal was successful"
@@ -2547,50 +2547,50 @@ paths:
   /api/v1/access-roles:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get access roles"
       description: "An access role defines what role is granted access to what resource"
       operationId: "getAccessRoles"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of access roles"
@@ -2600,16 +2600,16 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create a new access role"
       operationId: "addAccessRole"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.AccessRole"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.AccessRole"
       responses:
         201:
           description: "The created access role"
@@ -2620,17 +2620,17 @@ paths:
   /api/v1/access-roles/{access-role}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get access role by name"
       operationId: "getAccessRole"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-role"
-        description: "Access role name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "access-role"
+          description: "Access role name"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Acccess role"
@@ -2642,26 +2642,26 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch access role as rfc6902 request"
       operationId: "updateAccessRole"
       consumes:
-      - "application/json-patch+json"
+        - "application/json-patch+json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-role"
-        description: "Access role name"
-        required: true
-        type: "string"
-      - in: body
-        name: "job"
-        description: "Access role json patch"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "access-role"
+          description: "Access role name"
+          required: true
+          type: "string"
+        - in: body
+          name: "job"
+          description: "Access role json patch"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "The updated access role"
@@ -2671,23 +2671,23 @@ paths:
           description: "Access denied"
     put:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create or replace an access role"
       operationId: "replaceAccessRole"
       consumes:
-      - "application/json"
+        - "application/json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-role"
-        description: "Access role name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.AccessRole"
+        - in: "path"
+          name: "access-role"
+          description: "Access role name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.AccessRole"
       responses:
         200:
           description: "The updated access role"
@@ -2701,17 +2701,17 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete access-role by name"
       operationId: "deleteAccessRole"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "access-role"
-        description: "Access role name"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "access-role"
+          description: "Access role name"
+          required: true
+          type: "string"
       responses:
         204:
           description: "Server responds with 204 No Content if access role removal was successful"
@@ -2722,55 +2722,55 @@ paths:
   /api/v1/namespaces/{namespace}/jobs:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get list of active queued jobs"
       description: "A job is an asynchronous server process"
       operationId: "getJobs"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "List of active jobs"
@@ -2780,21 +2780,21 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Create new job"
       operationId: "addJob"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Job"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Job"
       responses:
         202:
           description: "The created job"
@@ -2807,22 +2807,22 @@ paths:
   /api/v1/namespaces/{namespace}/jobs/{job}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get job by id"
       operationId: "getJob"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "job"
+          description: "Job ID"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Job"
@@ -2834,22 +2834,22 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Delete job by id"
       operationId: "deleteJob"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "job"
+          description: "Job ID"
+          required: true
+          type: "string"
       responses:
         204:
           description: "Server responds with 204 No Content if job removal was successful"
@@ -2859,32 +2859,32 @@ paths:
           description: "Access denied"
     patch:
       tags:
-      - core.v1
+        - core.v1
       summary: "Patch job as rfc6902 request"
       description: "Update specific attributes of a job"
       operationId: "updateJob"
       consumes:
-      - "application/json-patch+json"
+        - "application/json-patch+json"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        description: "Object"
-        schema:
-          type: array
-          items:
-            $ref: "#/definitions/core.v1.JsonPatch"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "job"
+          description: "Job ID"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          description: "Object"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/core.v1.JsonPatch"
       responses:
         200:
           description: "If successful the server will respond with 200 OK"
@@ -2897,54 +2897,54 @@ paths:
   /api/v1/namespaces/{namespace}/processes:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get all processes"
       operationId: "getProcesses"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Process"
@@ -2956,21 +2956,21 @@ paths:
           description: "Access denied"
     post:
       tags:
-      - core.v1
+        - core.v1
       summary: "Trigger a new process"
       operationId: "addProcess"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: body
-        name: data
-        schema:
-          $ref: "#/definitions/core.v1.Process"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: body
+          name: data
+          schema:
+            $ref: "#/definitions/core.v1.Process"
       responses:
         202:
           description: "Returns a 202 if successful"
@@ -2983,22 +2983,22 @@ paths:
   /api/v1/namespaces/{namespace}/processes/{process}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get a single process of a job"
       operationId: "getProcess"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "process"
-        description: "Process ID"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "process"
+          description: "Process ID"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Process"
@@ -3010,22 +3010,22 @@ paths:
           description: "Access denied"
     delete:
       tags:
-      - core.v1
+        - core.v1
       summary: "Abort running process"
       operationId: "deleteProcess"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "process"
-        description: "Process ID"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "process"
+          description: "Process ID"
+          required: true
+          type: "string"
       responses:
         204:
           description: "Server responds with 204 No Content if process abort was successful"
@@ -3036,59 +3036,59 @@ paths:
   /api/v1/namespaces/{namespace}/jobs/{job}/logs:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get logs of a job"
       operationId: "getJobLogs"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "job"
+          description: "Job ID"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Job"
@@ -3101,27 +3101,27 @@ paths:
   /api/v1/namespaces/{namespace}/jobs/{job}/logs/{log}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get a single job error"
       operationId: "getJobLog"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "job"
-        description: "Job ID"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "log"
-        description: "Log id"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "job"
+          description: "Job ID"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "log"
+          description: "Log id"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Log"
@@ -3134,59 +3134,59 @@ paths:
   /api/v1/namespaces/{namespace}/processes/{process}/logs:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get logs of a process"
       operationId: "getProcessLogs"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "process"
-        description: "Process ID"
-        required: true
-        type: "string"
-      - in: "query"
-        name: "query"
-        description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "attributes"
-        description: "Filter attributes"
-        required: false
-        type: "array"
-        items:
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
           type: "string"
-      - in: "query"
-        name: "offset"
-        description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
-        required: false
-        type: "number"
-      - in: "query"
-        name: "limit"
-        description: "Objects limit, per default 20 objects will get returned"
-        required: false
-        type: "number"
-      - in: "query"
-        name: "sort"
-        description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
-        required: false
-        type: "string"
-      - in: "query"
-        name: "stream"
-        description: "Stream resources. There is no limit by default."
-        required: false
-        type: "boolean"
-      - in: "query"
-        name: "watch"
-        description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
-        required: false
-        type: "boolean"
+        - in: "path"
+          name: "process"
+          description: "Process ID"
+          required: true
+          type: "string"
+        - in: "query"
+          name: "query"
+          description: "Specify a MongoDB based resource query (https://docs.mongodb.com/manual/tutorial/query-documents) using JSON (For example: {\"name\": {$regex: 'foo.*'}})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "attributes"
+          description: "Filter attributes"
+          required: false
+          type: "array"
+          items:
+            type: "string"
+        - in: "query"
+          name: "offset"
+          description: "Objects offset, per default it starts from 0. You may also request a negative offset which will return results from the end [total - offset]."
+          required: false
+          type: "number"
+        - in: "query"
+          name: "limit"
+          description: "Objects limit, per default 20 objects will get returned"
+          required: false
+          type: "number"
+        - in: "query"
+          name: "sort"
+          description: "Specify a MongoDB sort operation (https://docs.mongodb.com/manual/reference/method/cursor.sort/) using JSON (For example: {\"name\": -1})."
+          required: false
+          type: "string"
+        - in: "query"
+          name: "stream"
+          description: "Stream resources. There is no limit by default."
+          required: false
+          type: "boolean"
+        - in: "query"
+          name: "watch"
+          description: "Watch resources. By default a stream and useful to retrieve UPDATE, DELETE and ADD updates."
+          required: false
+          type: "boolean"
       responses:
         200:
           description: "Log"
@@ -3199,27 +3199,27 @@ paths:
   /api/v1/namespaces/{namespace}/process/{process}/logs/{log}:
     get:
       tags:
-      - core.v1
+        - core.v1
       summary: "Get a single process log"
       operationId: "getProcessLog"
       produces:
-      - "application/json"
+        - "application/json"
       parameters:
-      - in: "path"
-        name: "namespace"
-        description: "Namespace name"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "process"
-        description: "Process ID"
-        required: true
-        type: "string"
-      - in: "path"
-        name: "log"
-        description: "Log id"
-        required: true
-        type: "string"
+        - in: "path"
+          name: "namespace"
+          description: "Namespace name"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "process"
+          description: "Process ID"
+          required: true
+          type: "string"
+        - in: "path"
+          name: "log"
+          description: "Log id"
+          required: true
+          type: "string"
       responses:
         200:
           description: "Log"
@@ -3418,12 +3418,12 @@ definitions:
                   type: "string"
                   enum:
                     - "*"
-                    - GET
-                    - POST
-                    - PUT
-                    - PATCH
-                    - DELETE
-                    - HEAD
+                    - "GET"
+                    - "POST"
+                    - "PUT"
+                    - "PATCH"
+                    - "DELETE"
+                    - "HEAD"
               selectors:
                 description: "A list of selectors to match resources, for example namespace, collection, endpoint, ..."
                 type: "array"
@@ -3529,29 +3529,29 @@ definitions:
                     description: "A list of mail adresses which the notification should be sent to. This option has no affect if notification is disabled."
                     type: array
                     items:
-                      type: string
+                      type: "string"
                     default: []
                   identifier:
                     description: "A list of dataobject attributes which should be added to the notification mail when dataobject can't be synced. This option has no affect if notification is disabled."
                     type: array
                     items:
-                      type: string
+                      type: "string"
                     default: []
               collections:
                 description: "A list of collections (name) the job should match. You may use a wildcard to specify all collections. Each element may contain either a single collection name or a list of collections. A list will be processed in parallel while single collections get synchronized syncronely"
                 type: array
                 items:
-                  type: string
+                  type: "string"
                 default: []
               endpoints:
                 description: "A list of endoints (name) the job should match. You may use a wildcard to specify all endpoints. Each element may contain either a single endpoint name or a list of endpoints. A list will be processed in parallel while single endpoints get synchronized syncronely."
                 type: array
                 items:
-                  type: string
+                  type: "string"
                 default: []
               filter:
                 description: "Data object filter (JSON encoded)."
-                type: string
+                type: "string"
               ignore:
                 description: "If enabled the server does ignores any sync errors and continue with the process."
                 type: boolean
@@ -3562,15 +3562,15 @@ definitions:
                 default: false
               log_level:
                 description: "You may change the log level which gets applied during a sync job. Note that a log level too verbose has a big impact on the sync performance."
-                type: string
+                type: "string"
                 default: error
                 enum:
-                  - emerg
-                  - error
-                  - warn
-                  - info
-                  - notice
-                  - debug
+                  - "emerg"
+                  - "error"
+                  - "warn"
+                  - "info"
+                  - "notice"
+                  - "debug"
               options:
                 description: "Holds options about when a job should start and with what interval."
                 type: object
@@ -3589,8 +3589,8 @@ definitions:
                     type: "string"
                     default: "end"
                     enum:
-                      - start
-                      - end
+                      - "start"
+                      - "end"
                   retry:
                     description: "The number of times a failed job should be restarted. The default is never."
                     type: "integer"
@@ -3688,19 +3688,19 @@ definitions:
             description: "The type of endpoint."
             type: "string"
             enum:
-              - PdoEndpoint
-              - MysqlEndpoint
-              - XmlEndpoint
-              - CsvEndpoint
-              - ImageEndpoint
-              - JsonEndpoint
-              - MongodbEndpoint
-              - MoodleEndpoint
-              - BalloonEndpoint
-              - OdataRestEndpoint
-              - UcsEndpoint
-              - SqlSrvUsersEndpoint
-              - MattermostEndpoint
+              - "PdoEndpoint"
+              - "MysqlEndpoint"
+              - "XmlEndpoint"
+              - "CsvEndpoint"
+              - "ImageEndpoint"
+              - "JsonEndpoint"
+              - "MongodbEndpoint"
+              - "MoodleEndpoint"
+              - "BalloonEndpoint"
+              - "OdataRestEndpoint"
+              - "UcsEndpoint"
+              - "SqlSrvUsersEndpoint"
+              - "MattermostEndpoint"
           data:
             type: "object"
             properties:
@@ -3709,10 +3709,10 @@ definitions:
                 type: "string"
                 default: "browse"
                 enum:
-                  - browse
-                  - source
-                  - destination
-                  - bidirectional
+                  - "browse"
+                  - "source"
+                  - "destination"
+                  - "bidirectional"
               options:
                 type: "object"
                 properties:
@@ -3723,7 +3723,7 @@ definitions:
                     description: "A list of attributes which gets used to uniquely identify an object on the endpoint."
                     type: "array"
                     items:
-                      type: string
+                      type: "string"
                   flush:
                     description: "If true and the endpoint is of type source, the endpoint gets flushed before export. If the type is destination, the endpoints collection gets flushed before import. Pay attention with flush as it may result in data loss!"
                     type: "boolean"
@@ -3742,7 +3742,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always PdoEndpoint."
-            type: "string"
             default: "PdoEndpoint"
           data:
             properties:
@@ -3755,13 +3754,13 @@ definitions:
                 properties:
                   dsn:
                     description: "Data source name (DSN)."
-                    type: string
+                    type: "string"
                   username:
                     description: "Username if required."
-                    type: string
+                    type: "string"
                   passwd:
                     description: "Password if required."
-                    type: string
+                    type: "string"
                   options:
                     description: "Driver specific connection options."
                     type: object
@@ -3774,7 +3773,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always MysqlEndpoint."
-            type: "string"
             default: "MysqlEndpoint"
           data:
             properties:
@@ -3787,20 +3785,20 @@ definitions:
                 properties:
                   host:
                     description: "MySQL Server (Or compatible MySQL fork like MariaDB)."
-                    type: string
+                    type: "string"
                   username:
                     description: "Username."
-                    type: string
+                    type: "string"
                   passwd:
                     description: "Password if required."
-                    type: string
+                    type: "string"
                   port:
                     description: "Specifies the port number to attempt to connect to the MySQL server."
                     type: integer
                     default: 3306
                   socket:
                     description: "Specifies the socket or named pipe that should be used."
-                    type: string
+                    type: "string"
   core.v1.LdapEndpoint:
     description: "LDAP (OpenLDAP, Microsoft AD and other LDAP compatible Server) endpoint"
     allOf:
@@ -3809,7 +3807,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always LdapEndpoint."
-            type: "string"
             default: "LdapEndpoint"
           data:
             properties:
@@ -3819,16 +3816,16 @@ definitions:
                 properties:
                   uri:
                     description: "A full LDAP URI of the form ldap://hostname:port or ldaps://hostname:port for SSL encryption."
-                    type: string
+                    type: "string"
                   binddn:
                     description: "Bind DN if required."
-                    type: string
+                    type: "string"
                   bindpw:
                     description: "Bind password if required."
-                    type: string
+                    type: "string"
                   basedn:
                     description: "Specifies the base dn (Like dc=example,dc=net)."
-                    type: string
+                    type: "string"
                   tls:
                     description: "Set to true if TLS shall be used."
                     type: boolean
@@ -3844,7 +3841,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always SqlSrvUsersEndpoint."
-            type: "string"
             default: "SqlSrvUsersEndpoint"
           data:
             properties:
@@ -3854,16 +3850,16 @@ definitions:
                 properties:
                   host:
                     description: "MSSQL Server."
-                    type: string
+                    type: "string"
                   username:
                     description: "Username if required."
-                    type: string
+                    type: "string"
                   password:
                     description: "Password if required."
-                    type: string
+                    type: "string"
                   dbname:
                     description: "Database."
-                    type: string
+                    type: "string"
                   port:
                     description: "Specifies the port number to attempt to connect to the MSSQL server."
                     type: integer
@@ -3876,7 +3872,7 @@ definitions:
                       nullable: true
                       default: principal_id
                       description: Endpoint resource identifier.
-                      type: string
+                      type: "string"
   core.v1.OdataRestEndpoint:
     description: "OData REST API endpoint (Compatible with Microsoft graph (Office365 and more) and other OData compatible api's)"
     allOf:
@@ -3885,7 +3881,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always OdataRestEndpoint."
-            type: "string"
             default: "OdataRestEndpoint"
           data:
             properties:
@@ -3895,45 +3890,45 @@ definitions:
                 properties:
                   base_uri:
                     description: "Base uri to resources (Like https://rest.api/v1/resources)."
-                    type: string
+                    type: "string"
                   container:
                     description: "Key of array which contains the data in REST response"
-                    type: string
+                    type: "string"
                   request_options:
                     description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
                     type: object
                   auth:
                     description: "Authentication adapter, either of none, http basic authentication or oauth2 using client_credentials flow."
-                    type: string
+                    type: "string"
                     enum:
-                      - basic
-                      - oauth2
+                      - "basic"
+                      - "oauth2"
                   basic:
                     description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
                     type: object
                     properties:
                       username:
                         description: "Basic authentication username."
-                        type: string
+                        type: "string"
                       password:
                         description: "Password if required."
-                        type: string
+                        type: "string"
                   oauth2:
                     description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
                     type: object
                     properties:
                       token_endpoint:
                         description: "URI to token endpoint."
-                        type: string
+                        type: "string"
                       client_id:
                         description: "OAuth2 client_id."
-                        type: string
+                        type: "string"
                       client_secret:
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
-                        type: string
+                        type: "string"
                       scope:
                         description: "OAuth2 scopes"
-                        type: string
+                        type: "string"
   core.v1.UcsEndpoint:
     description: "UCS endpoint (Univention Corporate Server, https://www.univention.com/products/ucs)"
     allOf:
@@ -3942,7 +3937,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always UcsEndpoint."
-            type: "string"
             default: "UcsEndpoint"
           data:
             properties:
@@ -3952,10 +3946,10 @@ definitions:
                 properties:
                   base_uri:
                     description: "Base uri to univention server (usually including /univention) (Like https://master/univention)."
-                    type: string
+                    type: "string"
                   flavor:
                     description: "Object type flavor (For example users/user or groups/group)."
-                    type: string
+                    type: "string"
                   request_options:
                     description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
                     type: object
@@ -3965,10 +3959,10 @@ definitions:
                     properties:
                       username:
                         description: "Basic authentication username."
-                        type: string
+                        type: "string"
                       password:
                         description: "Password if required."
-                        type: string
+                        type: "string"
   core.v1.MongodbEndpoint:
     description: "MongoDB endpoint"
     allOf:
@@ -3977,23 +3971,22 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always MongodbEndpoint."
-            type: "string"
             default: "MongodbEndpoint"
           data:
             properties:
               database:
                 description: "The name of the MongoDB database where the collection is located at."
-                type: string
+                type: "string"
               collection:
                 description: "The name of the MongoDB collection where the data is located at."
-                type: string
+                type: "string"
               resource:
                 description: "Holds the relevant options of how to connect to the endpoint."
                 type: "object"
                 properties:
                   uri:
                     description: "MongoDB connection uri"
-                    type: string
+                    type: "string"
                     default: "mongodb://127.0.0.1"
                   uri_options:
                     description: "Advanced URI options"
@@ -4009,27 +4002,26 @@ definitions:
       - $ref: '#/definitions/core.v1.Endpoint'
       - type: object
         required:
-        - kind
-        - data
+          - kind
+          - data
         properties:
           kind:
             description: "The type of endpoint. Always BalloonEndpoint."
-            type: "string"
             default: "BalloonEndpoint"
           data:
             type: object
             required:
-            - resource
+              - resource
             properties:
               resource:
                 description: "Holds the relevant options of how to connect to the endpoint."
                 type: "object"
                 required:
-                - base_uri
+                  - base_uri
                 properties:
                   base_uri:
                     description: "Base uri to resources (Like https://rest.api/v2/users)."
-                    type: string
+                    type: "string"
                   request_options:
                     default: []
                     description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
@@ -4037,10 +4029,10 @@ definitions:
                   auth:
                     default: null
                     description: "Authentication adapter, either of none, http basic authentication or oauth2 using client_credentials flow."
-                    type: string
+                    type: "string"
                     enum:
-                      - basic
-                      - oauth2
+                      - "basic"
+                      - "oauth2"
                   basic:
                     description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
                     type: object
@@ -4051,11 +4043,11 @@ definitions:
                       username:
                         default: null
                         description: "Basic authentication username."
-                        type: string
+                        type: "string"
                       password:
                         default: null
                         description: "Password if required."
-                        type: string
+                        type: "string"
                   oauth2:
                     description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
                     type: object
@@ -4067,15 +4059,15 @@ definitions:
                       token_uri:
                         default: null
                         description: "URI to token endpoint."
-                        type: string
+                        type: "string"
                       client_id:
                         default: null
                         description: "OAuth2 client_id."
-                        type: string
+                        type: "string"
                       client_secret:
                         default: null
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
-                        type: string
+                        type: "string"
   core.v1.MattermostEndpoint:
     description: "Mattermost online chat service"
     allOf:
@@ -4087,7 +4079,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always MattermostEndpoint."
-            type: "string"
             default: "MattermostEndpoint"
           data:
             type: object
@@ -4102,7 +4093,7 @@ definitions:
                 properties:
                   base_uri:
                     description: "Base uri to resources (Like https://rest.api/v2/users)."
-                    type: string
+                    type: "string"
                   request_options:
                     default: []
                     description: "Advanced request options, see http://docs.guzzlephp.org/en/stable/request-options.html"
@@ -4110,10 +4101,10 @@ definitions:
                   auth:
                     default: null
                     description: "Authentication adapter, either of none, http basic authentication or oauth2 using client_credentials flow."
-                    type: string
+                    type: "string"
                     enum:
-                      - basic
-                      - oauth2
+                      - "basic"
+                      - "oauth2"
                   basic:
                     description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
                     type: object
@@ -4124,11 +4115,11 @@ definitions:
                       username:
                         default: null
                         description: "Basic authentication username."
-                        type: string
+                        type: "string"
                       password:
                         default: null
                         description: "Password if required."
-                        type: string
+                        type: "string"
                   oauth2:
                     description: "Oauth2 client credentials flow. auth must be set to oauth2 if this adapter should be used."
                     type: object
@@ -4140,15 +4131,15 @@ definitions:
                       token_uri:
                         default: null
                         description: "URI to token endpoint."
-                        type: string
+                        type: "string"
                       client_id:
                         default: null
                         description: "OAuth2 client_id."
-                        type: string
+                        type: "string"
                       client_secret:
                         default: null
                         description: "OAuth2 client_secret. Note the client_secret gets encrypted on the server an can't be retrieved after it."
-                        type: string
+                        type: "string"
   core.v1.CsvEndpoint:
     description: "CSV data format endpoint"
     allOf:
@@ -4157,7 +4148,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always CsvEndpoint."
-            type: "string"
             default: "CsvEndpoint"
           data:
             properties:
@@ -4165,22 +4155,22 @@ definitions:
                 $ref: '#/definitions/core.v1.Storage'
               file:
                 description: "File uri or pattern, depends what storage you have choosen."
-                type: string
+                type: "string"
               resource:
                 description: "CSV parse options."
                 type: object
                 properties:
                   delimiter:
                     description: "Field delimiter."
-                    type: string
+                    type: "string"
                     default: ","
                   enclosure:
                     description: "Field enclosure."
-                    type: string
+                    type: "string"
                     default: '"'
                   escape:
                     description: "Escape character."
-                    type: string
+                    type: "string"
                     default: "\\"
   core.v1.XmlEndpoint:
     description: "XML data format endpoint"
@@ -4190,7 +4180,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always XmlEndpoint."
-            type: "string"
             default: "XmlEndpoint"
           data:
             properties:
@@ -4198,18 +4187,18 @@ definitions:
                 $ref: '#/definitions/core.v1.Storage'
               file:
                 description: "File uri or pattern, depends what storage you have choosen."
-                type: string
+                type: "string"
               resource:
                 description: "CSV parse options."
                 type: object
                 properties:
                   root_name:
                     description: "The name of the root element."
-                    type: string
+                    type: "string"
                     default: "dataObjects"
                   node_name:
                     description: "The name of the sub node of the root element. For example: <root><row><a>0</a></row><a>1</a><row></row</root>"
-                    type: string
+                    type: "string"
                     default: "row"
                   pretty:
                     description: "Prettify xml output, note this is only useful if the XmlEndpoint is a destination endpoint."
@@ -4227,7 +4216,6 @@ definitions:
         properties:
           kind:
             description: "The type of endpoint. Always JsonEndpoint."
-            type: "string"
             default: "JsonEndpoint"
           data:
             properties:
@@ -4235,20 +4223,20 @@ definitions:
                 $ref: '#/definitions/core.v1.Storage'
               file:
                 description: "File uri or pattern, depends what storage you have choosen."
-                type: string
+                type: "string"
   core.v1.Storage:
     description: "The storage defines where data can be fetched."
     type: object
     properties:
       kind:
         description: "The kind of storage where data shall be fetched."
-        type: string
+        type: "string"
         default: "Stream"
         enum:
-          - Stream
-          - LocalFilesystem
-          - Smb
-          - Balloon
+          - "Stream"
+          - "LocalFilesystem"
+          - "Smb"
+          - "Balloon"
   core.v1.Workflows:
     description: "A list of workflows."
     allOf:
@@ -4277,16 +4265,16 @@ definitions:
                 type: integer
                 default: 0
               ensure:
-                type: string
+                type: "string"
                 enum:
-                  - last
-                  - exists
-                  - absent
-                  - merge
+                  - "last"
+                  - "exists"
+                  - "absent"
+                  - "merge"
                 default: last
               condition:
                 description: "Holds a scripted condition if a given workflow gets matched and executed."
-                type: string
+                type: "string"
               map:
                 description: "Map attributes from the endpoint to the collection schema (if the endpoint is of type source) or map attributes from the collection to the endpoint if the endpoint is of type destination."
                 type: object
