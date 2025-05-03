@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: ""
-  version: 1.2.4
+  version: 1.2.4-beta2
   title: Tubee API
   termsOfService: ""
   contact:
@@ -5120,6 +5120,7 @@ components:
                         this adapter should be used.
                       type: object
                       default:
+                        token: null
                         username: null
                         password: null
                       properties:
