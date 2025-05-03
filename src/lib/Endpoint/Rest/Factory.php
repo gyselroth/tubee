@@ -31,7 +31,7 @@ class Factory
             $options['auth'] = [];
 
             if (isset($resource['data']['resource']['basic']['token'])) {
-                $options['headers']['Authorization'] = 'Bearer ' . $resource['data']['resource']['basic']['token'];
+                $options['headers']['Authorization'] = 'Bearer '.$resource['data']['resource']['basic']['token'];
             } else {
                 if (isset($resource['data']['resource']['basic']['username'])) {
                     $options['auth'][] = $resource['data']['resource']['basic']['username'];
