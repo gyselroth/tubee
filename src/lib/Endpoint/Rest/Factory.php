@@ -30,12 +30,16 @@ class Factory
         if (isset($resource['data']['resource']['auth']) && $resource['data']['resource']['auth'] === 'basic') {
             $options['auth'] = [];
 
-            if (isset($resource['data']['resource']['basic']['username'])) {
-                $options['auth'][] = $resource['data']['resource']['basic']['username'];
-            }
+            if (isset($resource['data']['resource']['basic']['token'])) {
+                $options['headers']['Authorization'] = 'Bearer ' . $resource['data']['resource']['basic']['token'];
+            } else {
+                if (isset($resource['data']['resource']['basic']['username'])) {
+                    $options['auth'][] = $resource['data']['resource']['basic']['username'];
+                }
 
-            if (isset($resource['data']['resource']['basic']['password'])) {
-                $options['auth'][] = $resource['data']['resource']['basic']['password'];
+                if (isset($resource['data']['resource']['basic']['password'])) {
+                    $options['auth'][] = $resource['data']['resource']['basic']['password'];
+                }
             }
         }
 
