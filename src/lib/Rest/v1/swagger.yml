@@ -4108,11 +4108,11 @@ definitions:
                   basic:
                     description: "HTTP Basic authentication. auth must be set to basic if this adapter should be used."
                     type: object
-                    default:
-                      token: null
-                      username: null
-                      password: null
                     properties:
+                      token:
+                        default: null
+                        description: "Basic authentication Bearer token."
+                        type: "string"
                       username:
                         default: null
                         description: "Basic authentication username."
