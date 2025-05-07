@@ -13,6 +13,7 @@ namespace Tubee\Endpoint;
 
 use Generator;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
@@ -26,11 +27,27 @@ class Mattermost extends AbstractRest
     public const KIND = 'MattermostEndpoint';
 
     /**
+     * Unique filter attributes.
+     */
+    public const UNIQUEFILTERATTR = [
+        'id',
+        'username',
+        'email',
+    ];
+
+    /**
+     * Logger.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
-        $this->container = 'data';
+        $this->logger = $logger;
         parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }
 
@@ -99,24 +116,60 @@ class Mattermost extends AbstractRest
      */
     public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
-        $filter = $this->transformQuery($this->getFilterOne($object));
+        $filterOne = $this->getFilterOne($object);
+        $filter = $this->transformQuery($filterOne);
         $this->logGetOne($filter);
+        $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne);
 
-        $options = [];
-        $options['query'] = [
-            'query' => stripslashes($filter),
-        ];
+        if ($uniqueFilter === []) {
+            $options['query'] = [
+                'query' => stripslashes($filter),
+            ];
 
-        $result = $this->client->get('', $options);
-        $data = $this->getResponse($result);
+            $result = $this->client->get('', $options);
+            $data = $this->getResponse($result);
 
-        if (count($data) > 1) {
-            throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
-        }
-        if (count($data) === 0) {
-            throw new Exception\ObjectNotFound('no object found with filter '.$filter);
+            if (count($data) > 1) {
+                throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
+            }
+
+            if (count($data) === 0) {
+                throw new Exception\ObjectNotFound('no object found with filter '.$filter);
+            }
+        } else {
+            $uri = $this->client->getConfig('base_uri').'/'.$uniqueFilter['value'];
+            $this->logger->debug('use attribute ['.$uniqueFilter['attr'].'] to find object on endpoint: '.$uri);
+
+            try {
+                $result = $this->client->get($uri);
+            } catch (RequestException $e) {
+                if ($e->getCode() === 404) {
+                    throw new Exception\ObjectNotFound('no object found with filter '.$filter);
+                }
+
+                throw $e;
+            }
+
+            $data = $this->getResponse($result);
         }
 
         return $this->build(array_shift($data), $filter);
+    }
+
+    /**
+     * Check if unique attribute is set in filter.
+     */
+    public function checkFilterForUniqueAttr(array $filter): array
+    {
+        foreach (self::UNIQUEFILTERATTR as $attr) {
+            if (isset($filter[$attr])) {
+                return [
+                    'attr' => $attr,
+                    'value' => $filter[$attr],
+                    ];
+            }
+        }
+
+        return [];
     }
 }

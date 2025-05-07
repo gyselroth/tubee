@@ -105,6 +105,11 @@ class Engine extends V8Js
         return new ObjectId($id);
     }
 
+    public function hmacHash(string $data, string $secret, string $algo = 'sha256'): string
+    {
+        return hash_hmac($algo, $data, $secret);
+    }
+
     /**
      * Register functions.
      */
