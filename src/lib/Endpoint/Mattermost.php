@@ -15,6 +15,7 @@ use Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
+use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
@@ -29,11 +30,25 @@ class Mattermost extends AbstractRest
     /**
      * Unique filter attributes.
      */
-    public const UNIQUEFILTERATTR = [
+    public const UNIQUE_FILTER_ATTR_USER = [
         'id',
         'username',
         'email',
     ];
+
+    /**
+     * API URI by attribute.
+     */
+    public const API_URI_BY_ATTR_USER = [
+        'id' => '/',
+        'username' => '/username/',
+        'email' => '/email/',
+    ];
+
+    /**
+     * If disable attr is set as an attribute in worfklow, object gets disabled on endpoint.
+     */
+    public const DISABLE_ATTR = 'disable_object';
 
     /**
      * Logger.
@@ -137,7 +152,7 @@ class Mattermost extends AbstractRest
                 throw new Exception\ObjectNotFound('no object found with filter '.$filter);
             }
         } else {
-            $uri = $this->client->getConfig('base_uri').'/'.$uniqueFilter['value'];
+            $uri = $this->client->getConfig('base_uri').$uniqueFilter['uri'].$uniqueFilter['value'];
             $this->logger->debug('use attribute ['.$uniqueFilter['attr'].'] to find object on endpoint: '.$uri);
 
             try {
@@ -153,7 +168,57 @@ class Mattermost extends AbstractRest
             $data = $this->getResponse($result);
         }
 
-        return $this->build(array_shift($data), $filter);
+        return $this->build($data, $filter);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
+    {
+        foreach ($diff as $key => $value) {
+            if ($key === self::DISABLE_ATTR) {
+                $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
+
+                $this->logger->info('disable mattermost object [{object}] on endpoint [{identifier}]', [
+                    'category' => get_class($this),
+                    'identifier' => $this->getIdentifier(),
+                    'object' => $diff,
+                ]);
+
+                if ($simulate === false) {
+                    $this->client->delete($uri);
+                }
+
+                return null;
+            }
+        }
+
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/patch';
+        $this->logChange($uri, $diff);
+
+        if ($simulate === false) {
+            $this->client->put($uri, [
+                'json' => $diff,
+            ]);
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'?permanent=true';
+        $this->logDelete($uri);
+
+        if ($simulate === false) {
+            $this->client->delete($uri);
+        }
+
+        return true;
     }
 
     /**
@@ -161,11 +226,12 @@ class Mattermost extends AbstractRest
      */
     public function checkFilterForUniqueAttr(array $filter): array
     {
-        foreach (self::UNIQUEFILTERATTR as $attr) {
+        foreach (self::UNIQUE_FILTER_ATTR_USER as $attr) {
             if (isset($filter[$attr])) {
                 return [
                     'attr' => $attr,
                     'value' => $filter[$attr],
+                    'uri' => self::API_URI_BY_ATTR_USER[$attr],
                     ];
             }
         }
