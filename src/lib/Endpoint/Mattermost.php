@@ -29,9 +29,19 @@ class Mattermost extends AbstractRest
     public const KIND = 'MattermostEndpoint';
 
     /**
+     * Users URI identifier.
+     */
+    public const USERS_URI_IDENTIFIER = '/users';
+
+    /**
      * Teams URI identifier.
      */
     public const TEAMS_URI_IDENTIFIER = '/teams';
+
+    /**
+     * Channels URI identifier.
+     */
+    public const CHANNELS_URI_IDENTIFIER = '/channels';
 
     /**
      * Unique filter attributes for users.
@@ -65,6 +75,20 @@ class Mattermost extends AbstractRest
     public const API_URI_BY_ATTR_TEAM = [
         'id' => '/',
         'name' => '/name/',
+    ];
+
+    /**
+     * Unique filter attributes default.
+     */
+    public const UNIQUE_FILTER_ATTR_DEFAULT = [
+        'id',
+    ];
+
+    /**
+     * API URI by attribute default.
+     */
+    public const API_URI_BY_ATTR_DEFAULT = [
+        'id' => '/',
     ];
 
     /**
@@ -179,43 +203,61 @@ class Mattermost extends AbstractRest
 
         if (strpos((string) $this->client->getConfig('base_uri'), self::TEAMS_URI_IDENTIFIER) !== false) {
             $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne, 'team');
-        } else {
+        } elseif (strpos((string) $this->client->getConfig('base_uri'), self::USERS_URI_IDENTIFIER) !== false) {
             $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne, 'user');
+        } else {
+            $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne);
         }
 
-        if ($uniqueFilter === []) {
-            $options['query'] = [
-                'query' => stripslashes($filter),
-            ];
+        $uri = $this->client->getConfig('base_uri').$uniqueFilter['uri'].$uniqueFilter['value'];
+        $this->logger->debug('use attribute ['.$uniqueFilter['attr'].'] to find object on endpoint: '.$uri);
 
-            $result = $this->client->get('', $options);
-            $data = $this->getResponse($result);
-
-            if (count($data) > 1) {
-                throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
-            }
-
-            if (count($data) === 0) {
+        try {
+            $result = $this->client->get($uri);
+        } catch (RequestException $e) {
+            if ($e->getCode() === 404) {
                 throw new Exception\ObjectNotFound('no object found with filter '.$filter);
             }
-        } else {
-            $uri = $this->client->getConfig('base_uri').$uniqueFilter['uri'].$uniqueFilter['value'];
-            $this->logger->debug('use attribute ['.$uniqueFilter['attr'].'] to find object on endpoint: '.$uri);
 
-            try {
-                $result = $this->client->get($uri);
-            } catch (RequestException $e) {
-                if ($e->getCode() === 404) {
-                    throw new Exception\ObjectNotFound('no object found with filter '.$filter);
-                }
-
-                throw $e;
-            }
-
-            $data = $this->getResponse($result);
+            throw $e;
         }
 
+        $data = $this->getResponse($result);
+
         return $this->build($data, $filter);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
+    {
+        $this->logCreate($object);
+        $uri = (string) $this->client->getConfig('base_uri');
+
+        if (strpos($uri, self::CHANNELS_URI_IDENTIFIER) !== false && isset($object['type']) && $object['type'] === 'direct-channel' && isset($object['data'])) {
+            if ($simulate === false) {
+                $result = $this->client->post($uri.'/direct', [
+                    'json' => $object['data'],
+                ]);
+
+                $body = json_decode($result->getBody()->getContents(), true);
+
+                return $this->getResourceId($body);
+            }
+        } else {
+            if ($simulate === false) {
+                $result = $this->client->post('', [
+                    'json' => $object,
+                ]);
+
+                $body = json_decode($result->getBody()->getContents(), true);
+
+                return $this->getResourceId($body);
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -333,14 +375,24 @@ class Mattermost extends AbstractRest
     /**
      * Check if unique attribute is set in filter.
      */
-    public function checkFilterForUniqueAttr(array $filter, string $type): array
+    public function checkFilterForUniqueAttr(array $filter, ?string $type = null): array
     {
-        if ($type === 'team') {
-            $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_TEAM;
-            $apiUriByAttr = self::API_URI_BY_ATTR_TEAM;
-        } else {
-            $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_USER;
-            $apiUriByAttr = self::API_URI_BY_ATTR_USER;
+        switch ($type) {
+            case 'team':
+                $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_TEAM;
+                $apiUriByAttr = self::API_URI_BY_ATTR_TEAM;
+
+                break;
+            case 'user':
+                $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_USER;
+                $apiUriByAttr = self::API_URI_BY_ATTR_USER;
+
+                break;
+            default:
+                $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_DEFAULT;
+                $apiUriByAttr = self::API_URI_BY_ATTR_DEFAULT;
+
+                break;
         }
 
         foreach ($uniqueFilterAttr as $attr) {
@@ -349,7 +401,7 @@ class Mattermost extends AbstractRest
                     'attr' => $attr,
                     'value' => $filter[$attr],
                     'uri' => $apiUriByAttr[$attr],
-                    ];
+                ];
             }
         }
 
