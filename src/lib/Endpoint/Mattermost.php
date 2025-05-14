@@ -57,14 +57,24 @@ class Mattermost extends AbstractRest
     public const DISABLE_ATTR = 'disable_object';
 
     /**
-     * Attribute to identify if multiple users are added to team.
+     * Attribute to identify if multiple users should be added to team.
      */
     public const ADD_MULTIPLE_USERS_TO_TEAM_ATTR = 'addMultipleUsers';
+
+    /**
+     * Attribute to identify if users should be removed from team.
+     */
+    public const REMOVE_USER_FROM_TEAM_ATTR = 'removeUsers';
 
     /**
      * Workflow attribute which contains users to add to a team.
      */
     public const USERS_ATTR = 'members';
+
+    /**
+     * Workflow attribute which contains user_id to remove from team.
+     */
+    public const USER_ATTR = 'user_id';
 
     /**
      * Logger.
@@ -236,7 +246,7 @@ class Mattermost extends AbstractRest
         $this->logger->debug('change team object on endpoint');
 
         if (isset($diff[self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR])) {
-            $this->logger->debug('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is set. Add multiple users to team.');
+            $this->logger->info('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is set. Add multiple users to team.');
 
             if ($diff[self::USERS_ATTR]) {
                 $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/members/batch';
@@ -251,7 +261,29 @@ class Mattermost extends AbstractRest
                 throw new MattermostException\UserAttrNotSet('attribute ['.self::USERS_ATTR.'] is not set. To add multiple users configure workflow attribute ['.self::USERS_ATTR.']');
             }
         } else {
-            $this->logger->debug('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is not set. Do not add multiple users.');
+            $this->logger->info('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is not set. Do not add multiple users.');
+        }
+
+        if (isset($diff[self::REMOVE_USER_FROM_TEAM_ATTR])) {
+            $this->logger->info('attribute ['.self::REMOVE_USER_FROM_TEAM_ATTR.'] is set. Remove users from team.');
+
+            foreach ($diff[self::USERS_ATTR] as $member) {
+                if (isset($member[self::USER_ATTR])) {
+                    $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/members/'.$member[self::USER_ATTR];
+                    $this->logChange($uri, $diff);
+
+                    if ($simulate === false) {
+                        $this->client->delete($uri);
+                    }
+                } else {
+                    $this->logger->warning('attribute ['.self::USER_ATTR.'] is not set. Skip user [{object}]', [
+                        'category' => get_class($this),
+                        'object' => $member,
+                    ]);
+                }
+            }
+        } else {
+            $this->logger->info('attribute ['.self::REMOVE_USER_FROM_TEAM_ATTR.'] is not set. Do not remove users.');
         }
     }
 
