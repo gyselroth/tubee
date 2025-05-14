@@ -117,6 +117,16 @@ class Mattermost extends AbstractRest
     public const USER_ATTR = 'user_id';
 
     /**
+     * Workflow attribute which defines type for channel.
+     */
+    public const TYPE_ATTR_FOR_DIRECT_CHANNELS = 'type';
+
+    /**
+     * Workflow attribute which defines direct channels.
+     */
+    public const TYPE_FOR_DIRECT_CHANNELS = 'direct-channel';
+
+    /**
      * Logger.
      *
      * @var LoggerInterface
@@ -235,7 +245,7 @@ class Mattermost extends AbstractRest
         $this->logCreate($object);
         $uri = (string) $this->client->getConfig('base_uri');
 
-        if (strpos($uri, self::CHANNELS_URI_IDENTIFIER) !== false && isset($object['type']) && $object['type'] === 'direct-channel' && isset($object['data'])) {
+        if (strpos($uri, self::CHANNELS_URI_IDENTIFIER) !== false && isset($object[self::TYPE_ATTR_FOR_DIRECT_CHANNELS]) && $object[self::TYPE_ATTR_FOR_DIRECT_CHANNELS] === self::TYPE_FOR_DIRECT_CHANNELS && isset($object['data'])) {
             if ($simulate === false) {
                 $result = $this->client->post($uri.'/direct', [
                     'json' => $object['data'],
