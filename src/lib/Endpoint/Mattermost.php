@@ -17,6 +17,7 @@ use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
+use Tubee\Endpoint\Mattermost\Exception as MattermostException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -26,6 +27,11 @@ class Mattermost extends AbstractRest
      * Kind.
      */
     public const KIND = 'MattermostEndpoint';
+
+    /**
+     * Teams URI identifier.
+     */
+    public const TEAMS_URI_IDENTIFIER = '/teams';
 
     /**
      * Unique filter attributes.
@@ -49,6 +55,16 @@ class Mattermost extends AbstractRest
      * If disable attr is set as an attribute in worfklow, object gets disabled on endpoint.
      */
     public const DISABLE_ATTR = 'disable_object';
+
+    /**
+     * Attribute to identify if multiple users are added to team.
+     */
+    public const ADD_MULTIPLE_USERS_TO_TEAM_ATTR = 'addMultipleUsers';
+
+    /**
+     * Workflow attribute which contains users to add to a team.
+     */
+    public const USERS_ATTR = 'members';
 
     /**
      * Logger.
@@ -176,6 +192,19 @@ class Mattermost extends AbstractRest
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
+        if (strpos((string) $this->client->getConfig('base_uri'), self::TEAMS_URI_IDENTIFIER) !== false) {
+            $this->changeTeam($diff, $object, $endpoint_object, $simulate);
+        } else {
+            $this->changeUser($diff, $object, $endpoint_object, $simulate);
+        }
+
+        return null;
+    }
+
+    public function changeUser(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    {
+        $this->logger->debug('change user object on endpoint');
+
         foreach ($diff as $key => $value) {
             if ($key === self::DISABLE_ATTR) {
                 $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
@@ -189,8 +218,6 @@ class Mattermost extends AbstractRest
                 if ($simulate === false) {
                     $this->client->delete($uri);
                 }
-
-                return null;
             }
         }
 
@@ -202,8 +229,30 @@ class Mattermost extends AbstractRest
                 'json' => $diff,
             ]);
         }
+    }
 
-        return null;
+    public function changeTeam(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    {
+        $this->logger->debug('change team object on endpoint');
+
+        if (isset($diff[self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR])) {
+            $this->logger->debug('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is set. Add multiple users to team.');
+
+            if ($diff[self::USERS_ATTR]) {
+                $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/members/batch';
+                $this->logChange($uri, $diff);
+
+                if ($simulate === false) {
+                    $this->client->post($uri, [
+                        'json' => $diff[self::USERS_ATTR],
+                    ]);
+                }
+            } else {
+                throw new MattermostException\UserAttrNotSet('attribute ['.self::USERS_ATTR.'] is not set. To add multiple users configure workflow attribute ['.self::USERS_ATTR.']');
+            }
+        } else {
+            $this->logger->debug('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is not set. Do not add multiple users.');
+        }
     }
 
     /**
