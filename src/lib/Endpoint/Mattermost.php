@@ -34,7 +34,7 @@ class Mattermost extends AbstractRest
     public const TEAMS_URI_IDENTIFIER = '/teams';
 
     /**
-     * Unique filter attributes.
+     * Unique filter attributes for users.
      */
     public const UNIQUE_FILTER_ATTR_USER = [
         'id',
@@ -43,12 +43,28 @@ class Mattermost extends AbstractRest
     ];
 
     /**
-     * API URI by attribute.
+     * API URI by attribute for users.
      */
     public const API_URI_BY_ATTR_USER = [
         'id' => '/',
         'username' => '/username/',
         'email' => '/email/',
+    ];
+
+    /**
+     * Unique filter attributes for teams.
+     */
+    public const UNIQUE_FILTER_ATTR_TEAM = [
+        'id',
+        'name',
+    ];
+
+    /**
+     * API URI by attribute for users.
+     */
+    public const API_URI_BY_ATTR_TEAM = [
+        'id' => '/',
+        'name' => '/name/',
     ];
 
     /**
@@ -160,7 +176,12 @@ class Mattermost extends AbstractRest
         $filterOne = $this->getFilterOne($object);
         $filter = $this->transformQuery($filterOne);
         $this->logGetOne($filter);
-        $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne);
+
+        if (strpos((string) $this->client->getConfig('base_uri'), self::TEAMS_URI_IDENTIFIER) !== false) {
+            $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne, 'team');
+        } else {
+            $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne, 'user');
+        }
 
         if ($uniqueFilter === []) {
             $options['query'] = [
@@ -215,20 +236,8 @@ class Mattermost extends AbstractRest
     {
         $this->logger->debug('change user object on endpoint');
 
-        foreach ($diff as $key => $value) {
-            if ($key === self::DISABLE_ATTR) {
-                $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
-
-                $this->logger->info('disable mattermost object [{object}] on endpoint [{identifier}]', [
-                    'category' => get_class($this),
-                    'identifier' => $this->getIdentifier(),
-                    'object' => $diff,
-                ]);
-
-                if ($simulate === false) {
-                    $this->client->delete($uri);
-                }
-            }
+        if (isset($diff[self::DISABLE_ATTR])) {
+            $this->disable($diff, $object, $endpoint_object, $simulate);
         }
 
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/patch';
@@ -285,6 +294,25 @@ class Mattermost extends AbstractRest
         } else {
             $this->logger->info('attribute ['.self::REMOVE_USER_FROM_TEAM_ATTR.'] is not set. Do not remove users.');
         }
+
+        if (isset($diff[self::DISABLE_ATTR])) {
+            $this->disable($diff, $object, $endpoint_object, $simulate);
+        }
+    }
+
+    public function disable(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
+
+        $this->logger->info('disable mattermost object [{object}] on endpoint [{identifier}]', [
+            'category' => get_class($this),
+            'identifier' => $this->getIdentifier(),
+            'object' => $diff,
+        ]);
+
+        if ($simulate === false) {
+            $this->client->delete($uri);
+        }
     }
 
     /**
@@ -305,14 +333,22 @@ class Mattermost extends AbstractRest
     /**
      * Check if unique attribute is set in filter.
      */
-    public function checkFilterForUniqueAttr(array $filter): array
+    public function checkFilterForUniqueAttr(array $filter, string $type): array
     {
-        foreach (self::UNIQUE_FILTER_ATTR_USER as $attr) {
+        if ($type === 'team') {
+            $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_TEAM;
+            $apiUriByAttr = self::API_URI_BY_ATTR_TEAM;
+        } else {
+            $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_USER;
+            $apiUriByAttr = self::API_URI_BY_ATTR_USER;
+        }
+
+        foreach ($uniqueFilterAttr as $attr) {
             if (isset($filter[$attr])) {
                 return [
                     'attr' => $attr,
                     'value' => $filter[$attr],
-                    'uri' => self::API_URI_BY_ATTR_USER[$attr],
+                    'uri' => $apiUriByAttr[$attr],
                     ];
             }
         }
