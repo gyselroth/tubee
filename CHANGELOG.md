@@ -1,3 +1,10 @@
+## 2.7.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed May 14 17:30:00 CEST 2025
+
+### Feature
+* Implementation of MattermostEndpoint
+
 ## 2.6.3
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed Mar 05 16:00:00 CEST 2025
