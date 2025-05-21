@@ -346,7 +346,12 @@ class Mattermost extends AbstractRest
             foreach ($diff[self::USERS_ATTR] as $member) {
                 if (isset($member[self::USER_ATTR])) {
                     $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/members/'.$member[self::USER_ATTR];
-                    $this->logChange($uri, $diff);
+
+                    $this->logger->debug('remove user [{user}] from team [{team}]', [
+                        'category' => get_class($this),
+                        'user' => $member[self::USER_ATTR],
+                        'team' => $member['team_id'],
+                    ]);
 
                     if ($simulate === false) {
                         $this->client->delete($uri);
