@@ -5,7 +5,10 @@ RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
 RUN sed -i -e 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list
 RUN sed -i -e '/stretch-updates/d' /etc/apt/sources.list
 
-RUN apt-get update && apt-get install -y --allow-unauthenticated \
+RUN apt-get update && apt-get install -y --allow-unauthenticated gnupg
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 112695A0E562B32A 0E98404D386FA1D9 DCC9EFBF77E11517 648ACFD622F3D138 && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install -y \
   libldb-dev \
   libldap2-dev \
   libxml2-dev \
@@ -19,7 +22,6 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
   unixodbc-dev \
   build-essential \
   curl \
-  gnupg \
   git \
   chrpath \
   python \
@@ -31,7 +33,7 @@ RUN apt-get update && apt-get install -y --allow-unauthenticated \
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list \
     && apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y --allow-unauthenticated unixodbc unixodbc-dev msodbcsql17 wget dialog \
+    && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql17 wget dialog \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.a /usr/lib/ \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.so /usr/lib/ \
 #    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
