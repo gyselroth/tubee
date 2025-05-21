@@ -127,6 +127,11 @@ class Mattermost extends AbstractRest
     public const TYPE_FOR_DIRECT_CHANNELS = 'direct-channel';
 
     /**
+     * Mattermost API batch size limit.
+     */
+    public const BATCH_SIZE = 20;
+
+    /**
      * Logger.
      *
      * @var LoggerInterface
@@ -284,7 +289,22 @@ class Mattermost extends AbstractRest
         return null;
     }
 
-    public function changeUser(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    /**
+     * {@inheritdoc}
+     */
+    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'?permanent=true';
+        $this->logDelete($uri);
+
+        if ($simulate === false) {
+            $this->client->delete($uri);
+        }
+
+        return true;
+    }
+
+    protected function changeUser(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
     {
         $this->logger->debug('change user object on endpoint');
 
@@ -302,24 +322,19 @@ class Mattermost extends AbstractRest
         }
     }
 
-    public function changeTeam(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    protected function changeTeam(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
     {
         $this->logger->debug('change team object on endpoint');
 
         if (isset($diff[self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR])) {
             $this->logger->info('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is set. Add multiple users to team.');
 
-            if ($diff[self::USERS_ATTR]) {
+            if ($diff[self::USERS_ATTR] && count($diff[self::USERS_ATTR]) !== 0) {
                 $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/members/batch';
-                $this->logChange($uri, $diff);
 
-                if ($simulate === false) {
-                    $this->client->post($uri, [
-                        'json' => $diff[self::USERS_ATTR],
-                    ]);
-                }
+                $this->batch($diff[self::USERS_ATTR], $uri, $simulate);
             } else {
-                throw new MattermostException\UserAttrNotSet('attribute ['.self::USERS_ATTR.'] is not set. To add multiple users configure workflow attribute ['.self::USERS_ATTR.']');
+                throw new MattermostException\UserAttrNotSet('attribute ['.self::USERS_ATTR.'] is not set or empty. To add multiple users configure workflow attribute ['.self::USERS_ATTR.']');
             }
         } else {
             $this->logger->info('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is not set. Do not add multiple users.');
@@ -352,7 +367,7 @@ class Mattermost extends AbstractRest
         }
     }
 
-    public function disable(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    protected function disable(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
     {
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
 
@@ -368,24 +383,9 @@ class Mattermost extends AbstractRest
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
-    {
-        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'?permanent=true';
-        $this->logDelete($uri);
-
-        if ($simulate === false) {
-            $this->client->delete($uri);
-        }
-
-        return true;
-    }
-
-    /**
      * Check if unique attribute is set in filter.
      */
-    public function checkFilterForUniqueAttr(array $filter, ?string $type = null): array
+    protected function checkFilterForUniqueAttr(array $filter, ?string $type = null): array
     {
         switch ($type) {
             case 'team':
@@ -416,5 +416,53 @@ class Mattermost extends AbstractRest
         }
 
         return [];
+    }
+
+    /**
+     * Batch call.
+     */
+    protected function batch(array $requests, string $uri, bool $simulate = false, bool $throw = true): array
+    {
+        $results = [];
+
+        foreach (array_chunk($requests, self::BATCH_SIZE) as $chunk) {
+            $chunk = ['json' => $chunk];
+
+            $this->logger->debug('batch request chunk [{chunk}] ', [
+                'category' => get_class($this),
+                'chunk' => $chunk,
+            ]);
+
+            if ($simulate === false) {
+                $response = $this->client->post($uri, $chunk);
+
+                $results[] = array_merge($results, $this->validateBatchResponse($response, $throw));
+            }
+        }
+
+        return $results;
+    }
+
+    /**
+     * Validate batch request.
+     */
+    protected function validateBatchResponse($response, bool $throw = true): array
+    {
+        $data = json_decode($response->getBody()->getContents(), true);
+
+        if (count($data) === 0) {
+            throw new MattermostException\BatchRequestFailed('invalid batch response data, expected array of team members');
+        }
+
+        if ($response->getStatusCode() !== 201 && $throw === true) {
+            throw new MattermostException\BatchRequestFailed('batch request part failed with http code '.$response->getStatusCode());
+        }
+
+        $this->logger->debug('batch request part succeeded with http code [{status}]', [
+            'category' => get_class($this),
+            'status' => $response->getStatusCode(),
+        ]);
+
+        return $data;
     }
 }
