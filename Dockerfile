@@ -5,7 +5,7 @@ RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
 RUN sed -i -e 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list
 RUN sed -i -e '/stretch-updates/d' /etc/apt/sources.list
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install -y --allow-unauthenticated \
   libldb-dev \
   libldap2-dev \
   libxml2-dev \
