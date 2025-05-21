@@ -1,3 +1,10 @@
+## 2.7.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed May 21 13:15:00 CEST 2025
+
+### Bugfix
+* Use batch call to add multiple users to team
+
 ## 2.7.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed May 14 17:30:00 CEST 2025
