@@ -81,6 +81,13 @@ class Ldap extends AbstractEndpoint
     protected $options = [];
 
     /**
+     * Source attributes.
+     *
+     * @var array
+     */
+    protected $source_attributes = [];
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, LdapServer $ldap, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
@@ -90,6 +97,15 @@ class Ldap extends AbstractEndpoint
 
         if (isset($resource['data']['resource'])) {
             $this->setLdapOptions($resource['data']['resource']);
+        }
+
+        if (isset($resource['data']['attributes']) && $resource['data']['attributes'] !== []) {
+            $this->source_attributes = $resource['data']['attributes'];
+
+            $logger->debug('get ldap objects with following attributes: {attributes}', [
+                'category' => get_class($this),
+                'attributes' => $resource['data']['attributes'],
+            ]);
         }
 
         parent::__construct($name, $type, $collection, $workflow, $logger, $resource);
@@ -292,7 +308,7 @@ class Ldap extends AbstractEndpoint
         $i = 0;
         $this->logger->debug(json_encode([$filter, $this->basedn]));
 
-        $result = $this->ldap->ldapSearch($this->basedn, $filter)->getEntries();
+        $result = $this->ldap->ldapSearch($this->basedn, $filter, $this->source_attributes)->getEntries();
         array_shift($result);
 
         foreach ($result as $object) {
