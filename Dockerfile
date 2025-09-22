@@ -5,6 +5,10 @@ RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
 RUN sed -i -e 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list
 RUN sed -i -e '/stretch-updates/d' /etc/apt/sources.list
 
+RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list.d/buster.list
+RUN sed -i -e 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list.d/buster.list
+RUN sed -i -e '/stretch-updates/d' /etc/apt/sources.list.d/buster.list
+
 RUN apt-get update && apt-get install -y --allow-unauthenticated gnupg
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 112695A0E562B32A 0E98404D386FA1D9 DCC9EFBF77E11517 648ACFD622F3D138 && rm -rf /var/lib/apt/lists/*
 
