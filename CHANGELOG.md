@@ -1,3 +1,17 @@
+## 2.7.3
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Mon Sep 22 23:45:00 CEST 2025
+
+### Bugfix
+* Mysql-Endpoint: added backticks to table name
+
+## 2.7.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Jun 13 15:30:00 CEST 2025
+
+### Feature
+* LDAP-Endpoint: configure attributes to be read from source endpoint
+
 ## 2.7.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed May 21 13:15:00 CEST 2025
