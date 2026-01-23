@@ -132,12 +132,12 @@ class Mattermost extends AbstractRest
     public const BATCH_SIZE = 20;
 
     /**
-     * Attribute name of user properties
+     * Attribute name of user properties.
      */
     public const PROPS_ATTR = 'props';
 
     /**
-     * Divider for props attribute
+     * Divider for props attribute.
      */
     public const PROPS_DIVIDER = ':';
 
@@ -332,7 +332,7 @@ class Mattermost extends AbstractRest
             $this->disable($diff, $object, $endpoint_object, $simulate);
         }
 
-        $props       = [];
+        $props = [];
         $absentProps = [];
 
         foreach ($diff as $attr => $value) {
@@ -340,6 +340,7 @@ class Mattermost extends AbstractRest
                 unset($diff[$attr]);
                 if ($value === null) {
                     $absentProps[] = explode(self::PROPS_DIVIDER, $attr)[1];
+
                     continue;
                 }
                 $props[explode(self::PROPS_DIVIDER, $attr)[1]] = $value;
@@ -359,7 +360,7 @@ class Mattermost extends AbstractRest
                 unset($endpoint_props[$absentProp]);
             }
 
-            $diff[self::PROPS_ATTR] = (object)array_merge($endpoint_props, $props);
+            $diff[self::PROPS_ATTR] = (object) array_merge($endpoint_props, $props);
         }
 
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/patch';
