@@ -132,6 +132,16 @@ class Mattermost extends AbstractRest
     public const BATCH_SIZE = 20;
 
     /**
+     * Attribute name of user properties
+     */
+    public const PROPS_ATTR = 'props';
+
+    /**
+     * Divider for props attribute
+     */
+    public const PROPS_DIVIDER = ':';
+
+    /**
      * Logger.
      *
      * @var LoggerInterface
@@ -215,11 +225,13 @@ class Mattermost extends AbstractRest
         $filterOne = $this->getFilterOne($object);
         $filter = $this->transformQuery($filterOne);
         $this->logGetOne($filter);
+        $isUser = false;
 
         if (strpos((string) $this->client->getConfig('base_uri'), self::TEAMS_URI_IDENTIFIER) !== false) {
             $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne, 'team');
         } elseif (strpos((string) $this->client->getConfig('base_uri'), self::USERS_URI_IDENTIFIER) !== false) {
             $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne, 'user');
+            $isUser = true;
         } else {
             $uniqueFilter = $this->checkFilterForUniqueAttr($filterOne);
         }
@@ -238,6 +250,14 @@ class Mattermost extends AbstractRest
         }
 
         $data = $this->getResponse($result);
+
+        if ($isUser && isset($data[self::PROPS_ATTR])) {
+            foreach ($data[self::PROPS_ATTR] as $key => $value) {
+                $data[self::PROPS_ATTR.self::PROPS_DIVIDER.$key] = $value;
+            }
+
+            unset($data[self::PROPS_ATTR]);
+        }
 
         return $this->build($data, $filter);
     }
@@ -310,6 +330,36 @@ class Mattermost extends AbstractRest
 
         if (isset($diff[self::DISABLE_ATTR])) {
             $this->disable($diff, $object, $endpoint_object, $simulate);
+        }
+
+        $props       = [];
+        $absentProps = [];
+
+        foreach ($diff as $attr => $value) {
+            if (str_contains($attr, self::PROPS_ATTR.self::PROPS_DIVIDER)) {
+                unset($diff[$attr]);
+                if ($value === null) {
+                    $absentProps[] = explode(self::PROPS_DIVIDER, $attr)[1];
+                    continue;
+                }
+                $props[explode(self::PROPS_DIVIDER, $attr)[1]] = $value;
+            }
+        }
+
+        if ($props !== [] || $absentProps !== []) {
+            $endpoint_props = [];
+
+            foreach ($endpoint_object->getData() as $key => $value) {
+                if (strpos($key, self::PROPS_ATTR.self::PROPS_DIVIDER) !== false) {
+                    $endpoint_props[explode(self::PROPS_DIVIDER, $key)[1]] = $value;
+                }
+            }
+
+            foreach ($absentProps as $absentProp) {
+                unset($endpoint_props[$absentProp]);
+            }
+
+            $diff[self::PROPS_ATTR] = (object)array_merge($endpoint_props, $props);
         }
 
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/patch';
