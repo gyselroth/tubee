@@ -1,3 +1,10 @@
+## 2.7.4
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Jan 23 18:30:00 CEST 2026
+
+### Bugfix
+* Mattermost-Endpoint: user-props
+
 ## 2.7.3
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Mon Sep 22 23:45:00 CEST 2025
