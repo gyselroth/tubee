@@ -21,11 +21,18 @@ class Engine extends V8Js
     protected $__result;
 
     /**
+     * LoggerInterface.
+     *
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * Create v8 engine with some default functionality.
      */
     public function __construct(LoggerInterface $logger)
     {
-        parent::__construct('core', [], [], true, '');
+        parent::__construct('core');
         $this->logger = $logger;
         $this->registerFunctions();
         $this->setMemoryLimit(50000000);

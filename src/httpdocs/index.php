@@ -28,7 +28,7 @@ set_include_path(implode(PATH_SEPARATOR, [
 $composer = require 'vendor/autoload.php';
 
 $dic = ContainerBuilder::get($composer);
-$request = Zend\Diactoros\ServerRequestFactory::fromGlobals();
+$request = Laminas\Diactoros\ServerRequestFactory::fromGlobals();
 $logger = $dic->get(Psr\Log\LoggerInterface::class);
 
 set_exception_handler(function ($e) use ($logger) {
