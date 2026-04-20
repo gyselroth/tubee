@@ -81,11 +81,12 @@
         "cache/void-adapter": "^1.0",
         "cache/apcu-adapter": "^1.0",
         "psr/simple-cache": "^1.0",
-        "helmich/mongomock": "dev-master#6925c67",
+        "helmich/mongomock": "dev-tubee-php82#9982e83",
         "laminas/laminas-filter": "^2.42",
         "league/event": "^2.2",
         "composer/package-versions-deprecated": "^1.11",
-        "friendsofphp/proxy-manager-lts": "^1.0"
+        "friendsofphp/proxy-manager-lts": "^1.0",
+        "laminas/laminas-httphandlerrunner": "^2.13"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
