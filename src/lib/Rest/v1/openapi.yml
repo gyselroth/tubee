@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: ""
-  version: 1.2.6
+  version: 1.2.7
   title: Tubee API
   termsOfService: ""
   contact:
@@ -5228,11 +5228,11 @@ components:
                         auth must be set to oauth2 if this adapter should be used.
                       type: object
                       default:
-                        token_uri: null
+                        token_endpoint: null
                         username: null
                         password: null
                       properties:
-                        token_uri:
+                        token_endpoint:
                           description: URI to token endpoint.
                           nullable: true
                           default: null
