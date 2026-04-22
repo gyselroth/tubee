@@ -54,15 +54,31 @@ class Polyright extends AbstractRest
      */
     public function transformQuery(?array $query = null)
     {
+        $return = [];
+
         if ($this->filter_all !== null && empty($query)) {
-            return stripslashes($this->filter_all);
+            $filter = json_decode(stripslashes($this->filter_all), true);
+            foreach (array_shift($filter) as $item) {
+                $return = array_merge($return, $item);
+            }
+
+            return $return;
         }
         if (!empty($query)) {
             if ($this->filter_all === null) {
-                return json_encode($query, JSON_UNESCAPED_UNICODE);
+                return $query;
             }
 
-            return '{"$and":['.stripslashes($this->filter_all).', '.json_encode($query).']}';
+            $filter = json_decode(stripslashes($this->filter_all), true);
+            foreach (array_shift($filter) as $item) {
+                $return = array_merge($return, $item);
+            }
+
+            foreach($query as $key => $value) {
+                $return[$key] = $value;
+            }
+
+            return $return;
         }
 
         return null;
@@ -98,8 +114,6 @@ class Polyright extends AbstractRest
         $data = $this->getResponse($response);
 
         if ($query !== [] && $query !== null) {
-            $query = json_decode($query, true);
-
             $matches = array_filter(array_shift($data), function ($item) use ($query) {
                 foreach ($query as $key => $value) {
                     if (!isset($item[$key]) || $item[$key] != $value) {
