@@ -28,10 +28,27 @@ class Polyright extends AbstractRest
      */
     public const KIND = 'PolyrightEndpoint';
 
-//    /**
-//     * Persons identifier.
-//     */
-//    public const PERSONS_IDENTIFIER = 'persons';
+    /**
+     * Included person information
+     */
+    public const ADDITIONAL_PERSON_INFORMATION = [
+        'includePersonalInformation',
+        'includeValidity',
+        'includeEmployeeData',
+        'includeStudentData',
+        'includeDefaultMedium',
+        'includeDefaultPersonalAccount',
+        'includeRepresentedPersons',
+        'includeRepresentativePersons',
+        'includeCustomFields',
+        'includeComputedFields',
+        'includePricingProfileData'
+    ];
+
+    /**
+     * Divider for additional attributes.
+     */
+    public const ADDITIONAL_ATTR_DIVIDER = ':';
 
     /**
      * Logger.
@@ -114,14 +131,7 @@ class Polyright extends AbstractRest
         $data = $this->getResponse($response);
 
         if ($query !== [] && $query !== null) {
-            $matches = array_filter(array_shift($data), function ($item) use ($query) {
-                foreach ($query as $key => $value) {
-                    if (!isset($item[$key]) || $item[$key] != $value) {
-                        return false;
-                    }
-                }
-                return true;
-            });
+            $matches = $this->matchItemsByQuery($data, $query);
 
             foreach ($matches as $object) {
                 yield $this->build($object);
@@ -140,73 +150,68 @@ class Polyright extends AbstractRest
      */
     public function getOne(array $object, ?array $attributes = []): EndpointObjectInterface
     {
-//        $filter = $this->transformQuery($this->getFilterOne($object));
-//        $this->logGetOne($filter);
-//
-//        $options = [];
-//        $options['query']['$filter'] = $filter;
-//        $attributes[] = $this->identifier;
-//        $options['query']['$select'] = join(',', $attributes);
-//
-//        try {
-//            $result = $this->client->get('', $options);
-//            $data = $this->getResponse($result);
-//        } catch (RequestException $e) {
-//            if ($e->getCode() === 404) {
-//                throw new Exception\ObjectNotFound('no object found with filter '.$filter);
-//            }
-//
-//            throw $e;
-//        }
-//
-//        if (count($data) > 1) {
-//            throw new Exception\ObjectMultipleFound('found more than one object with filter '.$filter);
-//        }
-//        if (count($data) === 0) {
-//            throw new Exception\ObjectNotFound('no object found with filter '.$filter);
-//        }
-//
-//        $data = array_shift($data);
-//
-//        if ($this->isGroupEndpoint()) {
-//            $data = array_merge_recursive($data, $this->fetchMembers($data['id']));
-//        }
-//
-//        return $this->build($data, $filter);
+        $filter = $this->transformQuery($this->getFilterOne($object));
+        $this->logGetOne($filter);
+
+        $attributes = implode('=true&', self::ADDITIONAL_PERSON_INFORMATION) . '=true';
+
+        try {
+            $result = $this->client->get($this->client->getConfig('base_uri').'/'.reset($filter).'?'.$attributes);
+            $data = $this->getResponse($result);
+
+            if (isset($data[$this->identifier])) {
+                $data[$this->identifier] = strval($data[$this->identifier]);
+            }
+
+        } catch (RequestException $e) {
+            if ($e->getCode() === 404) {
+                throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
+            }
+
+            throw $e;
+        }
+
+        return $this->build($this->flattenArray($data), $filter);
     }
-//
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
-//    {
-//        $this->logCreate($object);
-//        $uri = (string) $this->client->getConfig('base_uri');
-//
-//        if (strpos($uri, self::CHANNELS_URI_IDENTIFIER) !== false && isset($object[self::TYPE_ATTR_FOR_DIRECT_CHANNELS]) && $object[self::TYPE_ATTR_FOR_DIRECT_CHANNELS] === self::TYPE_FOR_DIRECT_CHANNELS && isset($object['data'])) {
-//            if ($simulate === false) {
-//                $result = $this->client->post($uri.'/direct', [
-//                    'json' => $object['data'],
-//                ]);
-//
-//                $body = json_decode($result->getBody()->getContents(), true);
-//
-//                return $this->getResourceId($body);
-//            }
-//        } else {
-//            if ($simulate === false) {
-//                $result = $this->client->post('', [
-//                    'json' => $object,
-//                ]);
-//
-//                $body = json_decode($result->getBody()->getContents(), true);
-//
-//                return $this->getResourceId($body);
-//            }
-//        }
-//
-//        return null;
-//    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
+    {
+        $this->unflattenArray($object);
+
+        if ($simulate === false) {
+            $result = $this->client->post('', [
+                'json' => $object,
+            ]);
+
+            $body = json_decode($result->getBody()->getContents(), true);
+
+            return $this->getResourceId($body);
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
+        $diff = $this->unflattenArray($diff);
+        $this->logChange($uri, $diff);
+
+        if ($simulate === false) {
+            $this->client->patch($uri, [
+                'json' => $diff,
+            ]);
+        }
+
+        return null;
+    }
+
 //
 //    /**
 //     * {@inheritdoc}
@@ -434,4 +439,44 @@ class Polyright extends AbstractRest
 //
 //        return $data;
 //    }
+
+    protected function matchItemsByQuery(array $data, ?array $query): array
+    {
+        return array_filter(array_shift($data), function ($item) use ($query) {
+            foreach ($query as $key => $value) {
+                if (!isset($item[$key]) || $item[$key] != $value) {
+                    return false;
+                }
+            }
+            return true;
+        });
+    }
+
+    protected function flattenArray(array $data, string $prefix = ''): array {
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            $newKey = $prefix ? $prefix . self::ADDITIONAL_ATTR_DIVIDER . $key : $key;
+
+            if (is_array($value)) {
+                $result = array_merge($result, $this->flattenArray($value, $newKey));
+            } else {
+                $result[$newKey] = $value;
+            }
+        }
+
+        return $result;
+    }
+
+    protected function unflattenArray(array $array): array {
+        foreach ($array as $attr => $value) {
+            if (str_contains($attr, self::ADDITIONAL_ATTR_DIVIDER)) {
+                $container = explode(':', $attr);
+                $array[$container[0]][$container[1]] = $value;
+                unset($array[$attr]);
+            }
+        }
+
+        return $array;
+    }
 }
