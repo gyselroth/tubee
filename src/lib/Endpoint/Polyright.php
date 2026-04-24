@@ -17,7 +17,6 @@ use GuzzleHttp\Exception\RequestException;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
-use Tubee\Endpoint\Mattermost\Exception as MattermostException;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -196,7 +195,7 @@ class Polyright extends AbstractRest
                 } else {
                     $this->archive($diff, $object, $endpoint_object, $simulate);
                 }
-            } else if ($endpoint_object->getData()['status'] === 'Archived'){
+            } elseif ($endpoint_object->getData()['status'] === 'Archived') {
                 $this->unarchive($diff, $object, $endpoint_object, $simulate);
             } else {
                 unset($diff[self::ARCHIVE_ATTR]);
