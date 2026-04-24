@@ -29,6 +29,11 @@ class Polyright extends AbstractRest
     public const KIND = 'PolyrightEndpoint';
 
     /**
+     * If archive attr is set as an attribute in worfklow, the object gets archived on the endpoint.
+     */
+    public const ARCHIVE_ATTR = 'archive';
+
+    /**
      * Included person information.
      */
     public const ADDITIONAL_PERSON_INFORMATION = [
@@ -100,24 +105,6 @@ class Polyright extends AbstractRest
 
         return null;
     }
-
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function count(?array $query = null): int
-//    {
-//        $query = $this->transformQuery($query);
-//
-//        $options = [];
-//        $options['query'] = [
-//            'query' => $query,
-//        ];
-//
-//        $response = $this->client->get('', $options);
-//
-//        return $this->decodeResponse($response)['total'] ?? 0;
-//    }
-//
 
     /**
      * {@inheritdoc}
@@ -199,6 +186,32 @@ class Polyright extends AbstractRest
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
+        if (isset($diff[self::ARCHIVE_ATTR])) {
+            if ($diff[self::ARCHIVE_ATTR]) {
+                if ($endpoint_object->getData()['status'] === 'Archived') {
+                    $this->logger->debug('object on endpoint [{identifier}] is already up2date', [
+                        'identifier' => $this->getIdentifier(),
+                        'category' => get_class($this),
+                    ]);
+                } else {
+                    $this->archive($diff, $object, $endpoint_object, $simulate);
+                }
+            } else if ($endpoint_object->getData()['status'] === 'Archived'){
+                $this->unarchive($diff, $object, $endpoint_object, $simulate);
+            } else {
+                unset($diff[self::ARCHIVE_ATTR]);
+
+                if ($diff === []) {
+                    $this->logger->debug('object on endpoint [{identifier}] is already up2date', [
+                        'identifier' => $this->getIdentifier(),
+                        'category' => get_class($this),
+                    ]);
+
+                    return null;
+                }
+            }
+        }
+
         $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
         $diff = $this->unflattenArray($diff);
         $this->logChange($uri, $diff);
@@ -212,233 +225,35 @@ class Polyright extends AbstractRest
         return null;
     }
 
-//
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
-//    {
-//        if (strpos((string) $this->client->getConfig('base_uri'), self::TEAMS_URI_IDENTIFIER) !== false) {
-//            $this->changeTeam($diff, $object, $endpoint_object, $simulate);
-//        } else {
-//            $this->changeUser($diff, $object, $endpoint_object, $simulate);
-//        }
-//
-//        return null;
-//    }
-//
-//    /**
-//     * {@inheritdoc}
-//     */
-//    public function delete(AttributeMapInterface $map, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): bool
-//    {
-//        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'?permanent=true';
-//        $this->logDelete($uri);
-//
-//        if ($simulate === false) {
-//            $this->client->delete($uri);
-//        }
-//
-//        return true;
-//    }
-//
-//    protected function changeUser(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
-//    {
-//        $this->logger->debug('change user object on endpoint');
-//
-//        if (isset($diff[self::DISABLE_ATTR])) {
-//            $this->disable($diff, $object, $endpoint_object, $simulate);
-//        }
-//
-//        $props = [];
-//        $absentProps = [];
-//
-//        foreach ($diff as $attr => $value) {
-//            if (str_contains($attr, self::PROPS_ATTR.self::PROPS_DIVIDER)) {
-//                unset($diff[$attr]);
-//                if ($value === null) {
-//                    $absentProps[] = explode(self::PROPS_DIVIDER, $attr)[1];
-//
-//                    continue;
-//                }
-//                $props[explode(self::PROPS_DIVIDER, $attr)[1]] = $value;
-//            }
-//        }
-//
-//        if ($props !== [] || $absentProps !== []) {
-//            $endpoint_props = [];
-//
-//            foreach ($endpoint_object->getData() as $key => $value) {
-//                if (strpos($key, self::PROPS_ATTR.self::PROPS_DIVIDER) !== false) {
-//                    $endpoint_props[explode(self::PROPS_DIVIDER, $key)[1]] = $value;
-//                }
-//            }
-//
-//            foreach ($absentProps as $absentProp) {
-//                unset($endpoint_props[$absentProp]);
-//            }
-//
-//            $diff[self::PROPS_ATTR] = (object) array_merge($endpoint_props, $props);
-//        }
-//
-//        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/patch';
-//        $this->logChange($uri, $diff);
-//
-//        if ($simulate === false) {
-//            $this->client->put($uri, [
-//                'json' => $diff,
-//            ]);
-//        }
-//    }
-//
-//    protected function changeTeam(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
-//    {
-//        $this->logger->debug('change team object on endpoint');
-//
-//        if (isset($diff[self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR])) {
-//            $this->logger->info('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is set. Add multiple users to team.');
-//
-//            if ($diff[self::USERS_ATTR] && count($diff[self::USERS_ATTR]) !== 0) {
-//                $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/members/batch';
-//
-//                $this->batch($diff[self::USERS_ATTR], $uri, $simulate);
-//            } else {
-//                throw new MattermostException\UserAttrNotSet('attribute ['.self::USERS_ATTR.'] is not set or empty. To add multiple users configure workflow attribute ['.self::USERS_ATTR.']');
-//            }
-//        } else {
-//            $this->logger->info('attribute ['.self::ADD_MULTIPLE_USERS_TO_TEAM_ATTR.'] is not set. Do not add multiple users.');
-//        }
-//
-//        if (isset($diff[self::REMOVE_USER_FROM_TEAM_ATTR])) {
-//            $this->logger->info('attribute ['.self::REMOVE_USER_FROM_TEAM_ATTR.'] is set. Remove users from team.');
-//
-//            foreach ($diff[self::USERS_ATTR] as $member) {
-//                if (isset($member[self::USER_ATTR])) {
-//                    $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/members/'.$member[self::USER_ATTR];
-//
-//                    $this->logger->debug('remove user [{user}] from team [{team}]', [
-//                        'category' => get_class($this),
-//                        'user' => $member[self::USER_ATTR],
-//                        'team' => $member['team_id'],
-//                    ]);
-//
-//                    if ($simulate === false) {
-//                        $this->client->delete($uri);
-//                    }
-//                } else {
-//                    $this->logger->warning('attribute ['.self::USER_ATTR.'] is not set. Skip user [{object}]', [
-//                        'category' => get_class($this),
-//                        'object' => $member,
-//                    ]);
-//                }
-//            }
-//        } else {
-//            $this->logger->info('attribute ['.self::REMOVE_USER_FROM_TEAM_ATTR.'] is not set. Do not remove users.');
-//        }
-//
-//        if (isset($diff[self::DISABLE_ATTR])) {
-//            $this->disable($diff, $object, $endpoint_object, $simulate);
-//        }
-//    }
-//
-//    protected function disable(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
-//    {
-//        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
-//
-//        $this->logger->info('disable mattermost object [{object}] on endpoint [{identifier}]', [
-//            'category' => get_class($this),
-//            'identifier' => $this->getIdentifier(),
-//            'object' => $diff,
-//        ]);
-//
-//        if ($simulate === false) {
-//            $this->client->delete($uri);
-//        }
-//    }
-//
-//    /**
-//     * Check if unique attribute is set in filter.
-//     */
-//    protected function checkFilterForUniqueAttr(array $filter, ?string $type = null): array
-//    {
-//        switch ($type) {
-//            case 'team':
-//                $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_TEAM;
-//                $apiUriByAttr = self::API_URI_BY_ATTR_TEAM;
-//
-//                break;
-//            case 'user':
-//                $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_USER;
-//                $apiUriByAttr = self::API_URI_BY_ATTR_USER;
-//
-//                break;
-//            default:
-//                $uniqueFilterAttr = self::UNIQUE_FILTER_ATTR_DEFAULT;
-//                $apiUriByAttr = self::API_URI_BY_ATTR_DEFAULT;
-//
-//                break;
-//        }
-//
-//        foreach ($uniqueFilterAttr as $attr) {
-//            if (isset($filter[$attr])) {
-//                return [
-//                    'attr' => $attr,
-//                    'value' => $filter[$attr],
-//                    'uri' => $apiUriByAttr[$attr],
-//                ];
-//            }
-//        }
-//
-//        return [];
-//    }
-//
-//    /**
-//     * Batch call.
-//     */
-//    protected function batch(array $requests, string $uri, bool $simulate = false, bool $throw = true): array
-//    {
-//        $results = [];
-//
-//        foreach (array_chunk($requests, self::BATCH_SIZE) as $chunk) {
-//            $chunk = ['json' => $chunk];
-//
-//            $this->logger->debug('batch request chunk [{chunk}] ', [
-//                'category' => get_class($this),
-//                'chunk' => $chunk,
-//            ]);
-//
-//            if ($simulate === false) {
-//                $response = $this->client->post($uri, $chunk);
-//
-//                $results[] = array_merge($results, $this->validateBatchResponse($response, $throw));
-//            }
-//        }
-//
-//        return $results;
-//    }
-//
-//    /**
-//     * Validate batch request.
-//     */
-//    protected function validateBatchResponse($response, bool $throw = true): array
-//    {
-//        $data = json_decode($response->getBody()->getContents(), true);
-//
-//        if (count($data) === 0) {
-//            throw new MattermostException\BatchRequestFailed('invalid batch response data, expected array of team members');
-//        }
-//
-//        if ($response->getStatusCode() !== 201 && $throw === true) {
-//            throw new MattermostException\BatchRequestFailed('batch request part failed with http code '.$response->getStatusCode());
-//        }
-//
-//        $this->logger->debug('batch request part succeeded with http code [{status}]', [
-//            'category' => get_class($this),
-//            'status' => $response->getStatusCode(),
-//        ]);
-//
-//        return $data;
-//    }
+    protected function archive(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/archive';
+
+        $this->logger->info('archive polyright object [{object}] on endpoint [{identifier}]', [
+            'category' => get_class($this),
+            'identifier' => $this->getIdentifier(),
+            'object' => $diff,
+        ]);
+
+        if ($simulate === false) {
+            $this->client->post($uri);
+        }
+    }
+
+    protected function unarchive(array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate): void
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object).'/unarchive';
+
+        $this->logger->info('unarchive polyright object [{object}] on endpoint [{identifier}]', [
+            'category' => get_class($this),
+            'identifier' => $this->getIdentifier(),
+            'object' => $diff,
+        ]);
+
+        if ($simulate === false) {
+            $this->client->post($uri);
+        }
+    }
 
     protected function matchItemsByQuery(array $data, ?array $query): array
     {
