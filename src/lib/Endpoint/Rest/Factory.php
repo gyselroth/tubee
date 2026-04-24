@@ -125,7 +125,8 @@ class Factory
 
         if (isset($body['access_token'])) {
             return $body['access_token'];
-        } else if (isset($body['accessToken'])) {
+        }
+        if (isset($body['accessToken'])) {
             return $body['accessToken'];
         }
 

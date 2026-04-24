@@ -29,7 +29,7 @@ class Polyright extends AbstractRest
     public const KIND = 'PolyrightEndpoint';
 
     /**
-     * Included person information
+     * Included person information.
      */
     public const ADDITIONAL_PERSON_INFORMATION = [
         'includePersonalInformation',
@@ -42,7 +42,7 @@ class Polyright extends AbstractRest
         'includeRepresentativePersons',
         'includeCustomFields',
         'includeComputedFields',
-        'includePricingProfileData'
+        'includePricingProfileData',
     ];
 
     /**
@@ -91,7 +91,7 @@ class Polyright extends AbstractRest
                 $return = array_merge($return, $item);
             }
 
-            foreach($query as $key => $value) {
+            foreach ($query as $key => $value) {
                 $return[$key] = $value;
             }
 
@@ -118,6 +118,7 @@ class Polyright extends AbstractRest
 //        return $this->decodeResponse($response)['total'] ?? 0;
 //    }
 //
+
     /**
      * {@inheritdoc}
      */
@@ -153,7 +154,7 @@ class Polyright extends AbstractRest
         $filter = $this->transformQuery($this->getFilterOne($object));
         $this->logGetOne($filter);
 
-        $attributes = implode('=true&', self::ADDITIONAL_PERSON_INFORMATION) . '=true';
+        $attributes = implode('=true&', self::ADDITIONAL_PERSON_INFORMATION).'=true';
 
         try {
             $result = $this->client->get($this->client->getConfig('base_uri').'/'.reset($filter).'?'.$attributes);
@@ -162,7 +163,6 @@ class Polyright extends AbstractRest
             if (isset($data[$this->identifier])) {
                 $data[$this->identifier] = strval($data[$this->identifier]);
             }
-
         } catch (RequestException $e) {
             if ($e->getCode() === 404) {
                 throw new Exception\ObjectNotFound('no object found with filter '.json_encode($filter));
@@ -448,15 +448,17 @@ class Polyright extends AbstractRest
                     return false;
                 }
             }
+
             return true;
         });
     }
 
-    protected function flattenArray(array $data, string $prefix = ''): array {
+    protected function flattenArray(array $data, string $prefix = ''): array
+    {
         $result = [];
 
         foreach ($data as $key => $value) {
-            $newKey = $prefix ? $prefix . self::ADDITIONAL_ATTR_DIVIDER . $key : $key;
+            $newKey = $prefix ? $prefix.self::ADDITIONAL_ATTR_DIVIDER.$key : $key;
 
             if (is_array($value)) {
                 $result = array_merge($result, $this->flattenArray($value, $newKey));
@@ -468,7 +470,8 @@ class Polyright extends AbstractRest
         return $result;
     }
 
-    protected function unflattenArray(array $array): array {
+    protected function unflattenArray(array $array): array
+    {
         foreach ($array as $attr => $value) {
             if (str_contains($attr, self::ADDITIONAL_ATTR_DIVIDER)) {
                 $container = explode(':', $attr);
