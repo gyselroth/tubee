@@ -337,7 +337,7 @@ class Polyright extends AbstractRest
             }
         }
 
-        if ($compare && $resourceId !== '') {
+        if ($photoAttr !== [] && $compare && $resourceId !== '') {
             if (!$this->samePhoto($photoAttr, $resourceId)) {
                 return [$object, $photoAttr];
             }
