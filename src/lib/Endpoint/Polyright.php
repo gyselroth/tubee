@@ -19,6 +19,9 @@ use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
+use \MongoDB\BSON\Binary;
+use Jenssegers\ImageHash\ImageHash;
+use Jenssegers\ImageHash\Implementations\AverageHash;
 
 class Polyright extends AbstractRest
 {
@@ -62,11 +65,17 @@ class Polyright extends AbstractRest
     protected $logger;
 
     /**
+     * @var ImageHash
+     */
+    protected $hasher;
+
+    /**
      * Init endpoint.
      */
     public function __construct(string $name, string $type, Client $client, CollectionInterface $collection, WorkflowFactory $workflow, LoggerInterface $logger, array $resource = [])
     {
         $this->logger = $logger;
+        $this->hasher = new ImageHash(new AverageHash());
         parent::__construct($name, $type, $client, $collection, $workflow, $logger, $resource);
     }
 
@@ -165,16 +174,22 @@ class Polyright extends AbstractRest
      */
     public function create(AttributeMapInterface $map, array $object, bool $simulate = false): ?string
     {
-        $this->unflattenArray($object);
+        $object = $this->unflattenArray($object);
+
+        [$object, $photoAttr] = $this->checkPhotoAttr($object);
 
         if ($simulate === false) {
             $result = $this->client->post('', [
                 'json' => $object,
             ]);
 
-            $body = json_decode($result->getBody()->getContents(), true);
+            $resourceId = $this->getResourceId(json_decode($result->getBody()->getContents(), true));
 
-            return $this->getResourceId($body);
+            if ($photoAttr !== []){
+                $this->photoUpload($photoAttr, $resourceId);
+            }
+
+            return $resourceId;
         }
 
         return null;
@@ -185,6 +200,9 @@ class Polyright extends AbstractRest
      */
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
+        $resourceId = $this->getResourceId($object, $endpoint_object);
+        [$diff, $photoAttr] = $this->checkPhotoAttr($diff, true, $resourceId);
+
         if (isset($diff[self::ARCHIVE_ATTR])) {
             if ($diff[self::ARCHIVE_ATTR]) {
                 if ($endpoint_object->getData()['status'] === 'Archived') {
@@ -200,7 +218,7 @@ class Polyright extends AbstractRest
             } else {
                 unset($diff[self::ARCHIVE_ATTR]);
 
-                if ($diff === []) {
+                if ($diff === [] && $photoAttr === []) {
                     $this->logger->debug('object on endpoint [{identifier}] is already up2date', [
                         'identifier' => $this->getIdentifier(),
                         'category' => get_class($this),
@@ -211,14 +229,20 @@ class Polyright extends AbstractRest
             }
         }
 
-        $uri = $this->client->getConfig('base_uri').'/'.$this->getResourceId($object, $endpoint_object);
+        $uri = $this->client->getConfig('base_uri').'/'.$resourceId;
         $diff = $this->unflattenArray($diff);
         $this->logChange($uri, $diff);
 
         if ($simulate === false) {
-            $this->client->patch($uri, [
-                'json' => $diff,
-            ]);
+            if ($diff !== []) {
+                $this->client->patch($uri, [
+                    'json' => $diff,
+                ]);
+            }
+
+            if ($photoAttr !== []){
+                $this->photoUpload($photoAttr, $resourceId);
+            }
         }
 
         return null;
@@ -295,5 +319,93 @@ class Polyright extends AbstractRest
         }
 
         return $array;
+    }
+
+    protected function checkPhotoAttr(array $object, bool $compare = false, string $resourceId = ''): array
+    {
+        $photoAttr = [];
+
+        foreach ($object as $attr => $value) {
+            if ($value instanceof Binary) {
+                $this->logger->debug('there is a photo attribute [{attr}]', [
+                    'attr' => $attr,
+                    'category' => get_class($this),
+                ]);
+
+                $photoAttr = $value;
+                unset($object[$attr]);
+            }
+        }
+
+        if ($compare && $resourceId !== '') {
+            if (!$this->samePhoto($photoAttr, $resourceId)) {
+                return [$object, $photoAttr];
+            } else {
+                return [$object, []];
+            }
+        }
+
+        return [$object, $photoAttr];
+    }
+
+    protected function samePhoto(Binary $photo, string $resourceId): bool
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$resourceId.'/photo';
+
+        $this->logger->debug('compare photo for resource [{resource}] on endpoint [{identifier}]', [
+            'category' => get_class($this),
+            'identifier' => $this->getIdentifier(),
+            'resource' => $uri,
+        ]);
+
+        $result = $this->client->get($uri);
+
+        $this->logger->debug('request to ['.$uri.'] ended with code ['.$result->getStatusCode().']', [
+            'category' => get_class($this),
+        ]);
+
+        if ($result->getStatusCode() !== 200) {
+            return false;
+        }
+
+        $endpointPhoto = $result->getBody()->getContents();
+        $endpointPhotoHash = $this->hasher->hash($endpointPhoto);
+        $sourcePhotoHash = $this->hasher->hash($photo->getData());
+
+        if ($this->hasher->distance($endpointPhotoHash, $sourcePhotoHash) < 5) {
+            $this->logger->debug('photos are similar - do not upload new photo to endpoint [{identifier}]', [
+                'identifier' => $this->getIdentifier(),
+                'category' => get_class($this),
+            ]);
+
+            return true;
+        }
+
+        $this->logger->debug('there is a new photo - upload new photo to endpoint [{identifier}]', [
+            'identifier' => $this->getIdentifier(),
+            'category' => get_class($this),
+        ]);
+
+        return false;
+    }
+
+    protected function photoUpload(Binary $attr, string $resourceId): void
+    {
+        $uri = $this->client->getConfig('base_uri').'/'.$resourceId.'/photo';
+
+        $this->logger->debug('upload photo for resource [{resource}] on endpoint [{identifier}]', [
+            'category' => get_class($this),
+            'identifier' => $this->getIdentifier(),
+            'resource' => $uri,
+        ]);
+
+        $this->client->put($uri, [
+            'multipart' => [
+                [
+                    'name'     => 'photo_'.$resourceId,
+                    'contents' => $attr,
+                ]
+            ],
+        ]);
     }
 }
