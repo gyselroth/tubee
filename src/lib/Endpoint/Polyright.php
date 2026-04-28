@@ -14,14 +14,14 @@ namespace Tubee\Endpoint;
 use Generator;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Jenssegers\ImageHash\ImageHash;
+use Jenssegers\ImageHash\Implementations\AverageHash;
+use MongoDB\BSON\Binary;
 use Psr\Log\LoggerInterface;
 use Tubee\AttributeMap\AttributeMapInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\EndpointObject\EndpointObjectInterface;
 use Tubee\Workflow\Factory as WorkflowFactory;
-use \MongoDB\BSON\Binary;
-use Jenssegers\ImageHash\ImageHash;
-use Jenssegers\ImageHash\Implementations\AverageHash;
 
 class Polyright extends AbstractRest
 {
@@ -176,7 +176,7 @@ class Polyright extends AbstractRest
     {
         $object = $this->unflattenArray($object);
 
-        [$object, $photoAttr] = $this->checkPhotoAttr($object);
+        list($object, $photoAttr) = $this->checkPhotoAttr($object);
 
         if ($simulate === false) {
             $result = $this->client->post('', [
@@ -185,7 +185,7 @@ class Polyright extends AbstractRest
 
             $resourceId = $this->getResourceId(json_decode($result->getBody()->getContents(), true));
 
-            if ($photoAttr !== []){
+            if ($photoAttr !== []) {
                 $this->photoUpload($photoAttr, $resourceId);
             }
 
@@ -201,7 +201,7 @@ class Polyright extends AbstractRest
     public function change(AttributeMapInterface $map, array $diff, array $object, EndpointObjectInterface $endpoint_object, bool $simulate = false): ?string
     {
         $resourceId = $this->getResourceId($object, $endpoint_object);
-        [$diff, $photoAttr] = $this->checkPhotoAttr($diff, true, $resourceId);
+        list($diff, $photoAttr) = $this->checkPhotoAttr($diff, true, $resourceId);
 
         if (isset($diff[self::ARCHIVE_ATTR])) {
             if ($diff[self::ARCHIVE_ATTR]) {
@@ -240,7 +240,7 @@ class Polyright extends AbstractRest
                 ]);
             }
 
-            if ($photoAttr !== []){
+            if ($photoAttr !== []) {
                 $this->photoUpload($photoAttr, $resourceId);
             }
         }
@@ -340,9 +340,9 @@ class Polyright extends AbstractRest
         if ($compare && $resourceId !== '') {
             if (!$this->samePhoto($photoAttr, $resourceId)) {
                 return [$object, $photoAttr];
-            } else {
-                return [$object, []];
             }
+
+            return [$object, []];
         }
 
         return [$object, $photoAttr];
@@ -402,9 +402,9 @@ class Polyright extends AbstractRest
         $this->client->put($uri, [
             'multipart' => [
                 [
-                    'name'     => 'photo_'.$resourceId,
+                    'name' => 'photo_'.$resourceId,
                     'contents' => $attr,
-                ]
+                ],
             ],
         ]);
     }

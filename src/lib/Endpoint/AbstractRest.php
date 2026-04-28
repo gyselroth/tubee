@@ -181,13 +181,13 @@ abstract class AbstractRest extends AbstractEndpoint
     protected function getResourceId(array $object, ?EndpointObjectInterface $endpoint_object = null): string
     {
         if (isset($object[$this->identifier])) {
-            return (string)$object[$this->identifier];
+            return (string) $object[$this->identifier];
         }
 
         if ($endpoint_object !== null) {
             $data = $endpoint_object->getData();
             if (isset($data[$this->identifier])) {
-                return (string)$data[$this->identifier];
+                return (string) $data[$this->identifier];
             }
         }
 
