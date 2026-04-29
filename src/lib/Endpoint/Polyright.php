@@ -326,13 +326,18 @@ class Polyright extends AbstractRest
         $photoAttr = [];
 
         foreach ($object as $attr => $value) {
-            if ($value instanceof Binary) {
+            if ($value instanceof Binary || $this->isBase64Image($value)) {
                 $this->logger->debug('there is a photo attribute [{attr}]', [
                     'attr' => $attr,
                     'category' => get_class($this),
                 ]);
 
-                $photoAttr = $value;
+                if (!($value instanceof Binary)) {
+                    $photoAttr = new Binary(base64_decode($value, true), Binary::TYPE_GENERIC);
+                } else {
+                    $photoAttr = $value;
+                }
+
                 unset($object[$attr]);
             }
         }
@@ -407,5 +412,24 @@ class Polyright extends AbstractRest
                 ],
             ],
         ]);
+    }
+
+    protected function isBase64Image($string): bool
+    {
+        if (!is_string($string) || strlen($string) < 50) {
+            return false;
+        }
+
+        if (
+            str_starts_with($string, '/9j/') ||     // JPEG
+            str_starts_with($string, 'iVBORw0KGgo') || // PNG
+            str_starts_with($string, 'R0lGOD')      // GIF
+        ) {
+            $data = base64_decode($string, true);
+
+            return $data !== false && @getimagesizefromstring($data) !== false;
+        }
+
+        return false;
     }
 }
