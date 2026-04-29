@@ -1,3 +1,10 @@
+## 2.8.0
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Wed Apr 29 16:00:00 CEST 2026
+
+### Feature
+* Implementation of PolyrightEndpoint
+
 ## 2.7.4
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Jan 23 18:30:00 CEST 2026
