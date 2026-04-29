@@ -9,12 +9,12 @@ declare(strict_types=1);
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
-namespace Tubee\Endpoint\MicrosoftGraph;
+namespace Tubee\Endpoint\Polyright;
 
 use Psr\Log\LoggerInterface;
 use Tubee\Collection\CollectionInterface;
 use Tubee\Endpoint\EndpointInterface;
-use Tubee\Endpoint\MicrosoftGraph;
+use Tubee\Endpoint\Polyright;
 use Tubee\Endpoint\Rest\Factory as RestFactory;
 use Tubee\Workflow\Factory as WorkflowFactory;
 
@@ -27,6 +27,6 @@ class Factory
     {
         $client = RestFactory::buildClient($resource, $logger);
 
-        return new MicrosoftGraph($resource['name'], $resource['data']['type'], $client, $collection, $workflow_factory, $logger, $resource);
+        return new Polyright($resource['name'], $resource['data']['type'], $client, $collection, $workflow_factory, $logger, $resource);
     }
 }

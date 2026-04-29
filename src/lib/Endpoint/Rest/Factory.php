@@ -5,7 +5,7 @@ declare(strict_types=1);
 /**
  * tubee
  *
- * @copyright   Copryright (c) 2017-2025 gyselroth GmbH (https://gyselroth.com)
+ * @copyright   Copryright (c) 2017-2026 gyselroth GmbH (https://gyselroth.com)
  * @license     GPL-3.0 https://opensource.org/licenses/GPL-3.0
  */
 
@@ -106,14 +106,9 @@ class Factory
         ]);
 
         try {
-            $response = $client->post($oauth['token_endpoint'], [
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                    'client_id' => $oauth['client_id'],
-                    'client_secret' => $oauth['client_secret'],
-                    'scope' => $oauth['scope'],
-                ],
-            ]);
+            $response = isset($oauth['client_id'])
+                ? self::fetchOauthClientCredentialToken($client, $oauth)
+                : self::fetchOauthPasswortGrantToken($client, $oauth);
         } catch (\Exception $e) {
             $logger->error('failed to fetch access_token with message: '.$e->getMessage(), [
                 'category' => __CLASS__,
@@ -131,7 +126,32 @@ class Factory
         if (isset($body['access_token'])) {
             return $body['access_token'];
         }
+        if (isset($body['accessToken'])) {
+            return $body['accessToken'];
+        }
 
         throw new Exception\AccessTokenNotAvailable('No access_token in token_endpoint response');
+    }
+
+    protected static function fetchOauthClientCredentialToken(Client $client, array $oauth): ResponseInterface
+    {
+        return $client->post($oauth['token_endpoint'], [
+            'form_params' => [
+                'grant_type' => 'client_credentials',
+                'client_id' => $oauth['client_id'],
+                'client_secret' => $oauth['client_secret'],
+                'scope' => $oauth['scope'],
+            ],
+        ]);
+    }
+
+    protected static function fetchOauthPasswortGrantToken(Client $client, array $oauth): ResponseInterface
+    {
+        return $client->post($oauth['token_endpoint'], [
+            'auth' => [
+                $oauth['username'],
+                $oauth['password'],
+            ],
+        ]);
     }
 }

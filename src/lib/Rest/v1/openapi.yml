@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   description: ""
-  version: 1.2.5
+  version: 1.2.7
   title: Tubee API
   termsOfService: ""
   contact:
@@ -4426,6 +4426,7 @@ components:
                 - MicrosoftGraphEndpoint
                 - SqlSrvUsersEndpoint
                 - MattermostEndpoint
+                - PolyrightEndpoint
             namespace:
               description: The resource namespace
               type: string
@@ -5169,6 +5170,80 @@ components:
                           type: string
                         scopes:
                           description: OAuth2 scopes
+                          nullable: true
+                          default: null
+                          type: string
+                options:
+                  type: object
+                  default:
+                    identifier: id
+                  properties:
+                    identifier:
+                      nullable: true
+                      default: id
+                      description: Endpoint resource identifier.
+                      type: string
+    core.v1.PolyrightEndpoint:
+      description: Polyright endpoint for SECANDA manager
+      allOf:
+        - $ref: "#/components/schemas/core.v1.Endpoint"
+        - type: object
+          required:
+            - kind
+            - data
+          properties:
+            kind:
+              description: The type of endpoint. Always PolyrightEndpoint.
+              type: string
+              default: PolyrightEndpoint
+            data:
+              type: object
+              required:
+                - resource
+              properties:
+                resource:
+                  description: Holds the relevant options of how to connect to the endpoint.
+                  type: object
+                  required:
+                    - base_uri
+                  properties:
+                    base_uri:
+                      description: Base uri to resources (Like https://rest.api/v2/users).
+                      type: string
+                    request_options:
+                      default:
+                        {}
+                      description: Advanced request options, see
+                        http://docs.guzzlephp.org/en/stable/request-options.html
+                      type: object
+                    auth:
+                      nullable: true
+                      default: null
+                      description: Authentication adapter, oauth2 using password grant flow.
+                      type: string
+                      enum:
+                        - oauth2
+                    oauth2:
+                      description: Oauth2 client password grant flow.
+                        auth must be set to oauth2 if this adapter should be used.
+                      type: object
+                      default:
+                        token_endpoint: null
+                        username: null
+                        password: null
+                      properties:
+                        token_endpoint:
+                          description: URI to token endpoint.
+                          nullable: true
+                          default: null
+                          type: string
+                        username:
+                          description: OAuth2 username.
+                          nullable: true
+                          default: null
+                          type: string
+                        password:
+                          description: OAuth2 password.
                           nullable: true
                           default: null
                           type: string
