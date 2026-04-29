@@ -75,7 +75,8 @@
         "helmich/mongomock": "dev-master#7bb0b5d",
         "zendframework/zend-filter": "^2.9",
         "league/event": "^2.2",
-        "composer/package-versions-deprecated": "^1.11"
+        "composer/package-versions-deprecated": "^1.11",
+        "jenssegers/imagehash": "^0.8"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
