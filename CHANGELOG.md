@@ -1,3 +1,10 @@
+## 2.8.1
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Sat Jul 11 23:45:00 CEST 2026
+
+### Feature
+* Implemented reduceImageFileSizeByBlob core function
+
 ## 2.8.0
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Wed Apr 29 16:00:00 CEST 2026
