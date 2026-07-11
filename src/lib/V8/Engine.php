@@ -110,7 +110,7 @@ class Engine extends V8Js
         return hash_hmac($algo, $data, $secret);
     }
 
-    function reduceImageFileSizeByBlob(string $blob, int $quality = 50): string
+    public function reduceImageFileSizeByBlob(string $blob, int $quality = 50): string
     {
         $image = new \Imagick();
         $image->readImageBlob(base64_decode($blob));
@@ -121,14 +121,15 @@ class Engine extends V8Js
             case 'jpg':
                 $image->setImageCompression(\Imagick::COMPRESSION_JPEG);
                 $image->setImageCompressionQuality($quality);
-                break;
 
+                break;
             case 'webp':
                 $image->setImageCompressionQuality($quality);
-                break;
 
+                break;
             case 'png':
                 $image->setOption('png:compression-level', '9');
+
                 break;
         }
 
