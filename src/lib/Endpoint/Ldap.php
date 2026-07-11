@@ -306,7 +306,6 @@ class Ldap extends AbstractEndpoint
         $this->logGetAll($filter);
 
         $i = 0;
-        $this->logger->debug(json_encode([$filter, $this->basedn]));
 
         $result = $this->ldap->ldapSearch($this->basedn, $filter, $this->source_attributes)->getEntries();
         array_shift($result);
