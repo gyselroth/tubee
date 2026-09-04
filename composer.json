@@ -78,7 +78,6 @@
         "composer/package-versions-deprecated": "^1.11",
         "jenssegers/imagehash": "^0.8"
     },
-    "minimum-stability": "dev",
     "prefer-stable": true,
     "suggest": {
         "ext-v8js": "*",
