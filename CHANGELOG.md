@@ -1,3 +1,10 @@
+## 2.8.2
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Fri Sep 04 12:00:00 CEST 2026
+
+### Bugfix
+* Polyright-Endpoint: allow multiple attribute divider
+
 ## 2.8.1
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Sat Jul 11 23:45:00 CEST 2026
