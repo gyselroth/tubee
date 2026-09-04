@@ -312,9 +312,17 @@ class Polyright extends AbstractRest
     {
         foreach ($array as $attr => $value) {
             if (str_contains($attr, self::ADDITIONAL_ATTR_DIVIDER)) {
-                $container = explode(':', $attr);
-                $array[$container[0]][$container[1]] = $value;
+                $container = explode(self::ADDITIONAL_ATTR_DIVIDER, $attr);
+
+                $ref = &$array;
+                foreach ($container as $key) {
+                    $ref = &$ref[$key];
+                }
+
+                $ref = $value;
                 unset($array[$attr]);
+
+                unset($ref);
             }
         }
 
