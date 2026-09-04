@@ -320,9 +320,7 @@ class Polyright extends AbstractRest
                 }
 
                 $ref = $value;
-                unset($array[$attr]);
-
-                unset($ref);
+                unset($array[$attr], $ref);
             }
         }
 
