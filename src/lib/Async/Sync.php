@@ -187,11 +187,10 @@ class Sync extends AbstractJob
             }
 
             return true;
-        } else {
-            $this->logger->debug('no notification message is sent for job ['.$job['_id'].'] with status ['.$status.']', [
+        }
+        $this->logger->debug('no notification message is sent for job ['.$job['_id'].'] with status ['.$status.']', [
                 'category' => get_class($this),
             ]);
-        }
 
         return false;
     }
