@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a7eab8f05094178158d4bcbfd5a8bc53",
+    "content-hash": "07d1945d98f625c8f04d546b248cffd8",
     "packages": [
         {
             "name": "bramus/ansi-php",
@@ -1201,16 +1201,16 @@
         },
         {
             "name": "gyselroth/mongodb-php-task-scheduler",
-            "version": "v4.1.0-beta8",
+            "version": "v4.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/gyselroth/php-task-scheduler.git",
-                "reference": "53b163ec10b12389a0e759450c931978cf5f66d7"
+                "reference": "5029cb0b062bdcca62c517719af17cd114e13258"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/53b163ec10b12389a0e759450c931978cf5f66d7",
-                "reference": "53b163ec10b12389a0e759450c931978cf5f66d7",
+                "url": "https://api.github.com/repos/gyselroth/php-task-scheduler/zipball/5029cb0b062bdcca62c517719af17cd114e13258",
+                "reference": "5029cb0b062bdcca62c517719af17cd114e13258",
                 "shasum": ""
             },
             "require": {
@@ -1257,9 +1257,9 @@
             ],
             "support": {
                 "issues": "https://github.com/gyselroth/php-task-scheduler/issues",
-                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.1.0-beta8"
+                "source": "https://github.com/gyselroth/php-task-scheduler/tree/v4.1.0"
             },
-            "time": "2026-11-03T16:03:38+00:00"
+            "time": "2026-11-04T09:56:58+00:00"
         },
         {
             "name": "gyselroth/stream-iterator",
@@ -7407,16 +7407,16 @@
         },
         {
             "name": "symfony/filesystem",
-            "version": "v5.4.54",
+            "version": "v5.4.56",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/filesystem.git",
-                "reference": "c4a6cc5733386414f6d17d744ee5ad8b445e349d"
+                "reference": "97768a0b5c3495c2a2469dfc1f3db00e006fc5d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/filesystem/zipball/c4a6cc5733386414f6d17d744ee5ad8b445e349d",
-                "reference": "c4a6cc5733386414f6d17d744ee5ad8b445e349d",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/97768a0b5c3495c2a2469dfc1f3db00e006fc5d5",
+                "reference": "97768a0b5c3495c2a2469dfc1f3db00e006fc5d5",
                 "shasum": ""
             },
             "require": {
@@ -7454,7 +7454,7 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/filesystem/tree/v5.4.54"
+                "source": "https://github.com/symfony/filesystem/tree/v5.4.56"
             },
             "funding": [
                 {
@@ -7474,7 +7474,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-08-30T06:54:06+00:00"
+            "time": "2026-11-03T06:18:36+00:00"
         },
         {
             "name": "symfony/finder",
