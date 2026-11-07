@@ -1,3 +1,11 @@
+## 2.8.3
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Sat Nov 07 23:45:00 CEST 2026
+
+### Feature
+* Task-Scheduler: upgraded to v4.1.1
+* Notification: enabled job notifications
+
 ## 2.8.2
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Fri Sep 04 12:00:00 CEST 2026
