@@ -50,7 +50,7 @@
         "mongodb/mongodb": "^2.2",
         "ulrichsg/getopt-php": "^4.0",
         "laminas/laminas-mail": "^2.25",
-        "gyselroth/mongodb-php-task-scheduler": "dev-tubee-php82#a3a04dc",
+        "gyselroth/mongodb-php-task-scheduler": "dev-php_update_8.2#fdb122f",
         "hassankhan/config": "^3.2",
         "symfony/yaml": "~3.1",
         "monolog/monolog": "^2.0.0-beta1",
