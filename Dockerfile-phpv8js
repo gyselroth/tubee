@@ -1,23 +1,44 @@
-FROM php:7.2-fpm
+# =========================
+# Stage 1: build v8js
+# =========================
+FROM php:8.2-fpm-bookworm AS builder
 
 RUN apt-get update && apt-get install -y \
-  git \
-  python \
-  make \
-  gcc \
-  chrpath \
-  && git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /tmp/depot_tools \
-  && export PATH="$PATH:/tmp/depot_tools" \
-  && cd /usr/local/src && fetch v8 && cd v8 \
-  && git checkout 5.4.500.40 && gclient sync --with_branch_heads \
-  && export GYPFLAGS="-Dv8_use_external_startup_data=0" \
-  && export GYPFLAGS="${GYPFLAGS} -Dlinux_use_bundled_gold=0" \
-  && make native library=shared snapshot=on -j4 \
-  && mkdir -p /usr/local/lib \
-  && cp /usr/local/src/v8/out/native/lib.target/lib*.so /usr/local/lib \
-  && echo "create /usr/local/lib/libv8_libplatform.a\naddlib out/native/obj.target/src/libv8_libplatform.a\nsave\nend" | ar -M \
-  && cp -R /usr/local/src/v8/include /usr/local && chrpath -r '$ORIGIN' /usr/local/lib/libv8.so \
-  && pecl install v8js && docker-php-ext-enable v8js \
-  && rm -rf /var/lib/apt/lists/* \
-  && rm -rfv /usr/local/src/v8 \
-  && rm -rfv /tmp/depot_tools
+    git \
+    build-essential \
+    pkg-config \
+    libglib2.0-dev \
+    libicu-dev \
+    libxml2-dev \
+    libnode-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /opt
+
+RUN git clone https://github.com/phpv8/v8js.git
+
+WORKDIR /opt/v8js
+
+RUN phpize
+RUN ./configure --with-v8js=/usr
+RUN make -j$(nproc)
+RUN make install
+
+
+# =========================
+# Stage 2: runtime
+# =========================
+FROM php:8.2-fpm-bookworm
+
+RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libicu72 \
+    libxml2 \
+    libnode108 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=builder /usr/local/lib/php/extensions/ /usr/local/lib/php/extensions/
+
+RUN echo "extension=v8js.so" > /usr/local/etc/php/conf.d/v8js.ini
+
+RUN php -m | grep v8js

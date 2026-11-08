@@ -1,16 +1,13 @@
-FROM gyselroth/tubee:php7.2-fpm-v8js
+FROM php8.2-v8js-fpm
 
-ENV TUBEE_ENCRYPTION_KEY 314004007129e4d0bfbc36d0242d33ffadc798a8a55a307ce245392d91f2474efd7ce229af7ea3ed08ddbff1010678ac71050572856abdc54b851665d3a5afbd3c77dda953d5cfa066112b61aca7e04f0f71224db3c89c2e178f4a361b49799e3a32079d
+ENV TUBEE_ENCRYPTION_KEY=314004007129e4d0bfbc36d0242d33ffadc798a8a55a307ce245392d91f2474efd7ce229af7ea3ed08ddbff1010678ac71050572856abdc54b851665d3a5afbd3c77dda953d5cfa066112b61aca7e04f0f71224db3c89c2e178f4a361b49799e3a32079d
 
-RUN mkdir -p /usr/share/man/man1/ && echo TLS_REQCERT never > /etc/ldap/ldap.conf
-RUN sed -i -e 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list
-RUN sed -i -e 's|security.debian.org|archive.debian.org/|g' /etc/apt/sources.list
-RUN sed -i -e '/stretch-updates/d' /etc/apt/sources.list
-
-RUN apt-get update && apt-get install -y --allow-unauthenticated gnupg
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 112695A0E562B32A 0E98404D386FA1D9 DCC9EFBF77E11517 648ACFD622F3D138 && rm -rf /var/lib/apt/lists/*
+#-----------
+#RUN mkdir -p /usr/share/man/man1/ && echo TLS_REQCERT never > /etc/ldap/ldap.conf
+#-----------
 
 RUN apt-get update && apt-get install -y \
+  gnupg \
   libldb-dev \
   libldap2-dev \
   libxml2-dev \
@@ -19,19 +16,18 @@ RUN apt-get update && apt-get install -y \
   libzip-dev \
   libicu-dev \
   libsmbclient-dev \
-  apt-transport-https=1.4.10 \
+  apt-transport-https \
   libmagickwand-dev \
   unixodbc-dev \
   build-essential \
   curl \
   git \
   chrpath \
-  python \
+  python3 \
   smbclient \
   libglib2.0-dev \
   ca-certificates-java \
-  vim \
-  && rm -rf /var/lib/apt/lists/*
+  vim
 
 RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && curl https://packages.microsoft.com/config/debian/9/prod.list > /etc/apt/sources.list.d/mssql-release.list \
@@ -39,44 +35,38 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
     && ACCEPT_EULA=Y apt-get install -y unixodbc unixodbc-dev msodbcsql17 wget dialog  \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.a /usr/lib/ \
     && ln -s /usr/lib/x86_64-linux-gnu/libsybdb.so /usr/lib/ \
-#    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
-    && wget http://archive.debian.org/debian-archive/debian-security/pool/updates/main/o/openssl//libssl1.0.0_1.0.1t-1+deb8u12_amd64.deb \
+    && wget http://security-cdn.debian.org/debian-security/pool/updates/main/o/openssl/libssl1.1_1.1.1w-0+deb11u5_amd64.deb \
     && dpkg -i *.deb
 
-ENV DEBIAN_FRONTEND noninteractive
+ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y locales \
     && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
     && locale-gen en_US.UTF-8 \
     && dpkg-reconfigure locales \
     && /usr/sbin/update-locale LANG=en_US.UTF-8
 
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
+ENV LANG=en_US.UTF-8
+ENV LANGUAGE=en_US:en
+ENV LC_ALL=en_US.UTF-8
 
 RUN ln -s /usr/lib/x86_64-linux-gnu/libldap.so /usr/lib/libldap.so
 RUN docker-php-ext-install ldap xml opcache curl zip intl sockets pcntl sysvmsg mysqli
 
-RUN pecl install mongodb-1.16.2 \
-# TODO: use mongodb on php > 7.2
+RUN pecl install mongodb \
     && pecl install apcu \
-    && pecl install imagick-3.4.4 \
-# TODO: use imagick on php > 7.2
-    && pecl install smbclient-1.1.2 \
-# TODO: use smbclient on php 7.4
-    && pecl install sqlsrv-5.8.1 \
-    && pecl install pdo_sqlsrv-5.8.1 \
-    && pecl install swoole-4.8.6 \
-# TODO: use swoole on php > 7.2
+    && pecl install imagick \
+    && pecl install smbclient \
+    && pecl install sqlsrv-5.12.0 \
+    && pecl install pdo_sqlsrv-5.12.0 \
+    && pecl install swoole \
     && docker-php-ext-enable mongodb apcu imagick smbclient pcntl sqlsrv pdo_sqlsrv mysqli swoole
 
-# TODO: use xdebug on php > 7.2
-RUN pecl install xdebug-3.1.3 \
+RUN pecl install xdebug \
     && docker-php-ext-enable xdebug \
     && echo "xdebug.mode=coverage" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini \
     && ln -s /srv/www/tubee/config/php.ini /usr/local/etc/php/conf.d/zz-custom.ini
 
-RUN apt-get update && apt-get --no-install-recommends install -y nginx make rsync gnupg smbclient
+RUN apt-get update && apt-get install -y nginx make rsync gnupg smbclient
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
  && php composer-setup.php --filename=composer --install-dir=/usr/bin \
