@@ -1,27 +1,80 @@
-FROM php:8.2.35-fpm-alpine3.24
+# ---------- Stage 1: V8 bauen ----------
+FROM --platform=linux/amd64 php:8.4-fpm AS v8-build
 
-RUN apk add --no-cache \
-        nodejs-libs \
-    && apk add --no-cache --virtual .build-deps \
-        $PHPIZE_DEPS \
-        autoconf \
-        build-base \
-        curl \
-        libtool \
-        m4 \
-        nodejs-dev \
-        pkgconf \
-    \
-    # Install PHP Installer for Extensions (PIE)
-    && curl -fsSL \
-        https://github.com/php/pie/releases/latest/download/pie.phar \
-        -o /usr/local/bin/pie \
-    && chmod +x /usr/local/bin/pie \
-    \
-    # Build and install v8js against Alpine's V8
-    && pie install standa/php-v8js --with-v8js=/usr \
-    && docker-php-ext-enable v8js \
-    \
-    # Cleanup build dependencies
-    && apk del .build-deps \
-    && rm -rf /tmp/* /var/cache/apk/*
+ARG V8_VERSION=12.4.254.21
+ARG NINJA_JOBS=2
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git python3 curl ca-certificates pkg-config lsb-release sudo xz-utils \
+    build-essential \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN git clone https://chromium.googlesource.com/chromium/tools/depot_tools.git /opt/depot_tools
+ENV PATH="/opt/depot_tools:${PATH}"
+
+# depot_tools einmalig initialisieren (lädt eigenes Python, cipd, gn usw.)
+RUN update_depot_tools
+
+WORKDIR /usr/local/src
+
+# Schritt 1: Quellcode holen, Tag auschecken, Abhängigkeiten syncen
+# (alles in EINEM RUN, sonst scheitert cipd an Overlayfs: "invalid cross-device link")
+RUN fetch --no-history v8 \
+  && cd v8 \
+  && git fetch --depth=1 origin refs/tags/${V8_VERSION}:refs/tags/${V8_VERSION} \
+  && git checkout ${V8_VERSION} \
+  && gclient sync -D --no-history
+
+# Schritt 2: bauen (Build-Verzeichnis als Cache, damit ein Abbruch nicht alles verwirft)
+RUN --mount=type=cache,target=/usr/local/src/v8/out.gn \
+    cd v8 \
+  && gn gen out.gn/release --args='\
+       is_debug=false \
+       target_cpu="x64" \
+       is_component_build=false \
+       v8_monolithic=true \
+       v8_use_external_startup_data=false \
+       v8_enable_pointer_compression=false \
+       v8_enable_sandbox=false \
+       use_custom_libcxx=false \
+       v8_enable_i18n_support=false \
+       treat_warnings_as_errors=false' \
+  && ninja -j${NINJA_JOBS} -C out.gn/release v8_monolith \
+  && mkdir -p /opt/v8/lib \
+  && cp out.gn/release/obj/libv8_monolith.a /opt/v8/lib/ \
+  && cp -R include /opt/v8/
+
+# ---------- Stage 2: Endimage ----------
+FROM --platform=linux/amd64 php:8.4-fpm
+
+COPY --from=v8-build /opt/v8 /opt/v8
+
+# Schritt A: aus dem Monolith libv8.so erzeugen, plus leere libv8_libplatform.so
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    $PHPIZE_DEPS git libstdc++6 \
+  && cd /opt/v8/lib \
+  && g++ -shared -o libv8.so \
+       -Wl,--whole-archive libv8_monolith.a -Wl,--no-whole-archive \
+       -lpthread -ldl \
+  && echo "" | g++ -shared -x c++ -o libv8_libplatform.so - \
+  && ( nm -D --defined-only libv8.so | grep -q "NewDefaultPlatform" \
+       || ( echo "FEHLER: Platform-Symbole fehlen in libv8.so"; exit 1 ) ) \
+  && rm -f libv8_monolith.a
+
+# Schritt B1: v8js holen und konfigurieren (bei Fehler config.log ausgeben)
+RUN git clone https://github.com/phpv8/v8js.git /tmp/v8js \
+  && cd /tmp/v8js \
+  && phpize \
+  && ( ./configure --with-v8js=/opt/v8 CXXFLAGS="-std=c++20" LDFLAGS="-lstdc++" \
+       || ( echo "=== CONFIGURE FAILED ==="; ls -la /opt/v8/lib; tail -60 config.log; exit 1 ) )
+
+# Schritt B2: kompilieren
+RUN cd /tmp/v8js && make -j2
+
+# Schritt B3: installieren und aufräumen
+RUN cd /tmp/v8js \
+  && make install \
+  && docker-php-ext-enable v8js \
+  && cd / && rm -rf /tmp/v8js \
+  && apt-get purge -y --auto-remove $PHPIZE_DEPS git \
+  && rm -rf /var/lib/apt/lists/*
