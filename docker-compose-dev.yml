@@ -78,7 +78,7 @@ services:
     links:
       - balloon
   tubee-dev:
-    image: tubee-8.2-fpm
+    image: tubee-8.4-fpm
     ports:
       - "8095:80"
       - "8090:443"
