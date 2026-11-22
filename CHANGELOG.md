@@ -1,3 +1,10 @@
+## 2.8.4
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Sun Nov 22 10:30:00 CEST 2026
+
+### Bugfix
+* Removed notifications for canceled jobs
+
 ## 2.8.3
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Sat Nov 07 23:45:00 CEST 2026
