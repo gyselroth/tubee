@@ -141,7 +141,7 @@ class Sync extends AbstractJob
 
     public function notification(int $status, array $job): bool
     {
-        if ($status >= 4 && $this->checkReceiver($job['data'], $job['_id'])) {
+        if (($status === JobInterface::STATUS_FAILED || $status === JobInterface::STATUS_TIMEOUT) && $this->checkReceiver($job['data'], $job['_id'])) {
             $namespace = $job['data']['namespace'];
             $collections = implode(', ', $this->getArrayDataByKey($job['data'], 'collections'));
             $endpoints = implode(', ', $this->getArrayDataByKey($job['data'], 'endpoints'));
