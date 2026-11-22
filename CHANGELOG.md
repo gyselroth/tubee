@@ -1,3 +1,10 @@
+## 2.8.5
+**Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
+**Date**: Sun Nov 22 10:45:00 CEST 2026
+
+### Bugfix
+* Run job-notification only when status is failed or timeout
+
 ## 2.8.4
 **Maintainer**: Sandro Aebischer <aebischer@gyselroth.com>\
 **Date**: Sun Nov 22 10:30:00 CEST 2026
