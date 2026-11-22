@@ -1,5 +1,4 @@
-# Basis: selbst gebautes Image (Debian 13, PHP 8.4, v8js)
-FROM --platform=linux/amd64 gyselroth/tubee:php8.4-fpm-v8js
+FROM --platform=linux/amd64 gyselroth/tubee:php8.3-fpm-v8js
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -47,7 +46,7 @@ RUN docker-php-ext-install -j"$(nproc)" \
 
 # PECL-Erweiterungen
 # mongodb: Version zur Composer-Bibliothek passend wählen (siehe composer.lock)
-RUN pecl install mongodb-1.21.0 apcu imagick smbclient sqlsrv pdo_sqlsrv \
+RUN pecl install mongodb apcu imagick smbclient sqlsrv pdo_sqlsrv \
     && docker-php-ext-enable \
        mongodb \
        apcu \
@@ -88,6 +87,10 @@ RUN echo "pm.max_children = 500" >> /usr/local/etc/php-fpm.d/www.conf.default \
 RUN cp /usr/local/etc/php/php.ini-development /usr/local/etc/php/php.ini \
     && sed -i -e 's/^ *memory_limit.*/memory_limit = 512M/g' \
        /usr/local/etc/php/php.ini
+
+RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
+ && php composer-setup.php --filename=composer --install-dir=/usr/bin \
+ && php -r "unlink('composer-setup.php');"
 
 ENV TUBEE_PATH=/usr/share/tubee
 ENV TUBEE_CONFIG_DIR=/etc/tubee

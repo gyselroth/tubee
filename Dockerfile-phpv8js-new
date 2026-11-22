@@ -45,7 +45,7 @@ RUN --mount=type=cache,target=/usr/local/src/v8/out.gn \
   && cp -R include /opt/v8/
 
 # ---------- Stage 2: Endimage ----------
-FROM --platform=linux/amd64 php:8.4-fpm
+FROM --platform=linux/amd64 php:8.3-fpm
 
 COPY --from=v8-build /opt/v8 /opt/v8
 
