@@ -152,11 +152,6 @@ class Sync extends AbstractJob
                     $body = "Hi there\n\nThe sync process on collections [$collections] and endpoints [$endpoints] failed. Check tubee log for further information";
 
                     break;
-                case JobInterface::STATUS_CANCELED:
-                    $subject = '['.$namespace.']: sync process canceled';
-                    $body = "Hi there\n\nThe sync process on collections [$collections] and endpoints [$endpoints] was canceled. Check tubee log for further information";
-
-                    break;
                 case JobInterface::STATUS_TIMEOUT:
                     $subject = '['.$namespace.']: sync process ran into timeout';
                     $body = "Hi there\n\nThe sync process on collections [$collections] and endpoints [$endpoints] ran into a timeout.";
